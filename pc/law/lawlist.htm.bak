@@ -45,22 +45,22 @@
 <body>
 	<div id="container">
 		<header>
-  		<h1 align="center">下载</h1>
+  		<h1 align="center">法律</h1>
   	</header>
   	<section class="main">
 			<div id="div1">
 				<ul>
-					<li><a href="https://www.telerik.com/download/fiddler">fiddler官方版</a></li>
-					<li><a href="http://www.telerik.com/docs/default-source/fiddler/addons/fiddlercertmaker.exe?sfvrsn=2">Fiddler证书生成器</a></li>
-					<li><a href="#about">java</a></li>
-					<li><a href="#contact">android</a></li>
-					<li><a href="#contact">smali</a></li>
-					<li><a href="#contact">linux</a></li>
-					<li><a href="#contact">html</a></li>
-					<li><a href="#contact">多媒体</a></li>
-					<li><a href="#contact">小视频</a></li>
-					<li><a href="#contact">下载</a></li>
-					<li><a href="#contact">留言板</a></li>
+					<li><a href="law001.html">law</a></li>
+					<li><a href="law001.html">law</a></li>
+					<li><a href="law001.html">law</a></li>
+					<li><a href="law001.html">law</a></li>
+					<li><a href="law001.html">law</a></li>
+					<li><a href="law001.html">law</a></li>
+					<li><a href="law001.html">law</a></li>
+					<li><a href="law001.html">law</a></li>
+					<li><a href="law001.html">law</a></li>
+					<li><a href="law001.html">law</a></li>
+					<li><a href="law001.html">law</a></li>
 				</ul>
 			</div>
 		</section>
