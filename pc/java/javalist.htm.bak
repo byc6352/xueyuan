@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<title>雪原的博客</title>
+		<style>
+			*{
+    		margin: 0;
+    		padding: 0;
+			}
+			html,body{
+    		height: 100%;
+			}
+			#container{
+    		display: flex;
+    		flex-direction: column;
+    		height: 100%;
+			}
+			header{
+    		background: #999;
+    		flex: 0 0 auto;
+			}
+			.main{
+    		background: orange;
+    		flex: 1 0 auto;
+			}
+			footer{
+    		background: #333;
+    		flex: 0 0 auto;
+			}
+				ul,li{
+				height:40px;
+			}
+			a{
+				font-weight:bold;
+				color:#000000;
+			}
+				#div1{
+				width:1100px;
+				height:1100px;
+				margin:0 auto;
+			}
+		</style>
+	</head>
+
+<body>
+	<div id="container">
+		<header>
+  		<h1 align="center">java</h1>
+  	</header>
+  	<section class="main">
+			<div id="div1">
+				<ul>
+					<li><a href="java001.html">SpringMvc入门</a></li>
+					<li><a href="https://blog.csdn.net/weixin_41968788/article/details/83590848">spring(五).基于Spring MVC的前后端分离开发</a></li>
+					<li><a href="java003.html">eclipse中没有SERVER的解决办法</a></li>
+					<li><a href="https://jingyan.baidu.com/article/e5c39bf5c773cb39d7603307.html">调整CMD窗口显示的行数</a></li>
+					<li><a href="https://mvnrepository.com/artifact/org.springframework/spring-webmvc">Spring Web MVC</a></li>
+					<li><a href="java006.html">获取手机IMEI</a></li>
+					<li><a href="java007.html">android 简单socket收发字符串示例</a></li>
+					<li><a href="java008.html">如何生成唯一的Android设备ID？</a></li>
+					<li><a href="java009.html">fidder配合夜神模拟器进行抓包</a></li>
+					<li><a href="java010.html">Fiddler证书安装（查看HTTPS）</a></li>
+					<li><a href="java011.html">留言板</a></li>
+				</ul>
+			</div>
+		</section>
+		<footer>
+			<h3 align="center">本站资源大部分从网上收集而来，如有侵权，还望告知，定将立即纠正！</h3>
+		</footer>
+	</div>
+</body>
+</html>

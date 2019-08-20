@@ -1,0 +1,23 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>maven依赖的添加</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><div id="article_content" class="article_content clearfix">
+
+
+<div class="htmledit_views" id="content_views">
+<p>maven可是个管理jar依赖的好玩意，不用再关心导这个jar包那个jar包，这个jar包是谁家的，和谁有啥关系。有了maven，简简单单就搞定，下面以eclipse为例，在一个springboot项目中，使用轻松加愉快的maven依赖~</p><p>以eclipse为例，下载spring插件就不在赘述，本文只讲讲如何在网上查找依赖并copy到本地pom中，开始吧~</p><p>1.百度搜索一下，不用多说你懂得，搜索maven 响当当第一个网站就是了~<br></p>
+<p><a href="https://mvnrepository.com/artifact/org.springframework/spring-webmvc">Spring Web MVC</a></p>
+<p><img src="https://img-blog.csdn.net/20180710163755405?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM3NTI1ODk5/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt=""><br></p><p>2.然后输入你想要的jar包依赖，就是jar名称~然后单击search搜索，比如我想用codec</p><p><img src="https://img-blog.csdn.net/2018071016384967?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM3NTI1ODk5/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt=""><br></p><p>3.然后，选择你想要的那个jar来源地，这里有很多的来源，根据需求找到想要的，并单击进去</p><p><img src="https://img-blog.csdn.net/2018071016403812?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM3NTI1ODk5/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt=""><br></p><p>4.然后就是这个jar的历史记录了，有很多版本，我们选择一个版本号单击下~</p><p><img src="https://img-blog.csdn.net/20180710164144700?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM3NTI1ODk5/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt=""><br></p><p>5.Duang，出来了，就是下面这段代码，我们复制这段xml</p><p><img src="https://img-blog.csdn.net/20180710164251693?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM3NTI1ODk5/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt=""><br></p><p>6.打开你心爱的ide，我的心爱是eclipse，找到你的pom文件，并打开，咔嚓，粘贴在依赖标签&lt;dependencies&gt;&lt;/dependencies&gt;里头</p><p><img src="https://img-blog.csdn.net/20180710164338588?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM3NTI1ODk5/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt=""><br></p><p>7.保存，一瞬间，就下载到本地库了，看下图，轻松愉快~</p><p><img src="https://img-blog.csdn.net/20180710164616129?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM3NTI1ODk5/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt=""><br></p><p>当然，如果遇到保存后依赖爆红，有可能是你电脑没联网，或者jar不存在，这时就需要手动下载。</p>                                    </div>
+                    </div>
+</div>
+</body>
+
+</html>

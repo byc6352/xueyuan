@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>eclipse中没有SERVER的解决办法</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><div id="article_content" class="article_content clearfix">
+
+<div id="content_views" class="markdown_views prism-github-gist">
+                                            <p>用eclipese写网页很多时候需要配置tomcat，但有些朋友跟着网上的教程配置发现eclipse-&gt;【Window】-&gt;【Preferences】里没有【server】从而配置不了Runtime Environment。所以需要通过eclipse进行安装。<br>
+下面给出解决办法<br>
+首先，获取你的eclipse的版本类型，点击【help】-&gt;【about eclipse IDE】<br>
+<img src="https://img-blog.csdn.net/20181023164532781?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzQyMjM1NQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt=""></p>
+<p>记下你的eclipse的版本号<br>
+<img src="https://img-blog.csdn.net/2018102316461075?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzQyMjM1NQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt=""><br>
+关闭页面，点击【help】-&gt;【Install New Software…】<br>
+<img src="https://img-blog.csdn.net/2018102316495085?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzQyMjM1NQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt=""><br>
+点击【add】<br>
+<img src="https://img-blog.csdn.net/20181023165136973?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzQyMjM1NQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt=""><br>
+如下填写，name里写的是你eclipse的版本号，并且注意location后的版本号<img src="https://img-blog.csdn.net/20181023170224853?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzQyMjM1NQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt=""><br>
+</p><p>再点击Add按钮，找到选项“Web,XML, Java EE and OSGi Enterprise Development”选项下“JST Server AdaptersExtensions”，进行勾选。然后点击下一步Next按钮。</p>
+<br>
+</div></div><img src="https://img-blog.csdn.net/20181023170300826?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzQyMjM1NQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="">
+<br>
+<p><img src="https://img-blog.csdnimg.cn/20190819085509872.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2J5YzYzNTI=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>
+<br><br>
+<img src="https://img-blog.csdnimg.cn/20190819085549262.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2J5YzYzNTI=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>
+<br><br>
+<img src="https://img-blog.csdnimg.cn/20190819085615184.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2J5YzYzNTI=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>
+<br></p>
+<p>然后再下载依赖，等加载完成以后，点击Restart Now按钮，重启eclipse软件。会发现已经有了Sever选项，就可以正常使用了哦。</p>
+<p><img src="https://img-blog.csdnimg.cn/2019081908564014.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2J5YzYzNTI=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>
+<br></p>
+
+
+
+</div>
+</body>
+
+</html>
