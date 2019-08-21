@@ -1,0 +1,56 @@
+﻿<HTML><HEAD><TITLE>Tomcat下载以及安装、eclipse工具配置tomcat9的具体步骤以及注意事项！！！</TITLE>
+<META charset=utf-8>
+<META name=viewport content="width=device-width, initial-scale=1.0"><LINK rel=stylesheet href="https://stackedit.io/style.css"></HEAD>
+<BODY class=stackedit>
+<DIV style=" OVERFLOW: hidden" id=article_content class="article_content clearfix">
+<DIV class=article-copyright><SPAN class=creativecommons><A href="http://creativecommons.org/licenses/by-sa/4.0/" rel=license></A><SPAN>版权声明：本文为博主原创文章，遵循<A href="http://creativecommons.org/licenses/by-sa/4.0/" target=_blank> CC 4.0 by-sa </A>版权协议，转载请附上原文出处链接和本声明。 </SPAN>
+<DIV class=article-source-link2222>本文链接：<A href="https://blog.csdn.net/u014543872/article/details/79568712">https://blog.csdn.net/u014543872/article/details/79568712</A> </DIV></SPAN></DIV><LINK rel=stylesheet href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css"><LINK rel=stylesheet href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css">
+<DIV id=content_views class=htmledit_views jQuery191029150814368801514="18">
+<H2>一.Tomcat是什么</H2>
+<P>&nbsp; &nbsp; &nbsp; &nbsp;<STRONG><SPAN style="COLOR: #333333">Tomcat 服务器是一个免费的开放源代码的Web 应用服务器，属于轻量级应用</SPAN><A href="https://baike.so.com/doc/4487696-4696885.html" rel=nofollow data-token="5217fa4b0360e2ccd5056d4c51205236">服务器</A><SPAN style="COLOR: #333333">，在中小型系统和并发访问用户不是很多的场合下被普遍使用，是开发和调试JSP 程序的首选。对于一个初学者来说，可以这样认为，当在一台机器上配置好Apache 服务器，可利用它响应</SPAN><A href="https://baike.so.com/doc/5869876-6082735.html" rel=nofollow data-token="2998160f42f3dc28562e407a3cab442b">HTML</A></STRONG><STRONG><SPAN style="COLOR: #333333">(标准通用标记语言下的一个应用)页面的访问请求。实际上Tomcat是Apache 服务器的扩展，但运行时它是独立运行的，所以当你运行tomcat 时，它实际上作为一个与Apache 独立的进程单独运行的。</SPAN><SPAN style="COLOR: #ff6666">学习JavaWeb</SPAN><SPAN style="COLOR: #ff6666">开发一般都使用Tomcat服务器，该服务器支持全部JSP以及Servlet规范</SPAN></STRONG></P>
+<H2>二.Tomcat的下载安装</H2>
+<P>&nbsp; &nbsp; &nbsp; 进入官网:<A href="http://http//tomcat.apache.org/" rel=nofollow data-token="cf9164d689f114e1a33bffed0277769d">点击打开链接</A>(<A href="http://tomcat.apache.org/" rel=nofollow data-token="93c604d11e34c0bdda03456d30889e18">http://tomcat.apache.org/</A>&nbsp;)</P>
+<P>&nbsp; &nbsp; &nbsp;<SPAN style="COLOR: #ff0000"> 在这里我们选择做新版的tomcat 9.0版本</SPAN></P>
+<P><SPAN style="COLOR: #ff0000">&nbsp; &nbsp;<IMG class=has alt="" src="images/java00701.jpg"></SPAN></P>
+<P>&nbsp;根据自己电脑的系统选择，这里我们选择window x64版本</P>
+<P><IMG class=has alt="" src="images/java00702.jpg"></P>
+<P><STRONG><U>（注意：最新版本tomcat都是zip版的，也就是说下载之后直接就解压就好了），当我们把压缩包下载下来后，我们解压到一个文件夹，<SPAN style="COLOR: #ff0000">需要注意文件夹的命名不能是中文</SPAN>！！！</U></STRONG></P>
+<P>&nbsp; 找到目录bin下的startup.bat，启动Tomcat；shutdown.bat：关闭Tomcat。</P>
+<H2>三.Tomcat环境变量的配置</H2>
+<P>&nbsp; &nbsp;</P>
+<H3>右击，计算机——属性——高级系统设置——打开环境变量的配置窗口，在系统环境变量一栏点击新建。变量名为<SPAN style="COLOR: #454545">CATALINA_HOME&nbsp;</SPAN></H3>
+<P><SPAN style="COLOR: #454545"><IMG class=has alt="" src="images/java00703.jpg"></SPAN></P>
+<P>然后<STRONG>在系统环境变量一栏点击新建。变量名为</STRONG><SPAN style="COLOR: #454545"><STRONG>CATALINA_BASE</STRONG></SPAN></P>
+<P><SPAN style="COLOR: #454545"><STRONG>&nbsp;<IMG class=has alt="" src="images/java00704.jpg"></STRONG></SPAN></P>
+<P>&nbsp; 最后一步 -<STRONG>-<SPAN style="COLOR: #454545">找到系统变量中的Path，在Path中新增“</SPAN><SPAN style="COLOR: #333333">%CATALINA_HOME%\lib;%CATALINA_HOME%\bin”的环境变量，注意“;”分号；</SPAN></STRONG></P>
+<P>&nbsp;</P>
+<P><STRONG>三.验证是否安装成功</STRONG></P>
+<P><STRONG>&nbsp; &nbsp; &nbsp;</STRONG></P>
+<P><SPAN style="COLOR: #333333"><STRONG>①进入Tomcat目录的bin目录；</STRONG></SPAN><SPAN style="COLOR: #333333"><STRONG>找到</STRONG></SPAN><SPAN style="COLOR: #333333">“startup”命令或者“startup.bat”命令：</SPAN></P>
+<P><SPAN style="COLOR: #333333"><STRONG><IMG class=has alt="" src="images/java00705.jpg"></STRONG></SPAN></P>
+<P><SPAN style="COLOR: #333333"><STRONG><SPAN style="COLOR: #333333">②双击startup,会弹出一下窗体：</SPAN></STRONG></SPAN></P>
+<P><SPAN style="COLOR: #333333"><STRONG><SPAN style="COLOR: #333333"><IMG class=has alt="" src="images/java00706.jpg"></SPAN></STRONG></SPAN></P>
+<P><SPAN style="COLOR: #454545"><STRONG>③<SPAN style="COLOR: #333333">在浏览器中输入“</SPAN><SPAN style="COLOR: #333333">127.0.0.1:8080</SPAN><SPAN style="COLOR: #333333">”或者“localhost:8080”，若出现下图所示，则代表安装成功</SPAN></STRONG></SPAN></P>
+<P><IMG class=has alt="" src="images/java00707.jpg"></P>
+<P>四.eclipse下配置tomcat9</P>
+<P>&nbsp; &nbsp;打开你的eclipse，在菜单栏找到-window-Preferences-Server</P>
+<P>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<IMG class=has alt="" src="images/java00708.jpg"></P>
+<BLOCKQUOTE>
+<P>&nbsp;</P>
+<P><IMG class=has alt="" src="images/java00709.jpg"></P>
+<P><SPAN style="COLOR: #454545"><STRONG><SPAN style="COLOR: #333333"><IMG class=has alt="" src="images/java00710.jpg"></SPAN></STRONG></SPAN></P>
+<P>&nbsp;</P>
+<P><SPAN style="COLOR: #333333"><STRONG>接下来</STRONG></SPAN></P>
+<P><SPAN style="COLOR: #333333"><STRONG><IMG class=has alt="" src="images/java00711.jpg"></STRONG></SPAN></P>
+<P><SPAN style="COLOR: #333333"><STRONG>&nbsp;面板中 “click this to create a new server”超链接 ，或者在面板内部 右键 “new” 打开新增 Server 实例对话框</STRONG></SPAN></P>
+<P><SPAN style="COLOR: #333333"><STRONG><IMG class=has alt="" src="images/java00712.jpg"></STRONG></SPAN></P>
+<P><SPAN style="COLOR: #333333"><STRONG>根据页面内容选择你的Tomcat的版本，之后点击Finish就可以了</STRONG></SPAN></P>
+<P><SPAN style="COLOR: #333333"><STRONG>添加之后会显示下图所示</STRONG></SPAN></P>
+<P><SPAN style="COLOR: #333333"><STRONG><IMG class=has alt="" src="images/java00713.jpg"></STRONG></SPAN></P>
+<P><SPAN style="COLOR: #333333"><STRONG>这就说明的Tomcat配置已经好了</STRONG></SPAN></P>
+<P><SPAN style="COLOR: #333333"><STRONG>接下来运行测试一下</STRONG></SPAN></P>
+<P><SPAN style="COLOR: #333333"><STRONG><IMG class=has alt="" src="images/java00714.jpg"></STRONG></SPAN></P>
+<P><SPAN style="COLOR: #333333"><STRONG>以上就是本文的所有内容了，感谢您的浏览。</STRONG></SPAN></P>
+<P><SPAN style="COLOR: #333333"><STRONG>更多慕课优质课程请加QQ:2992648437</STRONG></SPAN></P>
+<P>&nbsp;</P>
+<P>&nbsp;</P></BLOCKQUOTE></DIV></DIV></BODY></HTML>

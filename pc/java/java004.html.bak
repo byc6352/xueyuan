@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tomcat下载以及安装、eclipse工具配置tomcat9的具体步骤以及注意事项！！！</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><div id="article_content" class="article_content clearfix">
+ <div class="article-copyright">
+ <span class="creativecommons">
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"></a>
+<span>版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank"> CC 4.0 by-sa </a>版权协议，转载请附上原文出处链接和本声明。 </span>
+</span><div class="article-source-link2222">
+本文链接：<a href="https://blog.csdn.net/u014543872/article/details/79568712">https://blog.csdn.net/u014543872/article/details/79568712</a>
+</div>
+            
+                    </div>
+                                                    
+                                        
+                <div class="htmledit_views" id="content_views">                                     
+<h2><a></a>一.Tomcat是什么</h2>
+</div></div><p>&nbsp; &nbsp; &nbsp; &nbsp;<strong><span>Tomcat 服务器是一个免费的开放源代码的Web 应用服务器，属于轻量级应用</span><a href="https://baike.so.com/doc/4487696-4696885.html" rel="nofollow">服务器</a><span>，在中小型系统和并发访问用户不是很多的场合下被普遍使用，是开发和调试JSP 程序的首选。对于一个初学者来说，可以这样认为，当在一台机器上配置好Apache 服务器，可利用它响应</span><a href="https://baike.so.com/doc/5869876-6082735.html" rel="nofollow">HTML</a></strong><strong><span>(标准通用标记语言下的一个应用)页面的访问请求。实际上Tomcat是Apache 服务器的扩展，但运行时它是独立运行的，所以当你运行tomcat 时，它实际上作为一个与Apache 独立的进程单独运行的。</span><span>学习JavaWeb</span><span>开发一般都使用Tomcat服务器，该服务器支持全部JSP以及Servlet规范</span></strong></p>
+<h2><a></a>二.Tomcat的下载安装</h2>
+<p>&nbsp; &nbsp; &nbsp; 进入官网:<a href="http://http//tomcat.apache.org/" rel="nofollow">点击打开链接</a>(<a href="http://tomcat.apache.org/" rel="nofollow">http://tomcat.apache.org/</a>&nbsp;)</p>
+<p>&nbsp; &nbsp; &nbsp;<span> 在这里我们选择做新版的tomcat 9.0版本</span></p>
+<p><span>&nbsp; &nbsp;<img alt="" class="has" src="//img-blog.csdn.net/20180315155006461"></span></p>
+<p>&nbsp;根据自己电脑的系统选择，这里我们选择window x64版本</p>
+<p><img alt="" class="has" src="//img-blog.csdn.net/20180315155418593"></p>
+<p><strong><u>（注意：最新版本tomcat都是zip版的，也就是说下载之后直接就解压就好了），当我们把压缩包下载下来后，我们解压到一个文件夹，<span>需要注意文件夹的命名不能是中文</span>！！！</u></strong></p>
+<p>&nbsp; 找到目录bin下的startup.bat，启动Tomcat；shutdown.bat：关闭Tomcat。</p>
+<h2><a></a>三.Tomcat环境变量的配置</h2>
+<p>&nbsp; &nbsp;</p>
+<h3><a></a>右击，计算机——属性——高级系统设置——打开环境变量的配置窗口，在系统环境变量一栏点击新建。变量名为<span>CATALINA_HOME&nbsp;</span></h3>
+<p><span><img alt="" class="has" src="//img-blog.csdn.net/20180315161553167"></span></p>
+<p>然后<strong>在系统环境变量一栏点击新建。变量名为</strong><span><strong>CATALINA_BASE</strong></span></p>
+<p><span><strong>&nbsp;<img alt="" class="has" src="//img-blog.csdn.net/20180315161656766"></strong></span></p>
+<p>&nbsp; 最后一步 -<strong>-<span>找到系统变量中的Path，在Path中新增“</span><span>%CATALINA_HOME%\lib;%CATALINA_HOME%\bin”的环境变量，注意“;”分号；</span></strong></p>
+<p>&nbsp;</p>
+<p><strong>三.验证是否安装成功</strong></p>
+<p><strong>&nbsp; &nbsp; &nbsp;</strong></p>
+<p><span><strong>①进入Tomcat目录的bin目录；</strong></span><span><strong>找到</strong></span><span>“startup”命令或者“startup.bat”命令：</span></p>
+<p><span><strong><img alt="" class="has" src="//img-blog.csdn.net/20180315162053349"></strong></span></p>
+<p><span><strong><span>②双击startup,会弹出一下窗体：</span></strong></span></p>
+<p><span><strong><span><img alt="" class="has" src="//img-blog.csdn.net/20180315162742815"></span></strong></span></p>
+<p><span><strong>③<span>在浏览器中输入“</span><span>127.0.0.1:8080</span><span>”或者“localhost:8080”，若出现下图所示，则代表安装成功</span></strong></span></p>
+<p><img alt="" class="has" src="//img-blog.csdn.net/2018031516312221"></p>
+<p>四.eclipse下配置tomcat9</p>
+<p>&nbsp; &nbsp;打开你的eclipse，在菜单栏找到-window-Preferences-Server</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<img alt="" class="has" src="//img-blog.csdn.net/20180315212417493"></p>
+<blockquote>
+<p>&nbsp;</p>
+</blockquote><p><img alt="" class="has" src="//img-blog.csdn.net/20180315212507960"></p>
+<p><span><strong><span><img alt="" class="has" src="//img-blog.csdn.net/20180315212522553"></span></strong></span></p>
+<p>&nbsp;</p>
+<p><span><strong>接下来</strong></span></p>
+<p><span><strong><img alt="" class="has" src="//img-blog.csdn.net/20180315212715792"></strong></span></p>
+<p><span><strong>&nbsp;面板中 “click this to create a new server”超链接 ，或者在面板内部 右键 “new” 打开新增 Server 实例对话框</strong></span></p>
+<p><span><strong><img alt="" class="has" src="//img-blog.csdn.net/2018031521281234"></strong></span></p>
+<p><span><strong>根据页面内容选择你的Tomcat的版本，之后点击Finish就可以了</strong></span></p>
+<p><span><strong>添加之后会显示下图所示</strong></span></p>
+<p><span><strong><img alt="" class="has" src="//img-blog.csdn.net/20180315213111943"></strong></span></p>
+<p><span><strong>这就说明的Tomcat配置已经好了</strong></span></p>
+<p><span><strong>接下来运行测试一下</strong></span></p>
+<p><span><strong><img alt="" class="has" src="//img-blog.csdn.net/20180315213522332"></strong></span></p>
+<p><span><strong>以上就是本文的所有内容了，感谢您的浏览。</strong></span></p>
+<p><span><strong>更多慕课优质课程请加QQ:1409232611</strong></span></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+                                    
+                    
+</div>
+</body>
+
+</html>
