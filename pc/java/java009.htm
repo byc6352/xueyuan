@@ -1,0 +1,224 @@
+﻿<HTML XMLNS:[default] = "http://www.w3.org/2000/svg" XMLNS:[default] http://www.w3.org/2000/svg = "http://www.w3.org/2000/svg"><HEAD><TITLE>java后台开发例子--使用Maven建立springmvc的web项目 - 2010yhh - CSDN博客</TITLE>
+<META charset=utf-8>
+<META name=viewport content="width=device-width, initial-scale=1.0"><LINK rel=stylesheet href="images/style.css"></HEAD>
+<BODY class=stackedit>
+<DIV class=stackedit__html>
+<DIV style="OVERFLOW: hidden" id=article_content class="article_content clearfix">
+<DIV class=article-copyright><SPAN class=creativecommons><A href="http://creativecommons.org/licenses/by-sa/4.0/" rel=license></A><SPAN>版权声明：本文为博主原创文章，遵循<A href="http://creativecommons.org/licenses/by-sa/4.0/" target=_blank> CC 4.0 by-sa </A>版权协议，转载请附上原文出处链接和本声明。 </SPAN>
+<DIV class=article-source-link2222>本文链接：<A href="https://blog.csdn.net/yhhyhhyhhyhh/article/details/77102228">https://blog.csdn.net/yhhyhhyhhyhh/article/details/77102228</A> </DIV></SPAN></DIV><LINK rel=stylesheet href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css">
+<DIV id=content_views class="markdown_views prism-atelier-sulphurpool-light" jQuery19103170053028369391="17"><!-- flowchart 箭头图标 勿删 --><svg style="DISPLAY: none" xmlns="http://www.w3.org/2000/svg"><path style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0)" id=raphael-marker-block stroke-linecap="round" d="M5,0 0,2.5 5,5z"></path></svg>
+<H1><A id=javaMavenspringmvcweb_0></A>java后台开发例子–使用Maven建立springmvc的web项目</H1>
+<P></P>
+<DIV class=toc>
+<H3>文章目录</H3>
+<UL>
+<LI><A href="#javaMavenspringmvcweb_0" rel=nofollow data-token="ae7230e454d7be9dbc3147376d89dc0b">java后台开发例子--使用Maven建立springmvc的web项目</A> 
+<UL>
+<LI><A href="#1_17" rel=nofollow data-token="2a19e5f68d1660e5b8cd0e3a7a54d7f6">1.测试</A> 
+<LI><A href="#2_35" rel=nofollow data-token="f96877131415eb505d0ee15fc3a224e2">2.详细配置</A> 
+<UL>
+<LI><A href="#21_37" rel=nofollow data-token="e21e39a06c0fa65a251d82dad07faa91">2.1建立工程结构：</A> 
+<LI><A href="#22jarjdk_58" rel=nofollow data-token="f3732536665ad6e61266a5bd9229597c">2.2添加jar包及配置jdk版本</A> 
+<LI><A href="#23web_127" rel=nofollow data-token="07651de3af809d34426c3f4d9b1adc5d">2.3修改web版本：</A> 
+<LI><A href="#24_142" rel=nofollow data-token="734cfe54b574058bc3755f34cdeffe5c">2.4建立项目</A> 
+<LI><A href="#25_273" rel=nofollow data-token="702ec816471716519ad90454037d8d5a">2.5更新，运行测试</A></LI></UL></LI></UL></LI></UL></DIV><BR><STRONG>环境：</STRONG> 
+<P></P>
+<BLOCKQUOTE>
+<P>win7；jdk1.8_121；tomact8.0；</P>
+<P>需要安装及配置好jdk，mysql。</P></BLOCKQUOTE>
+<P><STRONG>前言：</STRONG></P>
+<BLOCKQUOTE>
+<P>maven管理工程，非常方便，但是由于eclipse新建web项目的jdk和web版本比较低，在eclipse下利用maven建立springmvc的web项目，网上的教程都较为复杂，且配置经常出现请求不到或扫描不到control的情况，这里记录一下eclipse下利用maven建立springmvc的web项目最简单的一个例子。</P></BLOCKQUOTE>
+<P>完整代码下载：</P>
+<P><A href="http://download.csdn.net/download/yhhyhhyhhyhh/9930009" rel=nofollow data-token="0563cf686110f11b98aee48567e49254">java后台开发例子–使用Maven建立springmvc的web项目</A></P>
+<H2><A id=1_17></A>1.测试</H2>
+<P><STRONG>最终的例子的工程结构：</STRONG></P>
+<P><IMG alt=这里写图片描述 src="images/java00900.jpg"></P>
+<P><STRONG>测试效果：</STRONG></P>
+<P><IMG alt=这里写图片描述 src="images/java00901.jpg"></P>
+<P><IMG alt=这里写图片描述 src="images/java00902.jpg"></P>
+<P><STRONG>maven install:</STRONG></P>
+<P><IMG alt=这里写图片描述 src="images/java00903.jpg"></P>
+<H2><A id=2_35></A>2.详细配置</H2>
+<H3><A id=21_37></A>2.1建立工程结构：</H3>
+<P>使用eclipse建立的maven web项目不符合正常的目录结构，需要手动创建一些文件夹。</P>
+<P><IMG alt=这里写图片描述 src="images/java00904.jpg"><BR><IMG alt=这里写图片描述 src="images/java00905.jpg"></P>
+<P>修改jdk版本，显示maven新建web项目自带的文件夹（<STRONG>这里修改后，还需要在pom.xmL中配置，否则更新工程后，jdk版本又恢复默认的</STRONG>）：</P>
+<P><IMG alt=这里写图片描述 src="images/java00906.jpg"></P>
+<P>项目右键建个source folder（测试用的，其实不建也不影响）：</P>
+<P><IMG alt=这里写图片描述 src="images/java00907.jpg"></P>
+<P>删除自动生成的index.jsp，在webapp\WEB-INF下建立views。</P>
+<H3><A id=22jarjdk_58></A>2.2添加jar包及配置jdk版本</H3>
+<P>复制下面pom.xml文件内容或者在pom.xml中添加需要的spring，servlet，common-logging jar包。</P>
+<P><STRONG>注意：下面的pom.xml配置jdk版本为1.8了</STRONG></P><PRE><CODE>&lt;project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"&gt;
+  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+  &lt;groupId&gt;com.test&lt;/groupId&gt;
+  &lt;artifactId&gt;TestMaven&lt;/artifactId&gt;
+  &lt;packaging&gt;war&lt;/packaging&gt;
+  &lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+  &lt;name&gt;TestMaven Maven Webapp&lt;/name&gt;
+  &lt;url&gt;http://maven.apache.org&lt;/url&gt;
+  &lt;properties&gt;
+      &lt;spring.version&gt;4.3.0.RELEASE&lt;/spring.version&gt;
+  &lt;/properties&gt;
+  &lt;dependencies&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;junit&lt;/groupId&gt;
+      &lt;artifactId&gt;junit&lt;/artifactId&gt;
+      &lt;version&gt;3.8.1&lt;/version&gt;
+      &lt;scope&gt;test&lt;/scope&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-core&lt;/artifactId&gt;
+        &lt;version&gt;${spring.version}&lt;/version&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-web&lt;/artifactId&gt;
+        &lt;version&gt;${spring.version}&lt;/version&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-webmvc&lt;/artifactId&gt;
+        &lt;version&gt;${spring.version}&lt;/version&gt;
+    &lt;/dependency&gt;
+    
+    &lt;dependency&gt;
+        &lt;groupId&gt;javax.servlet&lt;/groupId&gt;
+        &lt;artifactId&gt;javax.servlet-api&lt;/artifactId&gt;
+        &lt;version&gt;3.1.0&lt;/version&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+  &lt;build&gt;
+    &lt;plugins&gt;
+&lt;plugin&gt;
+&lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+&lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+&lt;configuration&gt;
+&lt;source&gt;1.8&lt;/source&gt;
+&lt;target&gt;1.8&lt;/target&gt;
+&lt;/configuration&gt;
+&lt;/plugin&gt;
+&lt;/plugins&gt;
+    &lt;finalName&gt;TestMaven&lt;/finalName&gt;
+  &lt;/build&gt;
+&lt;/project&gt;
+</CODE></PRE>
+<P>或者一个一个的添加在pom.xml中添加需要的spring，servlet，common-logging jar包。（<STRONG>手动添加jar包需要pom.xml配置jdk版本，否则update更新完后，需要在build path中设置jdk版本，麻烦</STRONG>）<BR>如图添加依赖：<BR><IMG alt=这里写图片描述 src="images/java00908.jpg"></P>
+<H3><A id=23web_127></A>2.3修改web版本：</H3>
+<P><STRONG>修改前：</STRONG><BR><IMG alt=这里写图片描述 src="images/java00909.jpg"></P>
+<P><STRONG>修改后;</STRONG></P>
+<P><IMG alt=这里写图片描述 src="images/java00910.jpg"></P>
+<P><STRONG>如果不修改会出现红叉且运行失败：</STRONG></P>
+<P><IMG alt=这里写图片描述 src="images/java00911.jpg"></P>
+<H3><A id=24_142></A>2.4建立项目</H3>
+<P>上述工程结构建立及配置完后，进入项目内容方面。</P>
+<P>建立control类；建立spring配置文件，修改web.xml，建立视图jsp文件等等</P>
+<P><STRONG>src\main\java下：ManygeSystem.java</STRONG></P><PRE><CODE>package com.test;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+@Controller
+public class ManygeSystem {
+	@RequestMapping("/Login")  
+	 public ModelAndView login(@RequestParam("username") String userName, 
+			 @RequestParam("password") String passWord) {  
+		    ModelAndView mv = new ModelAndView("menu");//指定视图
+	        mv.addObject("name", userName);
+	        return mv;
+	  }
+}
+</CODE></PRE>
+<P><STRONG>spring DispatcherServlet配置文件;</STRONG></P>
+<P>src\main\resources：springContext.xml</P><PRE><CODE>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.0.xsd"&gt;
+    &lt;!-- spring扫描 --&gt;
+    &lt;context:component-scan base-package="com.test"/&gt;
+    &lt;!-- 视图页面配置 --&gt;
+    &lt;bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"&gt;
+     &lt;property name="prefix" value="/WEB-INF/views/" /&gt;  
+        &lt;property name="suffix" value=".jsp" /&gt;  
+    &lt;/bean&gt;
+&lt;/beans&gt;
+</CODE></PRE>
+<P><STRONG>web.xml（这里是3.1版本）：</STRONG></P><PRE><CODE>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xmlns="http://xmlns.jcp.org/xml/ns/javaee" 
+xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee 
+http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1"&gt;
+  &lt;display-name&gt;TestMaven&lt;/display-name&gt;
+    &lt;welcome-file-list&gt;
+    &lt;welcome-file&gt;/WEB-INF/views/index.jsp&lt;/welcome-file&gt;
+  &lt;/welcome-file-list&gt;
+  &lt;servlet&gt;
+      &lt;servlet-name&gt;dispatcher&lt;/servlet-name&gt;
+      &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;
+          &lt;init-param&gt;
+             &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;
+          &lt;param-value&gt;classpath:springContext.xml&lt;/param-value&gt;
+      &lt;/init-param&gt;
+      &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
+  &lt;/servlet&gt;
+  &lt;servlet-mapping&gt;
+      &lt;servlet-name&gt;dispatcher&lt;/servlet-name&gt;
+      &lt;url-pattern&gt;/&lt;/url-pattern&gt;
+  &lt;/servlet-mapping&gt;
+  &lt;context-param&gt;
+      &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;
+      &lt;param-value&gt;classpath:springContext.xml&lt;/param-value&gt;
+  &lt;/context-param&gt;
+  &lt;listener&gt;
+      &lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;/listener-class&gt;
+  &lt;/listener&gt;
+&lt;/web-app&gt;
+</CODE></PRE>
+<P><STRONG>views下的视图文件（测试）</STRONG></P>
+<P>index.jsp</P><PRE><CODE>&lt;%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%&gt;
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;
+&lt;title&gt;登录&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;form action="Login" method="post"&gt;
+&lt;div&gt;
+账号:&lt;input type="text" name="username"/&gt;&lt;br/&gt;
+密码:&lt;input type="text" name="password"/&gt;&lt;br/&gt;
+&lt;input type="submit" value="Login"/&gt;
+&lt;/div&gt;
+&lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</CODE></PRE>
+<P>menu.jsp</P><PRE><CODE>&lt;%@ page language="java" contentType="text/html; charset=UTF-8" 
+    pageEncoding="UTF-8"%&gt; 
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"&gt;
+&lt;html&gt; 
+&lt;head&gt; 
+&lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt; 
+&lt;title&gt;java web开发mvc测试&lt;/title&gt; 
+&lt;/head&gt; 
+&lt;body&gt;
+      &lt;h1&gt;&lt;font color="green"&gt;${name}  &lt;/font&gt; 欢迎你！&lt;/h1&gt;
+&lt;/body&gt; 
+&lt;/html&gt;
+</CODE></PRE>
+<H3><A id=25_273></A>2.5更新，运行测试</H3>
+<P>上述文件建立或修改后，都要保存。</P>
+<P>右键项目，maven ；update（<STRONG>一定要更新</STRONG>，所有的红叉消失，如果不在2.3中修改web版本，还会有红叉）。然后运行会得到1中的测试效果。</P>
+<P>**注意：**常见运行失败问题,请求不到control</P>
+<P>（1）修改2.3中的web版本，与web.xml中的web版本一致。（一般都是直接从别的工程复制过来，然后修改）</P>
+<P>（2）更新后maven install 失败，未在pom.xml中配置jdk版本，这样更新后maven web项目默认的jdk版本为1.5较低。</P>
+<P>（3）<STRONG>一般修改后，运行前要更新一下工程</STRONG>。如果tomact启动失败需要重启eclipse或者删除当前server，重新建个server或者删除tomact webapp下生成的项目文件。</P></DIV><LINK rel=stylesheet href="https://csdnimg.cn/release/phoenix/mdeditor/markdown_views-e44c3c0e64.css"></DIV></DIV></BODY></HTML>

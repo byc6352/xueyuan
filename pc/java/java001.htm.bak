@@ -1,0 +1,130 @@
+﻿<HTML><HEAD><TITLE>Spring MVC(一)----eclipse通过Maven创建一个Spring MVC项目 - fendo - CSDN博客</TITLE>
+<META charset=utf-8>
+<META name=viewport content="width=device-width, initial-scale=1.0"><LINK rel=stylesheet href="images/style.css"></HEAD>
+<BODY class=stackedit>
+<DIV style="OVERFLOW: hidden" id=article_content class="article_content clearfix">
+<DIV class=article-copyright><SPAN class=creativecommons><A href="http://creativecommons.org/licenses/by-sa/4.0/" rel=license></A><SPAN>版权声明：本文为博主原创文章，遵循<A href="http://creativecommons.org/licenses/by-sa/4.0/" target=_blank> CC 4.0 by-sa </A>版权协议，转载请附上原文出处链接和本声明。 </SPAN>
+<DIV class=article-source-link2222>本文链接：<A href="https://blog.csdn.net/u011781521/article/details/53021435">https://blog.csdn.net/u011781521/article/details/53021435</A> </DIV></SPAN></DIV><LINK rel=stylesheet href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css"><LINK rel=stylesheet href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css">
+<DIV id=content_views class=htmledit_views jQuery191023856846948684307="17">
+<P><SPAN style="FONT-SIZE: 24px"><STRONG>一、新建工程</STRONG></SPAN></P>
+<P><SPAN style="FONT-SIZE: 24px"><STRONG><BR></STRONG></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">在eclipse中新建一个Maven项目</SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><IMG alt="" src="images/java00100.jpg"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><STRONG>注:Eclipse 需要安装maven插件</STRONG></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><STRONG><BR></STRONG></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">然后选择webapp</SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><IMG alt="" src="images/java00101.jpg"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">下一步</SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><IMG alt="" src="images/java00102.jpg"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">点击完成</SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">一个完整的项目</SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><IMG alt="" src="images/java00103.jpg"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">这里报jsp文件的错</SPAN></P>
+<P><BR></P>
+<P><SPAN style="FONT-SIZE: 18px"><STRONG><IMG alt="" src="images/java00104.jpg"><BR></STRONG></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><STRONG><BR></STRONG></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">The superclass "javax.servlet.http.HttpServlet" was not found on the Java Build Path<BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 24px"><STRONG><BR></STRONG></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">这是由于web工程类中没有添加Web 容器Runtime相关类导致。</SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">解决方法很简单，在pom.xml中添加如下配置即可：<BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">&lt;dependency&gt;<BR><SPAN></SPAN>&lt;groupId&gt;javax.servlet&lt;/groupId&gt;<BR><SPAN></SPAN>&lt;artifactId&gt;servlet-api&lt;/artifactId&gt;<BR><SPAN></SPAN>&lt;version&gt;2.5&lt;/version&gt;<BR><SPAN></SPAN>&lt;scope&gt;provided&lt;/scope&gt;<BR>&lt;/dependency&gt;<BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">添加Source文件夹,由于默认情况下,下面的三个文件是不显示的<BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">src/main/java</SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">src/test/java&nbsp;</SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">src/test/resources</SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px">右键项目根目录点击Build Path</SPAN><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><BR></SPAN></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><IMG alt="" src="images/java00105.jpg"><BR></SPAN></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><BR></SPAN></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px">去掉上面的勾，那</SPAN></SPAN><SPAN style="FONT-SIZE: 18px">三个文件夹就出来了。</SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><IMG alt="" src="images/java00106.jpg"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><BR></P>
+<P><BR></P>
+<P><SPAN style="FONT-SIZE: 24px"><STRONG>二、配置SpringMVC</STRONG></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">配置web.xml，使其支持springmvc特性，主要配置两处，一个是ContextLoaderListener，一个是DispatcherServlet。代码如下：<BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">&lt;web-app&gt;<BR>&nbsp; &lt;display-name&gt;Archetype Created Web Application&lt;/display-name&gt;<BR>&nbsp;&nbsp;<BR>&nbsp;&nbsp;<BR>&nbsp; <SPAN></SPAN>&lt;!-- 字符集 过滤器 &nbsp;--&gt;<BR><SPAN></SPAN>&lt;filter&gt;<BR><SPAN></SPAN>&lt;filter-name&gt;CharacterEncodingFilter&lt;/filter-name&gt;<BR><SPAN></SPAN>&lt;filter-class&gt;org.springframework.web.filter.CharacterEncodingFilter&lt;/filter-class&gt;<BR><SPAN></SPAN>&lt;init-param&gt;<BR><SPAN></SPAN>&lt;param-name&gt;encoding&lt;/param-name&gt;<BR><SPAN></SPAN>&lt;param-value&gt;UTF-8&lt;/param-value&gt;<BR><SPAN></SPAN>&lt;/init-param&gt;<BR><SPAN></SPAN>&lt;init-param&gt;<BR><SPAN></SPAN>&lt;param-name&gt;forceEncoding&lt;/param-name&gt;<BR><SPAN></SPAN>&lt;param-value&gt;true&lt;/param-value&gt;<BR><SPAN></SPAN>&lt;/init-param&gt;<BR><SPAN></SPAN>&lt;/filter&gt;<BR><SPAN></SPAN>&lt;filter-mapping&gt;<BR><SPAN></SPAN>&lt;filter-name&gt;CharacterEncodingFilter&lt;/filter-name&gt;<BR><SPAN></SPAN>&lt;url-pattern&gt;/*&lt;/url-pattern&gt;<BR><SPAN></SPAN>&lt;/filter-mapping&gt;<BR>&nbsp;&nbsp;<BR>&nbsp; &nbsp; &lt;!-- 加载Springmvc.xml --&gt;<BR><SPAN></SPAN>&lt;servlet&gt;<BR><SPAN></SPAN>&lt;servlet-name&gt;springDispatcherServlet&lt;/servlet-name&gt;<BR><SPAN></SPAN>&lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;<BR><SPAN></SPAN>&lt;init-param&gt;<BR><SPAN></SPAN>&lt;param-name&gt;<SPAN style="COLOR: #ff0000">contextConfigLocation</SPAN>&lt;/param-name&gt;<BR><SPAN></SPAN>&lt;!-- &lt;param-value&gt;classpath:springmvc.xml&lt;/param-value&gt; --&gt;<BR><SPAN></SPAN>&lt;param-value&gt;/WEB-INF/springmvc.xml&lt;/param-value&gt;<BR><SPAN></SPAN>&lt;/init-param&gt;<BR><SPAN></SPAN>&lt;load-on-startup&gt;1&lt;/load-on-startup&gt;<BR><SPAN></SPAN>&lt;/servlet&gt;<BR><BR><BR><SPAN></SPAN>&lt;!-- Map all requests to the DispatcherServlet for handling --&gt;<BR><SPAN></SPAN>&lt;servlet-mapping&gt;<BR><SPAN></SPAN>&lt;servlet-name&gt;<SPAN style="COLOR: #ff0000">springDispatcherServlet</SPAN>&lt;/servlet-name&gt;<BR><SPAN></SPAN>&lt;url-pattern&gt;/&lt;/url-pattern&gt;<BR><SPAN></SPAN>&lt;/servlet-mapping&gt;<BR>&nbsp;&nbsp;<BR>&lt;/web-app&gt;<BR></SPAN></P>
+<P><BR></P>
+<P><SPAN style="FONT-SIZE: 18px">配置ContextLoaderListener表示，该工程要以spring的方式启动。启动时会默认在/WEB-INF目录下查找<SPAN style="FONT-SIZE: 18px">springmvc.xml</SPAN>作为spring容器的配置文件，这里可以初始化一些bean，如DataSource。我们这里什么也不做。<BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">配置DispatcherServlet表示，该工程将采用springmvc的方式。启动时也会默认在/WEB-INF目录下查找XXX-servlet.xml作为配置文件，XXX就是DispatcherServlet的名字，该文件中将配置两项重要的mvc特性<BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">在WEB-INF目录下新建springmvc.xml文件输入以下内容:</SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">&nbsp;&lt;!-- 激活@Controller模式 --&gt;<BR><SPAN></SPAN>&lt;mvc:annotation-driven /&gt;<BR>&nbsp;&nbsp;<BR><SPAN></SPAN>&lt;!-- 配置：扫描器 --&gt;<BR><SPAN></SPAN>&lt;context:component-scan base-package="com.fendo"&gt;&lt;/context:component-scan&gt;<BR><BR><SPAN></SPAN>&lt;!-- 配置：视图解析器 --&gt;<BR><SPAN></SPAN>&lt;bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"&gt;<BR><SPAN></SPAN>&lt;property name="prefix" value="/"&gt;&lt;/property&gt;<SPAN></SPAN><BR><SPAN></SPAN>&lt;property name="suffix" value=".jsp"&gt;&lt;/property&gt;<BR><SPAN></SPAN>&lt;/bean&gt;<BR></SPAN></P>
+<P><BR></P>
+<P><SPAN style="FONT-SIZE: 18px">在pom.xml中引入spring-web,servlet等特性的包。代码如下：<BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">&lt;dependencies&gt;<BR>&nbsp; &nbsp; &lt;dependency&gt;<BR>&nbsp; &nbsp; &nbsp; &lt;groupId&gt;junit&lt;/groupId&gt;<BR>&nbsp; &nbsp; &nbsp; &lt;artifactId&gt;junit&lt;/artifactId&gt;<BR>&nbsp; &nbsp; &nbsp; &lt;version&gt;3.8.1&lt;/version&gt;<BR>&nbsp; &nbsp; &nbsp; &lt;scope&gt;test&lt;/scope&gt;<BR>&nbsp; &nbsp; &lt;/dependency&gt;<BR>&nbsp; &nbsp;&nbsp;<BR>&nbsp; &lt;dependency&gt;<BR><SPAN></SPAN>&nbsp; &nbsp; &nbsp; &lt;groupId&gt;javax.servlet&lt;/groupId&gt;<BR><SPAN></SPAN>&nbsp; &nbsp; &nbsp;&lt;artifactId&gt;servlet-api&lt;/artifactId&gt;<BR><SPAN></SPAN>&nbsp; &nbsp; &nbsp;&lt;version&gt;2.5&lt;/version&gt;<BR><SPAN></SPAN>&nbsp; &nbsp; &nbsp;&lt;scope&gt;provided&lt;/scope&gt;<BR><SPAN></SPAN>&lt;/dependency&gt;<BR>&nbsp; &nbsp;&nbsp;<BR>&nbsp; &nbsp;&nbsp;<BR>&nbsp; &nbsp; &lt;dependency&gt;<BR>&nbsp; &nbsp; &nbsp; &nbsp; &lt;groupId&gt;org.springframework&lt;/groupId&gt;<BR>&nbsp; &nbsp; &nbsp; &nbsp; &lt;artifactId&gt;spring-web&lt;/artifactId&gt;<BR>&nbsp; &nbsp; &nbsp; &nbsp; &lt;version&gt;3.0.5.RELEASE&lt;/version&gt;<BR>&nbsp; &nbsp; &lt;/dependency&gt;<BR>&nbsp; &nbsp;&nbsp;<BR>&nbsp; &nbsp;&nbsp;<BR>&nbsp; &nbsp; &lt;dependency&gt;<BR>&nbsp; &nbsp; &nbsp; &nbsp; &lt;groupId&gt;org.springframework&lt;/groupId&gt;<BR>&nbsp; &nbsp; &nbsp; &nbsp; &lt;artifactId&gt;spring-webmvc&lt;/artifactId&gt;<BR>&nbsp; &nbsp; &nbsp; &nbsp; &lt;version&gt;3.0.5.RELEASE&lt;/version&gt;<BR>&nbsp; &nbsp; &lt;/dependency&gt;<BR>&nbsp; &nbsp;&nbsp;<BR>&nbsp; &nbsp; &lt;dependency&gt;<BR>&nbsp; &nbsp; &nbsp; &nbsp; &lt;groupId&gt;org.apache.geronimo.specs&lt;/groupId&gt;<BR>&nbsp; &nbsp; &nbsp; &nbsp; &lt;artifactId&gt;geronimo-servlet_2.5_spec&lt;/artifactId&gt;<BR>&nbsp; &nbsp; &nbsp; &nbsp; &lt;version&gt;1.2&lt;/version&gt;<BR>&nbsp; &nbsp; &lt;/dependency&gt;<BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">创建controller进行测试,新建一个TestController测试类,内容如下</SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">@RequestMapping("/aaa")<BR>@Controller<BR>public class TestController {<BR><SPAN></SPAN><BR><BR><SPAN></SPAN>@RequestMapping(value="/add")<BR><SPAN></SPAN>public String add(String uname,String upwd){<BR><SPAN></SPAN>System.out.println("添加操作的业务逻辑:"+uname+" "+upwd);<BR><SPAN></SPAN>return "success";<BR><SPAN></SPAN>}<BR><SPAN></SPAN><BR><SPAN></SPAN><BR>}<BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">新建<SPAN style="FONT-SIZE: 18px">success.jsp页面</SPAN></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><BR></SPAN></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"></SPAN></SPAN></P><PRE><CODE class=language-html>&lt;%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%&gt;
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;
+&lt;title&gt;Insert title here&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+	success
+&lt;/body&gt;
+&lt;/html&gt;</CODE></PRE><BR><SPAN style="FONT-SIZE: 18px">和index.jsp</SPAN><BR>
+<P></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><BR></SPAN></SPAN></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"></SPAN></SPAN></SPAN></P><PRE><CODE class=language-html>&lt;%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;
+&lt;title&gt;Insert title here&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+	&lt;form action="aaa/add" method="get"&gt;
+		&lt;input type="text" name="uname"/&gt;&lt;br/&gt;
+		&lt;input type="text" name="upwd"/&gt;&lt;br/&gt;
+		&lt;input type="submit" value="添加"/&gt;
+	&lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;</CODE></PRE>
+<P><SPAN style="FONT-SIZE: 18px"><BR></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px">完整的目录结构如下：</SPAN></P>
+<P></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><BR></SPAN></SPAN></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><IMG alt="" src="images/java00107.jpg"><BR></SPAN></SPAN></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><BR></SPAN></SPAN></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px">运行Tomcat访问:&nbsp;http://localhost:8080/SpringMVC_demo1/index.jsp</SPAN></SPAN></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><BR></SPAN></SPAN></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><IMG alt="" src="images/java00108.jpg"><BR></SPAN></SPAN></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><BR></SPAN></SPAN></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px">点击添加</SPAN></SPAN></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><BR></SPAN></SPAN></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><IMG alt="" src="images/java00109.jpg"><BR></SPAN></SPAN></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><BR></SPAN></SPAN></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px">成功跳转到success页面</SPAN></SPAN></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><BR></SPAN></SPAN></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><IMG alt="" src="images/java00110.jpg"><BR></SPAN></SPAN></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><BR></SPAN></SPAN></SPAN></P>
+<P><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px"><SPAN style="FONT-SIZE: 18px">完整的demo下载地址:&nbsp;<A href="http://download.csdn.net/detail/u011781521/9672334" rel=nofollow data-token="6b0c0a234a707f3e81d2847661384bc9">http://download.csdn.net/detail/u011781521/9672334</A></SPAN></SPAN></SPAN></P></DIV></DIV></BODY></HTML>
