@@ -1,0 +1,140 @@
+﻿<HTML><HEAD><TITLE>windows下MySQL8.0.15详细（图文）安装、使用教程 - qq_39119348的博客 - CSDN博客</TITLE>
+<META charset=utf-8>
+<META name=viewport content="width=device-width, initial-scale=1.0"><LINK rel=stylesheet href="images/style.css"></HEAD>
+<BODY class=stackedit>
+<DIV class=stackedit__html>
+<DIV style="OVERFLOW: hidden" id=article_content class="article_content clearfix">
+<DIV class=article-copyright><SPAN class=creativecommons><A href="http://creativecommons.org/licenses/by-sa/4.0/" rel=license></A><SPAN>版权声明：本文为博主原创文章，遵循<A href="http://creativecommons.org/licenses/by-sa/4.0/" target=_blank> CC 4.0 by-sa </A>版权协议，转载请附上原文出处链接和本声明。 </SPAN>
+<DIV class=article-source-link2222>本文链接：<A href="https://blog.csdn.net/qq_39119348/article/details/88655699">https://blog.csdn.net/qq_39119348/article/details/88655699</A> </DIV></SPAN></DIV><LINK rel=stylesheet href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css"><LINK rel=stylesheet href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css">
+<DIV id=content_views class=htmledit_views jQuery191014537341853164953="18">
+<P id=main-toc>&nbsp;</P>
+<P><STRONG>目录</STRONG></P>
+<P style="MARGIN-LEFT: 0px" id=%E5%AE%89%E8%A3%85-toc><A href="#%E5%AE%89%E8%A3%85" rel=nofollow data-token="2770adf67d6ac9a5016e5b7da46c6db0">安装</A></P>
+<P style="MARGIN-LEFT: 40px" id=1%E3%80%81%E5%AE%98%E7%BD%91%E4%B8%8B%E8%BD%BDzip-toc><A href="#1%E3%80%81%E5%AE%98%E7%BD%91%E4%B8%8B%E8%BD%BDzip" rel=nofollow data-token="b8d094fd1dd383c4a3a78f85ffcada05">1、官网下载zip</A></P>
+<P style="MARGIN-LEFT: 40px" id=2%E3%80%81%E8%A7%A3%E5%8E%8B%EF%BC%8C%E5%A4%8D%E5%88%B6%E5%88%B0%E6%8C%87%E5%AE%9A%E7%9B%AE%E5%BD%95%E3%80%82%E6%96%B0%E5%BB%BAdata%E6%96%87%E4%BB%B6%E3%80%82%E6%B7%BB%E5%8A%A0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F-toc><A href="#2%E3%80%81%E8%A7%A3%E5%8E%8B%EF%BC%8C%E5%A4%8D%E5%88%B6%E5%88%B0%E6%8C%87%E5%AE%9A%E7%9B%AE%E5%BD%95%E3%80%82%E6%96%B0%E5%BB%BAdata%E6%96%87%E4%BB%B6%E3%80%82%E6%B7%BB%E5%8A%A0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F" rel=nofollow data-token="84a6bdb27bb74f781bc6c2b4c78fabc1">2、解压，复制到指定目录。新建data文件。添加环境变量</A></P>
+<P style="MARGIN-LEFT: 40px" id=3%E3%80%81%E6%96%B0%E5%BB%BAmy.ini%E6%96%87%E4%BB%B6-toc><A href="#3%E3%80%81%E6%96%B0%E5%BB%BAmy.ini%E6%96%87%E4%BB%B6" rel=nofollow data-token="dde88ccb5406cb1a27c24d8a0f33a751">3、新建my.ini文件</A></P>
+<P style="MARGIN-LEFT: 40px" id=4%E3%80%81%E7%AE%A1%E7%90%86%E5%91%98%E8%BF%90%E8%A1%8C%E5%91%BD%E4%BB%A4%E8%A1%8C%E7%AA%97%E5%8F%A3%20%E9%85%8D%E7%BD%AEMySQL-toc><A href="#4%E3%80%81%E7%AE%A1%E7%90%86%E5%91%98%E8%BF%90%E8%A1%8C%E5%91%BD%E4%BB%A4%E8%A1%8C%E7%AA%97%E5%8F%A3%20%E9%85%8D%E7%BD%AEMySQL" rel=nofollow data-token="4f6afc999fb3695520839273cbdc8b9c">4、管理员运行命令行窗口 配置MySQL</A></P>
+<P style="MARGIN-LEFT: 40px" id=5%E3%80%81%E5%90%AF%E5%8A%A8mysql%E6%9C%8D%E5%8A%A1-toc><A href="#5%E3%80%81%E5%90%AF%E5%8A%A8mysql%E6%9C%8D%E5%8A%A1" rel=nofollow data-token="edb926698ffa0c32e8948496c7172e70">5、启动mysql服务</A></P>
+<P style="MARGIN-LEFT: 40px" id=6%E3%80%81%E5%90%AF%E5%8A%A8%E7%99%BB%E5%BD%95-toc><A href="#6%E3%80%81%E5%90%AF%E5%8A%A8%E7%99%BB%E5%BD%95" rel=nofollow data-token="d66401177f80490627d797d9936fd5a8">6、启动登录</A></P>
+<P style="MARGIN-LEFT: 40px" id=7%E3%80%81%E4%BD%BF%E7%94%A8%E6%95%B0%E6%8D%AE%E5%BA%93-toc><A href="#7%E3%80%81%E4%BD%BF%E7%94%A8%E6%95%B0%E6%8D%AE%E5%BA%93" rel=nofollow data-token="60d1b29d2cca07b09e7cac413d744807">7、使用数据库</A></P>
+<P style="MARGIN-LEFT: 40px" id=8%E3%80%81%E5%BB%BA%E6%95%B0%E6%8D%AE%E5%BA%93%E3%80%81%E5%BB%BA%E8%A1%A8-toc><A href="#8%E3%80%81%E5%BB%BA%E6%95%B0%E6%8D%AE%E5%BA%93%E3%80%81%E5%BB%BA%E8%A1%A8" rel=nofollow data-token="7d5fffffc5f63d4b1083504fe83e019d">8、建数据库、建表</A></P>
+<P style="MARGIN-LEFT: 40px" id=9%E3%80%81%E6%9F%A5%E7%9C%8Bmysql%E7%89%88%E6%9C%AC-toc><A href="#9%E3%80%81%E6%9F%A5%E7%9C%8Bmysql%E7%89%88%E6%9C%AC" rel=nofollow data-token="4122a148e99f55845ddace5617205d13">9、查看mysql版本</A></P>
+<P style="MARGIN-LEFT: 0px" id=%E4%BD%BF%E7%94%A8-toc><A href="#%E4%BD%BF%E7%94%A8" rel=nofollow data-token="ec6b2ea93fb429ce75d81850c272fdce">使用</A></P>
+<P style="MARGIN-LEFT: 40px" id=1%E3%80%81%E5%90%AF%E5%8A%A8mysql%E6%9C%8D%E5%8A%A1-toc><A href="#1%E3%80%81%E5%90%AF%E5%8A%A8mysql%E6%9C%8D%E5%8A%A1" rel=nofollow data-token="3fde511da4430e454b70fbaa024205c4">1、启动mysql服务</A></P>
+<P style="MARGIN-LEFT: 40px" id=2%E3%80%81%E5%90%AF%E5%8A%A8%E7%99%BB%E5%BD%95-toc><A href="#2%E3%80%81%E5%90%AF%E5%8A%A8%E7%99%BB%E5%BD%95" rel=nofollow data-token="40a31fab9bed9d05efd1221c9abb80a0">2、启动登录</A></P>
+<P style="MARGIN-LEFT: 40px" id=3%E3%80%81%E4%BD%BF%E7%94%A8%E6%95%B0%E6%8D%AE%E5%BA%93-toc><A href="#3%E3%80%81%E4%BD%BF%E7%94%A8%E6%95%B0%E6%8D%AE%E5%BA%93" rel=nofollow data-token="d9838f07201637a4ff8b4735ede26463">3、使用数据库</A></P>
+<P style="MARGIN-LEFT: 40px" id=4%E3%80%81%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C-toc><A href="#4%E3%80%81%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C" rel=nofollow data-token="89c5390804faa150f04c8b7276fc4080">4、常用操作</A></P>
+<P style="MARGIN-LEFT: 80px" id=%E5%88%9B%E5%BB%BA%E6%95%B0%E6%8D%AE%E5%BA%93-toc><A href="#%E5%88%9B%E5%BB%BA%E6%95%B0%E6%8D%AE%E5%BA%93" rel=nofollow data-token="41ead0d958ffe259a77d9ad556154567">创建数据库</A></P>
+<P style="MARGIN-LEFT: 80px" id=%E5%88%9B%E5%BB%BA%E8%A1%A8-toc><A href="#%E5%88%9B%E5%BB%BA%E8%A1%A8" rel=nofollow data-token="b7c9eabfd4d24e822be12d1857711136">创建表</A></P>
+<P style="MARGIN-LEFT: 80px" id=%E6%8F%92%E5%85%A5%E6%95%B0%E6%8D%AE-toc><A href="#%E6%8F%92%E5%85%A5%E6%95%B0%E6%8D%AE" rel=nofollow data-token="192f980f266a57f86d6faf22a5627cde">插入数据</A></P>
+<P style="MARGIN-LEFT: 80px" id=%E9%80%89%E6%8B%A9%E6%95%B0%E6%8D%AE-toc><A href="#%E9%80%89%E6%8B%A9%E6%95%B0%E6%8D%AE" rel=nofollow data-token="67a2f4d0c1aaa56f87ff84d9ba9d0306">选择数据</A></P>
+<P style="MARGIN-LEFT: 0px" id=Navicat%E8%BF%9E%E6%8E%A5MySQL-toc><A href="#Navicat%E8%BF%9E%E6%8E%A5MySQL" rel=nofollow data-token="b1dd536f651a94c7c96f835e66f2edde">Navicat连接MySQL</A></P>
+<P style="MARGIN-LEFT: 40px" id="%E8%A7%A3%E5%86%B3%E6%95%B0%E6%8D%AE%E5%BA%93Can't%20connect%20to%20MySQL%20server%20on%20'localhost'%20(10061)%E7%9A%84%E9%97%AE%E9%A2%98-toc"><A href="#%E8%A7%A3%E5%86%B3%E6%95%B0%E6%8D%AE%E5%BA%93Can' rel=" data-token="4a7d825355ed8231845f4bc88d30b985" nofollow?t%20connect%20to%20MySQL%20server%20on%20?localhost?%20(10061)%E7%9A%84%E9%97%AE%E9%A2%98?>解决数据库Can't connect to MySQL server on 'localhost' (10061)的问题</A></P>
+<HR id=hr-toc>
+
+<P>&nbsp;</P>
+<H1 id=%E5%AE%89%E8%A3%85>安装</H1>
+<H2 id=1%E3%80%81%E5%AE%98%E7%BD%91%E4%B8%8B%E8%BD%BDzip>1、官网下载zip</H2>
+<P><IMG class=has alt="" src="images/java01100.jpg"></P>
+<P><IMG class=has alt="" src="images/java01101.jpg"></P>
+<P>&nbsp;</P>
+<H2 id=2%E3%80%81%E8%A7%A3%E5%8E%8B%EF%BC%8C%E5%A4%8D%E5%88%B6%E5%88%B0%E6%8C%87%E5%AE%9A%E7%9B%AE%E5%BD%95%E3%80%82%E6%96%B0%E5%BB%BAdata%E6%96%87%E4%BB%B6%E3%80%82%E6%B7%BB%E5%8A%A0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F>2、解压，复制到指定目录。新建data文件。添加环境变量</H2>
+<P><IMG class=has alt="" src="images/java01102.png" width=644 height=175></P>
+<P><IMG class=has alt="" src="images/java01103.jpg"></P>
+<P>&nbsp;</P>
+<H2 id=3%E3%80%81%E6%96%B0%E5%BB%BAmy.ini%E6%96%87%E4%BB%B6>3、新建my.ini文件</H2>
+<P><IMG class=has alt="" src="images/java01104.jpg"></P><PRE class=has><CODE>[mysqld]
+# 设置3306端口
+port=3306
+# 设置mysql的安装目录
+basedir=D:\\MySQL\\mysql-8.0.15-winx64
+# 设置mysql数据库的数据的存放目录
+datadir=D:\MySQL\\data
+# 允许最大连接数
+max_connections=200
+# 允许连接失败的次数。
+max_connect_errors=10
+# 服务端使用的字符集默认为UTF8
+character-set-server=utf8
+# 创建新表时将使用的默认存储引擎
+default-storage-engine=INNODB
+# 默认使用“mysql_native_password”插件认证
+#mysql_native_password
+default_authentication_plugin=mysql_native_password
+[mysql]
+# 设置mysql客户端默认字符集
+default-character-set=utf8
+[client]
+# 设置mysql客户端连接服务端时默认使用的端口
+port=3306
+default-character-set=utf8</CODE></PRE>
+<H2 id=4%E3%80%81%E7%AE%A1%E7%90%86%E5%91%98%E8%BF%90%E8%A1%8C%E5%91%BD%E4%BB%A4%E8%A1%8C%E7%AA%97%E5%8F%A3%20%E9%85%8D%E7%BD%AEMySQL>4、管理员运行命令行窗口 配置MySQL</H2>
+<P>进入bin目录，执行命令</P>
+<P><IMG class=has alt="" src="images/java01105.png" width=502 height=198><BR>mysqld --install --console</P>
+<P>再执行<BR>mysqld --initialize --console</P>
+<P><IMG class=has alt="" src="images/java01106.jpg"><BR>记住密码：kf,aaCx:I6Rq（不含首位空格）</P>
+<P>&nbsp;</P>
+<H2 id=5%E3%80%81%E5%90%AF%E5%8A%A8mysql%E6%9C%8D%E5%8A%A1>5、启动mysql服务</H2>
+<P>net start mysql</P>
+<P>说服务名无效</P>
+<P>mysqld --install --console根据提示说服务已经存在，但还是服务名无效，后来我把console参数去掉，执行<BR>mysql --install<BR>显示服务安装成功，然后启动<BR>net start mysql<BR>启动成功。</P>
+<P>（停止服务：net stop mysql）</P>
+<P><IMG class=has alt="" src="images/java01107.jpg"></P>
+<P>&nbsp;</P>
+<P>&nbsp;</P>
+<H2 id=6%E3%80%81%E5%90%AF%E5%8A%A8%E7%99%BB%E5%BD%95><SPAN style="COLOR: #f33b45">6、启动登录</SPAN></H2>
+<P><BR>mysql -u root -p<BR>回车，输入默认的那个极其安全的密码。</P>
+<P><IMG class=has alt="" src="images/java01108.jpg"></P>
+<P>使用数据库：<BR>use mysql<BR>它会提示你先要重新设置密码。执行</P><PRE class=has><CODE>ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '123456';</CODE></PRE>
+<P>此时密码改为了 123456。</P>
+<P><IMG class=has alt="" src="images/java01109.png" width=1200 height=152></P>
+<H2 id=7%E3%80%81%E4%BD%BF%E7%94%A8%E6%95%B0%E6%8D%AE%E5%BA%93><SPAN style="COLOR: #f33b45">7、使用数据库</SPAN></H2>
+<P><IMG class=has alt="" src="images/java01110.png" width=260 height=1011></P>
+<P>&nbsp;</P>
+<P>遇到这个错，Access denied for user 'root'@'localhost' (using password: YES) 这个登录报错，</P>
+<P>其实是我命令输错了</P>
+<P><IMG class=has alt="" src="images/java01111.jpg"></P>
+<P>参考解决的博文在此处：<A href="https://blog.csdn.net/cartoon_/article/details/80344637" rel=nofollow data-token="d9bbea1ff72a10f106fda03c6bcf27aa">解决win10下MySQL 8.0登录Access denied for user 'root'@'localhost' (using password: YES)的问题</A></P>
+<H2 id=8%E3%80%81%E5%BB%BA%E6%95%B0%E6%8D%AE%E5%BA%93%E3%80%81%E5%BB%BA%E8%A1%A8><SPAN style="COLOR: #f33b45">8、建数据库、建表</SPAN></H2>
+<P><IMG class=has alt="" src="images/java01112.jpg"></P>
+<P>&nbsp;</P>
+<H2 id=9%E3%80%81%E6%9F%A5%E7%9C%8Bmysql%E7%89%88%E6%9C%AC>9、查看mysql版本</H2>
+<P><IMG class=has alt="" src="images/java01113.png" width=598 height=86></P>
+<P>&nbsp;</P>
+<H1 id=%E4%BD%BF%E7%94%A8>使用</H1>
+<H2 id=1%E3%80%81%E5%90%AF%E5%8A%A8mysql%E6%9C%8D%E5%8A%A1>1、启动mysql服务</H2>
+<P>net start mysql</P>
+<P>要管理员启动</P>
+<P>（停止服务：net stop mysql）</P>
+<H2 id=2%E3%80%81%E5%90%AF%E5%8A%A8%E7%99%BB%E5%BD%95>2、启动登录</H2>
+<P>mysql -u root -p</P>
+<H2 id=3%E3%80%81%E4%BD%BF%E7%94%A8%E6%95%B0%E6%8D%AE%E5%BA%93>3、使用数据库</H2>
+<P>show databases;</P>
+<P>use test;</P>
+<P>show tables;</P>
+<P>quit</P>
+<P>net stop mysql</P>
+<P>&nbsp;</P>
+<H2 id=4%E3%80%81%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C>4、常用操作</H2>
+<H3 id=%E5%88%9B%E5%BB%BA%E6%95%B0%E6%8D%AE%E5%BA%93>创建数据库</H3>
+<P>create database test;</P>
+<H3 id=%E5%88%9B%E5%BB%BA%E8%A1%A8>创建表</H3>
+<P>create table student(<BR>&nbsp; &nbsp; -&gt; id integer,<BR>&nbsp; &nbsp; -&gt; name varchar(8),<BR>&nbsp; &nbsp; -&gt; password varchar(20));</P>
+<H3 id=%E6%8F%92%E5%85%A5%E6%95%B0%E6%8D%AE>插入数据</H3>
+<P>insert into student(id,name,password)<BR>&nbsp; &nbsp; -&gt; value(1001,"xx",123456);</P>
+<H3 id=%E9%80%89%E6%8B%A9%E6%95%B0%E6%8D%AE>选择数据</H3>
+<P>select * from student;</P>
+<P>&nbsp;</P>
+<P>&nbsp;</P>
+<H1 id=Navicat%E8%BF%9E%E6%8E%A5MySQL>Navicat连接MySQL</H1>
+<P>链接：https://pan.baidu.com/s/1_hwA3y3ec39bDZ7LlzJimw&nbsp;<BR>提取码：b76x&nbsp;</P>
+<P>打开exe，创建MySQL连接</P>
+<P><IMG class=has alt="" src="images/java01114.jpg"></P>
+<P>连接成功图标是绿色的</P>
+<P><IMG class=has alt="" src="images/java01115.png" width=273 height=290></P>
+<P>&nbsp;</P>
+<H2 id="%E8%A7%A3%E5%86%B3%E6%95%B0%E6%8D%AE%E5%BA%93Can't%20connect%20to%20MySQL%20server%20on%20'localhost'%20(10061)%E7%9A%84%E9%97%AE%E9%A2%98">解决数据库Can't connect to MySQL server on 'localhost' (10061)的问题</H2>
+<P>&nbsp;</P>
+<P>Can't connect to MySQL server on 'localhost' (10061)。我好像也没有去动过它，没办法，总是打不开。</P>
+<P>打开任务管理器-&gt;点击服务-&gt;找到MySQ然后右击启动服务，稍等片刻重新打开数据库就可以了</P>
+<P>&nbsp;</P></DIV></DIV></DIV></BODY></HTML>

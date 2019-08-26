@@ -1,0 +1,25 @@
+﻿<HTML><HEAD><TITLE></TITLE>
+<META charset=utf-8>
+<META name=viewport content="width=device-width, initial-scale=1.0"><LINK rel=stylesheet href="images/style.css"></HEAD>
+<BODY class=stackedit>
+<DIV class=stackedit__html><ARTICLE class=baidu_pl>
+<DIV id=article_content class="article_content clearfix">
+<DIV class=article-copyright><SPAN class=creativecommons><A href="http://creativecommons.org/licenses/by-sa/4.0/" rel=license></A><SPAN>版权声明：本文为博主原创文章，遵循<A href="http://creativecommons.org/licenses/by-sa/4.0/" target=_blank> CC 4.0 by-sa </A>版权协议，转载请附上原文出处链接和本声明。 </SPAN>
+<DIV class=article-source-link2222>本文链接：<A href="https://blog.csdn.net/byc6352/article/details/100060583">https://blog.csdn.net/byc6352/article/details/100060583</A> </DIV></SPAN></DIV><LINK rel=stylesheet href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css"><LINK rel=stylesheet href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css">
+<DIV id=content_views class=htmledit_views>
+<P>1、MySQL在5.5.3之后增加了这个utf8mb4的编码，mb4就是most bytes 4的意思，专门用来兼容四字节的unicode。</P>
+<P>2、好在utf8mb4是utf8的超集，除了将编码改为utf8mb4外不需要做其他转换。当然，为了节省空间，一般情况下使用utf8也就够了。</P>
+<P>二、内容描述</P>
+<P>1、那上面说了既然utf8能够存下大部分中文汉字,那为什么还要使用utf8mb4呢? 原来mysql支持的 utf8 编码最大字符长度为 3 字节，如果遇到 4 字节的宽字符就会插入异常了。</P>
+<P>2、三个字节的 UTF-8 最大能编码的 Unicode 字符是 0xffff，也就是 Unicode 中的<A href="https://www.baidu.com/s?wd=%E5%9F%BA%E6%9C%AC%E5%A4%9A%E6%96%87%E7%A7%8D%E5%B9%B3%E9%9D%A2&amp;tn=SE_PcZhidaonwhc_ngpagmjz&amp;rsv_dl=gh_pc_zhidao" rel=nofollow data-token="b03e119bf3aac8e39ad2294146db9a36">基本多文种平面</A>（BMP）。</P>
+<P>3、也就是说，任何不在基本多文本平面的 Unicode字符，都无法使用 Mysql 的 utf8 字符集存储。</P>
+<P>4、包括 Emoji 表情（Emoji 是一种特殊的 Unicode 编码，常见于 ios 和 android 手机上），和很多不常用的汉字，以及任何新增的 Unicode 字符等等。</P>
+<P>三、问题根源</P>
+<P>1、最初的 UTF-8 格式使用一至六个字节，最大能编码 31 位字符。最新的 UTF-8 规范只使用一到四个字节，最大能编码21位，正好能够表示所有的 17个 Unicode 平面。</P>
+<P>2、utf8 是 Mysql 中的一种字符集，只支持最长三个字节的 UTF-8字符，也就是 Unicode 中的基本多文本平面。</P>
+<P>3、Mysql 中的 utf8 为什么只支持持最长三个字节的 UTF-8字符呢？可能是因为 Mysql 刚开始开发那会，Unicode 还没有辅助平面这一说呢。</P>
+<P>4、那时候，Unicode 委员会还做着 “65535 个字符足够全世界用了”的美梦。Mysql 中的字符串长度算的是字符数而非字节数，对于 CHAR 数据类型来说，需要为字符串保留足够的长。</P>
+<P>5、当使用 utf8 字符集时，需要保留的长度就是 utf8 最长字符长度乘以字符串长度，所以这里理所当然的限制了 utf8 最大长度为 3，比如 CHAR(100) Mysql 会保留 300字节长度。</P>
+<P>6、至于后续的版本为什么不对 4 字节长度的 UTF-8 字符提供支持，我想一个是为了向后<A href="https://www.baidu.com/s?wd=%E5%85%BC%E5%AE%B9%E6%80%A7&amp;tn=SE_PcZhidaonwhc_ngpagmjz&amp;rsv_dl=gh_pc_zhidao" rel=nofollow data-token="02c5cf6c74bd7e7126458cc4c68ba365">兼容性</A>的考虑，还有就是<A href="https://www.baidu.com/s?wd=%E5%9F%BA%E6%9C%AC%E5%A4%9A%E6%96%87%E7%A7%8D%E5%B9%B3%E9%9D%A2&amp;tn=SE_PcZhidaonwhc_ngpagmjz&amp;rsv_dl=gh_pc_zhidao" rel=nofollow data-token="b03e119bf3aac8e39ad2294146db9a36">基本多文种平面</A>之外的字符确实很少用到。</P>
+<P>7、要在 Mysql 中保存 4 字节长度的 UTF-8 字符，需要使用 utf8mb4 字符集，但只有 5.5.3 版本以后的才支持（查看版本： select version();）。</P>
+<P>8、为了获取更好的<A href="https://www.baidu.com/s?wd=%E5%85%BC%E5%AE%B9%E6%80%A7&amp;tn=SE_PcZhidaonwhc_ngpagmjz&amp;rsv_dl=gh_pc_zhidao" rel=nofollow data-token="02c5cf6c74bd7e7126458cc4c68ba365">兼容性</A>，应该总是使用 utf8mb4 而非 utf8. 对于 CHAR 类型数据，utf8mb4 会多消耗一些空间，根据 Mysql 官方建议，使用 VARCHAR 替代 CHAR。</P></DIV></DIV></ARTICLE></DIV></BODY></HTML>
