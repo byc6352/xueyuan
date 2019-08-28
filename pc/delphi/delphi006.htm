@@ -1,0 +1,29 @@
+﻿<HTML><HEAD><TITLE></TITLE>
+<META charset=utf-8>
+<META name=viewport content="width=device-width, initial-scale=1.0"><LINK rel=stylesheet href="images/style.css"></HEAD>
+<BODY class=stackedit>
+<DIV class=stackedit__html><ARTICLE class=baidu_pl>
+<DIV id=article_content class="article_content clearfix">
+<DIV class=article-copyright><SPAN class=creativecommons><A href="http://creativecommons.org/licenses/by-sa/4.0/" rel=license></A><SPAN>版权声明：本文为博主原创文章，遵循<A href="http://creativecommons.org/licenses/by-sa/4.0/" target=_blank> CC 4.0 by-sa </A>版权协议，转载请附上原文出处链接和本声明。 </SPAN>
+<DIV class=article-source-link2222>本文链接：<A href="https://blog.csdn.net/byc6352/article/details/100127086">https://blog.csdn.net/byc6352/article/details/100127086</A> </DIV></SPAN></DIV><LINK rel=stylesheet href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css"><LINK rel=stylesheet href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css">
+<DIV id=content_views class=htmledit_views>
+<H1><A name=t0></A>delphi 详解Variant 的相关函数</H1>
+<P>1.VarArrayCreate()和VarArrayOf()这两个常用就不说了<BR>2.VarArrayRedim()函数能修改variant数组的最高限。<BR>3.VarArrayDimCount()函数返回Variant数组的维数，<BR>4.VarArrayLowBound()和VarArrayHighBound()函数分别返回Variant数组的下边界和上边界。<BR>5.VarArrayLock()和VarArrayUnlock()一般用于初始化一个大数组。<BR>如:<BR>它创建一个有10000字节的Variant数组。假定有另一个相同长度的非Variant类型的数组，并且想<BR>把非variant类型的数组复制到variant类型的数组中去。通常这都是通过用循环语句对variant数组<BR>的单元进行赋值实现的。示例如下：<BR><BR>begin<BR>&nbsp;&nbsp;v:=VarArrayCreate([1,10000],varBate);<BR>&nbsp;&nbsp;fori:=1to10000do<BR>&nbsp;&nbsp;v[i]:=a[i];<BR>end;<BR><BR>上面这段代码的主要问题在于，大量的时间花费在对Variant数组的初始化上，因为在对每一个元<BR>素进行赋值时，都要通过运行时逻辑来检查并判断数据类型的兼容性、每个元素的位置等等。为了避<BR>免运行时检查，要用VarArrayLock()函数和VarArrayUnlock()过程。VarArrayLock()函数在内存中锁<BR>定数组，使数组不再移动和改变大小，并能返回一个指向数组数据的指针。而VarArrayUnlock()过程<BR>用来对VarArrayLock()函数锁定的数组进行解锁，使数组能重新移动或改变大小。在锁定数组后，能<BR>用更有效的方法对数组进行初始化，例如用指向数组数据的指针调用Move()过程，下面的代码也对<BR>Variant数组进行初始化，但它更有效：<BR><BR>begin<BR>&nbsp;&nbsp;v:=VarArrayCreate([1,10000],varBate);<BR>&nbsp;&nbsp;p:=VarArrayLock(v)<BR>&nbsp;&nbsp;try<BR>&nbsp;&nbsp; &nbsp;move(A,P^,10000);<BR>&nbsp;&nbsp;finally<BR>&nbsp;&nbsp; &nbsp;VarArrayUnlock(v);<BR>&nbsp;&nbsp;end;<BR>end;<BR><BR>6.VarArrayRef()获得variant指向的数据<BR>7.VarIsArray()函数是一个简单的布尔检查函数，如果传递给它的参数是一个Variant数组则返回True，否则返回False.<BR>8.VarClear()过程清除Variant变量并将VType域的值设为varEmpty.<BR>9.VarCopy()将Source复制到Dest。<BR>10.VarCast()将一个Variant转换成指定的类型并存储在另一个Variant变量中。<BR>11.VarType()返回指定Variant的varXXX类型代码。<BR>12.VarAsType()跟VarCast()的功能一样。<BR>13.VarIsEmpty()如果一个Variant变量的类型代码是varEmpty则返回True。<BR>14.VarIsNull()判断Variant变量是否包含null值。<BR>15.VarToStr()将一个Variant变量转换成字符串表达式(如果Variant为varEmpty或varNUll则为空字符<BR>串)。<BR>16.VarFromDateTime()返回一个Variant变量，它存放着指定的TDateTime类型的值。<BR>17.VarToDateTime()返回在Variant中的TDateTime类型的值。</P>
+<P>18.引用单元&nbsp;Variants</P>
+<P>&nbsp;</P>
+<H1><A name=t1></A><A id=cb_post_title_url href="http://www.cnblogs.com/hnxxcxg/archive/2013/01/30/2882721.html" rel=nofollow data-token="247555ed9a9a16f9565f600093b247db">OleVariant的本质</A></H1>
+<P>OleVariant的本质</P>
+<P>OleVariant，COM的一种数据类型。MIDAS基于COM之上构建的，自然使用OleVariant作为数据序列格式。</P>
+<P>延续到现在最新的DATASNAP仍然支持它。</P>
+<P>TClientDataset.data，TClientDataset.delta，这俩个属性<BR>的类型都是OleVariant。</P>
+<P>OleVariant可以是string,integer,float...<BR>这个大家都知道，但它也可以是array of OleVariant，这个<BR>可能有人不知道了。明白了这点就是datasnap中间件主从表<BR>数据同步的关键。</P>
+<P>olevariant存在于windows和linux平台,这二种类型主要的不同是variant类型仅是当前的应用程序可以进行操作,而olevariant类型则是ole自动化服务器所以定义的统一的数据类型,意味着可以通过网络或其他程序进行操作,当然也不必担心其他客户端如何进行操作.</P>
+<P>当你给一个variant类型的变量赋自定义的值的时候(例如delphi&nbsp;string,或一个其他的新的自定义类型),运行时间库将试着将他转化为olevariant标准数据类型(例如string转化为&nbsp;OLE&nbsp;BSTR&nbsp;string),例如,一个包括Ansistring数据的variant类型斌值给olevariant,ansiString将成为WideString,当把variant传为olevariant的函数参数也是一样的.</P>
+<P>&nbsp;</P>
+<P>------------------------------小小分割线---------------------------------</P>
+<P>VarlsEmpty 与&nbsp;&nbsp;VarlsNull&nbsp;</P>
+<P>他俩是一对双胞胎，长得像 但不是同一回事</P>
+<P>都是用于判断 Variant /OleVariant 这些变体型的数据格式</P>
+<P>区别（from delphi help）：</P>
+<P>1、VarIsNull是确定Variant变量是不是包含一个NULL值，这个变量是有值的，不过只是NULL，比如数据库字段的 null字段</P>
+<P>2、VarIsEmpty是确定Variant变量是不是有值，没有赋过值，这时这个函数返回True<BR>&nbsp;———————————</P></DIV></DIV></ARTICLE></DIV></BODY></HTML>
