@@ -1,0 +1,224 @@
+library Hook; 
+ 
+uses 
+SysUtils, 
+windows, 
+Messages, 
+APIHook in 'APIHook.pas'; 
+ 
+type 
+PData = ^TData; 
+TData = record 
+Hook: THandle; 
+Hooked: Boolean; 
+end; 
+ 
+var 
+DLLData: PData; 
+ 
+{------------------------------------} 
+{过程名:HookProc 
+{过程功能:HOOK过程 
+{过程参数:nCode, wParam, lParam消息的相 
+{ 关参数 
+{------------------------------------} 
+procedure HookProc(nCode, wParam, lParam: LongWORD);stdcall; 
+begin 
+if not DLLData^.Hooked then 
+begin 
+HookAPI; 
+DLLData^.Hooked := True; 
+end; 
+//调用下一个Hook 
+CallNextHookEx(DLLData^.Hook, nCode, wParam, lParam); 
+end; 
+ 
+ 
+{------------------------------------} 
+{函数名:InstallHook 
+{函数功能:在指定窗口上安装HOOK 
+{函数参数:sWindow:要安装HOOK的窗口 
+{返回值:成功返回TRUE,失败返回FALSE 
+{------------------------------------} 
+function InstallHook(SWindow: LongWORD):Boolean;stdcall; 
+var 
+ThreadID: LongWORD; 
+begin 
+Result := False; 
+DLLData^.Hook := 0; 
+ThreadID := GetWindowThreadProcessId(sWindow, nil); 
+//给指定窗口挂上钩子 
+DLLData^.Hook := SetWindowsHookEx(WH_GETMESSAGE, @HookProc, Hinstance, ThreadID); 
+if DLLData^.Hook > 0 then 
+Result := True //是否成功HOOK 
+else 
+exit; 
+end; 
+ 
+{------------------------------------} 
+{过程名:UnHook 
+{过程功能:卸载HOOK 
+{过程参数:无 
+{------------------------------------} 
+procedure UnHook;stdcall; 
+begin 
+UnHookAPI; 
+//卸载Hook 
+UnhookWindowsHookEx(DLLData^.Hook); 
+end; 
+ 
+{------------------------------------} 
+{过程名:DLL入口函数 
+{过程功能:进行DLL初始化,释放等 
+{过程参数:DLL状态 
+{------------------------------------} 
+procedure MyDLLHandler(Reason: Integer); 
+var 
+FHandle: LongWORD; 
+begin 
+case Reason of 
+DLL_PROCESS_ATTACH: 
+begin //建立文件映射,以实现DLL中的全局变量 
+FHandle := CreateFileMapping($FFFFFFFF, nil, PAGE_READWRITE, 0, $ffff, 'MYDLLDATA'); 
+if FHandle = 0 then 
+if GetLastError = ERROR_ALREADY_EXISTS then 
+begin 
+FHandle := OpenFileMapping(FILE_MAP_ALL_ACCESS, False, 'MYDLLDATA'); 
+if FHandle = 0 then Exit; 
+end else Exit; 
+DLLData := MapViewOfFile(FHandle, FILE_MAP_ALL_ACCESS, 0, 0, 0); 
+if DLLData = nil then 
+CloseHandle(FHandle); 
+end; 
+DLL_PROCESS_DETACH: 
+begin 
+if Assigned(DLLData) then 
+begin 
+UnmapViewOfFile(DLLData); 
+DLLData := nil; 
+end; 
+end; 
+end; 
+end; 
+ 
+{$R *.res} 
+exports 
+InstallHook, UnHook, HookProc; 
+ 
+begin 
+DLLProc := @MyDLLHandler; 
+MyDLLhandler(DLL_PROCESS_ATTACH); 
+DLLData^.Hooked := False; 
+end. 
+ 
+---------------------------------------------------------------------------------------- 
+APIHook.Pas的代码: 
+ 
+unit APIHook; 
+ 
+interface 
+ 
+uses 
+SysUtils, 
+Windows, WinSock; 
+ 
+type 
+//要HOOK的API函数定义 
+TSockProc = function (s: TSocket; var Buf; len, flags: Integer): Integer; stdcall; 
+ 
+PJmpCode = ^TJmpCode; 
+TJmpCode = packed record 
+JmpCode: BYTE; 
+Address: TSockProc; 
+MovEAX: Array [0..2] of BYTE; 
+end; 
+ 
+//--------------------函数声明--------------------------- 
+procedure HookAPI; 
+procedure UnHookAPI; 
+ 
+var 
+OldSend, OldRecv: TSockProc; //原来的API地址 
+JmpCode: TJmpCode; 
+OldProc: array [0..1] of TJmpCode; 
+AddSend, AddRecv: pointer; //API地址 
+TmpJmp: TJmpCode; 
+ProcessHandle: THandle; 
+implementation 
+ 
+{---------------------------------------} 
+{函数功能:Send函数的HOOK 
+{函数参数:同Send 
+{函数返回值:integer 
+{---------------------------------------} 
+function MySend(s: TSocket; var Buf; len, flags: Integer): Integer; stdcall; 
+var 
+dwSize: cardinal; 
+begin 
+//这儿进行发送的数据处理 
+MessageBeep(1000); //简单的响一声 
+//调用直正的Send函数 
+WriteProcessMemory(ProcessHandle, AddSend, @OldProc[0], 8, dwSize); 
+Result := OldSend(S, Buf, len, flags); 
+JmpCode.Address := @MySend; 
+WriteProcessMemory(ProcessHandle, AddSend, @JmpCode, 8, dwSize); 
+end; 
+ 
+{---------------------------------------} 
+{函数功能:Recv函数的HOOK 
+{函数参数:同Recv 
+{函数返回值:integer 
+{---------------------------------------} 
+function MyRecv(s: TSocket; var Buf; len, flags: Integer): Integer; stdcall; 
+var 
+dwSize: cardinal; 
+begin 
+//这儿进行接收的数据处理 
+MessageBeep(1000); //简单的响一声 
+//调用直正的Recv函数 
+WriteProcessMemory(ProcessHandle, AddRecv, @OldProc[1], 8, dwSize); 
+Result := OldRecv(S, Buf, len, flags); 
+JmpCode.Address := @MyRecv; 
+WriteProcessMemory(ProcessHandle, AddRecv, @JmpCode, 8, dwSize); 
+end; 
+ 
+{------------------------------------} 
+{过程功能:HookAPI 
+{过程参数:无 
+{------------------------------------} 
+procedure HookAPI; 
+var 
+DLLModule: THandle; 
+dwSize: cardinal; 
+begin 
+ProcessHandle := GetCurrentProcess; 
+DLLModule := LoadLibrary('ws2_32.dll'); 
+AddSend := GetProcAddress(DLLModule, 'send'); //取得API地址 
+AddRecv := GetProcAddress(DLLModule, 'recv'); 
+JmpCode.JmpCode := $B8; 
+JmpCode.MovEAX[0] := $FF; 
+JmpCode.MovEAX[1] := $E0; 
+JmpCode.MovEAX[2] := 0; 
+ReadProcessMemory(ProcessHandle, AddSend, @OldProc[0], 8, dwSize); 
+JmpCode.Address := @MySend; 
+WriteProcessMemory(ProcessHandle, AddSend, @JmpCode, 8, dwSize); //修改Send入口 
+ReadProcessMemory(ProcessHandle, AddRecv, @OldProc[1], 8, dwSize); 
+JmpCode.Address := @MyRecv; 
+WriteProcessMemory(ProcessHandle, AddRecv, @JmpCode, 8, dwSize); //修改Recv入口 
+OldSend := AddSend; 
+OldRecv := AddRecv; 
+end; 
+ 
+{------------------------------------} 
+{过程功能:取消HOOKAPI 
+{过程参数:无 
+{------------------------------------} 
+procedure UnHookAPI; 
+var 
+dwSize: Cardinal; 
+begin 
+WriteProcessMemory(ProcessHandle, AddSend, @OldProc[0], 8, dwSize); 
+WriteProcessMemory(ProcessHandle, AddRecv, @OldProc[1], 8, dwSize); 
+end; 
+ 
+end. 
