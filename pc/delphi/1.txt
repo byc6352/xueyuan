@@ -222,3 +222,132 @@ WriteProcessMemory(ProcessHandle, AddRecv, @OldProc[1], 8, dwSize);
 end; 
  
 end. 
+
+
+      这段代码讲解；找到winsock 中send和Recv 地址来回替换，send和recv是封包发送，接受的函数，其中参数，buf为其中的数据封包，就是本段程序要的，自己定义myseng和myrecv来替换。处理数据就在自己定义的的这两个函数中，这个方法听说过，没想到这么简单，作者厉害呀！在myseng和myrecv中加如下代码就可以看到发送出去什么受到什么了。 var tmp:string; begin setlength(tmp,len); move(buf,tmp[1],len); showmessage(tmp); end; 关于hook函数就不讲了相信，能把文看完的，就回略知一 二 如果你知道怎么解密网络游戏封包的话，游戏外挂的原理你就明白了。
+
+
+int PASCAL FAR recv (
+                     _In_ SOCKET s,
+                     _Out_writes_bytes_to_(len, return) __out_data_source(NETWORK) char FAR * buf,
+                     _In_ int len,
+                     _In_ int flags);
+
+int PASCAL FAR recvfrom (
+                         _In_ SOCKET s,
+                         _Out_writes_bytes_to_(len, return) __out_data_source(NETWORK) char FAR * buf,
+                         _In_ int len,
+                         _In_ int flags,
+                         _Out_writes_bytes_to_opt_(*fromlen, *fromlen) struct sockaddr FAR * from,
+                         _Inout_opt_ int FAR * fromlen);
+
+
+
+int PASCAL FAR send (
+                     _In_ SOCKET s,
+                     _In_reads_bytes_(len) const char FAR * buf,
+                     _In_ int len,
+                     _In_ int flags);
+
+int PASCAL FAR sendto (
+                       _In_ SOCKET s,
+                       _In_reads_bytes_(len) const char FAR * buf,
+                       _In_ int len,
+                       _In_ int flags,
+                       _In_reads_bytes_opt_(tolen) const struct sockaddr FAR *to,
+                       _In_ int tolen);
+
+
+
+
+
+
+
+
+
+
+鄙人近期正在写一个Sniffer,用的是inline Hook socket API的方法,原理想起来很简单,但真正开始操作后才发现有很多细节上的问题,在Google上搜了一下,发现很多人都有相同或相似的问题,经过我的不断摸索,终于将它们一一解决,却又不敢独享.
+
+一.被注入代码的进程莫名其妙出错
+这是由于多个线程对Socket API同时调用而造成的(inline hook api是用拆东墙补西墙的办法,这样一来自然会出问题).
+这个问题用Win32的临界区(CriticalSection)内核对象可以解决(关于CriticalSection,具体参照<Windows核心编程>).
+这里只给出MySend函数的代码模板:
+
+function NewSend(s: TSocket; var Buf; len, flags: Integer): Integer; stdcall;
+    begin
+     EnterCriticalSection(pCS_Send);//进入临界区 
+      //这里添加自己的代码
+      UnHookAPI(0);//自己写的API Hook单元中的函数
+      Result:=Send(s,buf,len,flags);
+     HOOKAPI(0,'wsock32.dll','send',@NewSend);//自己写的API Hook单元中的函数
+       LeaveCriticalSection(pCS_Send);//退出临界区
+    end;
+
+二.无法读取Buf的内容.
+
+问题产生的原因我也没有搞清楚,,不过我发现用Delphi内镶汇编可以解决这个问题.代码如下:
+
+function NewSend(s: TSocket; var Buf; len, flags: Integer): Integer; stdcall;
+var
+OutBuf:^String[100]; 
+begin
+EnterCriticalSection(pCS_Send);//进入临界区 
+asm
+    mov EDX,[Buf] //将Buf的地址读到EDX中
+    mov OutBuf,EDX //将EDX的值送入OutBuf中,这样一来,OutBuf^装的就是Buf的内容了.
+end;
+UnHookAPI(0);//自己写的API Hook单元中的函数
+Result:=Send(s,buf,len,flags);
+HOOKAPI(0,'wsock32.dll','send',@NewSend);//自己写的API Hook单元中的函数
+LeaveCriticalSection(pCS_Send);//退出临界区
+end;
+
+E控件是用
+InternetSetCookieEx : function(lpszUrl, lpszCookieName,
+lpszCookieData: LPCWSTR; dwFlags: DWORD; lpReserved: Pointer): DWORD; stdcall;
+
+InternetGetCookieEx : function(lpszUrl, lpszCookieName,
+lpszCookieData: LPCWSTR; var lpdwSize: DWORD; dwFlags: DWORD; lpReserved: Pointer): BOOL; stdcall;
+
+两个函数来操作内存的，HOOK 这两个函数就可以了
+
+
+老外写的Webbrowser调用dll,简单方便获取request header,response header等各种网络资源的例子，实现了原来只有WebClient,WebRequest和HttpWebResquest才能实现的功能。 需要dll的完整源代码见我上传的另外一个资源下载。 代码已经调试通过，如果访问网络资源超时有可能出现 "其他信息: CLR无法从COM上下文0x211c88转换为COM上下文0x211b18，这种状态已持续60秒。拥有目标上下文/单元的线程很有可能执行的是非泵式等待或者在不发送Windows消息的情况下处理一个运行时间非常长的操作。这种情况通常会影响到性能，甚至可能导致应用程序不响应或者使用的内存随时间不断累积。 要避免此问题，所有单线程单元(STA)线程都应使用泵式等待基元(如CoWaitForMultipleHandles)，并在运行时间很长的操作过程中定期发送消息" 解决方案： 在VS2008中,"调试"--&gt;"异常"---&gt;把Managed Debugging Assistants-----ContextSwitchDeadlock 后面的勾号去掉) 
+
+
+
+webbrowser内部使用wininet进行http通信，只需Hook wininet的相关API就可以获取并修改请求头与响应头。
+比如Hook HttpSendRequest，获取到请求句柄HINTERNET hRequest
+然后使用此句柄调用HttpQueryInfo，并使用HTTP_QUERY_RAW_HEADERS标志获取响应头。
+HTTP_QUERY_FLAG_REQUEST_HEADERS和HTTP_QUERY_RAW_HEADERS一起使用以获取请求头。
+获取其它信息，参考MSDN文档：
+https://msdn.microsoft.com/en-us/library/windows/desktop/aa385351(v=vs.85).aspx
+https://msdn.microsoft.com/en-us/library/windows/desktop/aa384238(v=vs.85).aspx
+
+SHDocVw_TLB是shdocvw.dll的类型库导入单元，你没有的话就改成shdocvw（delphi自带），或者在“Project”菜单下选“Import Type Library”，在弹出的对话框中再选择“Microsoft Internet Controls”，再点“Create Unit”即可。
+————————————————
+版权声明：本文为CSDN博主「qsdnet」的原创文章，遵循 CC 4.0 BY-SA 版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/qsdnet/article/details/510455
+
+原文:SHDocVw， AxSHDocVw的引用
+
+SHDocVw的引用
+SHDocVw一定要在下面这个路径找：
+
+类似
+
+C:\Program Files\Microsoft Visual Studio 9.0\VC\
+
+或者
+
+D:\Program Files (x86)\Microsoft Visual Studio 11.0\VC
+
+方法1：BHO插件  IE是基于COM IWebBrowser2的 
+方法2：HOOK Socket的Send，分析数据包中的URL
+
+帐号：byc6352
+姓名：白原
+原手机号：13229923589
+邮箱：byc6352@qq.com
+注册时间：2003年
+注册地点：云南昆明
