@@ -85,6 +85,20 @@
 					<li><a href="https://blog.csdn.net/zuishikonghuan/article/details/47979603">[Win32] API Hook（2）在64位系统上的实现</a></li>
 					<li><a href="https://www.cnblogs.com/findumars/p/4740518.html">https://www.cnblogs.com/findumars/p/4740518.htmlDelphi WebBrowser控件的使用（大全 good）</a></li>
 					<li><a href="delphi008.htm">Delphi通过IE窗口句柄获取网页接口（IWebBrowser2）</a></li>
+					<li><a href="https://blog.csdn.net/a1174858163/article/details/80368065">WebBrowser 控件获取POST数据</a></li>
+					<li><a href="https://docs.microsoft.com/en-us/previous-versions/aa917871(v=msdn.10)">msdn</a></li>
+					<li><a href="https://blog.csdn.net/wangjia184/article/details/4342393">Hook浏览器控件WebBrowser对WININET.dll的调用</a></li>
+					<li><a href="https://blog.csdn.net/kzh313561014/article/details/6788385">Wininet.dll中导出的几个函数，功能很强大</a></li>
+					<li><a href="https://blog.csdn.net/analogous_love/article/details/72515002">WinInet使用详解</a></li>
+					<li><a href="https://docs.microsoft.com/zh-cn/windows/win32/api/wininet/nf-wininet-httpendrequesta">https://docs.microsoft.com/zh-cn/windows/win32/api/wininet/nf-wininet-httpendrequesta</a></li>
+					<li><a href="https://www.cnblogs.com/bestlove/p/7067551.html">delphi弹出信息框大全</a></li>
+					<li><a href="https://blog.csdn.net/theone10211024/article/details/14001943">GetLastError()返回值列表</a></li>
+					<li><a href="https://www.cnblogs.com/xubao/p/10774533.html">如何解决WebBrowser.DocumentCompleted事件的多次调用</a></li>
+					<li><a href="https://www.cnblogs.com/KeenLeung/p/3837853.html">如何解决WebBrowser.DocumentCompleted事件的多次调用</a></li>
+					<li><a href=" ">  </a></li>
+					<li><a href=" ">  </a></li>
+					<li><a href=" ">  </a></li>
+					<li><a href=" ">  </a></li>
 					<li><a href=" ">  </a></li>
 					<li><a href=" ">  </a></li>
 					<li><a href=" ">  </a></li>
