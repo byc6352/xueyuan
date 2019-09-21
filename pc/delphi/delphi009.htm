@@ -1,0 +1,65 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content">
+                                                <div class="article-copyright">
+                <span class="creativecommons">
+                <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                    </a>
+            <span>
+                版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。            </span>
+               <div class="article-source-link2222">
+                    本文链接：<a href="https://blog.csdn.net/yuehaiyang/article/details/1875949">https://blog.csdn.net/yuehaiyang/article/details/1875949</a>
+                </div>
+            </span>
+                    </div>
+                                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            <p>客户机和服务器可用互相通讯。&nbsp;直接贴出代码吧，没有优化，代码可能有些冗余，只是实现了互相发送字符串的功能。仅供参考。</p>
+<p>服务器端：</p>
+<p><strong><font color="#0000ff">unit untserver;</font></strong></p>
+<p><strong><font color="#0000ff">interface</font></strong></p>
+<p><strong><font color="#0000ff">uses<br>&nbsp; Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,<br>&nbsp; Dialogs, StdCtrls,Winsock;</font></strong></p>
+<p><strong><font color="#0000ff">type<br>&nbsp; clients = record<br>&nbsp;&nbsp;&nbsp; soc :TSocket;<br>&nbsp;&nbsp;&nbsp; add :sockaddr_in;<br>&nbsp; end;<br>&nbsp; pclients = ^clients;</font></strong></p>
+<p><strong><font color="#0000ff">&nbsp; Tserver = class(TForm)<br>&nbsp;&nbsp;&nbsp; edt1: TEdit;<br>&nbsp;&nbsp;&nbsp; lbl1: TLabel;<br>&nbsp;&nbsp;&nbsp; btn1: TButton;<br>&nbsp;&nbsp;&nbsp; mmo1: TMemo;<br>&nbsp;&nbsp;&nbsp; lbl2: TLabel;<br>&nbsp;&nbsp;&nbsp; edt2: TEdit;<br>&nbsp;&nbsp;&nbsp; btn2: TButton;<br>&nbsp;&nbsp;&nbsp; btn3: TButton;<br>&nbsp;&nbsp;&nbsp; edt3: TEdit;<br>&nbsp;&nbsp;&nbsp; procedure btn1Click(Sender: TObject);<br>&nbsp;&nbsp;&nbsp; procedure btn3Click(Sender: TObject);<br>&nbsp;&nbsp;&nbsp; procedure btn2Click(Sender: TObject);<br>&nbsp; private<br>&nbsp;&nbsp;&nbsp; { Private declarations }<br>&nbsp; public<br>&nbsp;&nbsp;&nbsp; s :TSocket;<br>&nbsp;&nbsp;&nbsp; acThreadID :DWORD;<br>&nbsp; end;</font></strong></p>
+<p><strong><font color="#0000ff">procedure ServerAccept(s :TSocket);stdcall;<br>procedure SocketWorkThread(ns :TSocket);stdcall;<br>const buflen=100;</font></strong></p>
+<p><strong><font color="#0000ff">var<br>&nbsp; server: Tserver;<br>&nbsp; clientslist :TList;</font></strong></p>
+<p><strong><font color="#0000ff">implementation</font></strong></p>
+<p><strong><font color="#0000ff">{$R *.dfm}</font></strong></p>
+<p><strong><font color="#0000ff">procedure Tserver.btn1Click(Sender: TObject);<br>var<br>&nbsp;wsa :TWSAData;<br>&nbsp;wsstatus :Integer;<br>&nbsp;sa : sockaddr_in;<br>begin<br>&nbsp; wsstatus := WSAStartup($0202,wsa);&nbsp;&nbsp; <br>&nbsp; if wsstatus &lt;&gt; 0 then<br>&nbsp; begin<br>&nbsp;&nbsp;&nbsp; ShowMessage('初始化socket出错！');<br>&nbsp;&nbsp;&nbsp; Exit;<br>&nbsp; end;</font></strong></p>
+<p><strong><font color="#0000ff">&nbsp; s := Socket(AF_INET,SOCK_STREAM,0);<br>&nbsp; if s &lt; 0 then<br>&nbsp; begin<br>&nbsp;&nbsp;&nbsp; ShowMessage('创建socket出错！');<br>&nbsp;&nbsp;&nbsp; WSACleanup;<br>&nbsp;&nbsp;&nbsp; Exit;<br>&nbsp; end;</font></strong></p>
+<p><strong><font color="#0000ff">&nbsp; sa.sin_port := htons(StrToInt(edt1.Text));<br>&nbsp; sa.sin_family := AF_INET;<br>&nbsp; sa.sin_addr.S_addr := INADDR_ANY;<br>&nbsp; wsstatus := bind(s,sa,SizeOf(sa));<br>&nbsp; if wsstatus &lt;&gt; 0 then<br>&nbsp; begin<br>&nbsp;&nbsp;&nbsp; ShowMessage('绑定socket出错');<br>&nbsp;&nbsp;&nbsp; WSACleanup;<br>&nbsp;&nbsp;&nbsp; Exit;<br>&nbsp; end;</font></strong></p>
+<p><strong><font color="#0000ff">&nbsp; wsstatus := listen(s,5);<br>&nbsp; if&nbsp; wsstatus &lt;&gt; 0 then<br>&nbsp; begin<br>&nbsp;&nbsp;&nbsp; ShowMessage('监听出错！');<br>&nbsp;&nbsp;&nbsp; WSACleanup;<br>&nbsp;&nbsp;&nbsp; Exit;<br>&nbsp; end;</font></strong></p>
+<p><strong><font color="#0000ff">&nbsp; clientslist := TList.Create;<br>&nbsp; CreateThread(nil,0,@ServerAccept,Pointer(s),0,acThreadID);<br>&nbsp; btn1.Enabled := False;<br>end;</font></strong></p>
+<p><strong><font color="#0000ff">procedure ServerAccept(s :TSocket);stdcall;<br>var<br>&nbsp; ra :sockaddr_in;<br>&nbsp; ra_len :integer;<br>&nbsp; recev :TSocket;<br>&nbsp; ThreadID :DWORD;<br>&nbsp; ip :string;<br>&nbsp; newclient :pclients;<br>begin<br>&nbsp; ra_len := SizeOf(ra);<br>&nbsp; try<br>&nbsp;&nbsp;&nbsp; while True do<br>&nbsp;&nbsp;&nbsp; begin<br>&nbsp;&nbsp;&nbsp;&nbsp; recev := accept(s,@ra,@ra_len);<br>&nbsp;&nbsp;&nbsp;&nbsp; if recev = -1 then<br>&nbsp;&nbsp;&nbsp;&nbsp; begin<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ExitThread(0);<br>&nbsp;&nbsp;&nbsp;&nbsp; end;<br>&nbsp;&nbsp;&nbsp;&nbsp; ip := IntToHex(recev,2)+'-'+ IntToStr(Ord(ra.sin_addr.S_un_b.s_b1))+'.'+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IntToStr(Ord(ra.sin_addr.S_un_b.s_b2))+'.'+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IntToStr(Ord(ra.sin_addr.S_un_b.s_b3))+'.'+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IntToStr(Ord(ra.sin_addr.S_un_b.s_b4));<br>&nbsp;&nbsp;&nbsp;&nbsp; server.mmo1.Lines.Add(ip);<br>&nbsp;&nbsp;&nbsp;&nbsp; GetMem(newclient,SizeOf(clients));<br>&nbsp;&nbsp;&nbsp;&nbsp; newclient.soc := recev;<br>&nbsp;&nbsp;&nbsp;&nbsp; newclient.add := ra;<br>&nbsp;&nbsp;&nbsp;&nbsp; clientslist.Add(newclient);<br>&nbsp;&nbsp;&nbsp;&nbsp; CreateThread(nil,0,@SocketWorkThread,Pointer(recev),0,ThreadID);<br>&nbsp;&nbsp;&nbsp; end;<br>&nbsp; except<br>&nbsp; end;<br>end;</font></strong></p>
+<p><strong><font color="#0000ff">procedure SocketWorkThread(ns :TSocket);stdcall;<br>var<br>&nbsp;&nbsp; recvbuf :array[0..buflen -1] of Char;<br>&nbsp;&nbsp; rtn,k :Integer;<br>&nbsp;&nbsp; rs :string[buflen];<br>&nbsp;&nbsp; error :string;<br>begin<br>&nbsp; try<br>&nbsp;&nbsp;&nbsp; while true do<br>&nbsp;&nbsp;&nbsp; begin<br>&nbsp;&nbsp;&nbsp;&nbsp; rtn := recv(ns,recvbuf,buflen,0);<br>&nbsp;&nbsp;&nbsp;&nbsp; if rtn &lt; 1 then<br>&nbsp;&nbsp;&nbsp;&nbsp; begin<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; for k := 0 to clientslist.Count -1 do<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; begin<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if ns = pclients(clientslist.Items[k]).soc then<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; begin<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; clientslist.Delete(k);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Break;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; end<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; else<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Continue;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; end;&nbsp; <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLOSESOCKET(ns);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; error := IntToHex(ns,2)+'退出';<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; server.mmo1.Lines.Add(error);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ExitThread(0);<br>&nbsp;&nbsp;&nbsp;&nbsp; end;<br>&nbsp;&nbsp;&nbsp;&nbsp; rs := PChar(@recvbuf);<br>&nbsp;&nbsp;&nbsp;&nbsp; server.mmo1.Lines.Add(rs);<br>&nbsp;&nbsp;&nbsp; end;<br>&nbsp; except<br>&nbsp; end;<br>end;</font></strong></p>
+<p><strong><font color="#0000ff">end.</font></strong></p>
+<p>客户端：</p>
+<p><strong><font color="#0000ff">unit untclient;</font></strong></p>
+<p><strong><font color="#0000ff">interface</font></strong></p>
+<p><strong><font color="#0000ff">uses<br>&nbsp; Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,<br>&nbsp; Dialogs, StdCtrls,WinSock;</font></strong></p>
+<p><strong><font color="#0000ff">type<br>&nbsp; Tclient = class(TForm)<br>&nbsp;&nbsp;&nbsp; edt1: TEdit;<br>&nbsp;&nbsp;&nbsp; edt2: TEdit;<br>&nbsp;&nbsp;&nbsp; lbl1: TLabel;<br>&nbsp;&nbsp;&nbsp; lbl2: TLabel;<br>&nbsp;&nbsp;&nbsp; edt3: TEdit;<br>&nbsp;&nbsp;&nbsp; btn1: TButton;<br>&nbsp;&nbsp;&nbsp; btn2: TButton;<br>&nbsp;&nbsp;&nbsp; btn3: TButton;<br>&nbsp;&nbsp;&nbsp; mmo1: TMemo;<br>&nbsp;&nbsp;&nbsp; procedure btn1Click(Sender: TObject);<br>&nbsp;&nbsp;&nbsp; procedure btn2Click(Sender: TObject);<br>&nbsp;&nbsp;&nbsp; procedure btn3Click(Sender: TObject);<br>&nbsp; private<br>&nbsp;&nbsp;&nbsp; { Private declarations }<br>&nbsp; public<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s :TSocket;<br>&nbsp; end;</font></strong></p>
+<p><strong><font color="#0000ff">procedure Receive(server :TSocket);stdcall;<br>const buflen = 100;</font></strong></p>
+<p><strong><font color="#0000ff">var<br>&nbsp; client: Tclient;</font></strong></p>
+<p><strong><font color="#0000ff">implementation</font></strong></p>
+<p><strong><font color="#0000ff">{$R *.dfm}</font></strong></p>
+<p><strong><font color="#0000ff">procedure Tclient.btn1Click(Sender: TObject);<br>var<br>&nbsp; sa :TWSAData;<br>&nbsp; wstates :Integer;<br>&nbsp; ad :sockaddr_in;<br>&nbsp; threadid :DWORD;<br>begin<br>&nbsp;&nbsp; wstates := WSAStartup($0202,sa);<br>&nbsp;&nbsp; if&nbsp; wstates &lt;&gt; 0 then<br>&nbsp;&nbsp; begin<br>&nbsp;&nbsp;&nbsp;&nbsp; ShowMessage('socket初始化出错！');<br>&nbsp;&nbsp;&nbsp;&nbsp; Exit;<br>&nbsp;&nbsp; end;</font></strong></p>
+<p><strong><font color="#0000ff">&nbsp;&nbsp; s := socket(PF_INET,SOCK_STREAM,IPPROTO_IP);<br>&nbsp;&nbsp; if s = INVALID_SOCKET then<br>&nbsp;&nbsp; begin<br>&nbsp;&nbsp;&nbsp;&nbsp; ShowMessage('建立socket出错！');<br>&nbsp;&nbsp;&nbsp;&nbsp; WSACleanup;<br>&nbsp;&nbsp;&nbsp;&nbsp; Exit;<br>&nbsp;&nbsp; end;</font></strong></p>
+<p><strong><font color="#0000ff">&nbsp;&nbsp; ad.sin_family := PF_INET;<br>&nbsp;&nbsp; ad.sin_port := htons(StrToInt(edt2.Text));<br>&nbsp;&nbsp; ad.sin_addr.S_addr := inet_addr(PChar(edt1.Text));<br>&nbsp;&nbsp; wstates := connect(s,ad,SizeOf(ad));<br>&nbsp;&nbsp; if wstates &lt;&gt; 0 then<br>&nbsp;&nbsp; begin<br>&nbsp;&nbsp;&nbsp;&nbsp; ShowMessage('连接错误');<br>&nbsp;&nbsp;&nbsp;&nbsp; WSACleanup;<br>&nbsp;&nbsp;&nbsp;&nbsp; Exit;<br>&nbsp;&nbsp; end;<br>&nbsp; btn1.Enabled := False;<br>&nbsp; CreateThread(nil,0,@Receive,Pointer(s),0,threadid);<br>end;</font></strong></p>
+<p><strong><font color="#0000ff">procedure Tclient.btn2Click(Sender: TObject);<br>var<br>&nbsp; sendbuf :array[0..buflen -1] of Char;<br>&nbsp; sendLen :Integer;<br>&nbsp; i :Integer;<br>begin<br>&nbsp; if edt3.Text &lt;&gt; '' then<br>&nbsp; begin<br>&nbsp;&nbsp;&nbsp; for i := 0 to Length(edt3.Text) -1 do<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sendbuf[i] := (edt3.Text)[i+1];<br>&nbsp;&nbsp;&nbsp; sendLen := send(s,sendbuf,buflen,0);<br>&nbsp;&nbsp;&nbsp; if sendLen &lt; 0 then<br>&nbsp;&nbsp;&nbsp; begin<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ShowMessage('发送出错');<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WSACleanup;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; btn1.Enabled := False;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Exit;<br>&nbsp;&nbsp;&nbsp; end;&nbsp; <br>&nbsp; end;<br>end;</font></strong></p>
+<p><strong><font color="#0000ff">procedure Tclient.btn3Click(Sender: TObject);<br>begin<br>&nbsp; try<br>&nbsp;&nbsp;&nbsp; closesocket(s);<br>&nbsp;&nbsp;&nbsp; WSACleanup;<br>&nbsp; finally<br>&nbsp;&nbsp;&nbsp; btn1.Enabled := True;<br>&nbsp; end;<br>end;</font></strong></p>
+<p><strong><font color="#0000ff">procedure Receive(server :TSocket);stdcall;<br>var<br>&nbsp; recbuf:array[0..buflen -1] of Char;<br>&nbsp; rtn :Integer;<br>&nbsp; rs :string;<br>begin<br>&nbsp; while True do<br>&nbsp; begin<br>&nbsp;&nbsp;&nbsp; rtn := recv(server,recbuf,buflen,0);<br>&nbsp;&nbsp;&nbsp; if rtn &lt; 1 then<br>&nbsp;&nbsp;&nbsp; begin<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; closesocket(server);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ExitThread(0);<br>&nbsp;&nbsp;&nbsp; end;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; rs := pchar(@recbuf);<br>&nbsp;&nbsp;&nbsp; client.mmo1.Lines.Add(rs);<br>&nbsp; end;<br>end;&nbsp; <br>end.</font></strong></p>                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>

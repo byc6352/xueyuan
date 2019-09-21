@@ -1,0 +1,217 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CreateFile 函数详解 </title>
+  <link href="images/style.css" rel="stylesheet">
+<link href="https://adservice.google.com.hk/adsid/integrator.js?domain=" rel="preload"><script src="https://adservice.google.com.hk/adsid/integrator.js?domain=" type="text/javascript"></script><link href="https://adservice.google.com/adsid/integrator.js?domain=" rel="preload"><script src="https://adservice.google.com/adsid/integrator.js?domain=" type="text/javascript"></script><script src="https://securepubads.g.doubleclick.net/gpt/pubads_impl_2019093001.js" async=""></script></head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div id="post_detail">
+<div class="post">
+	<div class="postTitle">
+		
+<a class="postTitle2" id="cb_post_title_url" href="https://www.cnblogs.com/keycode/archive/2010/11/03/1868154.html">CreateFile 函数详解</a>
+
+	</div>
+	
+	<div class="postText">
+		
+<div class="blogpost-body " id="cnblogs_post_body">
+    <div class="cnblogs_Highlighter">
+<div><div class="syntaxhighlighter nogutter  delphi" id="highlighter_278892"><div class="toolbar"><span><a class="toolbar_item command_help help" href="#">?</a></span></div><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="delphi plain">HANDLE CreateFile(</code></div><div class="line number2 index1 alt1"><code class="delphi plain">LPCTSTR lpFileName,&nbsp;&nbsp;&nbsp; </code><code class="delphi comments">//指向文件名的指针</code></div><div class="line number3 index2 alt2"><code class="delphi plain">DWORD dwDesiredAccess,&nbsp;&nbsp;&nbsp; </code><code class="delphi comments">//访问模式（写/读）</code></div><div class="line number4 index3 alt1"><code class="delphi plain">DWORD dwShareMode,&nbsp;&nbsp;&nbsp; </code><code class="delphi comments">//共享模式</code></div><div class="line number5 index4 alt2"><code class="delphi plain">LPSECURITY_ATTRIBUTES lpSecurityAttributes, </code><code class="delphi comments">//指向安全属性的指针</code></div><div class="line number6 index5 alt1"><code class="delphi plain">DWORD dwCreationDisposition,&nbsp;&nbsp; </code><code class="delphi comments">//如何创建</code></div><div class="line number7 index6 alt2"><code class="delphi plain">DWORD dwFlagsAndAttributes,&nbsp;&nbsp; </code><code class="delphi comments">//文件属性</code></div><div class="line number8 index7 alt1"><code class="delphi plain">HANDLE hTemplateFile&nbsp;&nbsp;&nbsp; </code><code class="delphi comments">//用于复制文件句柄</code></div><div class="line number9 index8 alt2"><code class="delphi plain">);</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p><strong>参数列表:</strong></p>
+<p><strong>lpFileName</strong></p>
+<div class="cnblogs_Highlighter">
+<div><div class="syntaxhighlighter nogutter  delphi" id="highlighter_302264"><div class="toolbar"><span><a class="toolbar_item command_help help" href="#">?</a></span></div><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="delphi comments">//指向一个空结尾字符串。该参数指定了用于创建或打开句柄的对象。如果lpFileName的对 象是一个路径，则有一个最大字符数的限制。不能超过常量(MAX_PATH).这个限制指示了CreateFile函数如何解析路径.</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p><strong>dwDesiredAccess</strong></p>
+<div class="cnblogs_Highlighter">
+<div><div class="syntaxhighlighter nogutter  delphi" id="highlighter_932426"><div class="toolbar"><span><a class="toolbar_item command_help help" href="#">?</a></span></div><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="delphi comments">//指定对象的访问方式,程序可以获得读访问权,写访问权,读写访问权或者是询问设备("device query") 访问权.这个参数可以是下列值的任意组合</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<div class="cnblogs_Highlighter">
+<div><div class="syntaxhighlighter nogutter  delphi" id="highlighter_962074"><div class="toolbar"><span><a class="toolbar_item command_help help" href="#">?</a></span></div><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="delphi plain">(值)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (含义)</code></div><div class="line number2 index1 alt1"><code class="delphi value">0</code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <code class="delphi comments">//指定询问访问权.程序可以在不直接访问设备的情况下查询设备的属性.</code></div><div class="line number3 index2 alt2">&nbsp;</div><div class="line number4 index3 alt1"><code class="delphi plain">GENERIC_READ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code><code class="delphi comments">//指定读访问权.可以从文件中读取数据,并且移动文件指针.可以和GENERIC_WRITE组合成为"读写访问权".</code></div><div class="line number5 index4 alt2">&nbsp;</div><div class="line number6 index5 alt1"><code class="delphi plain">GENERIC_WRITE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code><code class="delphi comments">//指定写访问权.可以从文件中写入数据,并且移动文件指针.可以和GENERIC_READ组合成为"读写访问权".</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>&nbsp;</p>
+<p><strong>dwShareMode</strong></p>
+<div class="cnblogs_Highlighter">
+<div><div class="syntaxhighlighter nogutter  delphi" id="highlighter_927389"><div class="toolbar"><span><a class="toolbar_item command_help help" href="#">?</a></span></div><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="delphi plain">设置位标志指明对象如休共享.如果参数是</code><code class="delphi value">0</code><code class="delphi plain">, 对象不能够共享. 后续的打开对象的操作将会失败,直到该对象的句柄关闭.</code></div><div class="line number2 index1 alt1"><code class="delphi plain">使用一个或多个下列值的组合来共享一个对象.</code></div><div class="line number3 index2 alt2"><code class="delphi plain">(值)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (含义)</code></div><div class="line number4 index3 alt1"><code class="delphi plain">FILE_SHARE_DELETE&nbsp;&nbsp; </code><code class="delphi comments">//WINDOWS NT:后续的仅仅请求删除访问权的打开操作将会成功.</code></div><div class="line number5 index4 alt2">&nbsp;</div><div class="line number6 index5 alt1"><code class="delphi plain">FILE_SHARE_READ&nbsp;&nbsp;&nbsp;&nbsp; </code><code class="delphi comments">//后续的仅仅请求读访问权的打开操作将会成功.</code></div><div class="line number7 index6 alt2">&nbsp;</div><div class="line number8 index7 alt1"><code class="delphi plain">FILE_SHARE_WRITE&nbsp;&nbsp; </code><code class="delphi comments">//后续的仅仅请求写访问权的打开操作将会成功.</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>&nbsp;</p>
+<p><strong>lpSecurityAttributes</strong></p>
+<div class="cnblogs_Highlighter">
+<div><div class="syntaxhighlighter nogutter  delphi" id="highlighter_837666"><div class="toolbar"><span><a class="toolbar_item command_help help" href="#">?</a></span></div><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="delphi comments">//指向一个 SECURITY_ATTRIBUTES 结构的指针用于确定如何在子进程中继承这个句柄.如果这个参数是NULL,则该句柄不可继承.</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>&nbsp;</p>
+<p><strong>dwCreationDisposition</strong></p>
+<div class="cnblogs_Highlighter">
+<div><div class="syntaxhighlighter nogutter  delphi" id="highlighter_32065"><div class="toolbar"><span><a class="toolbar_item command_help help" href="#">?</a></span></div><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="delphi comments">//指定当文件存在或者不存在时如何动作。关于这个参数更多的信息，参考批注部分。这个参数必须是一个或多个下列值。</code></div><div class="line number2 index1 alt1">&nbsp;</div><div class="line number3 index2 alt2"><code class="delphi plain">(值)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (含义)</code></div><div class="line number4 index3 alt1"><code class="delphi plain">CREATE_NEW&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code><code class="delphi comments">//创建一个新文件. 如果该文件已经存在函数则会失败.</code></div><div class="line number5 index4 alt2">&nbsp;</div><div class="line number6 index5 alt1"><code class="delphi plain">CREATE_ALWAYS&nbsp;&nbsp; </code><code class="delphi comments">//创建一个新文件.如果该文件已经存在,函数将覆盖已存在的文件并清除已存在的文件属性</code></div><div class="line number7 index6 alt2">&nbsp;</div><div class="line number8 index7 alt1"><code class="delphi plain">OPEN_EXISTING&nbsp;&nbsp;&nbsp; </code><code class="delphi comments">//打开一个文件,如果文件不存在函数将会失败.如查你使用CreateFile函数为设备装载控制台.请查看批注中的"为什么使用OPEN_EXISTING标志"的部分.</code></div><div class="line number9 index8 alt2"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code>&nbsp;</div><div class="line number10 index9 alt1"><code class="delphi plain">OPEN_ALWAYS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code><code class="delphi comments">//如果文件存在,打开文件. 如果文件不存在,并且参数中有CREATE_NEW标志,则创建文件.</code></div><div class="line number11 index10 alt2">&nbsp;</div><div class="line number12 index11 alt1"><code class="delphi plain">TRUNCATE_EXISTING&nbsp;&nbsp; </code><code class="delphi comments">//打开一个文件,每次打开,文件将被截至0字节.调用进程必须用GENERIC_WRITE访问模式打开文件.如果文件不存在则函数就会失败.</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>&nbsp;</p>
+<p><strong>dwFlagsAndatributes</strong></p>
+<div class="cnblogs_Highlighter">
+<div><div class="syntaxhighlighter nogutter  delphi" id="highlighter_219055"><div class="toolbar"><span><a class="toolbar_item command_help help" href="#">?</a></span></div><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="delphi plain">为文件指定属性和标志位</code></div><div class="line number2 index1 alt1"><code class="delphi plain">该参数可以接收下列属性的任意组合.除非其它所有的文件属性忽略FILE_ATTRIBUTE_NORMAL.</code></div><div class="line number3 index2 alt2"><code class="delphi plain">(属性)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (标志)</code></div><div class="line number4 index3 alt1"><code class="delphi plain">FILE_ATTRIBUTE_ARCHIVE&nbsp;&nbsp;&nbsp;&nbsp; </code><code class="delphi comments">//文件将被存档,程序使用此属性来标志文件去备份或移除</code></div><div class="line number5 index4 alt2">&nbsp;</div><div class="line number6 index5 alt1"><code class="delphi plain">FILE_ATTRIBUTE_HIDDEN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code><code class="delphi comments">//文件被隐藏,它不会在一般文件夹列表中被装载.</code></div><div class="line number7 index6 alt2">&nbsp;</div><div class="line number8 index7 alt1"><code class="delphi plain">FILE_ATTRIBUTE_NORMAL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code><code class="delphi comments">//文件没有被设置任何属性.</code></div><div class="line number9 index8 alt2">&nbsp;</div><div class="line number10 index9 alt1"><code class="delphi plain">FILE_ATTRIBUTE_OFFLINE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code><code class="delphi comments">//文件的数据没有被立即用到。指出正在脱机使用该文件。</code></div><div class="line number11 index10 alt2">&nbsp;</div><div class="line number12 index11 alt1"><code class="delphi plain">FILE_ATTRIBUTE_READONLY&nbsp;&nbsp; </code><code class="delphi comments">//这个文件只可读取.程序可以读文件,但不可以在上面写入内容,也不可删除.</code></div><div class="line number13 index12 alt2">&nbsp;</div><div class="line number14 index13 alt1"><code class="delphi plain">FILE_ATTRIBUTE_SYSTEM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code><code class="delphi comments">//文件是系统的一部分,或是系统专用的.</code></div><div class="line number15 index14 alt2">&nbsp;</div><div class="line number16 index15 alt1"><code class="delphi plain">FILE_ATTRIBUTE_TEMPORARY&nbsp; </code><code class="delphi comments">//文件被使用后，文件系统将努力为（文件的）所有数据的迅迅访问保持一块内存。临时文件应当在程序不用时及时删除。</code></div><div class="line number17 index16 alt2">&nbsp;</div><div class="line number18 index17 alt1"><code class="delphi plain">dwFlagAndAttributes可以接受下列标志的任意组合。</code></div><div class="line number19 index18 alt2">&nbsp;</div><div class="line number20 index19 alt1"><code class="delphi plain">（标志）&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (含义)</code></div><div class="line number21 index20 alt2"><code class="delphi plain">FILE_FLAG_WRITE_THROUGH&nbsp;&nbsp;&nbsp; </code><code class="delphi comments">//指示系统通过快速缓存直接写入磁盘，</code></div><div class="line number22 index21 alt1">&nbsp;</div><div class="line number23 index22 alt2"><code class="delphi plain">FILE_FLAG_OVERLAPPED&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code><code class="delphi comments">//指示系统初始化对象, 此操作将对进程设置一个引用计数并返回ERROR_IO_PENDING.处理完成后, 指定对象将被设置为信号状态.</code></div><div class="line number24 index23 alt1">&nbsp;</div><div class="line number25 index24 alt2"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">当你指定FILE_FLAG_OVERLAPPED时,读写文件的函数必须指定一个OVERLAPPED结构.</code></div><div class="line number26 index25 alt1"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">并且. 当FILE_FLAG_OVERLAPPED被指定, 程序必须执行重叠参数(指向OVERLAPPED</code></div><div class="line number27 index26 alt2"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">结构)去进行文件的读写.</code></div><div class="line number28 index27 alt1"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">这个标志也可以有超过一个操作去执行.</code></div><div class="line number29 index28 alt2">&nbsp;</div><div class="line number30 index29 alt1"><code class="delphi plain">FILE_FLAG_NO_BUFFERING&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code><code class="delphi comments">//指示系统不使用快速缓冲区或缓存，当和FILE_FLAG_OVERLAPPED组合,该标志给出最大的异步操作量, 因为I/O不依赖内存管理器的异步操作.然而,一些I/O操作将会运行得长一些,因为数据没有控制在缓存中.</code></div><div class="line number31 index30 alt2">&nbsp;</div><div class="line number32 index31 alt1"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">当使用FILE_FLAG_NO_BUFFERING打开文件进行工作时,程序必须达到下列要求:</code></div><div class="line number33 index32 alt2"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>&nbsp;</div><div class="line number34 index33 alt1"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">文件的存取开头的字节偏移量必须是扇区尺寸的整倍数.</code></div><div class="line number35 index34 alt2"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>&nbsp;</div><div class="line number36 index35 alt1"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">文件存取的字节数必须是扇区尺寸的整倍数.例如,如果扇区尺寸是</code><code class="delphi value">512</code><code class="delphi plain">字节</code></div><div class="line number37 index36 alt2"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">程序就可以读或者写</code><code class="delphi value">512</code><code class="delphi plain">,</code><code class="delphi value">1024</code><code class="delphi plain">或者</code><code class="delphi value">2048</code><code class="delphi plain">字节,但不能够是</code><code class="delphi value">335</code><code class="delphi plain">,</code><code class="delphi value">981</code><code class="delphi plain">或者</code><code class="delphi value">7171</code></div><div class="line number38 index37 alt1"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">字节.</code></div><div class="line number39 index38 alt2">&nbsp;</div><div class="line number40 index39 alt1"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">进行读和写操作的地址必须在扇区的对齐位置,在内存中对齐的地址是扇区</code></div><div class="line number41 index40 alt2"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">尺寸的整倍数.</code></div><div class="line number42 index41 alt1">&nbsp;</div><div class="line number43 index42 alt2"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">一个将缓冲区与扇区尺寸对齐的途径是使用VirtualAlloc函数. 它分配与操作系统</code></div><div class="line number44 index43 alt1"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">内存页大小的整倍数对齐的内存地址.因为内存页尺寸和扇区尺寸--</code><code class="delphi value">2</code><code class="delphi plain">都是它们的幂.</code></div><div class="line number45 index44 alt2"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">这块内存在地址中同样与扇区尺寸大小的整倍数对齐.</code></div><div class="line number46 index45 alt1">&nbsp;</div><div class="line number47 index46 alt2"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">程序可以通过调用GetDiskFreeSpace来确定扇区的尺寸.</code></div><div class="line number48 index47 alt1">&nbsp;</div><div class="line number49 index48 alt2"><code class="delphi plain">FILE_FLAG_RANDOM_ACCESS&nbsp; </code><code class="delphi comments">//指定文件是随机访问,这个标志可以使系统优化文件的缓冲.</code></div><div class="line number50 index49 alt1">&nbsp;</div><div class="line number51 index50 alt2">&nbsp;</div><div class="line number52 index51 alt1"><code class="delphi plain">FILE_FLAG_SEQUENTIAL_SCAN </code><code class="delphi comments">//指定文件将从头到尾连续地访问.这个标志可以提示系统优化文件缓冲. 如果程序在随机访问文件中移动文件指针,优化可能不会发生;然而,正确的操作仍然可以得到保证</code></div><div class="line number53 index52 alt2">&nbsp;</div><div class="line number54 index53 alt1"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">指定这个标志可以提高程序以顺序访问模式读取大文件的性能, 性能的提高在许多</code></div><div class="line number55 index54 alt2"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">程序读取一些大的顺序文件时是异常明显的.但是可能会有小范围的字节遗漏.</code></div><div class="line number56 index55 alt1">&nbsp;</div><div class="line number57 index56 alt2">&nbsp;</div><div class="line number58 index57 alt1"><code class="delphi plain">FILE_FLAG_DELETE_ON_CLOSE 指示系统在文件所有打开的句柄关闭后立即删除文件.不只有你可以指定FILE_FLAG_DELETE_ON_CLOSE</code></div><div class="line number59 index58 alt2"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>&nbsp;</div><div class="line number60 index59 alt1"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">如果没有使用FILE_SHARE_DELETE,后续的打开文件的请求将会失败.</code></div><div class="line number61 index60 alt2">&nbsp;</div><div class="line number62 index61 alt1"><code class="delphi plain">FILE_FLAG_BACKUP_SEMANTICS </code><code class="delphi comments">//WINDOWS NT:指示系统为文件的打开或创建执行一个备份或恢复操作. 系统保证调用进程忽略文件的安全选项,倘若它必须有一个特权.则相关的特权则是SE_BACKUP_NAME和SE_RESTORE_NAME.</code></div><div class="line number63 index62 alt2">&nbsp;</div><div class="line number64 index63 alt1"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">你也可以使用这个标志获得一个文件夹的句柄，一个文件夹句柄能够象一个文件句柄</code></div><div class="line number65 index64 alt2"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">一样传给某些Win32函数。</code></div><div class="line number66 index65 alt1">&nbsp;</div><div class="line number67 index66 alt2"><code class="delphi plain">FILE_FLAG_POSIX_SEMANTICS&nbsp; </code><code class="delphi comments">//指明文件符合POSIX标准.这是在MS-DOS与16位Windows下的标准.</code></div><div class="line number68 index67 alt1">&nbsp;</div><div class="line number69 index68 alt2"><code class="delphi plain">FILE_FLAG_OPEN_REPARSE_POINT&nbsp; </code><code class="delphi comments">//指定这个标志制约NTFS分区指针.该标志不能够和CREAT_ALWAYS一起使用.</code></div><div class="line number70 index69 alt1">&nbsp;</div><div class="line number71 index70 alt2"><code class="delphi plain">FILE_FLAG_OPEN_NO_RECALL&nbsp;&nbsp; </code><code class="delphi comments">//指明需要文件数据,但是将继续从远程存储器中接收.它不会将数据存放在本地存储器中.这个标志由远程存储系统或等级存储管理器系统使用.</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>&nbsp;</p>
+<p><strong>hTemplateFile</strong></p>
+<p>
+</p><div class="cnblogs_Highlighter">
+<div><div class="syntaxhighlighter nogutter  delphi" id="highlighter_943131"><div class="toolbar"><span><a class="toolbar_item command_help help" href="#">?</a></span></div><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="delphi comments">//为GENERIC_READ访问的模式指定一个句柄到模板文件.模板文件在文件开始创建后提供文件属性和扩展属性.</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p><strong>&nbsp;</strong></p>
+<p></p>
+<p><strong>返会值</strong></p>
+<p><strong>
+</strong></p><div class="cnblogs_Highlighter"><strong>
+<div><div class="syntaxhighlighter nogutter  delphi" id="highlighter_860130"><div class="toolbar"><span><a class="toolbar_item command_help help" href="#">?</a></span></div><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="delphi comments">//如果函数成功,返回一个打开的指定文件的句柄.如果指定文件在函数调用前已经存在并且dwCreation参数是CREATE_ALWAYS 或者OPEN_ALWAYS,调用GetLastError就会返回ERROR_ALREADY_EXISTS(表示函数成功). 如果函数文件在调用前不存在则会返回0.</code></div><div class="line number2 index1 alt1">&nbsp;</div><div class="line number3 index2 alt2"><code class="delphi comments">//如果函数失败,返会值会是INVALID_HANDLE_VALUE. 更多的错误信息可以调用GetLastError来获得.</code></div></div></td></tr></tbody></table></div></div>
+</strong></div><strong>
+</strong><p></p>
+</div>
+<div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block">
+
+
+    <div id="blog_post_info">
+<div id="green_channel">
+        <a id="green_channel_digg" onclick="DiggIt(1868154,cb_blogId,1);green_channel_success(this,'谢谢推荐！');" href="javascript:void(0);">好文要顶</a>
+        <a id="green_channel_follow" onclick="follow('6cea1a7a-bdc3-df11-ac81-842b2b196315');" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a title="分享至新浪微博" id="green_channel_weibo" onclick="ShareToTsina()" href="javascript:void(0);"><img alt="" src="images/delphi01001.png"></a>
+    <a title="分享至微信" id="green_channel_wechat" onclick="shareOnWechat()" href="javascript:void(0);"><img alt="" src="images/delphi01002.png"></a>
+</div>
+<div id="author_profile">
+    <div class="author_profile_info" id="author_profile_info">
+            <a href="https://home.cnblogs.com/u/keycode/" target="_blank"><img class="author_avatar" alt="" src="images/delphi01003.jpg"></a>
+        <div class="author_profile_info" id="author_profile_detail">
+            <a href="https://home.cnblogs.com/u/keycode/">逆转瞬间</a><br>
+            <a href="https://home.cnblogs.com/u/keycode/followees/">关注 - 0</a><br>
+            <a href="https://home.cnblogs.com/u/keycode/followers/">粉丝 - 39</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow">
+                <a onclick="follow('6cea1a7a-bdc3-df11-ac81-842b2b196315');return false;" href="javascript:void(0);">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(1868154,'Digg')">
+        <span class="diggnum" id="digg_count">0</span>
+    </div>
+    <div class="buryit" onclick="votePost(1868154,'Bury')">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+    <div class="clear"></div>
+    <div id="post_next_prev">
+
+    <a class="p_n_p_prefix" href="https://www.cnblogs.com/keycode/archive/2010/10/26/1861265.html">« </a> 上一篇：    <a title="发布于 2010-10-26 10:51" href="https://www.cnblogs.com/keycode/archive/2010/10/26/1861265.html">进制间互转的原理</a>
+    <br>
+    <a class="p_n_p_prefix" href="https://www.cnblogs.com/keycode/archive/2010/11/07/1871150.html">» </a> 下一篇：    <a title="发布于 2010-11-07 17:04" href="https://www.cnblogs.com/keycode/archive/2010/11/07/1871150.html">利用Delphi编写Socket通信程序</a>
+
+</div>
+</div>
+	</div>
+	
+	<div class="postfoot">
+		posted on 
+<span id="post-date">2010-11-03 15:52</span>&nbsp;<a href="https://www.cnblogs.com/keycode/">逆转瞬间</a> 阅读(<span id="post_view_count">7362</span>) 评论(<span id="post_comment_count">0</span>) <a href="https://i.cnblogs.com/EditPosts.aspx?postid=1868154" rel="nofollow"> 编辑</a> <a onclick="AddToWz(1868154); return false;" href="javascript:void(0)">收藏</a>
+
+	</div>
+</div>
+
+
+<script src="https://common.cnblogs.com/highlight/9.12.0/highlight.min.js"></script>
+<script>markdown_highlight();</script>
+<script>
+    var allowComments = true, cb_blogId = 77001, cb_blogApp = 'keycode', cb_blogUserGuid = '6cea1a7a-bdc3-df11-ac81-842b2b196315';
+    var cb_entryId = 1868154, cb_entryCreatedDate = '2010-11-03 15:52', cb_postType = 1; 
+    loadViewCount(cb_entryId);
+</script><a name="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<script>
+    var commentManager = new blogCommentManager();
+    commentManager.renderComments(0);
+</script>
+
+<div class="commentform" id="comment_form">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav"><span id="span_refresh_tips"></span><a id="lnk_RefreshComments" onclick="return RefreshCommentList();" href="javascript:void(0);" clientidmode="Static" runat="server">刷新评论</a><a onclick="return RefreshPage();" href="#">刷新页面</a><a href="#top">返回顶部</a></div>
+    <div id="comment_form_container"><div class="login_tips">
+    注册用户登录后才能发表评论，请 
+    <a class="underline" onclick="return login('commentform');" href="javascript:void(0);" rel="nofollow">登录</a>
+     或 
+    <a class="underline" onclick="return register();" href="javascript:void(0);" rel="nofollow">注册</a>，
+    <a href="https://www.cnblogs.com/">访问</a> 网站首页。
+</div></div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+    <div id="ad_t2"><a onclick="ga('send', 'event', 'Link', 'click', 'T2-工控')" href="http://www.ucancode.com/index.htm" target="_blank">【推荐】超50万行VC++源码: 大型组态工控、电力仿真CAD与GIS源码库</a><br><a onclick="ga('send', 'event', 'Link', 'click', 'T2-京东云')" href="https://www.jdcloud.com/cn/activity/year-end?utm_source=DMT_cnblogs&amp;utm_medium=CH&amp;utm_campaign=q4vm&amp;utm_term=Virtual-Machines" target="_blank">【活动】京东云服务器_云主机低于1折，低价高性能产品备战双11</a><br><a onclick="ga('send', 'event', 'Link', 'click', 'T2-华为云代金券')" href="https://www.cnblogs.com/cmt/p/11505603.html" target="_blank">【福利】git pull &amp;&amp; cherry-pick 博客园&amp;华为云百万代金券</a><br></div>
+    <div id="opt_under_post"></div>
+    <script src="https://www.googletagservices.com/tag/js/gpt.js" async="async"></script>
+    <script>
+        var googletag = googletag || {};
+        googletag.cmd = googletag.cmd || [];
+    </script>
+    <script>
+        googletag.cmd.push(function () {
+            googletag.defineSlot("/1090369/C1", [300, 250], "div-gpt-ad-1546353474406-0").addService(googletag.pubads());
+            googletag.defineSlot("/1090369/C2", [468, 60], "div-gpt-ad-1539008685004-0").addService(googletag.pubads());
+            googletag.pubads().enableSingleRequest();
+            googletag.enableServices();
+        });
+    </script>
+    <div class="c_ad_block" id="cnblogs_c1">
+        <div id="div-gpt-ad-1546353474406-0" style="width: 300px; height: 250px;" data-google-query-id="CNj-hOSMhOUCFQMzYAodMx4H_g"><div id="google_ads_iframe_/1090369/C1_0__container__" style="border: 0pt currentColor; border-image: none;"><iframe name="google_ads_iframe_/1090369/C1_0" width="300" height="250" title="3rd party ad content" id="google_ads_iframe_/1090369/C1_0" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border: 0px currentColor; border-image: none; vertical-align: bottom;" data-load-complete="true" data-google-container-id="1" srcdoc=""></iframe></div></div>
+    </div>
+    <div id="under_post_news"><div class="recomm-block"><b>相关博文：</b><br>·  <a title="CreateFile函数详解 " onclick="clickRecomItmem(1324673)" href="https://www.cnblogs.com/qdlgx/archive/2008/11/02/1324673.html" target="_blank">CreateFile函数详解 </a><br>·  <a title="CreateFile函数详解" onclick="clickRecomItmem(3493078)" href="https://www.cnblogs.com/x-st/p/3493078.html" target="_blank">CreateFile函数详解</a><br>·  <a title="CreateFile函数详解" onclick="clickRecomItmem(1634373)" href="https://www.cnblogs.com/czk55/archive/2009/12/28/1634373.html" target="_blank">CreateFile函数详解</a><br>·  <a title="串口之CreateFile 函数详解" onclick="clickRecomItmem(6457825)" href="https://www.cnblogs.com/minggong/p/6457825.html" target="_blank">串口之CreateFile 函数详解</a><br>·  <a title="CreateFile函数详解" onclick="clickRecomItmem(1748530)" href="https://www.cnblogs.com/okaimee/archive/2010/05/31/1748530.html" target="_blank">CreateFile函数详解</a><br></div></div>
+    <div class="c_ad_block" id="cnblogs_c2">
+        <div id="div-gpt-ad-1539008685004-0" style="width: 468px; height: 60px;" data-google-query-id="CNn-hOSMhOUCFQMzYAodMx4H_g">
+            
+        <div id="google_ads_iframe_/1090369/C2_0__container__" style="border: 0pt currentColor; border-image: none;"><iframe name="google_ads_iframe_/1090369/C2_0" width="468" height="60" title="3rd party ad content" id="google_ads_iframe_/1090369/C2_0" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border: 0px currentColor; border-image: none; vertical-align: bottom;" data-load-complete="true" data-google-container-id="2" srcdoc=""></iframe></div></div>
+    </div>
+    <div id="under_post_kb">
+<div class="itnews c_ad_block">
+    <b>最新 IT 新闻</b>:
+    <br>
+ ·              <a href="//news.cnblogs.com/n/641786/" target="_blank">为祖国生日刷火箭！长征四号丙成功发射高分十号卫星</a>
+            <br>
+ ·              <a href="//news.cnblogs.com/n/641785/" target="_blank">美政府调查：特斯拉未召回2000辆产品缺陷车</a>
+            <br>
+ ·              <a href="//news.cnblogs.com/n/641784/" target="_blank">Chrome 将不再允许 https：// 页面加载 HTTP 资源</a>
+            <br>
+ ·              <a href="//news.cnblogs.com/n/641783/" target="_blank">美国物理学家认为：外星人一直监控着我们</a>
+            <br>
+ ·              <a href="//news.cnblogs.com/n/641782/" target="_blank">苹果证实收购英国视觉效果公司iKinema 用于强化AR产品</a>
+            <br>
+    » <a title="IT 新闻" href="https://news.cnblogs.com/" target="_blank">更多新闻...</a>
+</div></div>
+    <div class="c_ad_block" id="HistoryToday"></div>
+    <script type="text/javascript">
+        fixPostBody();
+        setTimeout(function () { incrementViewCount(cb_entryId); }, 50);
+        deliverAdT2();
+        deliverAdC1();
+        deliverAdC2();
+        loadNewsAndKb();
+        loadBlogSignature();
+LoadPostCategoriesTags(cb_blogId, cb_entryId);        LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+        GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+        loadOptUnderPost();
+        GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+    </script>
+</div></div>
+
+</div>
+
+
+</body></html>

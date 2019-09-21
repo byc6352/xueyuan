@@ -1,0 +1,90 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>解决AS3 Socket编程中最令人头疼的问题_梦宇 - topfire7的专栏 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            <h3 style="text-align: center;"><span style="font-size: 16pt; font-weight: bold;"><span style='font-family: "宋体";'>解决AS3 Socket编程中最令人头疼的问题</span></span></h3>
+<p class="p0" style="text-align: center;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>－－解决AS3 Socket安全问题</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>什么是最令人头疼的问题?也许大家会异口同声的说：“安全问题”，不错，不仅仅是AS3 的Socket，整个AS3语言中最令人头疼的问题也无非就是安全问题了。</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>很 多同行的兄弟在郁闷的时候就会骂Adobe。但是，骂归骂，问题终归是要解决的，Adobe做这样的限制肯定是有他的用意的，大家都知道，swf文件是很 容易被反编的，那么也就是说你的swf文件内部与服务器通信的方式及路径是很容易被别人发现的，如果你的服务器中没有任何访问限制，那么你的服务器很容易 被一些人攻破，这并不需要很高的水平，只要一直刷，你的服务器就完了。</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>兄弟，您骂够了吗？我们来解决问题吧？</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>用Java写完Socket服务器后，运行，一切正常，用Flex写全Socket客户端后，运行，一切正常，可是当把生成的swf文件拷到其它地方来运行就出错了，总是无法连接服务器，然后就开始抛securityError，下面我们看一下输出信息。</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>打 开Flash CS3，打开远程调试器，选择菜单如 Debug-&gt;Begin Remote Debug Session-&gt;ActionScript3.0（中文版选择菜单如：调试－＞开始 远程调试会话－＞ActionScript3.0），下面我们打开客户端swf文件（记得此文件一定是调试版swf），则它会自动连接Flash CS3 的调试器，在Flash CS3中输出相关的调试信息。</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>可以看到输出信息如下：</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">[SWF] C:/Users/Administrator/Desktop/MyClientFlash.swf - 1112717 bytes after decompression</span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>警告: [strict] 将忽略 xmlsocket://localhost:9999 处的策略文件，因为出现语法错误。请访问 http://www.adobe.com/go/strict_policy_files_cn 以解决此问题。</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;">&nbsp;</p>
+<p class="p0" style="text-align: left; text-indent: 21pt;">&nbsp;</p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">*** <span style='font-family: "宋体";'>安全沙箱冲突 ***</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>到 localhost:9999 的连接已停止 - 不允许从 file:///C|/Users/Administrator/Desktop/MyClientFlash.swf 进行连接</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>错误: 拒绝请求位于 xmlsocket://localhost:9999 的资源（请求者从 file:///C|/Users/Administrator/Desktop/MyClientFlash.swf 发出请求），原因是缺乏策略文件权限。</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>原因是没有在服务器的9999端口放置安全策略文件（我写的服务器用的是9999端口），那么好吧，我就在此处给客户端返回了一个安全策略文件信息，此文件格式如下：</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">&lt;?xml version="1.0"?&gt;</span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">&lt;cross-domain-policy&gt; </span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">&nbsp;&nbsp;&nbsp; &lt;site-control permitted-cross-domain-policies="</span><span style="font-size: 10.5pt;">all</span><span style="font-size: 10.5pt;">"/&gt;</span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">&nbsp;&nbsp;&nbsp; &lt;allow-access-from domain="</span><span style="font-size: 10.5pt;">localhost</span><span style="font-size: 10.5pt;">" to-ports="</span><span style="font-size: 10.5pt;">9999</span><span style="font-size: 10.5pt;">,</span><span style="font-size: 10.5pt;">300-400</span><span style="font-size: 10.5pt;">" /</span><span style="font-size: 10.5pt;">&gt;</span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">&lt;/cross-domain-policy&gt;</span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>上述示例中是允许来自localhost域的swf文件访问9999端口和300至400端口，你也可以用*来代替localhost以允许来自任何域的swf文件访问。</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>此时我将客户端文件请求的信息在Java中打印出来，看到的是一段包含&lt;policy-file-request/&gt;的字符串，当Java服务器接收到这个字符串时，立即返回安全策略文件字符串。</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>我想这样应该没什么问题了吧，可是当我再连接服务器时仍然无法连接，输出信息成了这样：</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">[SWF] C:/Users/Administrator/Desktop/MyClientFlash.swf - 1112717 bytes after decompression</span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>警告: 等待 socket 策略文件时在 xmlsocket://localhost:9999 上超时（3 秒钟）。这不会造成任何问题，但可访问 http://www.adobe.com/go/strict_policy_files_cn 以获得说明。</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;">&nbsp;</p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">*** <span style='font-family: "宋体";'>安全沙箱冲突 ***</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>到 localhost:9999 的连接已停止 - 不允许从 file:///C|/Users/Administrator/Desktop/MyClientFlash.swf 进行连接</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>错误: 拒绝请求位于 xmlsocket://localhost:9999 的资源（请求者从 file:///C|/Users/Administrator/Desktop/MyClientFlash.swf 发出请求），原因是缺乏策略文件权限。</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>这时我并不灰心，就按照它的说明去了http://www.adobe.com/go/strict_policy_files_cn这里查看说明了。</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>等我看到这个页面时，我真的郁闷了，上面全是乱说一通，根本不着边，全是一些没用的信息，亏Adobe想得出来提示我到这里看。</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>就 在我将要放弃解决这个问题的时候，我发现了另外一个现象，那就是当我刚开始连接服务器时，服务器端并没有打印出来客户端的请求信息 (&lt;policy-file-request/&gt;)，而是在Flash CS3的调试器输出了超时错误之后，服务器端才打印出来这个请求信 息。</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>这时我看到了一线希望，那就是服务器端确实出现了等待，这肯定是服务器端的程序问题。服务器端接收请求的处理代码片断如下：</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">BufferedReader br=new BufferedReader(new InputStreamReader(s.getInputStream()));</span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">if(br.readLine().indexOf("&lt;policy-file-request/&gt;")!=-1){</span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">//<span style='font-family: "宋体";'>开始返回授权文件信息</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">...</span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">}</span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>其中变量s是ServerSocket实例通过accept方法获得的Socket实例。</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>此时我开始怀疑是readLine方法的问题了，因为readLine方法是当程序读到/n或者/r时才会返回信息，所以肯定是此方法中出现了等待，因为起初客户端并没有传来换行符或者回车符。</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>于是我改变了读取字符串的方法，不再用readLine了，而取流中前22个字符，代码片断如下所示：</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">BufferedReader br=new BufferedReader(new InputStreamReader(s.getInputStream()));</span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">char[] ch=new char[22];</span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">br.read(ch, 0, ch.length);</span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">StringBuffer sb=new StringBuffer();</span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">for(int i=0;i&lt; ch.length;i++){</span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">sb.append(ch[i]);</span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">}</span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">String st=sb.toString();</span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">if(st.indexOf("&lt;policy-file-request/&gt;")!=-1){</span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">//<span style='font-family: "宋体";'>开始返回授权文件信息</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">...</span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;">}</span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>当我再连接服务器时，果然不出我所料，成功连接服务器。</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>但是连接过程有点慢，貌似此过程也正好是3秒钟，莫非在连接此服务器之前已经进行了另外一次连接，而且是失败的。</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>查看Adobe官网的资料才明白，flashplayer会在连接指定的端口之前连接目标主机的843端口，如果3秒后得不到授权文件才再向指定的端口去请求授权文件，如果再经过3秒还得不到授权文件的话，则断开连接，抛出securityError。</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>那 意思就是说在连接我的服务器的9999端口之前还连接了我的服务器的843端口，并且在843端口等待了3秒，没有得到授权文件，之后开始向我指定的端口 请求此授权文件。那好吧，既然你要了，我就给你吧，不给你的话你还再磨矶磨矶，于是我又在843端口开了一个ServerSocket，此处专门处理授权 文件的请求。</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>这时我再连接服务器，呵呵，特快专列(T843)，立即就连接上了。</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;">&nbsp;</p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>----------------------------------------------------------------------------------------</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>结论就是</span></span>客户端会自动请求843端口的域策略文件，将客户端文件请求的信息在Java中打印出来，看到的是一段包含&lt;policy-file-request/&gt;的字符串。</span></span><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>服务器端建立一个线程侦听843端口，当有请求的时候发送回一个域策略文件即可</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>private void handleIncoming(Socket s){<br>&nbsp;&nbsp;BufferedReader br;<br>&nbsp;&nbsp;try {<br>&nbsp;&nbsp;&nbsp;br = new BufferedReader(new InputStreamReader(s.getInputStream()));<br>&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;char[] ch=new char[22];<br>&nbsp;&nbsp;&nbsp;br.read(ch, 0, 22);<br>&nbsp;&nbsp;&nbsp;StringBuffer sb=new StringBuffer();<br>&nbsp;&nbsp;&nbsp;for(int i=0;i&lt; ch.length;i++){<br>&nbsp;&nbsp;&nbsp;&nbsp;sb.append(ch[i]);<br>&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;String st=sb.toString();<br>&nbsp;&nbsp;&nbsp;//OutTxt.getSingleOutTxt().append(st+"/n");<br>&nbsp;&nbsp;&nbsp;System.out.println("843br:"+st.indexOf("&lt;policy-file-request/&gt;"));<br>&nbsp;&nbsp;&nbsp;if(st.indexOf("&lt;policy-file-request/&gt;")!=-1){<br>&nbsp;&nbsp;&nbsp;&nbsp;//文件授权线程<br>&nbsp;&nbsp;&nbsp;&nbsp;new PolicyThread(s).start();<br>&nbsp;&nbsp;&nbsp;}else{<br>&nbsp;&nbsp;&nbsp;&nbsp;br.close();<br>&nbsp;&nbsp;&nbsp;&nbsp;br=null;<br>&nbsp;&nbsp;&nbsp;&nbsp;ch=null;<br>&nbsp;&nbsp;&nbsp;&nbsp;sb=null;<br>&nbsp;&nbsp;&nbsp;&nbsp;System.gc();<br>&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;}catch (IOException e) {<br>&nbsp;&nbsp;&nbsp;e.printStackTrace();<br>&nbsp;&nbsp;}<br>&nbsp;}</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>---------------------------------------------------------</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"><span style='font-family: "宋体";'>JAVA的侦听843端口socket解决方案，当解析头22个字符是"&lt;policy-file-request/&gt;"的时候，发送域策略文件给FLASH</span></span></p>
+<p class="p0" style="text-align: left; text-indent: 21pt;"><span style="font-size: 10.5pt;"></span>&nbsp;</p>                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>

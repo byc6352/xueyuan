@@ -1,0 +1,123 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                                <div class="article-copyright">
+                <span class="creativecommons">
+                <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                    </a>
+            <span>
+                版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。            </span>
+               <div class="article-source-link2222">
+                    本文链接：<a href="https://blog.csdn.net/caimouse/article/details/1837984">https://blog.csdn.net/caimouse/article/details/1837984</a>
+                </div>
+            </span>
+                    </div>
+                                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            <div><span style="font-size: 10.5pt;">在</span><span style="font-size: 10.5pt;">PC</span><span style="font-size: 10.5pt;">硬件体系结构里，速度最快的存储器是</span><span style="font-size: 10.5pt;">CPU</span><span style="font-size: 10.5pt;">里面的寄存器，接着到二级缓存，再到系统</span><span style="font-size: 10.5pt;">RAM</span><span style="font-size: 10.5pt;">内存，最后才到硬盘。由于这样的体系结构，就决定了操作系统对文件的操作方式，或者说是最优化的算法。比如操作系统接收到写文件的数据时，就会先把数据保存到</span><span style="font-size: 10.5pt;">RAM</span><span style="font-size: 10.5pt;">里，然后在合适的时间或者合适的数据量时再写到硬盘里。但有时候我们希望数据一定要保存到硬盘里，而不是保存在</span><span style="font-size: 10.5pt;">RAM</span><span style="font-size: 10.5pt;">里，这时就需要使用函数</span><span style="font-size: 10.5pt;">FlushFileBuffers</span><span style="font-size: 10.5pt;">来把</span><span style="font-size: 10.5pt;">RAM</span><span style="font-size: 10.5pt;">里的数据保存到硬盘里。文件的结构是一个有序的队列，有头有尾，当读写文件后，就会移动文件里的文件指针。有时候想移动到特定的位置读取数据。比如读取一个</span><span style="font-size: 10.5pt;">BMP</span><span style="font-size: 10.5pt;">的文件，它有文件头和数据块组成，就需要先读取文件头，然后根据文件头里指示数据块开始位置去读取图片显示数据，这时就需要使用到</span><span style="font-size: 10.5pt;">SetFilePointer</span><span style="font-size: 10.5pt;">函数。</span></div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div><span style="font-size: 10.5pt;">函数</span><span style="font-size: 10.5pt;">FlushFileBuffers</span><span style="font-size: 10.5pt;">和</span><span style="font-size: 10.5pt;">SetFilePointer</span><span style="font-size: 10.5pt;">声明如下：</span></div>
+<div>&nbsp;</div>
+<div><span style="font-size: 10.5pt;">WINBASEAPI</span></div>
+<div><span style="font-size: 10.5pt;">BOOL</span></div>
+<div><span style="font-size: 10.5pt;">WINAPI</span></div>
+<div><span style="font-size: 10.5pt;">FlushFileBuffers(</span></div>
+<div><span style="font-size: 10.5pt;">&nbsp;&nbsp;&nbsp; __in HANDLE hFile</span></div>
+<div><span style="font-size: 10.5pt;">&nbsp;&nbsp;&nbsp; );</span></div>
+<div><span style="font-size: 10.5pt;">&nbsp;&nbsp;&nbsp; </span></div>
+<div><span style="font-size: 10.5pt;">WINBASEAPI</span></div>
+<div><span style="font-size: 10.5pt;">DWORD</span></div>
+<div><span style="font-size: 10.5pt;">WINAPI</span></div>
+<div><span style="font-size: 10.5pt;">SetFilePointer(</span></div>
+<div><span style="font-size: 10.5pt;">&nbsp;&nbsp;&nbsp;__in&nbsp;&nbsp;&nbsp;&nbsp; HANDLE hFile,</span></div>
+<div><span style="font-size: 10.5pt;">&nbsp;&nbsp;&nbsp; __in&nbsp;&nbsp;&nbsp;&nbsp; LONG lDistanceToMove,</span></div>
+<div><span style="font-size: 10.5pt;">&nbsp;&nbsp;&nbsp; __in_opt PLONG lpDistanceToMoveHigh,</span></div>
+<div><span style="font-size: 10.5pt;">&nbsp;&nbsp;&nbsp; __in&nbsp;&nbsp;&nbsp;&nbsp; DWORD dwMoveMethod</span></div>
+<div><span style="font-size: 10.5pt;">&nbsp;&nbsp;&nbsp; );</span></div>
+<div>&nbsp;</div>
+<div><strong><em><span style="font-size: 10.5pt;">hFile</span></em></strong><span style="font-size: 10.5pt;">是文件句柄。</span></div>
+<div><strong><em><span style="font-size: 10.5pt;">lDistanceToMove</span></em></strong><span style="font-size: 10.5pt;">是文件指针距离头或尾的长度。</span></div>
+<div><strong><em><span style="font-size: 10.5pt;">lpDistanceToMoveHigh</span></em></strong><span style="font-size: 10.5pt;">是文件指针距离头或尾的长度高位长度。</span></div>
+<div><strong><em><span style="font-size: 10.5pt;">dwMoveMethod</span></em></strong><span style="font-size: 10.5pt;">是相对文件头、文件尾或者当前位置的方式。</span></div>
+<div>&nbsp;</div>
+<div><span style="font-size: 10.5pt;">调用函数的例子如下：</span></div>
+<div><span style="font-size: 10.5pt;">#001&nbsp;&nbsp;//</span><span style="font-size: 10.5pt;">创建、写入、读取文件。</span></div>
+<div><span style="font-size: 10.5pt;">#002&nbsp;&nbsp;//</span><span style="font-size: 10.5pt;">蔡军生</span><span style="font-size: 10.5pt;">&nbsp;2007/10/21 QQ:9073204 </span><span style="font-size: 10.5pt;">深圳</span></div>
+<div><span style="font-size: 10.5pt;">#003&nbsp;&nbsp;void CreateFileDemo(void)</span></div>
+<div><span style="font-size: 10.5pt;">#004&nbsp;&nbsp;{</span></div>
+<div><span style="font-size: 10.5pt;">#005&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //</span></div>
+<div><span style="font-size: 10.5pt;">#006&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HANDLE hFile = ::CreateFile(_T("CreateFileDemo.txt"),&nbsp;&nbsp;&nbsp;&nbsp; //</span><span style="font-size: 10.5pt;">创建文件的名称。</span></div>
+<div><span style="font-size: 10.5pt;">#007&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GENERIC_WRITE|GENERIC_READ,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // </span><span style="font-size: 10.5pt;">写和读文件。</span></div>
+<div><span style="font-size: 10.5pt;">#008&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // </span><span style="font-size: 10.5pt;">不共享读写。</span></div>
+<div><span style="font-size: 10.5pt;">#009&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NULL,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // </span><span style="font-size: 10.5pt;">缺省安全属性。</span></div>
+<div><span style="font-size: 10.5pt;">#010&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CREATE_ALWAYS,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // </span><span style="font-size: 10.5pt;">如果文件存在，也创建。</span></div>
+<div><span style="font-size: 10.5pt;">#011&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FILE_ATTRIBUTE_NORMAL, // </span><span style="font-size: 10.5pt;">一般的文件。</span><span style="font-size: 10.5pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></div>
+<div><span style="font-size: 10.5pt;">#012&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NULL);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // </span><span style="font-size: 10.5pt;">模板文件为空。</span></div>
+<div><span style="font-size: 10.5pt;">#013&nbsp;</span></div>
+<div><span style="font-size: 10.5pt;">#014&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (hFile == INVALID_HANDLE_VALUE) </span></div>
+<div><span style="font-size: 10.5pt;">#015&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { </span></div>
+<div><span style="font-size: 10.5pt;">#016&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //</span></div>
+<div><span style="font-size: 10.5pt;">#017&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OutputDebugString(_T("CreateFile fail!/r/n"));</span></div>
+<div><span style="font-size: 10.5pt;">#018&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span></div>
+<div><span style="font-size: 10.5pt;">#019&nbsp;</span></div>
+<div><span style="font-size: 10.5pt;">#020&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //</span><span style="font-size: 10.5pt;">往文件里写数据。</span></div>
+<div><span style="font-size: 10.5pt;">#021&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const int BUFSIZE = 4096;</span></div>
+<div><span style="font-size: 10.5pt;">#022&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; char chBuffer[BUFSIZE];&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></div>
+<div><span style="font-size: 10.5pt;">#023&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; memcpy(chBuffer,"Test",4);</span></div>
+<div><span style="font-size: 10.5pt;">#024&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DWORD dwWritenSize = 0;</span></div>
+<div><span style="font-size: 10.5pt;">#025&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BOOL bRet = ::WriteFile(hFile,chBuffer,4,&amp;dwWritenSize,NULL);</span></div>
+<div><span style="font-size: 10.5pt;">#026&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (bRet)</span></div>
+<div><span style="font-size: 10.5pt;">#027&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {</span></div>
+<div><span style="font-size: 10.5pt;">#028&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //</span></div>
+<div><span style="font-size: 10.5pt;">#029&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OutputDebugString(_T("WriteFile </span><span style="font-size: 10.5pt;">写文件成功</span><span style="font-size: 10.5pt;">/r/n"));</span></div>
+<div><span style="font-size: 10.5pt;">#030&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span></div>
+<div><span style="font-size: 10.5pt;">#031&nbsp;</span></div>
+<div><strong><span style="font-size: 10.5pt;">#032&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //</span></strong><strong><span style="font-size: 10.5pt;">先把写文件缓冲区的数据强制写入磁盘。</span></strong></div>
+<div><strong><span style="font-size: 10.5pt;">#033&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FlushFileBuffers(hFile);</span></strong></div>
+<div><span style="font-size: 10.5pt;">#034&nbsp;</span></div>
+<div><span style="font-size: 10.5pt;">#035&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //</span></div>
+<div><span style="font-size: 10.5pt;">#036&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //</span><span style="font-size: 10.5pt;">从文件里读取数据。</span></div>
+<div><span style="font-size: 10.5pt;">#037&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LONG lDistance = 0;</span></div>
+<div><strong><span style="font-size: 10.5pt;">#038&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DWORD dwPtr = SetFilePointer(hFile, lDistance, NULL, FILE_BEGIN);</span></strong></div>
+<div><span style="font-size: 10.5pt;">#039&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (dwPtr == INVALID_SET_FILE_POINTER)</span></div>
+<div><span style="font-size: 10.5pt;">#040&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { </span></div>
+<div><span style="font-size: 10.5pt;">#041&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //</span><span style="font-size: 10.5pt;">获取出错码。</span></div>
+<div><span style="font-size: 10.5pt;">#042&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DWORD dwError = GetLastError() ; </span></div>
+<div><span style="font-size: 10.5pt;">#043&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //</span><span style="font-size: 10.5pt;">处理出错。</span><span style="font-size: 10.5pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></div>
+<div><span style="font-size: 10.5pt;">#044&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span></div>
+<div><span style="font-size: 10.5pt;">#045&nbsp;</span></div>
+<div><span style="font-size: 10.5pt;">#046&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DWORD dwReadSize = 0;</span></div>
+<div><span style="font-size: 10.5pt;">#047&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bRet = ::ReadFile(hFile,chBuffer,4,&amp;dwReadSize,NULL);</span></div>
+<div><span style="font-size: 10.5pt;">#048&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (bRet)</span></div>
+<div><span style="font-size: 10.5pt;">#049&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {</span></div>
+<div><span style="font-size: 10.5pt;">#050&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //</span></div>
+<div><span style="font-size: 10.5pt;">#051&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OutputDebugString(_T("ReadFile </span><span style="font-size: 10.5pt;">读文件成功</span><span style="font-size: 10.5pt;">/r/n"));</span></div>
+<div><span style="font-size: 10.5pt;">#052&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span></div>
+<div><span style="font-size: 10.5pt;">#053&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; else</span></div>
+<div><span style="font-size: 10.5pt;">#054&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {</span></div>
+<div><span style="font-size: 10.5pt;">#055&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //</span><span style="font-size: 10.5pt;">获取出错码。</span></div>
+<div><span style="font-size: 10.5pt;">#056&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DWORD dwError = GetLastError(); </span></div>
+<div><span style="font-size: 10.5pt;">#057&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //</span><span style="font-size: 10.5pt;">处理出错。</span><span style="font-size: 10.5pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></div>
+<div><span style="font-size: 10.5pt;">#058&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TCHAR chErrorBuf[1024];</span></div>
+<div><span style="font-size: 10.5pt;">#059&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; wsprintf(chErrorBuf,_T("GetLastError()=%d/r/n"),dwError);</span></div>
+<div><span style="font-size: 10.5pt;">#060&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OutputDebugString(chErrorBuf);</span></div>
+<div><span style="font-size: 10.5pt;">#061&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span></div>
+<div><span style="font-size: 10.5pt;">#062&nbsp;</span></div>
+<div><span style="font-size: 10.5pt;">#063&nbsp;&nbsp;}</span></div>
+&nbsp;                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>

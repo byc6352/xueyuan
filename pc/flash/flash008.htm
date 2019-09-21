@@ -1,0 +1,364 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AS3 Socket基础知识很全面 - 一个人的专栏 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content">
+                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            
+<span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">在讲AS3 Socket之前我们先来搞清几个概念，这有助于我们更加了解网络通信！</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span>1、网络中进程之间如何通信？</span></span>
+<p align="left" style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;">
+<span style="font-family: SimSun;"><span style="font-size: 13px;">首要解决的问题是如何唯一标识一个进程，否则通信无从谈起！在本地可以通过进程PID来唯一标识一个进程，但是在网络中这是行不通的。其实TCP/IP协议族已经帮我们解决了这个问题，网络层的“<span>ip地址</span>”可以唯一标识网络中的主机，而传输层的“<span>协议+端口</span>”可以唯一标识主机中的应用程序（进程）。这样利用三元组（ip地址，协议，端口）就可以标识网络的进程了，网络中的进程通信就可以利用这个标志与其它进程进行交互。</span></span></p>
+<p align="left" style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;">
+<span style="font-family: SimSun;"><span style="font-size: 13px;">使用TCP/IP协议的应用程序通常采用应用编程接口：UNIX&nbsp;&nbsp;BSD的套接字（socket）和UNIX System V的TLI（已经被淘汰），来实现网络进程之间的通信。就目前而言，几乎所有的应用程序都是采用socket，而现在又是网络时代，网络中进程通信是无处不在，这就是我为什么说“一切皆socket”。</span></span></p>
+<span style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span>2、什么是Socket？</span></span><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">上面我们已经知道网络中的进程是通过socket来通信的，那什么是socket呢？socket起源于Unix，而Unix/Linux基本哲学之一就是“一切皆文件”，都可以用“打开open
+ –&gt; 读写write/read –&gt; 关闭close”模式来操作。我的理解就是Socket就是该模式的一个实现，socket即是一种特殊的文件，一些socket函数就是对其进行的操作（读/写IO、打开、关闭），这些函数我们在后面进行介绍。<br></span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="font-family: SimSun;"><span style="font-size: 13px;"><br></span></span><span style="font-family: SimSun;"><span style="font-size: 13px;">socket一词的起源:在组网领域的首次使用是在1970年2月12日发布的文献IETF RFC33中发现的，撰写者为Stephen Carr、Steve Crocker和Vint Cerf。根据美国计算机历史博物馆的记载，Croker写道：“命名空间的元素都可称为套接字接口。一个套接字接口构成一个连接的一端，而一个连接可完全由一对套接字接口规定。”计算机历史博物馆补充道：“这比BSD的套接字接口定义早了大约12年。”</span></span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">好了，下面来讲讲AS3中的Socket编程。</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">我们在使用ActionScript3.0进行Socket编程的时候需要关注下面的问题,我们将在今后的学习中逐个对下面的问题进行讨论,并尽量逐渐的改进我们的程序.<br></span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;">1.与Socket服务器建立连接.&nbsp;<br>
+2.向Socket服务器发送数据.&nbsp;<br>
+3.从Socket服务器读数据.&nbsp;<br>
+4.同Socket服务器进行握手,并确定收到了什么样的数据和如何处理这些数据.&nbsp;<br>
+5.与Socket服务器断开,或者当服务器想与你断开的时候发消息给你.&nbsp;<br>
+6.处理使用Sockets时候引发的错误.&nbsp;<br><br><span>1.与Socket服务器建立连接.&nbsp;</span><br><br>
+解决方法:&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;我们通过调用Socket.connect( )或者XMLSocket.connect( )方法并监听网络连接的事件消息.&nbsp;<br><br>
+讨论:&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;连接一台Socket服务器你需要确定两个信息,一个是Socket服务器的域名或者IP地址,另一个是服务器监听的端口号.&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;无论你使用的是Socket还是XMLSocket类的实例,连接请求都是完全的一样的,两个类都是使用一个名叫connect()的方法,该方法有两个参数:&nbsp;<br>
+host :&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;该参数为字符串类型,可以是一个域名,例如"www.example.com",也可以是一个IP地址,例如"192.168.1.101".如果Socket服务器与你该Flash影片发布的Web服务器是同一个,该参数为Null.<br>
+port :&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;该参数为一个表示Socket服务器监听端口的int值.该值最小为1024.除非在服务器中有一个policy文件,用于指定允许端口号小于1024.&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;因为Flash Socket编程是一个异步的过程,connect()方法不会等到一个连接完成后再执行下一行代码的执行.如果你想在一个连接完全执行完之前与一个Socket完全绑定,那么你将会得到一个意想不到的结果,并且你当前的代码将不能工作.<br>
+&nbsp; &nbsp;&nbsp;&nbsp;在尝试一个新的Socket连接的时候我们最好先添加一个连接事件监听器.当一个连接建立成功,Socket或者XMLSocket会发出一个连接事件,这就可以让你知道交互已经准备好了.<br>
+&nbsp; &nbsp;&nbsp;&nbsp;下面举了一个Socket实例与本地Socket服务器的2900端口建立连接的例子:&nbsp;<br><br>
+package {&nbsp;<br>
+&nbsp; &nbsp;import flash.display.Sprite;&nbsp;<br>
+&nbsp; &nbsp;import flash.events.*;&nbsp;<br>
+&nbsp; &nbsp;import flash.net.Socket;&nbsp;<br><br>
+&nbsp; &nbsp;public class SocketExample extends Sprite {&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;private var socket:Socket;&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;public function SocketExample(&nbsp; &nbsp;) {&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; socket = new Socket(&nbsp; &nbsp;);&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; // Add an event listener to be notified when the connection&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; // is made&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; socket.addEventListener( Event.CONNECT, onConnect );&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; // Connect to the server&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; socket.connect( "localhost", 2900 );&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;}&nbsp;<br>
+&nbsp; &nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;private function onConnect( event:Event ):void {&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; trace( "The socket is now connected..." );&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;}&nbsp;<br>
+&nbsp; &nbsp;<br>
+&nbsp; &nbsp;}&nbsp;<br>
+}&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;如果你想通过XMLSocket与服务器建立连接代码也是基本一样的.首先你创建了一个连接事件监听器,然后调用connect()方法.所不同的是Socket实例改为了XMLSocket:<br><br>
+package {&nbsp;<br>
+&nbsp; &nbsp;import flash.display.Sprite;&nbsp;<br>
+&nbsp; &nbsp;import flash.events.*;&nbsp;<br>
+&nbsp; &nbsp;import flash.net.XMLSocket;&nbsp;<br><br>
+&nbsp; &nbsp;public class SocketExample extends Sprite {&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;private var socket:XMLSocket;&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;public function SocketExample(&nbsp; &nbsp;) {&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; socket = new XMLSocket(&nbsp; &nbsp;);&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; // Add an event listener to be notified when the connection is made&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; socket.addEventListener( Event.CONNECT, onConnect );&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; // Connect to the server&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; socket.connect( "localhost", 2900 );&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;}&nbsp;<br>
+&nbsp; &nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;private function onConnect( event:Event ):void {&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; trace( "The xml socket is now connected..." );&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;}&nbsp;<br>
+&nbsp; &nbsp;<br>
+&nbsp; &nbsp;}&nbsp;<br>
+}&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;如果连接失败,可能是下面两种原因的一种:一种是连接立即失败和运行时错误,另一种是如果无法完成连接从而产生一个ioError或者securityError事件.关于错误事件处理信息的描述,我们打算改日讨论.<br>
+&nbsp; &nbsp;&nbsp;&nbsp;请牢记,当与一个主机建立一个Socket连接时,Flash Player要遵守如下安全沙箱规则.&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;1.Flash的.swf文件和主机必须严格的在同一个域名,只有这样才可以成功建立连接.&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;2.一个从网上发布的.swf文件是不可以访问本地服务器的.&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;3.本地未通过认证的.swf文件是不可以访问任何网络资源的.&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;4.你想跨域访问或者连接低于1024的端口,必须使用一个跨域策略文件.&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;</span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;">&nbsp; &nbsp;&nbsp;&nbsp;如果尝试连接未认证的域或者低端口服务,这样就违反了安全沙箱策略,同时会产生一个securityError事件.这些情况都可以通过使用一个跨域策略 文件解决.无论是Socket对象还是XMLSocket对象的策略文件,都必须在连接之前通过使用 flash.system.Security.loadPolicyFile()方法载入策略文件.具体如下:<br>
+&nbsp; &nbsp;&nbsp;&nbsp;Security.loadPolicyFile("http://www.rightactionscript.com/crossdomain.xml");<br>
+&nbsp; &nbsp;&nbsp;&nbsp;获得的改策略文件不仅定义了允许的域名,还定义了端口号.如果你不设置端口号,那么Flash Player默认为80端口(HTTP协议默认端口).在&lt;allow-access-from&gt;标签中可以使用逗号隔开设置多个端口号.下 面这个例子就是允许访问80和110端口.<br><br>
+&lt;?xml version="1.0"?&gt;&nbsp;<br><br>
+&lt;!DOCTYPE cross-domain-policy SYSTEM "http://www.macromedia.com/xml/dtds/cross-domain-policy.dtd"&gt;<br>
+&lt;cross-domain-policy&gt;&nbsp;<br>
+&nbsp; &nbsp;&lt;allow-access-from domain="*" to-ports="80,110" /&gt;&nbsp;<br>
+&lt;/cross-domain-policy&gt;&nbsp;<br><br><span>2.向Socket服务器发送数据.&nbsp;</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;">解决方法:&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;对于Socket对象来说,通过是用write方法(writeByte(),writeUTFBytes( )等方法.)先向缓存区写入数据,然后使用flush()方法发送数据.对于XMLSocket对象,使用send()方法.<br><br>
+讨论:&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;Socket和XMLSocket类向Socket服务器发送数据的方法是不相同的.让我们首先看一下Socket类的方法.&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;当你使用Socket对象向服务器发送数据的时候,你首先要将数据写入到一个缓冲区中.Socket类设置了一系列的方法来写数据.每一个方法都用于写不 同的数据类型的数据(或者不同的数据).这些方法分别是: writeBoolean( ), writeByte( ), writeBytes( ), writeDouble( ), writeFloat( ), writeInt( ), writeMultiByte( ), writeObject( ), writeShort( ), write- UnsignedInt(
+ ), writeUTF(), 和writeUTFBytes( ). 这些方法大多数都只接受一个参数,该参数的类型同方法的名字相匹配.例如,writeBoolean()方法接受一个布尔值作为参数,而 writeByte( ), writeDouble( ), writeFloat( ), writeInt( ), writeShort( ), writeUnsignedInt( ) 方法接受一个数字型参数.writeObject()方法接受一个对象类型作为参数,但该对象必须序列化成为AMF格式.writeBytes(
+ )方法允许你传一个ByteArray参数,并带有偏移量和长度两个参数.例如,下面这段代码,调用了一个writeBytes( )方法,该方法将ByteArray对象中的所有byt值都传出去了(偏移量为0,长度和ByteArray数组长度等长):<br><br>
+socket.writeBytes(byteArray, 0, byteArray.length);&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;writeUTF( )和writeUTFBytes( ) 方法允许你的发送字符串类型的参数.每个一个方法只接受一个字符串作为参数.writeUTFBytes( )方法简单的将字符串作为Bytes发送.writeUTF( )方法在写入真正数据之前,先写入byts的数量.<br>
+&nbsp; &nbsp;&nbsp;&nbsp;writeMultiByte( )方法也允许字符串类型的参数,但是使用的为非默认字符集.该方法需要两个参数:字符串和字符集名称.在Flash和Flex的帮助文档中有一个自持所有 字符集的列表,该列表中的标签和描述符是一一对应的.使用标签值作为writeMultiByte( )作为字符集.例如下面的代码发送了一个编码为Unicode的字符串:<br><br>
+socket.writeMultiByte("example", "unicode");&nbsp;<br>
+&nbsp; &nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;向一个Socket对象传数值的方法完全依赖于你所有数据的类型和服务所接受数据的类型.使用一个Socket对象,你完全可以使用 ActionScript写一个Telnet和POP mail客户端.这两种协议都支持ASCII字符指令.例如,在连接一个POP服务器之后,你可以通过使用USER指令指定一个用户.下面代码向一个 Socket对象发一条指令:<br><br>
+// POP servers expect a newline (\n) to execute the preceding command.&nbsp;<br>
+socket.writeUTFBytes("USER exampleUsername\n");&nbsp;<br>
+&nbsp; &nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;向一个Socket对象写入数据其实并没有将数据发送到Socket服务器.每调用一个write方法都向Socket对象添加一个数据.例如,下面代码向一个Socket对象添加了四个byte的数据,但是没有一个发出了.<br><br>
+socket.writeByte(1);&nbsp;<br>
+socket.writeByte(5);&nbsp;<br>
+socket.writeByte(4);&nbsp;<br>
+socket.writeByte(8);&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;当你想将这些累积的数据发送到Socket服务器需要调用flush()方法.flush()方法调用之后将把所有已经写入的数据发送出去,并清空缓冲区:&nbsp;<br><br>
+socket.flush(&nbsp; &nbsp;);&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;XMLSocket类是一个非常简单用于发送数据的API.写于发数据都是由send()这一个方法来完成的.send()方法可以接受任何数据类型的参 数.它可以将所有的参数都转换为一个字符串类型并发送到服务器.通常参数为一个XML对象或者一个包含数据结构类似XML数据的字符串:<br><br>
+xmlSocket.send(xml);&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;然而,准确的格式完全依赖于服务器所能够接受的格式.如果服务器接受XML格式的数据,你必须发送XML格式的数据.如果服务器只接受URL编码的数据,你也必须发送URL编码的数据.<br><br><br><span>3.从Socket服务器读数据&nbsp;</span><br><br>
+解决方法:&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;对于Socket实例,先收到socketData事件,然后调用如下两个方法的一个,比如,readByte()或者readInt(),在事件控制器中确定不会去读过去的bytesAvailable.<br>
+&nbsp; &nbsp;&nbsp;&nbsp;对于XMLSocket实例,先收到data事件,然后解析从事件控制器内部装载的XML数据.&nbsp;<br><br>
+讨论:&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;从一个socket连接接收的数据依赖于你使用的Socket的类型.socket和XMLSocket都可以从服务器接受到数据,但是它们处于不同重量级的技术.让我们在讨论XMLSocket之前先关注下Socket类.<br>
+&nbsp; &nbsp;&nbsp;&nbsp;我都知道socket在Flash中是一个异步的行为.因此,它就不能简单的创建一个Socket连接,然后就立刻尝试去读取数据.read方法不能等到 从服务器传过来数据之后在返回.换句话说,你只能在客户端从服务器载入所有数据之后才可以读取数据.在数据可用之前读数据会产生一个错误.<br>
+&nbsp; &nbsp;&nbsp;&nbsp;通过socketData事件广播到Socket实例,这样我们就可以知道什么时候数据可以被读取.那么我们要为socketData事件添加一个事件监 听器,任何时候只要有新的数据从一个socket服务器发送过来,都会触发事件控制器.在事件处理器的内部我们写入我们要执行的代码去读取和处理收到的数 据.<br>
+&nbsp; &nbsp;&nbsp;&nbsp;从一个前端服务器读取数据,Socket类为我们提供了许多不同的方法,这些方法依赖于你所读得数据类型.例如,你可以通过readByte()方法读一 个byte数据,或者通过一个使用readUnsignedInt()方法去读一个无符号整数.下面这个表列出来能够从服务器读取的数据类型,返回值,和 read方法每次读入的字节数.<br><br>
+Table:Socket read methods for various datatypes&nbsp;<br>
+方法:返回值类型&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;描述&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;字节数&nbsp;<br>
+readBoolean( ):Boolean&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;从Socket读取一个Boolean值.&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;1&nbsp;<br>
+readByte( ):int&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;从Socket读取一个byte值.&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;1&nbsp;<br>
+readDouble( ):Number&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;从Socket读取一个IEEE 754双精度浮点数.&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;8&nbsp;<br>
+readFloat( ):Number&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;从Socket读取一个IEEE 754单精度浮点数.&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;4&nbsp;<br>
+readInt( ):int&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;从Socket读取一个有符号32-bit整数值.&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;4&nbsp;<br>
+readObject( ):*&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;从Socket读取一个AMF-encoded对象.&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;n&nbsp;<br>
+readShort( ):int&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;从Socket读取一个有符号16-bit整数值.&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;2&nbsp;<br>
+readUnsignedByte( ):uint&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;从Socket读取一个无符号字节.&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;1&nbsp;<br>
+readUnsignedInt( ):uint&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;从Socket读取一个无符号32-bit整数&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;4&nbsp;<br>
+readUnsignedShort( ):uint&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;从Socket读取一个无符号16-bit整数.&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;2&nbsp;<br>
+readUTF( ):String&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;从Socket读取一个一个UTF8字符串.&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;n&nbsp;<br><br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;有两个额外的方法没有在上面这个表中描述.它们分别是readBytes()和readUTFBytes().readBytes()方法只可以让socket读数据但不能返回一个值,并且该方法需要3个参数:<br><br>
+bytes:&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;一个flash.util.ByteArray实例读取从socket中收到的数据.&nbsp;<br>
+offset:&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;一个uint值,指定从什么位置开始读取socket中收到数据的偏移量.默认值为0.&nbsp;<br>
+length:&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;一个uint值,用于指定读取bytes的数量.默认值为0,意思就是说将所有的可用的数据都放入ByteArray中.&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;另一个readUTFBytes()方法,只需要一个长度参数用于指定UTF-8字节的读入数量,并且该方法会将所有读入的字节码转换成为字符串类型.&nbsp;<br><br>
+注意:在从一个Socket读数据之前,首先要判断bytesAvailable的属性.如果你不知道要读入的数据类型是什么就去读数据的话,将会产生一个错误(flash.errors.EOFError).<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;下面的例子代码连接了一个socket服务器,读取并显示每次从服务器发来的数据.&nbsp;<br><br>
+package {&nbsp;<br>
+&nbsp; &nbsp;import flash.display.Sprite;&nbsp;<br>
+&nbsp; &nbsp;import flash.events.ProgressEvent;&nbsp;<br>
+&nbsp; &nbsp;import flash.net.Socket;&nbsp;<br><br>
+&nbsp; &nbsp;public class SocketExample extends Sprite {&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;private var socket:Socket;&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;public function SocketExample(&nbsp; &nbsp;) {&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; socket = new Socket(&nbsp; &nbsp;);&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; // Listen for when data is received from the socket server&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; socket.addEventListener( ProgressEvent.SOCKET_DATA, onSocketData );&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp; &nbsp; // Connect to the server&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; socket.connect( "localhost", 2900 );&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;}&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;private function onSocketData( eventrogressEvent ):void {&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; trace( "Socket received " + socket.bytesAvailable + " byte(s) of data:" );<br><br>
+&nbsp; &nbsp;&nbsp; &nbsp; // Loop over all of the received data, and only read a byte if there&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; // is one available&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; while ( socket.bytesAvailable ) {&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;// Read a byte from the socket and display it&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;var data:int = socket.readByte(&nbsp; &nbsp;);&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;trace( data );&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; }&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;}&nbsp;<br>
+&nbsp; &nbsp;}&nbsp;<br>
+}&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;在上面的这个例子中,如果一个socket服务器发送回一个消息(例如"hello"),当一个客户段连入服务器就会返回并输出下面类似的文字:&nbsp;<br><br>
+Socket received 5 byte(s) of data:&nbsp;<br>
+72&nbsp;<br>
+101&nbsp;<br>
+108&nbsp;<br>
+108&nbsp;<br>
+111&nbsp;<br><br>
+注意:一旦数据从socket读出,它就不能再次被读.例如,读一个字节之后,这个字节就不能再"放回来",只能读后边的字节.&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;当收到的数据为ASCII编码,你可以通过readUTFBytes()方法重新构建一个字符串.readUTFBytes()方法需要知道多少个字节需要转换为字符串.你可以使用bytesAvailable去读所有的字节数据:<br><br>
+var string:String = socket.readUTFBytes(socket.bytesAvailable);&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;XMLSocket类的动作和Socket类相比在从服务器接受数据的风格相似.两者都是通过事件监听器来监听数据接收通知的,这主要取决于Flash异步的Socket实现.然而,在处理实际数据的时候有很大的不同.<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;有个XMLSocket实例在从服务器下载完数据后分发数据事件.通过flash.events.DataEvent.DATA常量定义的数据事件包含一个data属性,该属性包含了从服务器收到的信息.<br><br>
+注意:使用XMLSocket从服务器返回的数据总是认为是一个字符串类型的数据.这样不用为任何数据类型的数据指定读取方法.<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;这些从服务器返回的数据是没有经过任何处理的原始数据.因此,你不能通过XMLSocket连接立即使用XML,你发送和接收的都是纯字符串数据.如果你期望XML,在你处理数据之前,你必须首先将这些数据转换为一个XML的实例.<br>
+&nbsp; &nbsp;&nbsp;&nbsp;下面的这段代码在初始化的时候通过XMLSocket连接到了本地服务器的2900端口.在连接成功之后,一个&lt;test&gt;消息会发送到服务 器.onData事件监听者控制从服务器返回的响应.在本例中返回字符串&lt;response&gt;&lt;test success='true'/&gt;&lt;/response&gt;.你可以通过事件的data属性发现为字符串数据,然后XML类的构造函数将 字符串转换成为了XML实例.最后,通过使用E4X语法的XML实例的一部分信息.(关于通过使用E4X处理XML的更多详细信息,我们需要另外讨论.)<br><br>
+package {&nbsp;<br>
+&nbsp; &nbsp;import flash.display.Sprite;&nbsp;<br>
+&nbsp; &nbsp;import flash.events.Event;&nbsp;<br>
+&nbsp; &nbsp;import flash.events.DataEvent;&nbsp;<br>
+&nbsp; &nbsp;import flash.net.XMLSocket;&nbsp;<br><br>
+&nbsp; &nbsp;public class SocketExample extends Sprite {&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;private var xmlSocket:XMLSocket;&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;public function SocketExample(&nbsp; &nbsp;) {&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; xmlSocket = new XMLSocket(&nbsp; &nbsp;);&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; // Connect listener to send a message to the server&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; // after we make a successful connection&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; xmlSocket.addEventListener( Event.CONNECT, onConnect );&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; // Listen for when data is received from the socket server&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; xmlSocket.addEventListener( DataEvent.DATA, onData );&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp; &nbsp; // Connect to the server&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; xmlSocket.connect( "localhost", 2900 );&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;}&nbsp;<br>
+&nbsp; &nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;private function onConnect( event:Event ):void {&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; xmlSocket.send( "&lt;test/&gt;" );&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;}&nbsp;<br><br>
+&nbsp; &nbsp;&nbsp;&nbsp;private function onData( eventataEvent ):void {&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; // The raw string returned from the server.&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; // It might look something like this:&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; // &lt;response&gt;&lt;test success='true'/&gt;&lt;/response&gt;&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; trace( event.data );&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; // Convert the string into XML&nbsp; &nbsp;&nbsp;&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; var response:XML = new XML( event.data );&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; // Using E4X, access the success attribute of the "test"&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; // element node in the response.&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; // Output: true&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp; trace( response.test.@success );&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;}&nbsp;<br>
+&nbsp; &nbsp;}&nbsp;<br>
+}&nbsp;<br><br>
+注意:在data事件分发数据之前,XMLSocket实例必须从服务器收到一个表示为空的byte('\\0').也就是说,从服务器仅仅只发送所需要的字符串是不够的,必须在结尾处加入一个表示为空的byte.<br><br><br></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span>4.同Socket服务器进行握手,并确定收到了什么样的数据和如何处理这些数据.&nbsp;</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">解决方法:&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;创建不同的常量来声明协议的状态.使用这些常量将指定的处理函数映射到相应的状态.在一个socketData事件控制器中,通过状态映射调用这些函数的.&nbsp;<br><br>
+讨论:&nbsp;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;建立Socket连接通常要处理握手这个环节.尤其是在服务器初始化需要向客户端发送数据.然后客户端通过一种特殊的方式相应这些数据,接着服务器因此再次响应.整个处理过程直到握手完成并且建立起一个"正常的"连接为止.<br><br>
+&nbsp; &nbsp;处理服务器的不同响应是非难的,主要的原因是socketData事件控制器不能保存上下文的顺序.也就是说,服务器的响应不会告诉你"为什么"响应, 也不告诉你这些响应数据被那个处理程序来处理.要想知道如何处理这些从服务器返回的响应不能从响应的本身来获得,尤其在响应变化的时候.或许一个响应返回 了两个字节码,另一个返回了一个整数值还跟了一个双精度浮点数.这样看来让响应本身处理自己是一大难题.<br><br>
+&nbsp; &nbsp;我们通过创建一个状态量来标注不同的上下文,服务器通过这些上下文将数据发送到客户端.与这些状态量都有一个相关联的函数来处理该数据,这样你就可以很轻松的按照当前的协议状态去调用正确的处理函数.<br><br>
+&nbsp; &nbsp;当你要与一个Socket服务器建立连接需要考虑如下几个步骤:&nbsp;<br>
+1.当与服务器连接的时候,服务器立刻返回一个标志服务器可以支持的最高协议版本号的整数值.&nbsp;<br>
+2.客户端在响应的时候会返回一个实际使用协议的版本号.&nbsp;<br>
+3.服务器返回一个8byte的鉴定码.&nbsp;<br>
+4.然后客户端将这鉴定码返回到服务器.&nbsp;<br>
+5.如果客户端的响应不是服务器端所期望的,或者,就在这个时候该协议变成了一个常规操作模式,于是握手结束.&nbsp;<br><br>
+&nbsp; &nbsp;实际上在第四步可以在鉴定码中包含更多的安全响应.你可以通过发送各种加密方法的密匙来代替逐个发送的鉴定码.这通常使用在客户端向用户索要密码的时候, 然后密码成为了加密过的8byte鉴定码.该加密过的鉴定码接着返回到服务器.如果响应的鉴定码匙服务器所期望的,客户端就知道该密码是正确的,然后同意 建立连接.<br><br>
+&nbsp; &nbsp;实现握手框架,你首先要为处理从服务器返回的不同类型的数据分别创建常量.首先,你要从步骤1确定版本号.然后从步骤3收取鉴定码.最后就是步骤5的常规操作模式.我们可以声明<br><br>
+如下常量:&nbsp;<br><br>
+public const DETERMINE_VERSION:int = 0;&nbsp;<br>
+public const RECEIVE_CHALLENGE:int = 1;&nbsp;<br>
+public const NORMAL:int = 2;&nbsp;<br><br>
+&nbsp; &nbsp;常量的值并不重要,重要的是这些值要是不同的值,两两之间不能有相同的整数值.&nbsp;<br><br>
+&nbsp; &nbsp;下一个步骤我们就要为不同的数据创建不同处理函数了.创建的这三个函数分别被命名为readVersion( ), readChallenge( ) 和 readNormalProtocol( ). 创建完这三个函数后,我们就必须将这三个函数分别映射到前面不同状态常量,从而分别处理在该状态中收到的数据.代码如下:<br><br>
+stateMap = new Object(&nbsp; &nbsp;);&nbsp;<br>
+stateMap[ DETERMINE_VERSION ] = readVersion;&nbsp;<br>
+stateMap[ RECEIVE_CHALLENGE ] = readChallenge;&nbsp;<br>
+stateMap[ NORMAL&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; ] = readNormalProtocol;&nbsp;<br><br>
+&nbsp; &nbsp;最后一步是编写socketData事件处理控制器,只有通过这样的方式,建立在当前协议状态之上的正确的处理函数才可以被调用.首先需要创建一个 currentState的int变量.然后使用stateMap去查询与currentState相关联的函数,这样处理函数就可以被正确调用了.<br><br>
+var processFunc:Function = stateMap[ currentState ];&nbsp;<br>
+processFunc(&nbsp; &nbsp;); // Invoke the appropriate processing function&nbsp;<br><br>
+&nbsp; &nbsp;下面是一点与薄记相关的处理程序.在你的代码中更新currentState从而确保当前协议的状态.&nbsp;<br>
+&nbsp; &nbsp;前面我们所探讨的握手步骤的完整的代码如下:<br>
+package {<br>
+import flash.display.Sprite;<br>
+import flash.events.ProgressEvent;<br>
+import flash.net.Socket;<br>
+import flash.utils.ByteArray;</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">public class SocketExample extends Sprite {</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">&nbsp; &nbsp; // The state constants to describe the protocol<br>
+&nbsp; &nbsp; public const DETERMINE_VERSION:int = 0;<br>
+&nbsp; &nbsp; public const RECEIVE_CHALLENGE:int = 1;<br>
+&nbsp; &nbsp; public const NORMAL:int = 2;<br>
+&nbsp; &nbsp;<br>
+&nbsp; &nbsp; // Maps a state to a processing function<br>
+&nbsp; &nbsp; private var stateMap:Object;<br>
+&nbsp; &nbsp;<br>
+&nbsp; &nbsp; // Keeps track of the current protocol state<br>
+&nbsp; &nbsp; private var currentState:int;<br>
+&nbsp; &nbsp;<br>
+&nbsp; &nbsp; private var socket:Socket;</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">&nbsp; &nbsp; public function SocketExample( ) {<br>
+&nbsp; &nbsp;&nbsp; &nbsp;// Initialzes the states map<br>
+&nbsp; &nbsp;&nbsp; &nbsp;stateMap = new Object( );<br>
+&nbsp; &nbsp;&nbsp; &nbsp;stateMap[ DETERMINE_VERSION ] = readVersion;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;stateMap[ RECEIVE_CHALLENGE ] = readChallenge;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;stateMap[ NORMAL&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;] = readNormalProtocol;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;// Initialze the current state<br>
+&nbsp; &nbsp;&nbsp; &nbsp;currentState = DETERMINE_VERSION;</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">&nbsp; &nbsp;&nbsp; &nbsp;// Create and connect the socket<br>
+&nbsp; &nbsp;&nbsp; &nbsp;socket = new Socket( );<br>
+&nbsp; &nbsp;&nbsp; &nbsp;socket.addEventListener( ProgressEvent.SOCKET_DATA, onSocketData );<br>
+&nbsp; &nbsp;&nbsp; &nbsp;socket.connect( "localhost", 2900 );<br>
+&nbsp; &nbsp; }<br>
+&nbsp; &nbsp;<br>
+&nbsp; &nbsp; private function onSocketData( eventrogressEvent ):void {<br>
+&nbsp; &nbsp;&nbsp; &nbsp;// Look up the processing function based on the current state<br>
+&nbsp; &nbsp;&nbsp; &nbsp;var processFunc:Function = stateMap[ currentState ];<br>
+&nbsp; &nbsp;&nbsp; &nbsp;processFunc( );<br>
+&nbsp; &nbsp; }<br>
+&nbsp; &nbsp;<br>
+&nbsp; &nbsp; private function readVersion( ):void {<br>
+&nbsp; &nbsp;&nbsp; &nbsp;// Step 1 - read the version from the server<br>
+&nbsp; &nbsp;&nbsp; &nbsp;var version:int = socket.readInt( );<br>
+&nbsp; &nbsp;&nbsp;&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;// Once the version is read, the next state is receiving<br>
+&nbsp; &nbsp;&nbsp; &nbsp;// the challenge from the server<br>
+&nbsp; &nbsp;&nbsp; &nbsp;currentState = RECEIVE_CHALLENGE;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;// Step 2 - write the version back to the server<br>
+&nbsp; &nbsp;&nbsp; &nbsp;socket.writeInt( version );<br>
+&nbsp; &nbsp;&nbsp; &nbsp;socket.flush( );<br>
+&nbsp; &nbsp; }<br>
+&nbsp; &nbsp;<br>
+&nbsp; &nbsp; private function readChallenge( ):void {<br>
+&nbsp; &nbsp;&nbsp; &nbsp;// Step 3 - read the 8 byte challenge into a byte array<br>
+&nbsp; &nbsp;&nbsp; &nbsp;var bytes:ByteArray = new ByteArray( );<br>
+&nbsp; &nbsp;&nbsp; &nbsp;socket.readBytes( bytes, 0, 8 );<br>
+&nbsp; &nbsp;&nbsp;&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;// After the challenge is received, the next state is<br>
+&nbsp; &nbsp;&nbsp; &nbsp;// the normal protocol operation<br>
+&nbsp; &nbsp;&nbsp; &nbsp;currentState = NORMAL;<br>
+&nbsp; &nbsp;&nbsp;&nbsp;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;// Step 4 - write the bytes back to the server<br>
+&nbsp; &nbsp;&nbsp; &nbsp;socket.writeBytes( bytes );<br>
+&nbsp; &nbsp;&nbsp; &nbsp;socket.flush( );<br>
+&nbsp; &nbsp; }<br>
+&nbsp; &nbsp;<br>
+&nbsp; &nbsp; private function readNormalProtocol( ):void {<br>
+&nbsp; &nbsp;&nbsp; &nbsp;// Step 5 - process the normal socket messages here now that<br>
+&nbsp; &nbsp;&nbsp; &nbsp;// that handshaking process is complete<br>
+&nbsp; &nbsp; }<br>
+}<br>
+}</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="font-size: 16px;">5.与Socket服务器断开,或者当服务器想与你断开的时候发消息给你.</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">解决方法:<br>
+&nbsp; &nbsp; 通过调用Socket.close( )或者XMLSocket.close( )方法显性的断开与服务器的连接.同时可以通过监听close事件获得服务器主动断开的消息.</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">讨论:<br>
+&nbsp; &nbsp; 通常情况下我们需要对程序进行下清理工作.比如说,你创建了一个对象,当这个对象没有用的时候我们就要删除它.因此,无论我们什么时候连接一个 Socket服务器,都要在我们完成了必要的任务之后显性的断开连接. 一直留着无用的Socket连接浪费网络资源,应该尽量避免这种情况.如果你没有断开一个连接,那么这个服务器会继续保持着这个无用的连接.这样一来就很 快会超过了服务器最大Socket连接上线.</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">Socket和XMLSocket对象断开连接的方法是一样的.你只需要调用close()方法就可以了:</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">// Assume socket is a connected Socket instance<br>
+socket.close( ); // Disconnect from the server&nbsp;<br>
+简单心情,简单生活!&nbsp;<br>
+回复 | 引用 | 举报 | 删除2楼 yanxuanlin&nbsp; &nbsp;评论时间：2008年7月9日 0时34分8秒<br>
+同样的,XMLSocket对象断开连接的方法一样:</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">// Assume xmlSocket is a connected XMLSocket instance<br>
+xmlSocket.close( ); // Disconnect from the server</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">&nbsp; &nbsp; close()方法用于通知服务器客户端想要断开连接.当服务器主动断开连接会发消息通知客户端.可以通过调用addEventListener()方法 注册一个close事件的一个监听器.Socket
+ 和 XMLSocket都是使用Event.CLOSE作为"连接断开"事件类型的;例如:</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">// Add an event listener to be notified when the server disconnects<br>
+// the client<br>
+socket.addEventListener( Event.CLOSE, onClose );</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">注意:调用close()方法是不会触发close事件的,只用服务器主动发起断开才会触发.一旦一个Socket断开了,就无法读写数据了.如果你想要从新这个连接,你只能再建立个新的连接了.</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span>6.处理使用Sockets时候引发的错误.</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">解决方法:<br>
+&nbsp; &nbsp; 使用try/catch处理I/O和EOF(end of file)错误.</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">讨论:<br>
+&nbsp; &nbsp; Socket和XMLSocket类对错误的处理很类似.不如,当调用connect()方法的时候,在下面任何一个条件成立的情况下Socket和XMLSocket对象会抛出一个类型为SecurityError的错误.</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">* 该.swf未通过本地安全认证.<br>
+* 端口号大于655535.</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">&nbsp; &nbsp; 当调用XMLSocket对象的send()或者Socket对象的flush()的时候,如果socket还没有连接这两个方法都会抛出一个类型为 IOError的错误.尽管你可以将send()或者flush()方法放入try/catch结构块中,你也不能依赖于try/catch结构块作为你
+ 应用程序的逻辑.更好的办法是,在调用send()或者flush()方法之前使用一个if语句首先判断一下Socket对象的connected属性是 否为True.例如,下面的代码使用了if语句作为程序逻辑的一部分,当Socket对象当前不是连接状态就调用 connectToSocketServer()方法.但是我们依然需要将flush()方法放到try/catch语句块中.通过使用 try/catch语句块将flush()方法抛出的错误写入到日志中:</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">if ( socket.connected ) {<br>
+&nbsp; &nbsp; try {<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;socket.flush( );<br>
+&nbsp; &nbsp; }<br>
+&nbsp; &nbsp; catch( error:IOError ) {<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;logInstance.write( "socket.flush error\n" + error );<br>
+&nbsp; &nbsp; }<br>
+}<br>
+else {<br>
+&nbsp; &nbsp; connectToSocketServer( );<br>
+}</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">&nbsp; &nbsp; 所有的Socket类的read方法都能够抛出EOFError和IOError类型的错误.当你试图读一个数据,但是没有任何可用数据将触发EOF错误.当你试图从一个已经关闭的Socket对象中对数据时将会抛出I/O错误.</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">&nbsp; &nbsp; 除了Socket和XMLSocket类的方法能够抛出的错误以外,这些类的对象还会分发错误事件.有两种基本的错误事件类型,他们分别由 socketIOError和securityError错误引起.IOError事件为IOErrorEvent类型,当数据发送或接收失败触发该事
+ 件.SecurityError事件是SecurityErrorEvent类型,当一个Socket尝试连接一个服务器,但由于服务器不在安全沙箱范围 之内或者端口号小于1024的时候触发该错误事件.</span></span><br style="color: rgb(51, 51, 51); line-height: 21px; font-family: Tahoma, Helvetica, SimSun, sans-serif; font-size: 14px;"><span style="color: rgb(51, 51, 51); line-height: 21px; font-family: SimSun; font-size: 14px;"><span style="font-size: 13px;">注意:这两种安全策略引起的错误都可以通过跨域访问策略文件解决.</span></span>
+                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>
