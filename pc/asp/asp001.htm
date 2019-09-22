@@ -1,0 +1,159 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASP文件操作(FSO)详解</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            
+<p style='color: rgb(85, 85, 85); line-height: 24px; font-family: verdana, "ms song", "宋体", Arial, "微软雅黑", Helvetica, sans-serif;'>
+<span>实例一：写入文件&nbsp;<br></span>语法&nbsp;<br><br>
+object.CreateTextFile([要建立的文件],[如存在，是否替代])&nbsp;<br>
+&lt;%&nbsp;<br>
+Set fs&nbsp;<br>
+=Server.CreateObject("Scripting.FileSystemObject")&nbsp;&nbsp;&nbsp;<br>
+Set a =&nbsp;<br>
+fs.CreateTextFile(server.MapPath("ss.txt"), True)&nbsp;&nbsp;&nbsp;<br>
+’a =&nbsp;<br>
+fs.CreateTextFile("e:\web\testfile.txt", True)&nbsp;<br>
+a.WriteLine("我的文件写入")&nbsp;<br><br>
+a.Close&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ’关掉a文件&nbsp;<br>
+%&gt;&nbsp;<br><br><br><span>实例二：复制文件</span>&nbsp;<br>
+语法&nbsp;<br>
+object.CopyFile [复制路经], [粘贴路经][,&nbsp;<br>
+如存在，是否替代]&nbsp;<br>
+&lt;%&nbsp;<br>
+Set fs&nbsp;<br>
+=Server.CreateObject("Scripting.FileSystemObject")&nbsp;&nbsp;&nbsp;<br>
+fs.CopyFile&nbsp;<br>
+"d:\ss.txt","e:\bb.txt",True&nbsp;&nbsp;&nbsp; ’用fs的CopyFile方法复制文件&nbsp;<br>
+%&gt;</p>
+<br style='color: rgb(85, 85, 85); line-height: 24px; font-family: verdana, "ms song", "宋体", Arial, "微软雅黑", Helvetica, sans-serif;'><p style='color: rgb(85, 85, 85); line-height: 24px; font-family: verdana, "ms song", "宋体", Arial, "微软雅黑", Helvetica, sans-serif;'>
+<span>实例三：复制文件夹</span>&nbsp;<br>
+语法&nbsp;<br>
+object.CopyFolder [复制路经], [粘贴路经][,&nbsp;<br>
+如存在，是否替代]&nbsp;<br>
+&lt;%&nbsp;<br>
+Set fs&nbsp;<br>
+=Server.CreateObject("Scripting.FileSystemObject")&nbsp;&nbsp;&nbsp;<br>
+fs.CopyFolder&nbsp;<br>
+"d:\哈哈","e:\呵呵",True&nbsp;&nbsp;&nbsp; ’用fs的CopyFolder方法复制文件夹&nbsp;<br>
+%&gt;</p>
+<br style='color: rgb(85, 85, 85); line-height: 24px; font-family: verdana, "ms song", "宋体", Arial, "微软雅黑", Helvetica, sans-serif;'><p style='color: rgb(85, 85, 85); line-height: 24px; font-family: verdana, "ms song", "宋体", Arial, "微软雅黑", Helvetica, sans-serif;'>
+<span>实例四：创建文件夹</span>&nbsp;<br>
+语法&nbsp;<br>
+object.CreateFolder([文件])&nbsp;<br>
+&lt;%&nbsp;<br><br>
+Set fs =Server.CreateObject("Scripting.FileSystemObject")&nbsp;&nbsp;&nbsp;<br><br>
+fs.CreateFolder ("e:\呵呵",true)&nbsp;&nbsp;&nbsp; ’用fs的GreateFolder方法创建文件夹&nbsp;<br>
+%&gt;&nbsp;<br><br><br><span>实例五：删除文件</span>&nbsp;<br>
+语法&nbsp;<br>
+object.DeleteFile [路经][, force]&nbsp;&nbsp;&nbsp;<br>
+如果要删除只读文件，则force值为 True；否则为 False（默认）。&nbsp;<br>
+&lt;%&nbsp;<br>
+Set fs&nbsp;<br>
+=Server.CreateObject("Scripting.FileSystemObject")&nbsp;&nbsp;&nbsp;<br>
+fs.DeleteFile&nbsp;<br>
+"e:\ss.txt",true&nbsp;&nbsp;&nbsp; ’用fs的DeleteFile方法删除文件&nbsp;<br>
+%&gt;&nbsp;<br><br><br><span>实例六：删除文件夹</span>&nbsp;<br>
+语法&nbsp;<br>
+object.DeleteFile [路经][, force] 如果要删除只读文件夹，则force值为 True；否则为 False（默认）。&nbsp;<br>
+&lt;%&nbsp;<br>
+Set fs&nbsp;<br>
+=Server.CreateObject("Scripting.FileSystemObject")&nbsp;&nbsp;&nbsp;<br>
+fs.DeleteFolder&nbsp;<br>
+"e:\呵呵",true&nbsp;&nbsp;&nbsp; ’用fs的DeleteFolder方法删除文件夹&nbsp;<br>
+%&gt;&nbsp;<br><br><br><span>实例七：移动文件</span>&nbsp;<br>
+语法&nbsp;<br>
+object.MoveFile [路经],[移到路经]&nbsp;<br><br>
+&lt;%&nbsp;<br>
+Set fs =Server.CreateObject("Scripting.FileSystemObject")&nbsp;&nbsp;&nbsp;<br><br>
+fs.MoveFile "D:\ss.txt","E:\bb.txt"&nbsp;&nbsp;&nbsp; ’用fs的MoveFile方法移动文件&nbsp;<br>
+%&gt;&nbsp;<br><br><br><span>实例七：移动文件夹</span>&nbsp;<br>
+语法&nbsp;<br>
+object.MoveFolder [路经],[移到路经]&nbsp;<br><br>
+&lt;%&nbsp;<br>
+Set fs =Server.CreateObject("Scripting.FileSystemObject")&nbsp;&nbsp;&nbsp;<br><br>
+fs.MoveFolder "D:\哈哈","E:\呵呵"&nbsp;&nbsp;&nbsp; ’用fs的MoveFolder方法移动文件夹&nbsp;<br>
+%&gt;&nbsp;<br><br><br><span>实例八：查看驱动器是否存在</span>&nbsp;<br>
+语法&nbsp;<br>
+object.DriveExists([驱动器路径])&nbsp;&nbsp;&nbsp;<br>
+如果指定的驱动器存在，则返回 True；否则返回 False。&nbsp;<br>
+&lt;%&nbsp;<br>
+dim a&nbsp;<br>
+Set fs&nbsp;<br>
+=Server.CreateObject("Scripting.FileSystemObject")&nbsp;&nbsp;&nbsp;<br><br>
+a=fs.DriveExists("D:")&nbsp;&nbsp; ’用fs的DriveExists查找驱动器&nbsp;<br>
+response.write a&nbsp;<br><br>
+%&gt;&nbsp;<br><br><span>实例九：查看文件是否存在</span>&nbsp;<br>
+语法&nbsp;<br><br>
+object.FileExists([文件路经])&nbsp;&nbsp; 如果指定的文件存在，则返回 True；否则返回 False。&nbsp;<br>
+&lt;%&nbsp;<br>
+dim&nbsp;<br>
+a&nbsp;<br>
+Set fs =Server.CreateObject("Scripting.FileSystemObject")&nbsp;<br><br>
+a=fs.FileExists("D:\哈哈\ss.txt")&nbsp;&nbsp; ’用fs的FileExists查找文件&nbsp;<br>
+response.write a&nbsp;<br><br>
+%&gt;</p>
+<br style='color: rgb(85, 85, 85); line-height: 24px; font-family: verdana, "ms song", "宋体", Arial, "微软雅黑", Helvetica, sans-serif;'><p style='color: rgb(85, 85, 85); line-height: 24px; font-family: verdana, "ms song", "宋体", Arial, "微软雅黑", Helvetica, sans-serif;'>
+<span>实例十：查看文件夹是否存在</span>&nbsp;<br>
+语法&nbsp;<br>
+object.FolderExists([文件夹路经])&nbsp;&nbsp;&nbsp;<br>
+如果指定的文件夹存在，则返回 True；否则返回 False。&nbsp;<br>
+&lt;%&nbsp;<br>
+dim a&nbsp;<br>
+Set fs&nbsp;<br>
+=Server.CreateObject("Scripting.FileSystemObject")&nbsp;<br><br>
+a=fs.FolderExists("D:\哈哈")&nbsp;&nbsp; ’用fs的FolderExists查找文件夹&nbsp;<br>
+response.write a&nbsp;<br><br>
+%&gt;&nbsp;<br><br><span>实例十一：读取文件</span>&nbsp;<br>
+语法&nbsp;<br><br>
+object.OpenTextFile([文件路经],[打开类型]) //默认是只读打开&nbsp;<br>
+&lt;%&nbsp;<br>
+dim a&nbsp;<br>
+Set fs&nbsp;<br>
+=Server.CreateObject("Scripting.FileSystemObject")&nbsp;<br>
+Set&nbsp;<br>
+a=fs.OpenTextFile("D:\哈哈\ss.txt")&nbsp;<br>
+do while not a.AtEndOfStream&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+’判断是否读到文件最后一行&nbsp;<br>
+response.write a.readLine &amp; "&lt;br&gt;"&nbsp;&nbsp;&nbsp; ’读取文件逐行输出&nbsp;<br><br>
+loop&nbsp;<br>
+a.close&nbsp;<br>
+set fs=nothing&nbsp;<br>
+%&gt;&nbsp;<br><br><br><span>实例十二：追加记录</span>&nbsp;<br>
+语法&nbsp;<br><br>
+object.OpenTextFile([文件路经],[打开类型][,如果文件不存在，是否自动建立])&nbsp;<br>
+&lt;%&nbsp;<br>
+dim a&nbsp;<br><br>
+Set fs =Server.CreateObject("Scripting.FileSystemObject")&nbsp;<br>
+Set&nbsp;<br>
+a=fs.OpenTextFile("D:\哈哈\ss.txt",8,true)&nbsp;&nbsp; ’true 带表如果文件不存在就自动建立&nbsp;<br><br>
+a.WriteLine("我的文件写入")&nbsp;<br>
+a.close&nbsp;<br>
+set fs=nothing&nbsp;<br>
+%&gt;&nbsp;<br><br><br><span>实例十三：修改</span>&nbsp;<br>
+语法&nbsp;<br><br>
+object.OpenTextFile([文件路经],[打开类型][,如果文件不存在，是否自动建立])&nbsp;<br>
+&lt;%&nbsp;<br>
+dim a&nbsp;<br><br>
+Set fs =Server.CreateObject("Scripting.FileSystemObject")&nbsp;&nbsp;&nbsp; ’用Server创建一个&nbsp;<br>
+FSO Set a=fs.OpenTextFile("D:\哈哈\ss.txt",2,true)&nbsp;&nbsp; ’true 如果文件不存在就自动建立&nbsp;<br><br>
+a.WriteLine("我的文件写入")&nbsp;<br>
+a.close&nbsp;<br>
+set fs=nothing&nbsp;<br>
+%&gt;</p>
+                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>

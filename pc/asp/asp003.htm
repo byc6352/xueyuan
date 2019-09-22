@@ -1,0 +1,101 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASP用FSO读写文件 - linzai专栏 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content">
+                                                <div class="article-copyright">
+                <span class="creativecommons">
+                <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                    </a>
+            <span>
+                版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。            </span>
+               <div class="article-source-link2222">
+                    本文链接：<a href="https://blog.csdn.net/xylinzai_xy/article/details/5717316">https://blog.csdn.net/xylinzai_xy/article/details/5717316</a>
+                </div>
+            </span>
+                    </div>
+                                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            <div class="cnt" id="blog_text">
+<p>使用范例需要两个条件：</p>
+<p><span>1.（读写都需要）服务器开启父目录</span></p>
+<p><span>2.（写文件需要）服务器开启写入权限</span></p>
+<p><strong><span style="font-size: small;">（一）读取根目录下的所有文件及文件夹信息并输出</span></strong></p>
+<p>'filelist.asp</p>
+<p>'作用：读取path目录下所有子目录和文件并以表格输出其信息</p>
+<p>'path为读取文件相对根目录的路径,如根目录是"/"</p>
+<p><textarea name="code" class="c-sharp" rows="15" cols="56">&lt;table width="100%"&gt;
+&lt;tr&gt;&lt;td&gt;名称&lt;/td&gt;&lt;td&gt;父目录&lt;/td&gt;&lt;td&gt;属性&lt;/td&gt;&lt;td&gt;大小&lt;/td&gt;&lt;td&gt;日期&lt;/td&gt;&lt;td&gt; &lt;/td&gt;&lt;td&gt; &lt;/td&gt;
+&lt;/tr&gt;&lt;%
+path = request.QueryString("path")        '读取路径参数
+if path &lt;&gt; "" then path = path else path = "/" end if '不传参数时默认读根目录
+rootpath = Server.MapPath(path)       '获得path路径所在的服务器完整路径，需要开启父目录
+Set fileObj = Server.CreateObject("Scripting.FileSystemObject") '创建FSO对象
+Set root = fileObj.GetFolder(rootpath) '创建文件夹对象
+For each folder in root.subfolders '读取文件夹对象下的所有子目录并显示其信息
+   if path&lt;&gt;"/" then tmppath = path&amp;"/"&amp;folder.name else tmppath = path&amp;folder.name end if
+   Response.Write("&lt;tr&gt;&lt;td&gt;"&amp;folder.name&amp;"&lt;/td&gt;&lt;td&gt;"&amp;folder.ParentFolder.name&amp;"&lt;/td&gt;&lt;td&gt;目录&lt;/td&gt;&lt;td&gt;     &lt;/td&gt;&lt;td&gt;"&amp;folder.DateCreated&amp;"&lt;/td&gt;")
+   Response.Write("&lt;td&gt;&lt;a href="?path=" mce_href="?path=""&amp;tmppath&amp;"&gt;打开&lt;/a&gt;&lt;/td&gt;&lt;td&gt;删除&lt;/td&gt;&lt;/tr&gt;")
+next
+For each fileitem in root.files '读取目录下所有文件并显示其信息
+   if path&lt;&gt;"/" then tmppath = path&amp;"/"&amp;fileitem.name else tmppath = path&amp;fileitem.name end if
+   'response.Write(tmppath)
+   Response.Write("&lt;tr&gt;&lt;td&gt;"&amp;fileitem.name&amp;"&lt;/td&gt;&lt;td&gt;"&amp;fileitem.ParentFolder.name&amp;"&lt;/td&gt;&lt;td&gt;文件&lt;/td&gt;&lt;td&gt;"&amp;fileitem.size&amp;" byte&lt;/td&gt;&lt;td&gt;"&amp;fileitem.datelastmodified&amp;"&lt;/td&gt;")
+   Response.Write("&lt;td&gt;&lt;a href="editfile.asp?fid=" mce_href="editfile.asp?fid=""&amp;tmppath&amp;"&gt;打开&lt;/a&gt;&lt;/td&gt;&lt;td&gt;删除&lt;/td&gt;&lt;/tr&gt;")
+next 
+Set fileObj = nothing
+Set root = nothing
+Set folder = nothing
+Set fileitem = nothing
+%&gt;&lt;/table&gt;
+
+</textarea></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong><span style="font-size: small;">（二）读取某个文件内容并输出到文本区域</span></strong></p>
+<p>&nbsp;</p>
+<p><textarea name="code" class="c-sharp" rows="15" cols="56">&lt;%
+fid = Request.QueryString("fid") 'fid为文件相对根目录的路径，如根目录下的index.htm的fid = /index.htm
+%&gt;
+
+&lt;%
+Set fso = Server.CreateObject("scripting.FileSystemObject") '创建FSO对象
+Set fileObj = fso.opentextfile(server.mappath(fid),1,true) '创建文件读取对象,用于字符文件
+If Not fileObj.atEndOfStream Then 
+filecontent = fileObj.readline
+End If 
+%&gt;
+&lt;textarea name="content" rows="38" style="width:99%;"&gt;&lt;%=filecontent%&gt;</textarea></p>
+<p><!--Set fileObj = nothing
+Set fso = nothing
+--></p>
+<p><strong><span style="font-size: small;">（三）使用FSO写入文件</span></strong></p>
+<p><span style="color: rgb(255, 0, 255);"><textarea name="code" class="c-sharp" rows="15" cols="56">&lt;%
+content = Request.Form("content") '表单提交的数据
+fid = request.QueryString("fid") '请求参数，指向文件存取相对根目录的路径
+'response.Write("fid = "&amp;fid) '调试使用，输出请求参数
+'response.Write("content = "&amp;content) ’调试使用，输出表单提交数据
+Set fso = Server.CreateObject("scripting.FileSystemObject") '创建FSO对象
+Set fileObj = fso.opentextfile(server.mappath(fid),2,true) '使用FSO创建文件写入对象
+fileObj.Write content '向文件写入数据，覆盖形式写入
+fileObj.close '推送内容写入并关闭写入通道
+response.Write("保存成功")
+Set fileObj = nothing
+Set fso = nothing
+%&gt;
+</textarea></span></p>
+</div>                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>
