@@ -1,0 +1,205 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delphi 10.3中使用JSON</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="postBody">
+                
+<div class="blogpost-body " id="cnblogs_post_body">
+    <p>有一个对JSON处理的单元，在你需要使用JSON的单元里面引入"System.json"，随后你就可以用Delphi自己的json处理类了。</p>
+<p>&nbsp;</p>
+<div>注意：</div>
+<div>&nbsp; 1,JSON类创建后，里面所有元素不用管释放，JSON类自己管理，千万不要画蛇添足啊！！！！！！</div>
+<div>&nbsp;</div>
+<div>
+<div>const</div>
+<div>&nbsp; // 演示用的JSON</div>
+<div>&nbsp; jsonString = '{"name":"张三", "other":["中国","程序员"]}';</div>
+<div>&nbsp;</div>
+<div>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a title="复制代码" onclick="copyCnblogsCode(this)" href="javascript:void(0);"><img alt="复制代码" src="images/delphi01601.gif"></a></span></div>
+<pre deep="12"><span style="color: rgb(0, 0, 255);">const</span>
+  <span style="color: rgb(0, 128, 0);">//</span><span style="color: rgb(0, 128, 0);"> 演示用的JSON</span>
+  jsonString = <span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">{"name":"张三", "other":["中国","程序员"]}</span><span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(0, 0, 0);">;
+
+
+</span><span style="color: rgb(0, 0, 255);">implementation</span>
+
+
+<span style="color: rgb(0, 128, 0);">{</span><span style="color: rgb(0, 128, 0);">$R *.fmx</span><span style="color: rgb(0, 128, 0);">}</span>
+
+
+<span style="color: rgb(0, 0, 255);">uses</span><span style="color: rgb(0, 0, 0);">
+  System.json; </span><span style="color: rgb(0, 128, 0);">//</span><span style="color: rgb(0, 128, 0);"> Dephi自带的JSON单元</span>
+
+
+<span style="color: rgb(0, 0, 255);">procedure</span><span style="color: rgb(0, 0, 0);"> TForm1.Button1Click(Sender: TObject);
+</span><span style="color: rgb(0, 0, 255);">var</span><span style="color: rgb(0, 0, 0);">
+  JSONObject: TJSONObject; </span><span style="color: rgb(0, 128, 0);">//</span><span style="color: rgb(0, 128, 0);"> JSON类</span>
+  i: Integer; <span style="color: rgb(0, 128, 0);">//</span><span style="color: rgb(0, 128, 0);"> 循环变量</span>
+  temp: <span style="color: rgb(0, 0, 255);">string</span>; <span style="color: rgb(0, 128, 0);">//</span><span style="color: rgb(0, 128, 0);"> 临时使用变量</span>
+  jsonArray: TJSONArray; <span style="color: rgb(0, 128, 0);">//</span><span style="color: rgb(0, 128, 0);"> JSON数组变量</span>
+<span style="color: rgb(0, 0, 255);">begin</span>
+
+
+  <span style="color: rgb(0, 0, 255);">if</span> Trim(Memo1.Text) = <span style="color: rgb(128, 0, 0);">''</span> <span style="color: rgb(0, 0, 255);">then</span>
+  <span style="color: rgb(0, 0, 255);">begin</span><span style="color: rgb(0, 0, 0);">
+    ShowMessage(</span><span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">要解析数据不能为空！</span><span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(0, 0, 0);">);
+  </span><span style="color: rgb(0, 0, 255);">end</span>
+  <span style="color: rgb(0, 0, 255);">else</span>
+  <span style="color: rgb(0, 0, 255);">begin</span><span style="color: rgb(0, 0, 0);">
+    JSONObject :</span>= <span style="color: rgb(0, 0, 255);">nil</span><span style="color: rgb(0, 0, 0);">;
+    </span><span style="color: rgb(0, 0, 255);">try</span>
+      <span style="color: rgb(0, 128, 0);">{</span><span style="color: rgb(0, 128, 0);"> 从字符串生成JSON </span><span style="color: rgb(0, 128, 0);">}</span><span style="color: rgb(0, 0, 0);">
+      JSONObject :</span>= TJSONObject.ParseJSONValue(Trim(Memo1.Text)) <span style="color: rgb(0, 0, 255);">as</span><span style="color: rgb(0, 0, 0);"> TJSONObject;
+
+
+      </span><span style="color: rgb(0, 0, 255);">if</span> JSONObject.Count &gt; <span style="color: rgb(128, 0, 128);">0</span> <span style="color: rgb(0, 0, 255);">then</span>
+      <span style="color: rgb(0, 0, 255);">begin</span>
+
+
+        <span style="color: rgb(0, 128, 0);">{</span><span style="color: rgb(0, 128, 0);"> 1,遍历JSON数据 </span><span style="color: rgb(0, 128, 0);">}</span><span style="color: rgb(0, 0, 0);">
+        Memo2.Lines.Add(</span><span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">遍历JSON数据：</span><span style="color: rgb(128, 0, 0);">'</span> + #<span style="color: rgb(128, 0, 128);">13</span>#<span style="color: rgb(128, 0, 128);">10</span><span style="color: rgb(0, 0, 0);">);
+
+
+        Memo2.Lines.Add(</span><span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">JSON数据数量：</span><span style="color: rgb(128, 0, 0);">'</span> +<span style="color: rgb(0, 0, 0);"> IntToStr(JSONObject.Count));
+
+
+        </span><span style="color: rgb(0, 0, 255);">for</span> i := <span style="color: rgb(128, 0, 128);">0</span> <span style="color: rgb(0, 0, 255);">to</span> JSONObject.Count - <span style="color: rgb(128, 0, 128);">1</span> <span style="color: rgb(0, 0, 255);">do</span>
+        <span style="color: rgb(0, 0, 255);">begin</span>
+
+
+          <span style="color: rgb(0, 0, 255);">if</span> i = <span style="color: rgb(128, 0, 128);">0</span> <span style="color: rgb(0, 0, 255);">then</span>
+          <span style="color: rgb(0, 0, 255);">begin</span><span style="color: rgb(0, 0, 0);">
+            temp :</span>= JSONObject.Get(i).ToString + #<span style="color: rgb(128, 0, 128);">13</span>#<span style="color: rgb(128, 0, 128);">10</span><span style="color: rgb(0, 0, 0);">;;
+          </span><span style="color: rgb(0, 0, 255);">end</span>
+          <span style="color: rgb(0, 0, 255);">else</span>
+          <span style="color: rgb(0, 0, 255);">begin</span><span style="color: rgb(0, 0, 0);">
+            temp :</span>= temp + JSONObject.Get(i).ToString + #<span style="color: rgb(128, 0, 128);">13</span>#<span style="color: rgb(128, 0, 128);">10</span><span style="color: rgb(0, 0, 0);">;
+          </span><span style="color: rgb(0, 0, 255);">end</span><span style="color: rgb(0, 0, 0);">;
+
+
+        </span><span style="color: rgb(0, 0, 255);">end</span><span style="color: rgb(0, 0, 0);">;
+
+
+        </span><span style="color: rgb(0, 128, 0);">{</span><span style="color: rgb(0, 128, 0);"> output the JSON to console as String </span><span style="color: rgb(0, 128, 0);">}</span><span style="color: rgb(0, 0, 0);">
+        Memo2.Lines.Add(temp);
+
+
+        Memo2.Lines.Add(</span><span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">------------------------------</span><span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(0, 0, 0);">);
+
+
+        </span><span style="color: rgb(0, 128, 0);">{</span><span style="color: rgb(0, 128, 0);"> 2,按元素解析JSON数据 </span><span style="color: rgb(0, 128, 0);">}</span><span style="color: rgb(0, 0, 0);">
+        Memo2.Lines.Add(</span><span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">按元素解析JSON数据：</span><span style="color: rgb(128, 0, 0);">'</span> + #<span style="color: rgb(128, 0, 128);">13</span>#<span style="color: rgb(128, 0, 128);">10</span><span style="color: rgb(0, 0, 0);">);
+        temp :</span>= <span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">name = </span><span style="color: rgb(128, 0, 0);">'</span> + JSONObject.Values[<span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">name</span><span style="color: rgb(128, 0, 0);">'</span>].ToString + #<span style="color: rgb(128, 0, 128);">13</span>#<span style="color: rgb(128, 0, 128);">10</span><span style="color: rgb(0, 0, 0);">;
+        Memo2.Lines.Add(temp);
+
+
+        </span><span style="color: rgb(0, 128, 0);">//</span><span style="color: rgb(0, 128, 0);"> json数组</span>
+        jsonArray := TJSONArray(JSONObject.GetValue(<span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">other</span><span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(0, 0, 0);">));;
+        </span><span style="color: rgb(0, 0, 255);">if</span> jsonArray.Count &gt; <span style="color: rgb(128, 0, 128);">0</span> <span style="color: rgb(0, 0, 255);">then</span>
+        <span style="color: rgb(0, 0, 255);">begin</span>
+
+
+          <span style="color: rgb(0, 128, 0);">//</span><span style="color: rgb(0, 128, 0);"> 得到JSON数组字符串</span>
+          temp := <span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">other = </span><span style="color: rgb(128, 0, 0);">'</span> + JSONObject.GetValue(<span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">other</span><span style="color: rgb(128, 0, 0);">'</span>).ToString + #<span style="color: rgb(128, 0, 128);">13</span>#<span style="color: rgb(128, 0, 128);">10</span><span style="color: rgb(0, 0, 0);">;
+
+
+          </span><span style="color: rgb(0, 128, 0);">//</span><span style="color: rgb(0, 128, 0);"> 循环取得JSON数组中每个元素</span>
+          <span style="color: rgb(0, 0, 255);">for</span> i := <span style="color: rgb(128, 0, 128);">0</span> <span style="color: rgb(0, 0, 255);">to</span> jsonArray.Size - <span style="color: rgb(128, 0, 128);">1</span> <span style="color: rgb(0, 0, 255);">do</span>
+          <span style="color: rgb(0, 0, 255);">begin</span><span style="color: rgb(0, 0, 0);">
+            temp :</span>= temp + IntToStr(i + <span style="color: rgb(128, 0, 128);">1</span>) + <span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);"> : </span><span style="color: rgb(128, 0, 0);">'</span> +<span style="color: rgb(0, 0, 0);"> jsonArray.Items[i]
+              .Value </span>+ #<span style="color: rgb(128, 0, 128);">13</span>#<span style="color: rgb(128, 0, 128);">10</span><span style="color: rgb(0, 0, 0);">;
+          </span><span style="color: rgb(0, 0, 255);">end</span><span style="color: rgb(0, 0, 0);">;
+
+
+        </span><span style="color: rgb(0, 0, 255);">end</span><span style="color: rgb(0, 0, 0);">;
+
+
+        Memo2.Lines.Add(temp);
+
+
+      </span><span style="color: rgb(0, 0, 255);">end</span>
+      <span style="color: rgb(0, 0, 255);">else</span>
+      <span style="color: rgb(0, 0, 255);">begin</span><span style="color: rgb(0, 0, 0);">
+        temp :</span>= <span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">没有数据！</span><span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(0, 0, 0);">;
+        Memo2.Lines.Add(temp);
+      </span><span style="color: rgb(0, 0, 255);">end</span><span style="color: rgb(0, 0, 0);">;
+
+
+    </span><span style="color: rgb(0, 0, 255);">finally</span><span style="color: rgb(0, 0, 0);">
+      JSONObject.Free;
+    </span><span style="color: rgb(0, 0, 255);">end</span><span style="color: rgb(0, 0, 0);">;
+  </span><span style="color: rgb(0, 0, 255);">end</span><span style="color: rgb(0, 0, 0);">;
+
+
+</span><span style="color: rgb(0, 0, 255);">end</span>;</pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a title="复制代码" onclick="copyCnblogsCode(this)" href="javascript:void(0);"><img alt="复制代码" src="images/delphi01602.gif"></a></span></div></div>
+<p>&nbsp;</p>
+</div>
+</div>
+</div>
+<div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block"><div id="BlogPostCategory">
+    分类: 
+            <a href="https://www.cnblogs.com/Thenext/category/1348427.html" target="_blank">Delphi JSON</a></div>
+
+
+    <div id="blog_post_info">
+<div id="green_channel">
+        <a id="green_channel_digg" onclick="DiggIt(10288547,cb_blogId,1);green_channel_success(this,'谢谢推荐！');" href="javascript:void(0);">好文要顶</a>
+        <a id="green_channel_follow" onclick="follow('5547dd5e-8109-4757-4847-08d5f422f4b6');" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a title="分享至新浪微博" id="green_channel_weibo" onclick="ShareToTsina()" href="javascript:void(0);"><img alt="" src="images/delphi01603.png"></a>
+    <a title="分享至微信" id="green_channel_wechat" onclick="shareOnWechat()" href="javascript:void(0);"><img alt="" src="images/delphi01604.png"></a>
+</div>
+<div id="author_profile">
+    <div class="author_profile_info" id="author_profile_info">
+            <a href="https://home.cnblogs.com/u/Thenext/" target="_blank"><img class="author_avatar" alt="" src="images/delphi01605.png"></a>
+        <div class="author_profile_info" id="author_profile_detail">
+            <a href="https://home.cnblogs.com/u/Thenext/">Thenext</a><br>
+            <a href="https://home.cnblogs.com/u/Thenext/followees/">关注 - 7</a><br>
+            <a href="https://home.cnblogs.com/u/Thenext/followers/">粉丝 - 2</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow">
+                <a onclick="follow('5547dd5e-8109-4757-4847-08d5f422f4b6');return false;" href="javascript:void(0);">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(10288547,'Digg')">
+        <span class="diggnum" id="digg_count">0</span>
+    </div>
+    <div class="buryit" onclick="votePost(10288547,'Bury')">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+    <div class="clear"></div>
+    <div id="post_next_prev">
+
+    <a class="p_n_p_prefix" href="https://www.cnblogs.com/Thenext/p/10259741.html">« </a> 上一篇：    <a title="发布于 2019-01-12 14:57" href="https://www.cnblogs.com/Thenext/p/10259741.html">Win10系统进行远程桌面连接出现身份验证错误怎么办</a>
+    <br>
+    <a class="p_n_p_prefix" href="https://www.cnblogs.com/Thenext/p/10288703.html">» </a> 下一篇：    <a title="发布于 2019-01-18 17:09" href="https://www.cnblogs.com/Thenext/p/10288703.html">百度获取图片 json格式解析</a>
+
+</div>
+</div>
+            </div>
+
+</div>
+
+
+</body></html>
