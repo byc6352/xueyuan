@@ -1,0 +1,64 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>【Flash逆向调试之三】几个比较有用的注入代码 - 非鱼 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                                <div class="article-copyright">
+                <span class="creativecommons">
+                <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                    </a>
+            <span>
+                版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。            </span>
+               <div class="article-source-link2222">
+                    本文链接：<a href="https://blog.csdn.net/Hot_VC/article/details/50619348">https://blog.csdn.net/Hot_VC/article/details/50619348</a>
+                </div>
+            </span>
+                    </div>
+                                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            
+<p>1.插入日志代码</p>
+<p></p>
+<blockquote style="border: currentColor; border-image: none;">
+<p></p>
+<pre><code class="hljs python"><ol class="hljs-ln" style="width: 952px;"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">findpropstrict Qname(PackageNamespace(<span class="hljs-string">""</span>),<span class="hljs-string">"trace"</span>)</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">pushstring <span class="hljs-string">"====================================================================================================="</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">callpropvoid Qname(PackageNamespace(<span class="hljs-string">""</span>),<span class="hljs-string">"trace"</span>) <span class="hljs-number">1</span></div></div></li></ol></code></pre><br><p></p>
+</blockquote>
+<p></p>
+<p>2.插入日志代码，并获取参数</p>
+<p></p>
+<blockquote style="border: currentColor; border-image: none;">
+<p></p>
+<pre><code class="hljs python"><ol class="hljs-ln" style="width: 1036px;"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">findpropstrict Qname(PackageNamespace(<span class="hljs-string">""</span>),<span class="hljs-string">"trace"</span>)</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">pushstring <span class="hljs-string">"=======================我去去去去去=============================================================================="</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">getlocal_2</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">getproperty Qname(PackageNamespace(<span class="hljs-string">""</span>),<span class="hljs-string">"url"</span>)</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">add</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">callpropvoid Qname(PackageNamespace(<span class="hljs-string">""</span>),<span class="hljs-string">"trace"</span>) <span class="hljs-number">1</span></div></div></li></ol></code></pre><br><p></p>
+</blockquote>
+<p></p>
+<p>3.插入日志代码并打印调用堆栈</p>
+<p></p>
+<blockquote style="border: currentColor; border-image: none;">
+<p></p>
+<pre><code class="hljs python"><ol class="hljs-ln" style="width: 952px;"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">findpropstrict Qname(PackageNamespace(<span class="hljs-string">""</span>),<span class="hljs-string">"trace"</span>)</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">pushstring <span class="hljs-string">"====================================================================================================="</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">findpropstrict Qname(PackageNamespace(<span class="hljs-string">""</span>),<span class="hljs-string">"Error"</span>)</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">constructprop Qname(PackageNamespace(<span class="hljs-string">""</span>),<span class="hljs-string">"Error"</span>) <span class="hljs-number">0</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">callproperty Qname(PackageNamespace(<span class="hljs-string">""</span>),<span class="hljs-string">"getStackTrace"</span>) <span class="hljs-number">0</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">add</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">callpropvoid Qname(PackageNamespace(<span class="hljs-string">""</span>),<span class="hljs-string">"trace"</span>) <span class="hljs-number">1</span></div></div></li></ol></code></pre>
+<p></p>
+</blockquote>
+<br><p></p>
+<p>以上三个是我分析时候比较常用到的代码注入代码，由于不明原因第二条，第三条有时候在部分函数中会失败导致堆栈溢出，我也没发现原因，请各位遇到了找到原因告知下。具体修改方法，在第二篇文章有提到，请自行翻阅。</p>
+<p>如果各位有其他更好的，或者比较常用的代码可以站内通知我下，我替各位总结下。</p>
+<p>文末推荐一些相关资料链接：</p>
+<p>avm2虚拟机的相关介绍，包括指令集介绍：</p>
+<p>https://www.adobe.com/content/dam/Adobe/en/devnet/actionscript/articles/avm2overview.pdf<br></p>
+<p>如果想进一步研究SWF文件结构，以及更加深入的研究SWF文件请自行查阅。</p>
+<p><span style="color: rgb(255, 0, 0);"><br></span></p>
+<p><span style="color: rgb(255, 0, 0);">至此【FLASH逆向调试】文章结束。</span></p>
+<p><span style="color: rgb(255, 0, 0);">由于个人知识的浅薄，如有谬误请各位指出，自当修改。88</span></p>
+                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>

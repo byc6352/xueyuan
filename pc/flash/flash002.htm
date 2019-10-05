@@ -1,0 +1,127 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>【Flash逆向调试之一】环境搭建 - 非鱼 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                                <div class="article-copyright">
+                <span class="creativecommons">
+                <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                    </a>
+            <span>
+                版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。            </span>
+               <div class="article-source-link2222">
+                    本文链接：<a href="https://blog.csdn.net/Hot_VC/article/details/50600717">https://blog.csdn.net/Hot_VC/article/details/50600717</a>
+                </div>
+            </span>
+                    </div>
+                                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            
+<p>一、基础环境说明</p>
+<blockquote style="border: currentColor; border-image: none;">
+<p>系统：win7_x64</p>
+<p>浏览器：FireFox（火狐浏览器），（chrome浏览器日志输出环境我没配置出来，如有朋友配置出来请私信告知，我重新修改）</p>
+<p>分析软件：JPEXS（需要JAVA支持，请自行安装JAVA环境）</p>
+<p>这个软件应该有许多BUG，以及功能简陋，但是应该是市面上最好用的FLASH分析软件了。FLASH分析环境简陋，请大家忍受啊！！！</p>
+<p>下载地址：https://www.free-decompiler.com/flash/</p>
+<p>其它辅助软件：Cygwin64 Terminal</p>
+</blockquote>
+<p><span></span></p>
+<p><span></span></p>
+<p>二、软件安装配置</p>
+<blockquote style="border: currentColor; border-image: none;">
+<p>1.安装Flash Debug版本</p>
+</blockquote>
+<blockquote style="border: currentColor; border-image: none;">
+<blockquote style="border: currentColor; border-image: none;">
+<p>到<span>http://www.adobe.com/support/flashplayer/debug_downloads.html</span>官网下载debug版本的FLASH。由于我们是火狐浏览器，请找到如下版本下载安装。</p>
+</blockquote>
+</blockquote>
+<blockquote style="border: currentColor; border-image: none;">
+<p><img alt="" src="images/flash00201.jpg"></p>
+<div>2.配置相关配置文件</div>
+</blockquote>
+<blockquote style="border: currentColor; border-image: none;">
+<blockquote style="border: currentColor; border-image: none;">
+<div>请到当前用户的文件夹下新建配置文件mm.cfg。</div>
+</blockquote>
+<blockquote style="border: currentColor; border-image: none;">
+<div>以我的机器为例子：</div>
+</blockquote>
+</blockquote>
+<blockquote style="border: currentColor; border-image: none;">
+<blockquote style="border: currentColor; border-image: none;">
+<div><span>C:\Users\</span>HotVC\mm.cfg</div>
+</blockquote>
+<blockquote style="border: currentColor; border-image: none;">
+<div>在文件中添加如下内容：</div>
+<div><pre><code class="hljs objectivec"><ol class="hljs-ln" style="width: 967px;"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">AssetCacheSize=<span class="hljs-number">20</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">AutoUpdateDisable=<span class="hljs-number">0</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">AutoUpdateInterval=<span class="hljs-number">-1</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-built_in">AVHardwareDisable</span>=<span class="hljs-number">0</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">DisableDeviceFontEnumeration=<span class="hljs-number">0</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">DisableProductDownload=<span class="hljs-number">0</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">ErrorReportingEnable=<span class="hljs-number">1</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">FileDownloadDisable=<span class="hljs-number">0</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">FileUploadDisable=<span class="hljs-number">0</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">FullScreenDisable=<span class="hljs-number">0</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">LocalFileReadDisable=<span class="hljs-number">0</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">LocalStorageLimit=<span class="hljs-number">6</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">MaxWarnings=<span class="hljs-number">500</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">PolicyFileLog=<span class="hljs-number">1</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="15"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">PolicyFileLogAppend=<span class="hljs-number">1</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="16"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">SuppressDebuggerExceptionDialogs=<span class="hljs-number">1</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="17"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">TraceOutputFileEnable=<span class="hljs-number">1</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="18"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">TraceOutputFileName=C:\Users\Administrator.YOS<span class="hljs-number">-01511231632</span>\AppData\Roaming\Macromedia\Flash Player\Logs\flashlog.txt</div></div></li></ol></code></pre></div>
+</blockquote>
+<blockquote style="border: currentColor; border-image: none;">
+<div>TraceOutputFileName这个表示你的日志文件输出位置，但是我改过没什么用，如果有兄弟知道怎么回事的情告知。</div>
+</blockquote>
+<blockquote style="border: currentColor; border-image: none;">
+<div>至此，Flash分析环境算是搭建完成。在浏览器中打开FLASH游戏，或者视频播放器就能在C:\Users\HotVC\AppData\Roaming\Macromedia\Flash Player\Logs\flashlog.txt文件中看到日志输出了。一般flash都会有日志输出的。可以用日志作为参考进行分析。</div>
+</blockquote>
+</blockquote>
+<div><span></span></div>
+<div><span></span></div>
+<div><span></span></div>
+<div><span></span></div>
+<div>三、调试分析总结</div>
+<blockquote style="border: currentColor; border-image: none;">
+<div>1.目前Flash大部分并不支持在JPEXS中动态调试。所以JPEXS紧紧是作为静态分析以及修改工具。</div>
+<div>2.后期想知道某些值的话可以用JPEXS修改，注入trace代码，然后在日志文件中查看。</div>
+<div>3.通常我都用Cygwin64 Terminal的tailf功能进行实时日志输出查看。</div>
+</blockquote>
+<div><span></span></div>
+<div><span></span></div>
+<div><span></span></div>
+<blockquote style="border: currentColor; border-image: none;">
+<blockquote style="border: currentColor; border-image: none;">
+<div>(1). 打开Cygwin64 Terminal切换工作目录到C:\Users\HotVC\AppData\Roaming\Macromedia\Flash Player\Logs</div>
+</blockquote>
+<blockquote style="border: currentColor; border-image: none;">
+<div>(2). 执行命令：tailf flashlog.txt &nbsp;。在火狐浏览器中打开风行播放器，可以看到类似如下日志的实时输出情况：</div>
+</blockquote>
+</blockquote>
+<blockquote style="border: currentColor; border-image: none;">
+<blockquote style="border: currentColor; border-image: none;">
+<blockquote style="border: currentColor; border-image: none;">
+<div><span><img alt="" src="images/flash00202.jpg"></span></div>
+</blockquote>
+</blockquote>
+</blockquote>
+<div><span></span></div>
+<div><span></span></div>
+<div><span></span></div>
+<blockquote style="border: currentColor; border-image: none;">
+<div>4.JPEXS使用直接将下载下来的swf文件载入。</div>
+</blockquote>
+<div><span></span></div>
+<blockquote style="border: currentColor; border-image: none;">
+<blockquote style="border: currentColor; border-image: none;">
+<div><span><img alt="" src="images/flash00203.jpg"></span></div>
+</blockquote>
+<div><span><br></span></div>
+<blockquote style="border: currentColor; border-image: none;">
+<div><span>可以</span>使用右边的P-CODE代码编辑功能注入部分代码。</div>
+<div><strong><span style="color: rgb(255, 0, 0);"><br></span></strong></div>
+</blockquote>
+</blockquote>
+<strong><span style="color: rgb(255, 0, 0);">以上为此文全部内容，敬请期待下回！！！</span></strong><br><div><span></span></div>
+<p></p>
+                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>

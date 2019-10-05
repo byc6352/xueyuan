@@ -1,0 +1,770 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>浅谈常见的七种加密算法及实现</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                                <div class="article-copyright">
+                <span class="creativecommons">
+                <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                    </a>
+            <span>
+                版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。            </span>
+               <div class="article-source-link2222">
+                    本文链接：<a href="https://blog.csdn.net/baidu_22254181/article/details/82594072">https://blog.csdn.net/baidu_22254181/article/details/82594072</a>
+                </div>
+            </span>
+                    </div>
+                                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <div class="markdown_views" id="content_views">
+                    <!-- flowchart 箭头图标 勿删 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-linecap="round" d="M 5 0 L 0 2.5 L 5 5 Z" />
+                    </svg>
+                                            <h1 id="前言"><a name="t0"></a>前言</h1>
+
+<p><strong>数字签名</strong>、<strong>信息加密</strong> 是前后端开发都经常需要使用到的技术，应用场景包括了用户登入、交易、信息通讯、<code>oauth</code> 等等，不同的应用场景也会需要使用到不同的签名加密算法，或者需要搭配不一样的 <strong>签名加密算法</strong> 来达到业务目标。这里简单的给大家介绍几种常见的签名加密算法和一些典型场景下的应用。</p>
+
+<!-- more -->
+
+
+
+<h1 id="正文"><a name="t1"></a>正文</h1>
+
+
+
+<h2 id="1-数字签名"><a name="t2"></a>1. 数字签名</h2>
+
+<p><strong>数字签名</strong>，简单来说就是通过提供 <strong>可鉴别</strong> 的 <strong>数字信息</strong> 验证 <strong>自身身份</strong> 的一种方式。一套 <strong>数字签名</strong> 通常定义两种 <strong>互补</strong> 的运算，一个用于 <strong>签名</strong>，另一个用于 <strong>验证</strong>。分别由 <strong>发送者</strong> 持有能够 <strong>代表自己身份</strong> 的 <strong>私钥</strong> (私钥不可泄露),由 <strong>接受者</strong> 持有与私钥对应的 <strong>公钥</strong> ，能够在 <strong>接受</strong> 到来自发送者信息时用于 <strong>验证</strong> 其身份。</p>
+
+<p><img title="" alt="" src="images/html01101.jpg"></p>
+
+<blockquote>
+  <p><strong>注意</strong>：图中 <strong>加密过程</strong> 有别于 <strong>公钥加密</strong>，更多 <a href="https://www.zhihu.com/question/25912483" rel="nofollow" data-token="c8063c64c0d06b079a2ab4192df3c8c7">介绍戳这里</a>。<strong>签名</strong> 最根本的用途是要能够唯一 <strong>证明发送方的身份</strong>，防止 <strong>中间人攻击</strong>、<code>CSRF</code> <strong>跨域身份伪造</strong>。基于这一点在诸如 <strong>设备认证</strong>、<strong>用户认证</strong>、<strong>第三方认证</strong> 等认证体系中都会使用到 <strong>签名算法</strong> (彼此的实现方式可能会有差异)。</p>
+</blockquote>
+
+
+
+<h2 id="2-加密和解密"><a name="t3"></a>2. 加密和解密</h2>
+
+
+
+<h3 id="21-加密"><a name="t4"></a>2.1. 加密</h3>
+
+<p><strong>数据加密</strong> 的基本过程，就是对原来为 <strong>明文</strong> 的文件或数据按 <strong>某种算法</strong> 进行处理，使其成为 <strong>不可读</strong> 的一段代码，通常称为 <strong>“密文”</strong>。通过这样的途径，来达到 <strong>保护数据</strong> 不被 <strong>非法人窃取</strong>、阅读的目的。</p>
+
+
+
+<h3 id="22-解密"><a name="t5"></a>2.2. 解密</h3>
+
+<p><strong>加密</strong> 的 <strong>逆过程</strong> 为 <strong>解密</strong>，即将该 <strong>编码信息</strong> 转化为其 <strong>原来数据</strong> 的过程。</p>
+
+
+
+<h2 id="3-对称加密和非对称加密"><a name="t6"></a>3. 对称加密和非对称加密</h2>
+
+<p>加密算法分 <strong>对称加密</strong> 和 <strong>非对称加密</strong>，其中对称加密算法的加密与解密 <strong>密钥相同</strong>，非对称加密算法的加密密钥与解密 <strong>密钥不同</strong>，此外，还有一类 <strong>不需要密钥</strong> 的 <strong>散列算法</strong>。</p>
+
+<blockquote>
+  <p>常见的 <strong>对称加密</strong> 算法主要有 <code>DES</code>、<code>3DES</code>、<code>AES</code> 等，常见的 <strong>非对称算法</strong> 主要有 <code>RSA</code>、<code>DSA</code> 等，<strong>散列算法</strong> 主要有 <code>SHA-1</code>、<code>MD5</code> 等。</p>
+</blockquote>
+
+
+
+<h3 id="31-对称加密"><a name="t7"></a>3.1. 对称加密</h3>
+
+<p><strong>对称加密算法</strong> 是应用较早的加密算法，又称为 <strong>共享密钥加密算法</strong>。在 <strong>对称加密算法</strong> 中，使用的密钥只有一个，<strong>发送</strong> 和 <strong>接收</strong> 双方都使用这个密钥对数据进行 <strong>加密</strong> 和 <strong>解密</strong>。这就要求加密和解密方事先都必须知道加密的密钥。</p>
+
+<p><img title="" alt="" src="images/html01102.jpg"></p>
+
+<ol>
+<li><p>数据加密过程：在对称加密算法中，<strong>数据发送方</strong> 将 <strong>明文</strong> (原始数据) 和 <strong>加密密钥</strong> 一起经过特殊 <strong>加密处理</strong>，生成复杂的 <strong>加密密文</strong> 进行发送。</p></li>
+<li><p>数据解密过程：<strong>数据接收方</strong> 收到密文后，若想读取原数据，则需要使用 <strong>加密使用的密钥</strong> 及相同算法的 <strong>逆算法</strong> 对加密的密文进行解密，才能使其恢复成 <strong>可读明文</strong>。</p></li>
+</ol>
+
+
+
+<h3 id="32-非对称加密"><a name="t8"></a>3.2. 非对称加密</h3>
+
+<p><strong>非对称加密算法</strong>，又称为 <strong>公开密钥加密算法</strong>。它需要两个密钥，一个称为 <strong>公开密钥</strong> (<code>public key</code>)，即 <strong>公钥</strong>，另一个称为 <strong>私有密钥</strong> (<code>private key</code>)，即 <strong>私钥</strong>。</p>
+
+<p>因为 <strong>加密</strong> 和 <strong>解密</strong> 使用的是两个不同的密钥，所以这种算法称为 <strong>非对称加密算法</strong>。</p>
+
+<p><img title="" alt="" src="images/html01103.jpg"></p>
+
+<ol>
+<li><p>如果使用 <strong>公钥</strong> 对数据 <strong>进行加密</strong>，只有用对应的 <strong>私钥</strong> 才能 <strong>进行解密</strong>。</p></li>
+<li><p>如果使用 <strong>私钥</strong> 对数据 <strong>进行加密</strong>，只有用对应的 <strong>公钥</strong> 才能 <strong>进行解密</strong>。</p></li>
+</ol>
+
+<blockquote>
+  <p><strong>例子</strong>：甲方生成 <strong>一对密钥</strong> 并将其中的一把作为 <strong>公钥</strong> 向其它人公开，得到该公钥的 <strong>乙方</strong> 使用该密钥对机密信息 <strong>进行加密</strong> 后再发送给甲方，甲方再使用自己保存的另一把 <strong>专用密钥</strong> (<strong>私钥</strong>)，对 <strong>加密</strong> 后的信息 <strong>进行解密</strong>。</p>
+</blockquote>
+
+
+
+<h2 id="4-常见的签名加密算法"><a name="t9"></a>4. 常见的签名加密算法</h2>
+
+
+
+<h3 id="41-md5算法"><a name="t10"></a>4.1. MD5算法</h3>
+
+<p><code>MD5</code> 用的是 <strong>哈希函数</strong>，它的典型应用是对一段信息产生 <strong>信息摘要</strong>，以 <strong>防止被篡改</strong>。严格来说，<code>MD5</code> 不是一种 <strong>加密算法</strong> 而是 <strong>摘要算法</strong>。无论是多长的输入，<code>MD5</code> 都会输出长度为 <code>128bits</code> 的一个串 (通常用 <code>16</code> <strong>进制</strong> 表示为 <code>32</code> 个字符)。</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="language-java hljs  has-numbering"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">byte</span>[] <span class="hljs-title">computeMD5</span>(<span class="hljs-keyword">byte</span>[] content) {
+    <span class="hljs-keyword">try</span> {
+        MessageDigest md5 = MessageDigest.getInstance(<span class="hljs-string">"MD5"</span>);
+        <span class="hljs-keyword">return</span> md5.digest(content);
+    } <span class="hljs-keyword">catch</span> (NoSuchAlgorithmException e) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(e);
+    }
+}</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li></ul></pre>
+
+
+
+<h3 id="42-sha1算法"><a name="t11"></a>4.2. SHA1算法</h3>
+
+<p><code>SHA1</code> 是和 <code>MD5</code> 一样流行的 <strong>消息摘要算法</strong>，然而 <code>SHA1</code> 比 <code>MD5</code> 的 <strong>安全性更强</strong>。对于长度小于 <code>2 ^ 64</code> 位的消息，<code>SHA1</code> 会产生一个 <code>160</code> 位的 <strong>消息摘要</strong>。基于 <code>MD5</code>、<code>SHA1</code> 的信息摘要特性以及 <strong>不可逆</strong> (一般而言)，可以被应用在检查 <strong>文件完整性</strong> 以及 <strong>数字签名</strong> 等场景。</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="language-java hljs  has-numbering"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">byte</span>[] <span class="hljs-title">computeSHA1</span>(<span class="hljs-keyword">byte</span>[] content) {
+    <span class="hljs-keyword">try</span> {
+        MessageDigest sha1 = MessageDigest.getInstance(<span class="hljs-string">"SHA1"</span>);
+        <span class="hljs-keyword">return</span> sha1.digest(content);
+    } <span class="hljs-keyword">catch</span> (NoSuchAlgorithmException e) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(e);
+    }
+}</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li></ul></pre>
+
+
+
+<h3 id="43-hmac算法"><a name="t12"></a>4.3. HMAC算法</h3>
+
+<p><code>HMAC</code> 是密钥相关的 <strong>哈希运算消息认证码</strong>（Hash-based Message Authentication Code），<code>HMAC</code> 运算利用 <strong>哈希算法</strong> (<code>MD5</code>、<code>SHA1</code> 等)，以 <strong>一个密钥</strong> 和 <strong>一个消息</strong> 为输入，生成一个 <strong>消息摘要</strong> 作为 <strong>输出</strong>。</p>
+
+<p><code>HMAC</code> <strong>发送方</strong> 和 <strong>接收方</strong> 都有的 <code>key</code> 进行计算，而没有这把 <code>key</code> 的第三方，则是 <strong>无法计算</strong> 出正确的 <strong>散列值</strong>的，这样就可以 <strong>防止数据被篡改</strong>。</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="language-java hljs  has-numbering"><span class="hljs-keyword">package</span> net.pocrd.util;
+<span class="hljs-keyword">import</span> net.pocrd.annotation.NotThreadSafe;
+<span class="hljs-keyword">import</span> net.pocrd.define.ConstField;
+<span class="hljs-keyword">import</span> org.slf4j.Logger;
+<span class="hljs-keyword">import</span> org.slf4j.LoggerFactory;
+<span class="hljs-keyword">import</span> javax.crypto.Mac;
+<span class="hljs-keyword">import</span> javax.crypto.SecretKey;
+<span class="hljs-keyword">import</span> javax.crypto.spec.SecretKeySpec;
+<span class="hljs-keyword">import</span> java.util.Arrays;
+
+
+<span class="hljs-annotation">@NotThreadSafe</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HMacHelper</span> {</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> Logger logger = LoggerFactory.getLogger(HMacHelper.class);
+    <span class="hljs-keyword">private</span> Mac mac;
+
+    <span class="hljs-javadoc">/**
+     * MAC算法可选以下多种算法
+     * HmacMD5/HmacSHA1/HmacSHA256/HmacSHA384/HmacSHA512
+     */</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String KEY_MAC = <span class="hljs-string">"HmacMD5"</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-title">HMacHelper</span>(String key) {
+        <span class="hljs-keyword">try</span> {
+            SecretKey secretKey = <span class="hljs-keyword">new</span> SecretKeySpec(key.getBytes(ConstField.UTF8), KEY_MAC);
+            mac = Mac.getInstance(secretKey.getAlgorithm());
+            mac.init(secretKey);
+        } <span class="hljs-keyword">catch</span> (Exception e) {
+            logger.error(<span class="hljs-string">"create hmac helper failed."</span>, e);
+        }
+    }
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">byte</span>[] <span class="hljs-title">sign</span>(<span class="hljs-keyword">byte</span>[] content) {
+        <span class="hljs-keyword">return</span> mac.doFinal(content);
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">verify</span>(<span class="hljs-keyword">byte</span>[] signature, <span class="hljs-keyword">byte</span>[] content) {
+        <span class="hljs-keyword">try</span> {
+            <span class="hljs-keyword">byte</span>[] result = mac.doFinal(content);
+            <span class="hljs-keyword">return</span> Arrays.equals(signature, result);
+        } <span class="hljs-keyword">catch</span> (Exception e) {
+            logger.error(<span class="hljs-string">"verify sig failed."</span>, e);
+        }
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+    }
+}</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li><li style="color: rgb(153, 153, 153);">28</li><li style="color: rgb(153, 153, 153);">29</li><li style="color: rgb(153, 153, 153);">30</li><li style="color: rgb(153, 153, 153);">31</li><li style="color: rgb(153, 153, 153);">32</li><li style="color: rgb(153, 153, 153);">33</li><li style="color: rgb(153, 153, 153);">34</li><li style="color: rgb(153, 153, 153);">35</li><li style="color: rgb(153, 153, 153);">36</li><li style="color: rgb(153, 153, 153);">37</li><li style="color: rgb(153, 153, 153);">38</li><li style="color: rgb(153, 153, 153);">39</li><li style="color: rgb(153, 153, 153);">40</li><li style="color: rgb(153, 153, 153);">41</li><li style="color: rgb(153, 153, 153);">42</li><li style="color: rgb(153, 153, 153);">43</li><li style="color: rgb(153, 153, 153);">44</li></ul></pre>
+
+<blockquote>
+  <p><strong>测试结论</strong>：<code>HMAC</code> 算法实例在 <strong>多线程环境</strong> 下是 <strong>不安全的</strong>。但是需要在 <strong>多线程访问</strong> 时，进行同步的辅助类，使用 <code>ThreadLocal</code> 为 <strong>每个线程缓存</strong> 一个实例可以避免进行锁操作。</p>
+</blockquote>
+
+
+
+<h3 id="44-aesdes3des算法"><a name="t13"></a>4.4. AES/DES/3DES算法</h3>
+
+<p><code>AES</code>、<code>DES</code>、<code>3DES</code> 都是 <strong>对称</strong> 的 <strong>块加密算法</strong>，<strong>加解密</strong> 的过程是 <strong>可逆的</strong>。常用的有 <code>AES128</code>、<code>AES192</code>、<code>AES256</code> (默认安装的 <code>JDK</code> 尚不支持 <code>AES256</code>，需要安装对应的 <code>jce</code> 补丁进行升级 <code>jce1.7</code>，<code>jce1.8</code>)。</p>
+
+
+
+<h4 id="441-des算法">4.4.1. DES算法</h4>
+
+<p><code>DES</code> 加密算法是一种 <strong>分组密码</strong>，以 <code>64</code> 位为 <strong>分组对数据</strong> 加密，它的 <strong>密钥长度</strong> 是 <code>56</code> 位，<strong>加密解密</strong> 用 <strong>同一算法</strong>。</p>
+
+<p><code>DES</code> 加密算法是对 <strong>密钥</strong> 进行保密，而 <strong>公开算法</strong>，包括加密和解密算法。这样，只有掌握了和发送方 <strong>相同密钥</strong> 的人才能解读由 <code>DES</code>加密算法加密的密文数据。因此，破译 <code>DES</code> 加密算法实际上就是 <strong>搜索密钥的编码</strong>。对于 <code>56</code> 位长度的 <strong>密钥</strong> 来说，如果用 <strong>穷举法</strong> 来进行搜索的话，其运算次数为 <code>2 ^ 56</code> 次。</p>
+
+
+
+<h4 id="442-3des算法">4.4.2. 3DES算法</h4>
+
+<p>是基于 <code>DES</code> 的 <strong>对称算法</strong>，对 <strong>一块数据</strong> 用 <strong>三个不同的密钥</strong> 进行 <strong>三次加密</strong>，<strong>强度更高</strong>。</p>
+
+
+
+<h4 id="443-aes算法">4.4.3. AES算法</h4>
+
+<p><code>AES</code> 加密算法是密码学中的 <strong>高级加密标准</strong>，该加密算法采用 <strong>对称分组密码体制</strong>，密钥长度的最少支持为 <code>128</code> 位、 <code>192</code> 位、<code>256</code> 位，分组长度 <code>128</code> 位，算法应易于各种硬件和软件实现。这种加密算法是美国联邦政府采用的 <strong>区块加密标准</strong>。</p>
+
+<p><code>AES</code> 本身就是为了取代 <code>DES</code> 的，<code>AES</code> 具有更好的 <strong>安全性</strong>、<strong>效率</strong> 和 <strong>灵活性</strong>。</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="language-java hljs  has-numbering"><span class="hljs-keyword">import</span> net.pocrd.annotation.NotThreadSafe;
+<span class="hljs-keyword">import</span> javax.crypto.Cipher;
+<span class="hljs-keyword">import</span> javax.crypto.KeyGenerator;
+<span class="hljs-keyword">import</span> javax.crypto.spec.IvParameterSpec;
+<span class="hljs-keyword">import</span> javax.crypto.spec.SecretKeySpec;
+<span class="hljs-keyword">import</span> java.security.SecureRandom;
+
+<span class="hljs-annotation">@NotThreadSafe</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AesHelper</span> {</span>
+    <span class="hljs-keyword">private</span> SecretKeySpec keySpec;
+    <span class="hljs-keyword">private</span> IvParameterSpec iv;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title">AesHelper</span>(<span class="hljs-keyword">byte</span>[] aesKey, <span class="hljs-keyword">byte</span>[] iv) {
+        <span class="hljs-keyword">if</span> (aesKey == <span class="hljs-keyword">null</span> || aesKey.length &lt; <span class="hljs-number">16</span> || (iv != <span class="hljs-keyword">null</span> &amp;&amp; iv.length &lt; <span class="hljs-number">16</span>)) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">"错误的初始密钥"</span>);
+        }
+        <span class="hljs-keyword">if</span> (iv == <span class="hljs-keyword">null</span>) {
+            iv = Md5Util.compute(aesKey);
+        }
+        keySpec = <span class="hljs-keyword">new</span> SecretKeySpec(aesKey, <span class="hljs-string">"AES"</span>);
+        <span class="hljs-keyword">this</span>.iv = <span class="hljs-keyword">new</span> IvParameterSpec(iv);
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title">AesHelper</span>(<span class="hljs-keyword">byte</span>[] aesKey) {
+        <span class="hljs-keyword">if</span> (aesKey == <span class="hljs-keyword">null</span> || aesKey.length &lt; <span class="hljs-number">16</span>) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">"错误的初始密钥"</span>);
+        }
+        keySpec = <span class="hljs-keyword">new</span> SecretKeySpec(aesKey, <span class="hljs-string">"AES"</span>);
+        <span class="hljs-keyword">this</span>.iv = <span class="hljs-keyword">new</span> IvParameterSpec(Md5Util.compute(aesKey));
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">byte</span>[] <span class="hljs-title">encrypt</span>(<span class="hljs-keyword">byte</span>[] data) {
+        <span class="hljs-keyword">byte</span>[] result = <span class="hljs-keyword">null</span>;
+        Cipher cipher = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">try</span> {
+            cipher = Cipher.getInstance(<span class="hljs-string">"AES/CFB/NoPadding"</span>);
+            cipher.init(Cipher.ENCRYPT_MODE, keySpec, iv);
+            result = cipher.doFinal(data);
+        } <span class="hljs-keyword">catch</span> (Exception e) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(e);
+        }
+        <span class="hljs-keyword">return</span> result;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">byte</span>[] <span class="hljs-title">decrypt</span>(<span class="hljs-keyword">byte</span>[] secret) {
+        <span class="hljs-keyword">byte</span>[] result = <span class="hljs-keyword">null</span>;
+        Cipher cipher = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">try</span> {
+            cipher = Cipher.getInstance(<span class="hljs-string">"AES/CFB/NoPadding"</span>);
+            cipher.init(Cipher.DECRYPT_MODE, keySpec, iv);
+            result = cipher.doFinal(secret);
+        } <span class="hljs-keyword">catch</span> (Exception e) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(e);
+        }
+        <span class="hljs-keyword">return</span> result;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">byte</span>[] <span class="hljs-title">randomKey</span>(<span class="hljs-keyword">int</span> size) {
+        <span class="hljs-keyword">byte</span>[] result = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">try</span> {
+            KeyGenerator gen = KeyGenerator.getInstance(<span class="hljs-string">"AES"</span>);
+            gen.init(size, <span class="hljs-keyword">new</span> SecureRandom());
+            result = gen.generateKey().getEncoded();
+        } <span class="hljs-keyword">catch</span> (Exception e) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(e);
+        }
+        <span class="hljs-keyword">return</span> result;
+    }
+}</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li><li style="color: rgb(153, 153, 153);">28</li><li style="color: rgb(153, 153, 153);">29</li><li style="color: rgb(153, 153, 153);">30</li><li style="color: rgb(153, 153, 153);">31</li><li style="color: rgb(153, 153, 153);">32</li><li style="color: rgb(153, 153, 153);">33</li><li style="color: rgb(153, 153, 153);">34</li><li style="color: rgb(153, 153, 153);">35</li><li style="color: rgb(153, 153, 153);">36</li><li style="color: rgb(153, 153, 153);">37</li><li style="color: rgb(153, 153, 153);">38</li><li style="color: rgb(153, 153, 153);">39</li><li style="color: rgb(153, 153, 153);">40</li><li style="color: rgb(153, 153, 153);">41</li><li style="color: rgb(153, 153, 153);">42</li><li style="color: rgb(153, 153, 153);">43</li><li style="color: rgb(153, 153, 153);">44</li><li style="color: rgb(153, 153, 153);">45</li><li style="color: rgb(153, 153, 153);">46</li><li style="color: rgb(153, 153, 153);">47</li><li style="color: rgb(153, 153, 153);">48</li><li style="color: rgb(153, 153, 153);">49</li><li style="color: rgb(153, 153, 153);">50</li><li style="color: rgb(153, 153, 153);">51</li><li style="color: rgb(153, 153, 153);">52</li><li style="color: rgb(153, 153, 153);">53</li><li style="color: rgb(153, 153, 153);">54</li><li style="color: rgb(153, 153, 153);">55</li><li style="color: rgb(153, 153, 153);">56</li><li style="color: rgb(153, 153, 153);">57</li><li style="color: rgb(153, 153, 153);">58</li><li style="color: rgb(153, 153, 153);">59</li><li style="color: rgb(153, 153, 153);">60</li><li style="color: rgb(153, 153, 153);">61</li><li style="color: rgb(153, 153, 153);">62</li><li style="color: rgb(153, 153, 153);">63</li><li style="color: rgb(153, 153, 153);">64</li><li style="color: rgb(153, 153, 153);">65</li><li style="color: rgb(153, 153, 153);">66</li><li style="color: rgb(153, 153, 153);">67</li><li style="color: rgb(153, 153, 153);">68</li><li style="color: rgb(153, 153, 153);">69</li></ul></pre>
+
+
+
+<h3 id="45-rsa算法"><a name="t14"></a>4.5. RSA算法</h3>
+
+<p><code>RSA</code> 加密算法是目前最有影响力的 <strong>公钥加密算法</strong>，并且被普遍认为是目前 <strong>最优秀的公钥方案</strong> 之一。<code>RSA</code> 是第一个能同时用于 <strong>加密</strong> 和 <strong>数字签名</strong> 的算法，它能够 <strong>抵抗</strong> 到目前为止已知的 <strong>所有密码攻击</strong>，已被 <code>ISO</code> 推荐为公钥数据加密标准。</p>
+
+<blockquote>
+  <p><code>RSA</code> <strong>加密算法</strong> 基于一个十分简单的数论事实：将两个大 <strong>素数</strong> 相乘十分容易，但想要对其乘积进行 <strong>因式分解</strong> 却极其困难，因此可以将 <strong>乘积</strong> 公开作为 <strong>加密密钥</strong>。</p>
+</blockquote>
+
+
+
+<pre class="prettyprint" name="code"><code class="language-java hljs  has-numbering"><span class="hljs-keyword">import</span> net.pocrd.annotation.NotThreadSafe;
+<span class="hljs-keyword">import</span> org.bouncycastle.jce.provider.BouncyCastleProvider;
+<span class="hljs-keyword">import</span> org.slf4j.Logger;
+<span class="hljs-keyword">import</span> org.slf4j.LoggerFactory;
+<span class="hljs-keyword">import</span> javax.crypto.Cipher;
+<span class="hljs-keyword">import</span> java.io.ByteArrayOutputStream;
+<span class="hljs-keyword">import</span> java.security.KeyFactory;
+<span class="hljs-keyword">import</span> java.security.Security;
+<span class="hljs-keyword">import</span> java.security.Signature;
+<span class="hljs-keyword">import</span> java.security.interfaces.RSAPrivateCrtKey;
+<span class="hljs-keyword">import</span> java.security.interfaces.RSAPublicKey;
+<span class="hljs-keyword">import</span> java.security.spec.PKCS8EncodedKeySpec;
+<span class="hljs-keyword">import</span> java.security.spec.X509EncodedKeySpec;
+
+<span class="hljs-annotation">@NotThreadSafe</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RsaHelper</span> {</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> Logger logger = LoggerFactory.getLogger(RsaHelper.class);
+    <span class="hljs-keyword">private</span> RSAPublicKey publicKey;
+    <span class="hljs-keyword">private</span> RSAPrivateCrtKey privateKey;
+
+    <span class="hljs-keyword">static</span> {
+        Security.addProvider(<span class="hljs-keyword">new</span> BouncyCastleProvider()); <span class="hljs-comment">//使用bouncycastle作为加密算法实现</span>
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title">RsaHelper</span>(String publicKey, String privateKey) {
+        <span class="hljs-keyword">this</span>(Base64Util.decode(publicKey), Base64Util.decode(privateKey));
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title">RsaHelper</span>(<span class="hljs-keyword">byte</span>[] publicKey, <span class="hljs-keyword">byte</span>[] privateKey) {
+        <span class="hljs-keyword">try</span> {
+            KeyFactory keyFactory = KeyFactory.getInstance(<span class="hljs-string">"RSA"</span>);
+            <span class="hljs-keyword">if</span> (publicKey != <span class="hljs-keyword">null</span> &amp;&amp; publicKey.length &gt; <span class="hljs-number">0</span>) {
+                <span class="hljs-keyword">this</span>.publicKey = (RSAPublicKey)keyFactory.generatePublic(<span class="hljs-keyword">new</span> X509EncodedKeySpec(publicKey));
+            }
+            <span class="hljs-keyword">if</span> (privateKey != <span class="hljs-keyword">null</span> &amp;&amp; privateKey.length &gt; <span class="hljs-number">0</span>) {
+                <span class="hljs-keyword">this</span>.privateKey = (RSAPrivateCrtKey)keyFactory.generatePrivate(<span class="hljs-keyword">new</span> PKCS8EncodedKeySpec(privateKey));
+            }
+        } <span class="hljs-keyword">catch</span> (Exception e) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(e);
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title">RsaHelper</span>(String publicKey) {
+        <span class="hljs-keyword">this</span>(Base64Util.decode(publicKey));
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title">RsaHelper</span>(<span class="hljs-keyword">byte</span>[] publicKey) {
+        <span class="hljs-keyword">try</span> {
+            KeyFactory keyFactory = KeyFactory.getInstance(<span class="hljs-string">"RSA"</span>);
+            <span class="hljs-keyword">if</span> (publicKey != <span class="hljs-keyword">null</span> &amp;&amp; publicKey.length &gt; <span class="hljs-number">0</span>) {
+                <span class="hljs-keyword">this</span>.publicKey = (RSAPublicKey)keyFactory.generatePublic(<span class="hljs-keyword">new</span> X509EncodedKeySpec(publicKey));
+            }
+        } <span class="hljs-keyword">catch</span> (Exception e) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(e);
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">byte</span>[] <span class="hljs-title">encrypt</span>(<span class="hljs-keyword">byte</span>[] content) {
+        <span class="hljs-keyword">if</span> (publicKey == <span class="hljs-keyword">null</span>) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">"public key is null."</span>);
+        }
+
+        <span class="hljs-keyword">if</span> (content == <span class="hljs-keyword">null</span>) {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;
+        }
+
+        <span class="hljs-keyword">try</span> {
+            Cipher cipher = Cipher.getInstance(<span class="hljs-string">"RSA/ECB/PKCS1Padding"</span>);
+            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+            <span class="hljs-keyword">int</span> size = publicKey.getModulus().bitLength() / <span class="hljs-number">8</span> - <span class="hljs-number">11</span>;
+            ByteArrayOutputStream baos = <span class="hljs-keyword">new</span> ByteArrayOutputStream((content.length + size - <span class="hljs-number">1</span>) / size * (size + <span class="hljs-number">11</span>));
+            <span class="hljs-keyword">int</span> left = <span class="hljs-number">0</span>;
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; content.length; ) {
+                left = content.length - i;
+                <span class="hljs-keyword">if</span> (left &gt; size) {
+                    cipher.update(content, i, size);
+                    i += size;
+                } <span class="hljs-keyword">else</span> {
+                    cipher.update(content, i, left);
+                    i += left;
+                }
+                baos.write(cipher.doFinal());
+            }
+            <span class="hljs-keyword">return</span> baos.toByteArray();
+        } <span class="hljs-keyword">catch</span> (Exception e) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(e);
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">byte</span>[] <span class="hljs-title">decrypt</span>(<span class="hljs-keyword">byte</span>[] secret) {
+        <span class="hljs-keyword">if</span> (privateKey == <span class="hljs-keyword">null</span>) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">"private key is null."</span>);
+        }
+
+        <span class="hljs-keyword">if</span> (secret == <span class="hljs-keyword">null</span>) {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;
+        }
+
+        <span class="hljs-keyword">try</span> {
+            Cipher cipher = Cipher.getInstance(<span class="hljs-string">"RSA/ECB/PKCS1Padding"</span>);
+            cipher.init(Cipher.DECRYPT_MODE, privateKey);
+            <span class="hljs-keyword">int</span> size = privateKey.getModulus().bitLength() / <span class="hljs-number">8</span>;
+            ByteArrayOutputStream baos = <span class="hljs-keyword">new</span> ByteArrayOutputStream((secret.length + size - <span class="hljs-number">12</span>) / (size - <span class="hljs-number">11</span>) * size);
+            <span class="hljs-keyword">int</span> left = <span class="hljs-number">0</span>;
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; secret.length; ) {
+                left = secret.length - i;
+                <span class="hljs-keyword">if</span> (left &gt; size) {
+                    cipher.update(secret, i, size);
+                    i += size;
+                } <span class="hljs-keyword">else</span> {
+                    cipher.update(secret, i, left);
+                    i += left;
+                }
+                baos.write(cipher.doFinal());
+            }
+            <span class="hljs-keyword">return</span> baos.toByteArray();
+        } <span class="hljs-keyword">catch</span> (Exception e) {
+            logger.error(<span class="hljs-string">"rsa decrypt failed."</span>, e);
+        }
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">byte</span>[] <span class="hljs-title">sign</span>(<span class="hljs-keyword">byte</span>[] content) {
+        <span class="hljs-keyword">if</span> (privateKey == <span class="hljs-keyword">null</span>) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">"private key is null."</span>);
+        }
+        <span class="hljs-keyword">if</span> (content == <span class="hljs-keyword">null</span>) {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;
+        }
+        <span class="hljs-keyword">try</span> {
+            Signature signature = Signature.getInstance(<span class="hljs-string">"SHA1WithRSA"</span>);
+            signature.initSign(privateKey);
+            signature.update(content);
+            <span class="hljs-keyword">return</span> signature.sign();
+        } <span class="hljs-keyword">catch</span> (Exception e) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(e);
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">verify</span>(<span class="hljs-keyword">byte</span>[] sign, <span class="hljs-keyword">byte</span>[] content) {
+        <span class="hljs-keyword">if</span> (publicKey == <span class="hljs-keyword">null</span>) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">"public key is null."</span>);
+        }
+        <span class="hljs-keyword">if</span> (sign == <span class="hljs-keyword">null</span> || content == <span class="hljs-keyword">null</span>) {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+        }
+        <span class="hljs-keyword">try</span> {
+            Signature signature = Signature.getInstance(<span class="hljs-string">"SHA1WithRSA"</span>);
+            signature.initVerify(publicKey);
+            signature.update(content);
+            <span class="hljs-keyword">return</span> signature.verify(sign);
+        } <span class="hljs-keyword">catch</span> (Exception e) {
+            logger.error(<span class="hljs-string">"rsa verify failed."</span>, e);
+        }
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+    }
+}</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li><li style="color: rgb(153, 153, 153);">28</li><li style="color: rgb(153, 153, 153);">29</li><li style="color: rgb(153, 153, 153);">30</li><li style="color: rgb(153, 153, 153);">31</li><li style="color: rgb(153, 153, 153);">32</li><li style="color: rgb(153, 153, 153);">33</li><li style="color: rgb(153, 153, 153);">34</li><li style="color: rgb(153, 153, 153);">35</li><li style="color: rgb(153, 153, 153);">36</li><li style="color: rgb(153, 153, 153);">37</li><li style="color: rgb(153, 153, 153);">38</li><li style="color: rgb(153, 153, 153);">39</li><li style="color: rgb(153, 153, 153);">40</li><li style="color: rgb(153, 153, 153);">41</li><li style="color: rgb(153, 153, 153);">42</li><li style="color: rgb(153, 153, 153);">43</li><li style="color: rgb(153, 153, 153);">44</li><li style="color: rgb(153, 153, 153);">45</li><li style="color: rgb(153, 153, 153);">46</li><li style="color: rgb(153, 153, 153);">47</li><li style="color: rgb(153, 153, 153);">48</li><li style="color: rgb(153, 153, 153);">49</li><li style="color: rgb(153, 153, 153);">50</li><li style="color: rgb(153, 153, 153);">51</li><li style="color: rgb(153, 153, 153);">52</li><li style="color: rgb(153, 153, 153);">53</li><li style="color: rgb(153, 153, 153);">54</li><li style="color: rgb(153, 153, 153);">55</li><li style="color: rgb(153, 153, 153);">56</li><li style="color: rgb(153, 153, 153);">57</li><li style="color: rgb(153, 153, 153);">58</li><li style="color: rgb(153, 153, 153);">59</li><li style="color: rgb(153, 153, 153);">60</li><li style="color: rgb(153, 153, 153);">61</li><li style="color: rgb(153, 153, 153);">62</li><li style="color: rgb(153, 153, 153);">63</li><li style="color: rgb(153, 153, 153);">64</li><li style="color: rgb(153, 153, 153);">65</li><li style="color: rgb(153, 153, 153);">66</li><li style="color: rgb(153, 153, 153);">67</li><li style="color: rgb(153, 153, 153);">68</li><li style="color: rgb(153, 153, 153);">69</li><li style="color: rgb(153, 153, 153);">70</li><li style="color: rgb(153, 153, 153);">71</li><li style="color: rgb(153, 153, 153);">72</li><li style="color: rgb(153, 153, 153);">73</li><li style="color: rgb(153, 153, 153);">74</li><li style="color: rgb(153, 153, 153);">75</li><li style="color: rgb(153, 153, 153);">76</li><li style="color: rgb(153, 153, 153);">77</li><li style="color: rgb(153, 153, 153);">78</li><li style="color: rgb(153, 153, 153);">79</li><li style="color: rgb(153, 153, 153);">80</li><li style="color: rgb(153, 153, 153);">81</li><li style="color: rgb(153, 153, 153);">82</li><li style="color: rgb(153, 153, 153);">83</li><li style="color: rgb(153, 153, 153);">84</li><li style="color: rgb(153, 153, 153);">85</li><li style="color: rgb(153, 153, 153);">86</li><li style="color: rgb(153, 153, 153);">87</li><li style="color: rgb(153, 153, 153);">88</li><li style="color: rgb(153, 153, 153);">89</li><li style="color: rgb(153, 153, 153);">90</li><li style="color: rgb(153, 153, 153);">91</li><li style="color: rgb(153, 153, 153);">92</li><li style="color: rgb(153, 153, 153);">93</li><li style="color: rgb(153, 153, 153);">94</li><li style="color: rgb(153, 153, 153);">95</li><li style="color: rgb(153, 153, 153);">96</li><li style="color: rgb(153, 153, 153);">97</li><li style="color: rgb(153, 153, 153);">98</li><li style="color: rgb(153, 153, 153);">99</li><li style="color: rgb(153, 153, 153);">100</li><li style="color: rgb(153, 153, 153);">101</li><li style="color: rgb(153, 153, 153);">102</li><li style="color: rgb(153, 153, 153);">103</li><li style="color: rgb(153, 153, 153);">104</li><li style="color: rgb(153, 153, 153);">105</li><li style="color: rgb(153, 153, 153);">106</li><li style="color: rgb(153, 153, 153);">107</li><li style="color: rgb(153, 153, 153);">108</li><li style="color: rgb(153, 153, 153);">109</li><li style="color: rgb(153, 153, 153);">110</li><li style="color: rgb(153, 153, 153);">111</li><li style="color: rgb(153, 153, 153);">112</li><li style="color: rgb(153, 153, 153);">113</li><li style="color: rgb(153, 153, 153);">114</li><li style="color: rgb(153, 153, 153);">115</li><li style="color: rgb(153, 153, 153);">116</li><li style="color: rgb(153, 153, 153);">117</li><li style="color: rgb(153, 153, 153);">118</li><li style="color: rgb(153, 153, 153);">119</li><li style="color: rgb(153, 153, 153);">120</li><li style="color: rgb(153, 153, 153);">121</li><li style="color: rgb(153, 153, 153);">122</li><li style="color: rgb(153, 153, 153);">123</li><li style="color: rgb(153, 153, 153);">124</li><li style="color: rgb(153, 153, 153);">125</li><li style="color: rgb(153, 153, 153);">126</li><li style="color: rgb(153, 153, 153);">127</li><li style="color: rgb(153, 153, 153);">128</li><li style="color: rgb(153, 153, 153);">129</li><li style="color: rgb(153, 153, 153);">130</li><li style="color: rgb(153, 153, 153);">131</li><li style="color: rgb(153, 153, 153);">132</li><li style="color: rgb(153, 153, 153);">133</li><li style="color: rgb(153, 153, 153);">134</li><li style="color: rgb(153, 153, 153);">135</li><li style="color: rgb(153, 153, 153);">136</li><li style="color: rgb(153, 153, 153);">137</li><li style="color: rgb(153, 153, 153);">138</li><li style="color: rgb(153, 153, 153);">139</li><li style="color: rgb(153, 153, 153);">140</li><li style="color: rgb(153, 153, 153);">141</li><li style="color: rgb(153, 153, 153);">142</li><li style="color: rgb(153, 153, 153);">143</li><li style="color: rgb(153, 153, 153);">144</li><li style="color: rgb(153, 153, 153);">145</li><li style="color: rgb(153, 153, 153);">146</li><li style="color: rgb(153, 153, 153);">147</li><li style="color: rgb(153, 153, 153);">148</li><li style="color: rgb(153, 153, 153);">149</li><li style="color: rgb(153, 153, 153);">150</li><li style="color: rgb(153, 153, 153);">151</li><li style="color: rgb(153, 153, 153);">152</li><li style="color: rgb(153, 153, 153);">153</li><li style="color: rgb(153, 153, 153);">154</li><li style="color: rgb(153, 153, 153);">155</li><li style="color: rgb(153, 153, 153);">156</li><li style="color: rgb(153, 153, 153);">157</li></ul></pre>
+
+
+
+<h3 id="46-ecc算法"><a name="t15"></a>4.6. ECC算法</h3>
+
+<p><code>ECC</code> 也是一种 <strong>非对称加密算法</strong>，主要优势是在某些情况下，它比其他的方法使用 <strong>更小的密钥</strong>，比如 <code>RSA</code> <strong>加密算法</strong>，提供 <strong>相当的或更高等级</strong> 的安全级别。不过一个缺点是 <strong>加密和解密操作</strong> 的实现比其他机制 <strong>时间长</strong> (相比 <code>RSA</code> 算法，该算法对 <code>CPU</code> 消耗严重)。</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="language-java hljs  has-numbering"><span class="hljs-keyword">import</span> net.pocrd.annotation.NotThreadSafe;
+<span class="hljs-keyword">import</span> org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
+<span class="hljs-keyword">import</span> org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
+<span class="hljs-keyword">import</span> org.bouncycastle.jce.provider.BouncyCastleProvider;
+<span class="hljs-keyword">import</span> org.slf4j.Logger;
+<span class="hljs-keyword">import</span> org.slf4j.LoggerFactory;
+<span class="hljs-keyword">import</span> javax.crypto.Cipher;
+<span class="hljs-keyword">import</span> java.io.ByteArrayOutputStream;
+<span class="hljs-keyword">import</span> java.security.KeyFactory;
+<span class="hljs-keyword">import</span> java.security.Security;
+<span class="hljs-keyword">import</span> java.security.Signature;
+<span class="hljs-keyword">import</span> java.security.spec.PKCS8EncodedKeySpec;
+<span class="hljs-keyword">import</span> java.security.spec.X509EncodedKeySpec;
+
+<span class="hljs-annotation">@NotThreadSafe</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">EccHelper</span> {</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> Logger logger = LoggerFactory.getLogger(EccHelper.class);
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> SIZE = <span class="hljs-number">4096</span>;
+    <span class="hljs-keyword">private</span> BCECPublicKey  publicKey;
+    <span class="hljs-keyword">private</span> BCECPrivateKey privateKey;
+
+    <span class="hljs-keyword">static</span> {
+        Security.addProvider(<span class="hljs-keyword">new</span> BouncyCastleProvider());
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title">EccHelper</span>(String publicKey, String privateKey) {
+        <span class="hljs-keyword">this</span>(Base64Util.decode(publicKey), Base64Util.decode(privateKey));
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title">EccHelper</span>(<span class="hljs-keyword">byte</span>[] publicKey, <span class="hljs-keyword">byte</span>[] privateKey) {
+        <span class="hljs-keyword">try</span> {
+            KeyFactory keyFactory = KeyFactory.getInstance(<span class="hljs-string">"EC"</span>, <span class="hljs-string">"BC"</span>);
+            <span class="hljs-keyword">if</span> (publicKey != <span class="hljs-keyword">null</span> &amp;&amp; publicKey.length &gt; <span class="hljs-number">0</span>) {
+                <span class="hljs-keyword">this</span>.publicKey = (BCECPublicKey)keyFactory.generatePublic(<span class="hljs-keyword">new</span> X509EncodedKeySpec(publicKey));
+            }
+            <span class="hljs-keyword">if</span> (privateKey != <span class="hljs-keyword">null</span> &amp;&amp; privateKey.length &gt; <span class="hljs-number">0</span>) {
+                <span class="hljs-keyword">this</span>.privateKey = (BCECPrivateKey)keyFactory.generatePrivate(<span class="hljs-keyword">new</span> PKCS8EncodedKeySpec(privateKey));
+            }
+        } <span class="hljs-keyword">catch</span> (ClassCastException e) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">""</span>, e);
+        } <span class="hljs-keyword">catch</span> (Exception e) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(e);
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title">EccHelper</span>(String publicKey) {
+        <span class="hljs-keyword">this</span>(Base64Util.decode(publicKey));
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title">EccHelper</span>(<span class="hljs-keyword">byte</span>[] publicKey) {
+        <span class="hljs-keyword">try</span> {
+            KeyFactory keyFactory = KeyFactory.getInstance(<span class="hljs-string">"EC"</span>, <span class="hljs-string">"BC"</span>);
+            <span class="hljs-keyword">if</span> (publicKey != <span class="hljs-keyword">null</span> &amp;&amp; publicKey.length &gt; <span class="hljs-number">0</span>) {
+                <span class="hljs-keyword">this</span>.publicKey = (BCECPublicKey)keyFactory.generatePublic(<span class="hljs-keyword">new</span> X509EncodedKeySpec(publicKey));
+            }
+        } <span class="hljs-keyword">catch</span> (Exception e) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(e);
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">byte</span>[] <span class="hljs-title">encrypt</span>(<span class="hljs-keyword">byte</span>[] content) {
+        <span class="hljs-keyword">if</span> (publicKey == <span class="hljs-keyword">null</span>) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">"public key is null."</span>);
+        }
+        <span class="hljs-keyword">try</span> {
+            Cipher cipher = Cipher.getInstance(<span class="hljs-string">"ECIES"</span>, <span class="hljs-string">"BC"</span>);
+            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+            <span class="hljs-keyword">int</span> size = SIZE;
+            ByteArrayOutputStream baos = <span class="hljs-keyword">new</span> ByteArrayOutputStream((content.length + size - <span class="hljs-number">1</span>) / size * (size + <span class="hljs-number">45</span>));
+            <span class="hljs-keyword">int</span> left = <span class="hljs-number">0</span>;
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; content.length; ) {
+                left = content.length - i;
+                <span class="hljs-keyword">if</span> (left &gt; size) {
+                    cipher.update(content, i, size);
+                    i += size;
+                } <span class="hljs-keyword">else</span> {
+                    cipher.update(content, i, left);
+                    i += left;
+                }
+                baos.write(cipher.doFinal());
+            }
+            <span class="hljs-keyword">return</span> baos.toByteArray();
+        } <span class="hljs-keyword">catch</span> (Exception e) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(e);
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">byte</span>[] <span class="hljs-title">decrypt</span>(<span class="hljs-keyword">byte</span>[] secret) {
+        <span class="hljs-keyword">if</span> (privateKey == <span class="hljs-keyword">null</span>) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">"private key is null."</span>);
+        }
+        <span class="hljs-keyword">try</span> {
+            Cipher cipher = Cipher.getInstance(<span class="hljs-string">"ECIES"</span>, <span class="hljs-string">"BC"</span>);
+            cipher.init(Cipher.DECRYPT_MODE, privateKey);
+            <span class="hljs-keyword">int</span> size = SIZE + <span class="hljs-number">45</span>;
+            ByteArrayOutputStream baos = <span class="hljs-keyword">new</span> ByteArrayOutputStream((secret.length + size + <span class="hljs-number">44</span>) / (size + <span class="hljs-number">45</span>) * size);
+            <span class="hljs-keyword">int</span> left = <span class="hljs-number">0</span>;
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; secret.length; ) {
+                left = secret.length - i;
+                <span class="hljs-keyword">if</span> (left &gt; size) {
+                    cipher.update(secret, i, size);
+                    i += size;
+                } <span class="hljs-keyword">else</span> {
+                    cipher.update(secret, i, left);
+                    i += left;
+                }
+                baos.write(cipher.doFinal());
+            }
+            <span class="hljs-keyword">return</span> baos.toByteArray();
+        } <span class="hljs-keyword">catch</span> (Exception e) {
+            logger.error(<span class="hljs-string">"ecc decrypt failed."</span>, e);
+        }
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">byte</span>[] <span class="hljs-title">sign</span>(<span class="hljs-keyword">byte</span>[] content) {
+        <span class="hljs-keyword">if</span> (privateKey == <span class="hljs-keyword">null</span>) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">"private key is null."</span>);
+        }
+        <span class="hljs-keyword">try</span> {
+            Signature signature = Signature.getInstance(<span class="hljs-string">"SHA1withECDSA"</span>, <span class="hljs-string">"BC"</span>);
+            signature.initSign(privateKey);
+            signature.update(content);
+            <span class="hljs-keyword">return</span> signature.sign();
+        } <span class="hljs-keyword">catch</span> (Exception e) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(e);
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">verify</span>(<span class="hljs-keyword">byte</span>[] sign, <span class="hljs-keyword">byte</span>[] content) {
+        <span class="hljs-keyword">if</span> (publicKey == <span class="hljs-keyword">null</span>) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">"public key is null."</span>);
+        }
+        <span class="hljs-keyword">try</span> {
+            Signature signature = Signature.getInstance(<span class="hljs-string">"SHA1withECDSA"</span>, <span class="hljs-string">"BC"</span>);
+            signature.initVerify(publicKey);
+            signature.update(content);
+            <span class="hljs-keyword">return</span> signature.verify(sign);
+        } <span class="hljs-keyword">catch</span> (Exception e) {
+            logger.error(<span class="hljs-string">"ecc verify failed."</span>, e);
+        }
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+    }
+}</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li><li style="color: rgb(153, 153, 153);">28</li><li style="color: rgb(153, 153, 153);">29</li><li style="color: rgb(153, 153, 153);">30</li><li style="color: rgb(153, 153, 153);">31</li><li style="color: rgb(153, 153, 153);">32</li><li style="color: rgb(153, 153, 153);">33</li><li style="color: rgb(153, 153, 153);">34</li><li style="color: rgb(153, 153, 153);">35</li><li style="color: rgb(153, 153, 153);">36</li><li style="color: rgb(153, 153, 153);">37</li><li style="color: rgb(153, 153, 153);">38</li><li style="color: rgb(153, 153, 153);">39</li><li style="color: rgb(153, 153, 153);">40</li><li style="color: rgb(153, 153, 153);">41</li><li style="color: rgb(153, 153, 153);">42</li><li style="color: rgb(153, 153, 153);">43</li><li style="color: rgb(153, 153, 153);">44</li><li style="color: rgb(153, 153, 153);">45</li><li style="color: rgb(153, 153, 153);">46</li><li style="color: rgb(153, 153, 153);">47</li><li style="color: rgb(153, 153, 153);">48</li><li style="color: rgb(153, 153, 153);">49</li><li style="color: rgb(153, 153, 153);">50</li><li style="color: rgb(153, 153, 153);">51</li><li style="color: rgb(153, 153, 153);">52</li><li style="color: rgb(153, 153, 153);">53</li><li style="color: rgb(153, 153, 153);">54</li><li style="color: rgb(153, 153, 153);">55</li><li style="color: rgb(153, 153, 153);">56</li><li style="color: rgb(153, 153, 153);">57</li><li style="color: rgb(153, 153, 153);">58</li><li style="color: rgb(153, 153, 153);">59</li><li style="color: rgb(153, 153, 153);">60</li><li style="color: rgb(153, 153, 153);">61</li><li style="color: rgb(153, 153, 153);">62</li><li style="color: rgb(153, 153, 153);">63</li><li style="color: rgb(153, 153, 153);">64</li><li style="color: rgb(153, 153, 153);">65</li><li style="color: rgb(153, 153, 153);">66</li><li style="color: rgb(153, 153, 153);">67</li><li style="color: rgb(153, 153, 153);">68</li><li style="color: rgb(153, 153, 153);">69</li><li style="color: rgb(153, 153, 153);">70</li><li style="color: rgb(153, 153, 153);">71</li><li style="color: rgb(153, 153, 153);">72</li><li style="color: rgb(153, 153, 153);">73</li><li style="color: rgb(153, 153, 153);">74</li><li style="color: rgb(153, 153, 153);">75</li><li style="color: rgb(153, 153, 153);">76</li><li style="color: rgb(153, 153, 153);">77</li><li style="color: rgb(153, 153, 153);">78</li><li style="color: rgb(153, 153, 153);">79</li><li style="color: rgb(153, 153, 153);">80</li><li style="color: rgb(153, 153, 153);">81</li><li style="color: rgb(153, 153, 153);">82</li><li style="color: rgb(153, 153, 153);">83</li><li style="color: rgb(153, 153, 153);">84</li><li style="color: rgb(153, 153, 153);">85</li><li style="color: rgb(153, 153, 153);">86</li><li style="color: rgb(153, 153, 153);">87</li><li style="color: rgb(153, 153, 153);">88</li><li style="color: rgb(153, 153, 153);">89</li><li style="color: rgb(153, 153, 153);">90</li><li style="color: rgb(153, 153, 153);">91</li><li style="color: rgb(153, 153, 153);">92</li><li style="color: rgb(153, 153, 153);">93</li><li style="color: rgb(153, 153, 153);">94</li><li style="color: rgb(153, 153, 153);">95</li><li style="color: rgb(153, 153, 153);">96</li><li style="color: rgb(153, 153, 153);">97</li><li style="color: rgb(153, 153, 153);">98</li><li style="color: rgb(153, 153, 153);">99</li><li style="color: rgb(153, 153, 153);">100</li><li style="color: rgb(153, 153, 153);">101</li><li style="color: rgb(153, 153, 153);">102</li><li style="color: rgb(153, 153, 153);">103</li><li style="color: rgb(153, 153, 153);">104</li><li style="color: rgb(153, 153, 153);">105</li><li style="color: rgb(153, 153, 153);">106</li><li style="color: rgb(153, 153, 153);">107</li><li style="color: rgb(153, 153, 153);">108</li><li style="color: rgb(153, 153, 153);">109</li><li style="color: rgb(153, 153, 153);">110</li><li style="color: rgb(153, 153, 153);">111</li><li style="color: rgb(153, 153, 153);">112</li><li style="color: rgb(153, 153, 153);">113</li><li style="color: rgb(153, 153, 153);">114</li><li style="color: rgb(153, 153, 153);">115</li><li style="color: rgb(153, 153, 153);">116</li><li style="color: rgb(153, 153, 153);">117</li><li style="color: rgb(153, 153, 153);">118</li><li style="color: rgb(153, 153, 153);">119</li><li style="color: rgb(153, 153, 153);">120</li><li style="color: rgb(153, 153, 153);">121</li><li style="color: rgb(153, 153, 153);">122</li><li style="color: rgb(153, 153, 153);">123</li><li style="color: rgb(153, 153, 153);">124</li><li style="color: rgb(153, 153, 153);">125</li><li style="color: rgb(153, 153, 153);">126</li><li style="color: rgb(153, 153, 153);">127</li><li style="color: rgb(153, 153, 153);">128</li><li style="color: rgb(153, 153, 153);">129</li><li style="color: rgb(153, 153, 153);">130</li><li style="color: rgb(153, 153, 153);">131</li><li style="color: rgb(153, 153, 153);">132</li><li style="color: rgb(153, 153, 153);">133</li><li style="color: rgb(153, 153, 153);">134</li><li style="color: rgb(153, 153, 153);">135</li><li style="color: rgb(153, 153, 153);">136</li><li style="color: rgb(153, 153, 153);">137</li><li style="color: rgb(153, 153, 153);">138</li><li style="color: rgb(153, 153, 153);">139</li><li style="color: rgb(153, 153, 153);">140</li><li style="color: rgb(153, 153, 153);">141</li><li style="color: rgb(153, 153, 153);">142</li><li style="color: rgb(153, 153, 153);">143</li><li style="color: rgb(153, 153, 153);">144</li></ul></pre>
+
+
+
+<h2 id="5-各种加密算法对比"><a name="t16"></a>5. 各种加密算法对比</h2>
+
+
+
+<h3 id="51-散列算法比较"><a name="t17"></a>5.1. 散列算法比较</h3>
+
+<div class="table-box"><table>
+<thead>
+<tr>
+  <th align="left">名称</th>
+  <th align="left">安全性</th>
+  <th align="left">速度</th>
+</tr>
+</thead>
+<tbody><tr>
+  <td align="left">SHA-1</td>
+  <td align="left">高</td>
+  <td align="left">慢</td>
+</tr>
+<tr>
+  <td align="left">MD5</td>
+  <td align="left">中</td>
+  <td align="left">快</td>
+</tr>
+</tbody></table></div>
+
+
+
+
+<h3 id="52-对称加密算法比较"><a name="t18"></a>5.2. 对称加密算法比较</h3>
+
+<div class="table-box"><table>
+<thead>
+<tr>
+  <th align="left">名称</th>
+  <th align="left">密钥名称</th>
+  <th align="left">运行速度</th>
+  <th align="left">安全性</th>
+  <th align="left">资源消耗</th>
+</tr>
+</thead>
+<tbody><tr>
+  <td align="left">DES</td>
+  <td align="left">56位</td>
+  <td align="left">较快</td>
+  <td align="left">低</td>
+  <td align="left">中</td>
+</tr>
+<tr>
+  <td align="left">3DES</td>
+  <td align="left">112位或168位</td>
+  <td align="left">慢</td>
+  <td align="left">中</td>
+  <td align="left">高</td>
+</tr>
+<tr>
+  <td align="left">AES</td>
+  <td align="left">128、192、256位</td>
+  <td align="left">快</td>
+  <td align="left">高</td>
+  <td align="left">低</td>
+</tr>
+</tbody></table></div>
+
+
+
+
+<h3 id="53-非对称加密算法比较"><a name="t19"></a>5.3. 非对称加密算法比较</h3>
+
+<div class="table-box"><table>
+<thead>
+<tr>
+  <th align="left">名称</th>
+  <th align="left">成熟度</th>
+  <th align="left">安全性</th>
+  <th align="left">运算速度</th>
+  <th align="left">资源消耗</th>
+</tr>
+</thead>
+<tbody><tr>
+  <td align="left">RSA</td>
+  <td align="left">高</td>
+  <td align="left">高</td>
+  <td align="left">中</td>
+  <td align="left">中</td>
+</tr>
+<tr>
+  <td align="left">ECC</td>
+  <td align="left">高</td>
+  <td align="left">高</td>
+  <td align="left">慢</td>
+  <td align="left">高</td>
+</tr>
+</tbody></table></div>
+
+
+
+
+<h3 id="54-对称算法与非对称加密算法"><a name="t20"></a>5.4. 对称算法与非对称加密算法</h3>
+
+
+
+<h4 id="541-对称算法">5.4.1. 对称算法</h4>
+
+<ol>
+<li><p><strong>密钥管理</strong>：比较难，不适合互联网，一般用于内部系统</p></li>
+<li><p><strong>安全性</strong>：中</p></li>
+<li><p><strong>加密速度</strong>：快好 <strong>几个数量级</strong> (软件加解密速度至少快 <code>100</code> 倍，每秒可以加解密数 <code>M</code> <strong>比特</strong> 数据)，适合大数据量的加解密处理</p></li>
+</ol>
+
+
+
+<h4 id="542-非对称算法">5.4.2. 非对称算法</h4>
+
+<ol>
+<li><p><strong>密钥管理</strong>：密钥容易管理</p></li>
+<li><p><strong>安全性</strong>：高</p></li>
+<li><p><strong>加密速度</strong>：比较慢，适合 <strong>小数据量</strong> 加解密或数据签名</p></li>
+</ol>
+
+
+
+<h1 id="小结"><a name="t21"></a>小结</h1>
+
+<p>本文介绍了 <strong>数字签名</strong>，<strong>加密和解密</strong>，<strong>对称加密和非对称加密</strong>，然后详细介绍了 <code>MD5</code>，<code>SHA-1</code>，<code>HMAC</code>，<code>DES/AES</code>，<code>RSA</code> 和 <code>ECC</code> 这几种加密算法和代码示例。</p>
+
+<hr>
+
+<p>欢迎关注技术公众号： 零壹技术栈</p>
+
+<p><img title="" alt="零壹技术栈" src="images/html01104.jpg"></p>
+
+<p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>                                    </div>
+                <link href="https://csdnimg.cn/release/phoenix/mdeditor/markdown_views-095d4a0b23.css" rel="stylesheet">
+                    </div>
+
+
+</div>
+
+
+</body></html>

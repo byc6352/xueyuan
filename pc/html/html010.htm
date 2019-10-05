@@ -1,0 +1,171 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fiddler抓取HTTPS最全（强）攻略</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="blogpost-body " id="cnblogs_post_body" deep="8">
+    <p><strong>本文来自于</strong><strong>柠檬班49期学员superman</strong><strong>童鞋的学习笔记。希望对同样是测试萌新的你有帮助，如果觉得好，可以点个赞噢~</strong></p>
+<p>&nbsp;</p>
+<p>对于想抓取HTTPS的测试初学者来说，常用的工具就是fiddler。可是在初学时，大家对于fiddler如何抓取HTTPS真是伤了脑筋，可能你一步步按着网上的帖子成功了，那当然是极好的。</p>
+<p>&nbsp;</p>
+<p>有可能没有成功，这时候你就很抓狂了，我把一些我的安装经验和网络上的教程进行了整合（其中注意事项及10、11步骤）。</p>
+<p>&nbsp;</p>
+<p>下面为大家演示如何用fiddler抓取HTTPS的详细教程。如若失败，请先仔细检查，避免错过细节！可重新重试！</p>
+<p>&nbsp;</p>
+<p><strong>已安装fiddler用户：</strong></p>
+<p>&nbsp;</p>
+<p>1. 清除C:\Users\Administrator\AppData\Roaming\Microsoft\Crypto\RSA 目录下所有文件（首次安装fiddler请忽略）</p>
+<p>&nbsp;</p>
+<p>2. 清除电脑上的根证书，WIN+R快捷键，输入：certmgr.msc， 然后回车，查找所有fiddler证书，然后删除。（首次安装fiddler请忽略）</p>
+<p>&nbsp;</p>
+<p><img alt="" src="images/html01001.jpg" data-fail="0" data-w="667" data-type="png" data-src="https://mmbiz.qpic.cn/mmbiz_png/JbrCrRbE0AYRDRCvIXSgsPWFRVMic2qK3YnaB50h7gdjibQ0jAHllNXKE0ib9w7B15PKib6TYUl1iclGw3BOn65negw/640?wx_fmt=png" data-s="300,640" data-ratio="0.7856071964017991" data-copyright="0"></p>
+<p>&nbsp;</p>
+<h2>3. 清除浏览器上的证书文件<span class="Apple-converted-space">&nbsp;,此处需要仔细查找带有FiddlerRoot的字样，并删除，以谷歌浏览器为例说明，在浏览器上输入:&nbsp;chrome://settings/，（首次安装fiddler请忽略）</span></h2>
+<p>&nbsp;</p>
+<p><img alt="" src="images/html01002.jpg" data-fail="0" data-w="1123" data-type="png" data-src="https://mmbiz.qpic.cn/mmbiz_png/JbrCrRbE0AYRDRCvIXSgsPWFRVMic2qK3pvD3Aiaicek193nNBJlsZUKib3XMmsFOy6eytJylCBDowSI8iaaRlK5jxQ/640?wx_fmt=png" data-s="300,640" data-ratio="0.5040071237756011" data-copyright="0"></p>
+<p>&nbsp;</p>
+<h2>4. &nbsp;打开fiddler，点击工具栏中的Tools—&gt;Options，点击Actions,选择最后一项，Reset All certificates,然后关闭</h2>
+<p>&nbsp;</p>
+<p><img alt="" src="images/html01003.jpg" data-fail="0" data-w="557" data-type="png" data-src="https://mmbiz.qpic.cn/mmbiz_png/JbrCrRbE0AYRDRCvIXSgsPWFRVMic2qK3uwbZjTaPNgF10m9a4YhVT6oTmyIyKgLnZrfkKMJcpsbJqC6lFlDHiaw/640?wx_fmt=png" data-s="300,640" data-ratio="0.6588868940754039" data-copyright="0"></p>
+<p>&nbsp;</p>
+<p><strong>注意：以上步骤假设是已经安装fiddler的情况下需要做的处理 ，若已安装，建议执行上述步骤，然后进行重新安装；</strong></p>
+<p>&nbsp;</p>
+<p>首次安装fiddler用户及完成上述步骤已安装用户：</p>
+<h2>请先退出杀毒软件！！！</h2>
+<p>&nbsp;</p>
+<h2>&nbsp;</h2>
+<h1>&nbsp;</h1>
+<h1>①下载最新版fiddler ，强烈建议在官网下载：https://www.telerik.com/download/fiddler</h1>
+<p>&nbsp;</p>
+<h2>&nbsp;</h2>
+<h2>&nbsp;</h2>
+<p>②正常傻瓜式安装，下一步，下一步，安装完毕后，先不用急于打开软件。</p>
+<p>&nbsp;</p>
+<h2>&nbsp;</h2>
+<p>&nbsp;</p>
+<p>③下载并安装Fiddler证书生成器：http://www.telerik.com/docs/default-source/fiddler/addons/fiddlercertmaker.exe?sfvrsn=2</p>
+<p>&nbsp;</p>
+<h2>&nbsp;</h2>
+<p>④打开Fiddler，点击工具栏中的Tools—&gt;Options</p>
+<p>&nbsp;</p>
+<p><img alt="" src="images/html01004.jpg" data-fail="0" data-w="536" data-type="png" data-src="https://mmbiz.qpic.cn/mmbiz_png/JbrCrRbE0AYRDRCvIXSgsPWFRVMic2qK3d0lZIBT8oc1ibZyOmyfzUeHPTjvPgaSic2svwTRRHsBolK6yyP5Rs69Q/640?wx_fmt=png" data-s="300,640" data-ratio="0.5876865671641791" data-copyright="0"></p>
+<p>&nbsp;</p>
+<h2>&nbsp;</h2>
+<h2>5. 点击https设置选项，勾选选择项</h2>
+<p>&nbsp;</p>
+<p><img alt="" src="images/html01005.jpg" data-fail="0" data-w="672" data-type="png" data-src="https://mmbiz.qpic.cn/mmbiz_png/JbrCrRbE0AYRDRCvIXSgsPWFRVMic2qK3VpKbrp4Tbib7GBibbsheMKTJdvhBgqt8sxjYCvw3ZD437mVO2bvV0y3Q/640?wx_fmt=png" data-s="300,640" data-ratio="0.8139880952380952" data-copyright="0"></p>
+<h2>6. 点击Actions,点击第二项：Export Root Certificate to Desktop，这时候桌面上会出现证书FiddlerRoot.cer文件，点击OK设置成功，关闭fiddler&nbsp;&nbsp;&nbsp;&nbsp;</h2>
+<p>&nbsp;</p>
+<p><img alt="" src="images/html01006.jpg" data-fail="0" data-w="700" data-type="png" data-src="https://mmbiz.qpic.cn/mmbiz_png/JbrCrRbE0AYRDRCvIXSgsPWFRVMic2qK3fIOoK3icfh8iaC6tb7p8FHDEXjSyRkTRtzNRqJfNWPxGmdYVAOkNPxtQ/640?wx_fmt=png" data-s="300,640" data-ratio="0.7771428571428571" data-copyright="0"></p>
+<p>&nbsp;</p>
+<h2>&nbsp;</h2>
+<h2>7. PC端，在浏览器中导入证书FiddlerRoot.cer，以谷歌浏览器为例说明，在浏览器上输入:&nbsp;chrome://settings/ &nbsp;然后进入高级设置，点击管理证书</h2>
+<p>&nbsp;</p>
+<p><img alt="" src="images/html01007.jpg" data-fail="0" data-w="1387" data-type="png" data-src="https://mmbiz.qpic.cn/mmbiz_png/JbrCrRbE0AYRDRCvIXSgsPWFRVMic2qK3670AfmQpxZWlH73licic03dJ7KTDQDryyjWfzCBtbwvAYOiaSHsPBfJbQ/640?wx_fmt=png" data-s="300,640" data-ratio="0.528478731074261" data-copyright="0"></p>
+<p>&nbsp;</p>
+<h2>&nbsp;</h2>
+<h2>8.在受信任的根证书颁发机构，对证书进行导入</h2>
+<p>&nbsp;</p>
+<p><img alt="" src="images/html01008.jpg" data-fail="0" data-w="522" data-type="png" data-src="https://mmbiz.qpic.cn/mmbiz_png/JbrCrRbE0AYRDRCvIXSgsPWFRVMic2qK3ckY5kyNicpGulVYQCNV4nPTVpUdxF0ZySXcJLSVKIMNe6CLKicsgj7EQ/640?wx_fmt=png" data-s="300,640" data-ratio="0.8314176245210728" data-copyright="0"></p>
+<p>&nbsp;</p>
+<h2>&nbsp;</h2>
+<h2>9. 重新打开fiddler，就可以在电脑上进行https抓包了。如果不成功请看11步骤。</h2>
+<p>&nbsp;</p>
+<p><img alt="" src="images/html01009.jpg" data-fail="0" data-w="1176" data-type="png" data-src="https://mmbiz.qpic.cn/mmbiz_png/JbrCrRbE0AYRDRCvIXSgsPWFRVMic2qK3ia6YqKHxOMkcxnboeteXicEnDhz6X2AQ3FcDBEmAXkphNytz9G6bVAvw/640?wx_fmt=png" data-s="300,640" data-ratio="0.3852040816326531" data-copyright="0"></p>
+<p>&nbsp;</p>
+<p>10. 如果抓取的包都是错误的，需要注意把下面这几个反勾选掉。Autoresponder—enable rules</p>
+<p>&nbsp;</p>
+<p><img alt="" src="images/html01010.jpg" data-fail="0" data-w="1159" data-type="png" data-src="https://mmbiz.qpic.cn/mmbiz_png/JbrCrRbE0AYRDRCvIXSgsPWFRVMic2qK3hp0SwmibXv6EWQibt6iaiaXrm8m7naXEWhzoS3w0oITJRPiatva3EYfQ16g/640?wx_fmt=png" data-s="300,640" data-ratio="0.4270923209663503" data-copyright="0"></p>
+<p>&nbsp;</p>
+<p>11.配置浏览器</p>
+<ul class="list-paddingleft-2">
+<ul class="list-paddingleft-2">
+<li>
+<p>firefox安全链接提示</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+</li>
+</ul>
+</ul>
+<p>&nbsp;</p>
+<p><img class="img_loading" alt="" src="images/html01011.jpg" data-w="1340" data-type="png" data-src="https://mmbiz.qpic.cn/mmbiz_png/JbrCrRbE0AYRDRCvIXSgsPWFRVMic2qK3k2w0eLhFufUeZmdz23v5Yo40M7iaLRueMdKsqJhdA99XgjfdxxZXuHA/640?wx_fmt=png" data-s="300,640" data-ratio="0.6067164179104477" data-copyright="0"></p>
+<p>出现这个「您的连接并不安全」那么很多的使用者说可以通过配置Firefox浏览器配置即可，但是根据测试发现这个方法行不通！</p>
+<p>&nbsp;</p>
+<ul class="list-paddingleft-2">
+<li>
+<p>通过配置Firefox浏览器</p>
+</li>
+<li>
+<p>进入firefox配置</p>
+</li>
+<li>
+<p>可以通过在firefox浏览器地址栏中输入 「about:config」进入</p>
+</li>
+</ul>
+<p>&nbsp;</p>
+<p><img alt="" src="images/html01012.jpg" data-fail="0" data-w="1274" data-type="png" data-src="https://mmbiz.qpic.cn/mmbiz_png/JbrCrRbE0AYRDRCvIXSgsPWFRVMic2qK3KQ1bqbw9aHJaraC80UIJuQ7tVsV1AzxuO6IQELicBiaYhONoxt8oXLvg/640?wx_fmt=png" data-s="300,640" data-ratio="0.5737833594976453" data-copyright="0"></p>
+<p>&nbsp;</p>
+<p>修改配置项</p>
+<ul class="list-paddingleft-2">
+<ul class="list-paddingleft-2">
+<li>
+<p>在搜索栏输入「security.enterprise_roots.enabled」找到对应的配置项</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+</li>
+</ul>
+</ul>
+<p>&nbsp;</p>
+<p><img alt="" src="images/html01013.jpg" data-fail="0" data-w="1525" data-type="png" data-src="https://mmbiz.qpic.cn/mmbiz_png/JbrCrRbE0AYRDRCvIXSgsPWFRVMic2qK38ia4F4LpSXVCQnfDMibLBzAwIbvulIJgDqIWhnFbJqUJP0ouy71NgzdQ/640?wx_fmt=png" data-s="300,640" data-ratio="0.6072131147540983" data-copyright="0"></p>
+<p>&nbsp;</p>
+<p>通过双击或右键选择菜单项「切换」即可将 「值」对应的字段值设置为 「true&nbsp;&nbsp;&nbsp;&nbsp;」</p>
+<p>&nbsp;</p>
+<p><img alt="" src="images/html01014.jpg" data-fail="0" data-w="1338" data-type="png" data-src="https://mmbiz.qpic.cn/mmbiz_png/JbrCrRbE0AYRDRCvIXSgsPWFRVMic2qK3M4npkqUl15rVGKvxTsuRWHQm4YuaWpbkWxvFBOQZozic4V4Z5ahOFPg/640?wx_fmt=png" data-s="300,640" data-ratio="0.6068759342301944" data-copyright="0"></p>
+<p>&nbsp;</p>
+<p>·&nbsp;再次访问网络以验证是否可行</p>
+<p>&nbsp;</p>
+<p><img alt="" src="images/html01015.jpg" data-fail="0" data-w="1306" data-type="png" data-src="https://mmbiz.qpic.cn/mmbiz_png/JbrCrRbE0AYRDRCvIXSgsPWFRVMic2qK37X4UPt6EcDqwYl1hkuiarYfU50RIxzev6ibEssoKwNW0peEQfHdWuyVA/640?wx_fmt=png" data-s="300,640" data-ratio="0.607197549770291" data-copyright="0"></p>
+<p>咦！还是不行哦！不过通过以上配置这次访问网络时它比没有配置之前多了一个提示！看到没有？</p>
+<p>&nbsp;</p>
+<p>「此网站采用了 HTTP 严格传输安全（HSTS）机制，要求 Firefox 只能与其建立安全连接。正因如此，您也不能将此证书加入例外列表。」</p>
+<p>&nbsp;</p>
+<p>也就是说当前访问的站点是使用 「HTTP严格传输安全协议」也就是「https传输协议」, 那既然是这样, 当访问 「http传输协议」的站点也就没有问题喽！</p>
+<p>&nbsp;</p>
+<p>对就是这样, 那不防找一个「http传输协议」的站点试试！</p>
+<p>&nbsp;</p>
+<p><img alt="" src="images/html01016.jpg" data-fail="0" data-w="1256" data-type="png" data-src="https://mmbiz.qpic.cn/mmbiz_png/JbrCrRbE0AYRDRCvIXSgsPWFRVMic2qK3SibuMjCfj5X6kxttcK28iadJk7YYx34BUQWnCgovITHla5PThbYchTHw/640?wx_fmt=png" data-s="300,640" data-ratio="0.606687898089172" data-copyright="0"></p>
+<p>&nbsp;</p>
+<p>可以看到当访问 「菜鸟教程」这个站点时一点问题没有！</p>
+<p>&nbsp;</p>
+<p>那既然访问传输协议为 「https」的站点时会有这样的提示：此网站采用了 HTTP 严格传输安全（HSTS）机制，要求 Firefox 只能与其建立安全连接。正因如此，您也不能将此证书加入例外列表。</p>
+<p>&nbsp;</p>
+<p>那访问时就必须通过这个协议进行访问，并且firefox也不允许添加站点例外的方式进行访问, 那问题的关键就在于「fiddler」这个代理在访问以 「https传输协议」的站点时不被信任。</p>
+<p>&nbsp;</p>
+<p>&nbsp;那么想办法让 「Firefox」浏览器在访问以传输协议为 「https」被信任这个问题也就可以彻底解决啦！（先打开fiddler，浏览器才能访问网络！）</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>注意事项：</strong></p>
+<p>&nbsp;</p>
+<p><strong>1.&nbsp;浏览器、fiddler配置好需要重新启动，先启动fiddler，再启动浏览器；</strong></p>
+<p>&nbsp;</p>
+<p><strong>2. 在配置浏览器代理及端口时注意勾选“为所有协议使用相同代理服务器（s）”。</strong></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><img alt="" src="images/html01017.jpg" data-fail="0" data-w="711" data-type="png" data-src="https://mmbiz.qpic.cn/mmbiz_png/JbrCrRbE0AYRDRCvIXSgsPWFRVMic2qK3tJUicqvUOufd0pY7ryZPLMtnXPrM9pOzqXqfrQ7M9icBIJrQbicNC5JZA/640?wx_fmt=png" data-s="300,640" data-ratio="0.43037974683544306" data-copyright="0"></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<hr>
+<p>&nbsp;</p>
+<p>今天的分享就到这里啦~~赶紧去实战吧，如果大家过程中有什么问题，欢迎大家留言噢，有问必答乃柠檬班最大优点之一。</p>
+<p><strong>本文来自于</strong><strong>柠檬班49期学员superman</strong><strong>童鞋的学习笔记。希望对同样是测试萌新的你有帮助，如果觉得好，欢迎转发点赞噢~~</strong></p>
+<p><strong>&nbsp;</strong></p>
+</div>
+
+</div>
+
+
+</body></html>

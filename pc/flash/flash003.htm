@@ -1,0 +1,80 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>【Flash逆向调试之二】JPEXS的使用技巧说明 - 非鱼 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                                <div class="article-copyright">
+                <span class="creativecommons">
+                <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                    </a>
+            <span>
+                版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。            </span>
+               <div class="article-source-link2222">
+                    本文链接：<a href="https://blog.csdn.net/Hot_VC/article/details/50618916">https://blog.csdn.net/Hot_VC/article/details/50618916</a>
+                </div>
+            </span>
+                    </div>
+                                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            
+<p style="line-height: 26px; font-family: Arial; font-size: 14px;">
+一、基础环境说明</p>
+<blockquote style="border: currentColor; border-image: none; line-height: 26px; font-family: Arial;">
+<p>
+<span style="font-size: 10px;">系统：win7_x64</span></p>
+<p>
+<span style="font-size: 10px;">浏览器：FireFox（火狐浏览器），（chrome浏览器日志输出环境我没配置出来，如有朋友配置出来请私信告知，我重新修改）</span></p>
+<p>
+<span style="font-size: 10px;">分析软件：JPEXS（需要JAVA支持，请自行安装JAVA环境）</span></p>
+<p>
+<span style="font-size: 10px;">这个软件应该有许多BUG，以及功能简陋，但是应该是市面上最好用的FLASH分析软件了。FLASH分析环境简陋，请大家忍受啊！！！</span></p>
+<p>
+<span style="font-size: 10px;">下载地址：https://www.free-decompiler.com/flash/</span></p>
+<p>
+<span style="font-size: 10px;">其它辅助软件：Cygwin64 Terminal</span></p>
+<p>
+<span style="font-size: 10px;">分析案例：风行播放器的swf模块分析（FunPlayerP2p_2.0.1.2.swf这是FLASH主播放器的P2P模块）。</span></p>
+</blockquote>
+<p><span style="font-family: Arial;"><span style="line-height: 26px; font-size: 14px;">二、分析开始</span></span></p>
+<p></p>
+<blockquote style="border: currentColor; border-image: none;">
+<p>1.载入模块，将文件直接拖入JPEXS中可以看到如下界面：</p>
+<p><img alt="" src="images/flash00301.jpg"><br></p>
+<p>其中，脚本目录下，就是我们主要分析的AS3脚本了。</p>
+<p>2.导出项目</p>
+<p>可以点击文件工具栏下的导出到FLA，可以导出FLA项目用于FLASH CSX打开，但是导出项目无法编译通过，所以个人感觉没啥子用。当然不排除其它简单的SWF文件可以直接反编译。</p>
+<p>3.脚本查看与编辑</p>
+<p>点击其中一个脚本，可以看到如下界面。JPEXS是可以对FALSH进行修改的，只是不能直接修改AS3脚本，而是需要通过修改最右边的PCODE码进行修改。下图我通过修改PCODE码添加如下语句：</p>
+<p></p><pre><code class="hljs vbscript">trace(<span class="hljs-string">"in initMultCdnTask====================================================================================================="</span> + <span class="hljs-keyword">new</span> <span class="hljs-keyword">Error</span>().getStackTrace());</code></pre>pcode代码如下：
+<p></p><pre><code class="hljs python"><ol class="hljs-ln" style="width: 1090px;"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">findpropstrict Qname(PackageNamespace(<span class="hljs-string">""</span>),<span class="hljs-string">"trace"</span>)</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">pushstring <span class="hljs-string">"in initMultCdnTask====================================================================================================="</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">callpropvoid Qname(PackageNamespace(<span class="hljs-string">""</span>),<span class="hljs-string">"trace"</span>) <span class="hljs-number">1</span></div></div></li></ol></code></pre>
+<p><br></p>
+<p><img alt="" src="images/flash00302.jpg"><br></p>
+<p>添加这个语句后，保存文件。通过Flddler对于风行的这个swf文件进行劫持替换。然后可以在日志文件文件中看到如下结果：<img alt="" src="images/flash00303.jpg"></p>
+</blockquote>
+<p></p>
+<p></p>
+<blockquote style="border: currentColor; border-image: none;">
+<p>修改swf文件的时候请点击以下按钮：<img alt="" src="images/flash00304.jpg">&nbsp;PCODE栏目变化，如下：</p>
+<p><br></p>
+<p><img alt="" src="images/flash00305.jpg"><br></p>
+<p>此时的显示的的是AVM2虚拟机的字节码以及对应的操作符号，我们需要数清我们所添加的字节码。（字节码在上，操作符号在下）</p>
+<p>对文件进行添加删除代码的时候，需要根据自己添加或者删除的字节码对于一些偏移地址进行修改：</p>
+<p><img alt="" src="images/flash00306.jpg"><br></p>
+<p><strong><br></strong></p>
+</blockquote>
+<p></p>
+<p><span style="color: rgb(255, 0, 0);"><strong>以上为本文全部内容，下一篇将讲几个比较经常用到的有助于分析的几个注入代码。</strong></span></p>
+                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>

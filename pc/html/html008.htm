@@ -1,0 +1,108 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wireshark解密HTTPS数据流</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="postBody">
+                
+<div class="blogpost-body " id="cnblogs_post_body" deep="8">
+    <h1><span style="color: rgb(0, 0, 255);">如果是chrome浏览器的数据流 直接配置”SSLKEYLOGFILE“就可以解密了。</span></h1>
+<h2><span style="color: rgb(255, 0, 0);">实现过程：</span></h2>
+<p>1.配置系统环境变量</p>
+<p>变量名：SSLKEYLOGFILE</p>
+<p>变量值：随意指定一个存储路径，以便chrome输出keylog</p>
+<p><img alt="" src="images/html00801.jpg"></p>
+<p>2.配置Wireshark</p>
+<p>填入你在系统变量中指定的keylog存储路径，以便wireshark访问keylog中的key 从而解密https(ssl)</p>
+<p><img alt="" src="images/html00802.jpg"></p>
+<p>&nbsp;</p>
+<h2><span style="color: rgb(255, 0, 0);">原理解析：</span></h2>
+<p>当你配置了”SSLKEYLOGFILE“这个环境变量，这意味着你告诉chrome 你想知道chrome每次https会话的key记录，chrome将会在每次https会话结束后 将会话数据解密的key记录到keylog文件中，Wireshark通过访问keylog文件使用里面的key就可以解密自己捕获到的chrome产生的https会话数据流。</p>
+<p>&nbsp;</p>
+<h1><span style="color: rgb(0, 0, 255);">非chrome的https数据流怎么解密呢？</span></h1>
+<p>可以通过服务器证书的RSA私钥。</p>
+<p>&nbsp;</p>
+<p>列程，我想要解密百度的https数据流</p>
+<h2><span style="color: rgb(255, 0, 0);">实现过程：</span></h2>
+<p><span style="color: rgb(0, 128, 0);">1.拿到百度的服务器证书</span></p>
+<p>使用fiddler的中间人代理技术拿到含有私钥的服务器证书。</p>
+<p>1).打开fiddler并启用https代理服务</p>
+<p>2).用配置了fiddler代理的浏览器访问百度</p>
+<p>3).运行”certmgr.msc“打开证书管理器</p>
+<p>4)从Personal/Certificates目录下找到*.baidu.com的证书，右键所有任务-导出</p>
+<p><span style="color: rgb(0, 128, 0);">2.取出证书中的私钥</span></p>
+<p>使用openssl取出私钥。</p>
+<p>1).将pfx证书转为pem证书</p>
+<p>命令行：openssl pkcs12 -in &lt;pfx证书路径&gt; -nodes -out &lt;输出的pem证书路径(.pem)&gt;</p>
+<p>2).从pem证书中取出私钥</p>
+<p>命令行：openssl rsa -in&nbsp;&lt;pem证书路径&gt; -out&nbsp;&lt;输出的私钥文件路径(.key)&gt;</p>
+<p><span style="color: rgb(0, 128, 0);">3.将私钥配置到wireshark</span></p>
+<p><img alt="" src="images/html00803.jpg"></p>
+<p>现在就可以解密与*.baidu.com相关的https数据流了！</p>
+<p>&nbsp;</p>
+</div>
+<div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block"><div id="BlogPostCategory">
+    分类: 
+            <a href="https://www.cnblogs.com/aucy/category/1222055.html" target="_blank">技巧</a></div>
+<div id="EntryTag">
+    标签: 
+            <a href="https://www.cnblogs.com/aucy/tag/Wireshark/">Wireshark</a>,             <a href="https://www.cnblogs.com/aucy/tag/https%E8%A7%A3%E5%AF%86/">https解密</a>,             <a href="https://www.cnblogs.com/aucy/tag/pfx%E8%AF%81%E4%B9%A6/">pfx证书</a></div>
+
+    <div id="blog_post_info">
+<div id="green_channel">
+        <a id="green_channel_digg" onclick="DiggIt(9082429,cb_blogId,1);green_channel_success(this,'谢谢推荐！');" href="javascript:void(0);">好文要顶</a>
+        <a id="green_channel_follow" onclick="follow('fcaf6c85-f937-4aee-c858-08d58662b770');" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a title="分享至新浪微博" id="green_channel_weibo" onclick="ShareToTsina()" href="javascript:void(0);"><img alt="" src="images/html00804.png"></a>
+    <a title="分享至微信" id="green_channel_wechat" onclick="shareOnWechat()" href="javascript:void(0);"><img alt="" src="images/html00805.png"></a>
+</div>
+<div id="author_profile">
+    <div class="author_profile_info" id="author_profile_info">
+        <div class="author_profile_info" id="author_profile_detail">
+            <a href="https://home.cnblogs.com/u/aucy/">池温希傲</a><br>
+            <a href="https://home.cnblogs.com/u/aucy/followees/">关注 - 0</a><br>
+            <a href="https://home.cnblogs.com/u/aucy/followers/">粉丝 - 7</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow">
+                <a onclick="follow('fcaf6c85-f937-4aee-c858-08d58662b770');return false;" href="javascript:void(0);">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(9082429,'Digg')">
+        <span class="diggnum" id="digg_count">1</span>
+    </div>
+    <div class="buryit" onclick="votePost(9082429,'Bury')">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+    <div class="clear"></div>
+    <div id="post_next_prev">
+
+    <a class="p_n_p_prefix" href="https://www.cnblogs.com/aucy/p/9082245.html">« </a> 上一篇：    <a title="发布于 2018-05-24 12:17" href="https://www.cnblogs.com/aucy/p/9082245.html">QQ恶搞 - 卡死对方的手机QQ</a>
+    <br>
+    <a class="p_n_p_prefix" href="https://www.cnblogs.com/aucy/p/9090900.html">» </a> 下一篇：    <a title="发布于 2018-05-25 22:20" href="https://www.cnblogs.com/aucy/p/9090900.html">QQ大盗 - 巧用clientkey</a>
+
+</div>
+</div>
+            </div>
+
+</div>
+
+
+</body></html>

@@ -1,0 +1,300 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>‍swf文件格式解析入门（tag解析） - yoshikun的专栏 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+上文把文件头解析完成了，接下来就是解析标签<br>
+swf文件把所有的资源都打包在标签内部<br>
+如字体，位图，嵌入的2进制，代码等等</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+tag有两种类型，1种为短tag，1种为长tag<br>
+短tag的长度是小于63个字节的</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+短标签格式<br>
+RECORDHEADER (short)<br>
+Field&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Type&nbsp;&nbsp;&nbsp; Comment<br>
+TagCodeAndLength&nbsp;&nbsp;&nbsp; UI16&nbsp;&nbsp;&nbsp; Upper 10 bits: tag type Lower 6 bits: tag length<br>
+高10位表示标签类型，低6位表示标签长度</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+长标签格式 长标签的TagCodeAndLength为0x3F (=63)<br>
+长标签使用Length来表示标签的长度<br>
+RECORDHEADER (long)<br>
+Field&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Type&nbsp;&nbsp;&nbsp; Comment<br>
+TagCodeAndLength&nbsp;&nbsp;&nbsp; UI16&nbsp;&nbsp;&nbsp; Tag type and length of 0x3F Packed together as in short header<br>
+Length&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SI32&nbsp;&nbsp;&nbsp; Length of tag</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+跟着标签头后面就是标签指定长度的数据<br>
+然后根据不同的标签类型来解析数据就可以了</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+每个tag读取结束后，后面的又重新字节对齐了，不用考虑剩余几个字节的问题</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+<br>
+/**<br>
+* 读取tag类型，不移动position&nbsp;<br>
+* @param bytes<br>
+* @return&nbsp;<br>
+*/<br>
+private function readTagType(bytes:ByteArray):uint<br>
+{<br>
+&nbsp;&nbsp;&nbsp; var result:uint = bytes.readUnsignedShort();<br>
+&nbsp;&nbsp;&nbsp; result = result &gt;&gt; 6;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; bytes.position -= 2;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; return result;<br>
+}</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+/**<br>
+* 读取tag长度 不包括头本身占的长度&nbsp;<br>
+* @param bytes<br>
+* @return&nbsp;<br>
+*&nbsp;<br>
+*/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+private function readTagLength(bytes:ByteArray):uint{<br>
+&nbsp;&nbsp;&nbsp; var tagLength:uint = (bytes.readUnsignedShort() &amp; 0x3F);<br>
+&nbsp;&nbsp;&nbsp; if (tagLength == 0x3F){<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tagLength = bytes.readUnsignedInt();<br>
+&nbsp;&nbsp;&nbsp; };<br>
+&nbsp;&nbsp;&nbsp; if (tagLength &lt; 0){<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; throw (Error("SWFReader:无效的tag长度"));<br>
+&nbsp;&nbsp;&nbsp; };<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; return tagLength;<br>
+}</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+<br>
+/**<br>
+* 读取tag列表&nbsp;<br>
+* @param bytes<br>
+*&nbsp;<br>
+*/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+private function readTags(bytes:ByteArray):Array<br>
+{<br>
+&nbsp;&nbsp;&nbsp; var result:Array = [];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; var tagType:uint;<br>
+&nbsp;&nbsp;&nbsp; var tagLength:uint;<br>
+&nbsp;&nbsp;&nbsp; var start:int;<br>
+&nbsp;&nbsp;&nbsp; var tag:Tag;<br>
+&nbsp;&nbsp;&nbsp; var cl:Class;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; while(bytes.bytesAvailable &gt; 0)<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; start = bytes.position;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tagType = readTagType(bytes);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tagLength = readTagLength(bytes);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cl = TagTypes.getTagClassByTagType(tagType);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (cl == null)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; trace("Tag Not Found, Type=" + tagType, tagLength);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bytes.position += tagLength;// 跳过长度<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; continue;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tag = new cl();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tag.tagType = tagType;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if( tagLength &gt; 0)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bytes.readBytes(tag.data, 0, tagLength);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tag.data.endian = Endian.LITTLE_ENDIAN;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tag.data.position = 0;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 调用解析方法<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tag.parse();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; result.push(tag);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (tagType == TagTypes.TAG_END)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; break;<br>
+&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; return result;<br>
+}</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+// 所有的tag类型列表<br>
+package swf.file.tags<br>
+{<br>
+&nbsp;&nbsp;&nbsp; import com.the9.nbu.swf.file.tags.actions.*;<br>
+&nbsp;&nbsp;&nbsp; import com.the9.nbu.swf.file.tags.binary.*;<br>
+&nbsp;&nbsp;&nbsp; import com.the9.nbu.swf.file.tags.bitmaps.*;<br>
+&nbsp;&nbsp;&nbsp; import com.the9.nbu.swf.file.tags.buttons.*;<br>
+&nbsp;&nbsp;&nbsp; import com.the9.nbu.swf.file.tags.control.*;<br>
+&nbsp;&nbsp;&nbsp; import com.the9.nbu.swf.file.tags.displaylist.*;<br>
+&nbsp;&nbsp;&nbsp; import com.the9.nbu.swf.file.tags.font.*;<br>
+&nbsp;&nbsp;&nbsp; import com.the9.nbu.swf.file.tags.shapemorphing.*;<br>
+&nbsp;&nbsp;&nbsp; import com.the9.nbu.swf.file.tags.shapes.*;<br>
+&nbsp;&nbsp;&nbsp; import com.the9.nbu.swf.file.tags.sounds.*;<br>
+&nbsp;&nbsp;&nbsp; import com.the9.nbu.swf.file.tags.sprite.*;<br>
+&nbsp;&nbsp;&nbsp; import com.the9.nbu.swf.file.tags.text.*;<br>
+&nbsp;&nbsp;&nbsp; import com.the9.nbu.swf.file.tags.video.*;<br>
+&nbsp;&nbsp;&nbsp; import com.the9.nbu.swf.file.tags.unknown.*;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; /**<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * TagTypes<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * @author 任冬&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * $Id: TagTypes.as 499 2010-11-19 10:02:56Z rendong $<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * @version 1.0<br>
+&nbsp;&nbsp;&nbsp;&nbsp; */<br>
+&nbsp;&nbsp;&nbsp; public class TagTypes<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Flash 1 tags<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_END:uint = 0;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_SHOWFRAME:uint = 1;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINESHAPE:uint = 2;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_FREECHARACTER:uint = 3;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_PLACEOBJECT:uint = 4;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_REMOVEOBJECT:uint = 5;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEBITS:uint = 6;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEBUTTON:uint = 7;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_JPEGTABLES:uint = 8;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_SETBACKGROUNDCOLOR:uint = 9;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEFONT:uint = 10;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINETEXT:uint = 11;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DOACTION:uint = 12;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEFONTINFO:uint = 13;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINESOUND:uint = 14;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_STARTSOUND:uint = 15;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_STOPSOUND:uint = 16;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEBUTTONSOUND:uint = 17;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_SOUNDSTREAMHEAD:uint = 18;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_SOUNDSTREAMBLOCK:uint = 19;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Flash 2 tags<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEBITSLOSSLESS:uint = 20;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEBITSJPEG2:uint = 21;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINESHAPE2:uint = 22;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEBUTTONCXFORM:uint = 23;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_PROTECT:uint = 24;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_PATHSAREPOSTSCRIPT:uint = 25;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Flash 3 tags<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_PLACEOBJECT2:uint = 26;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_REMOVEOBJECT2:uint = 28;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_SYNCFRAME:uint = 29;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_FREEALL:uint = 31;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINESHAPE3:uint = 32;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINETEXT2:uint = 33;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEBUTTON2:uint = 34;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEBITSJPEG3:uint = 35;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEBITSLOSSLESS2:uint = 36;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Flash 4 tags<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEEDITTEXT:uint = 37;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEVIDEO:uint = 38;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINESPRITE:uint = 39;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_NAMECHARACTER:uint = 40;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_PRODUCTINFO:uint = 41;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINETEXTFORMAT:uint = 42;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_FRAMELABEL:uint = 43;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Flash 5 tags<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEBEHAVIOR:uint = 44;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_SOUNDSTREAMHEAD2:uint = 45;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEMORPHSHAPE:uint = 46;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_FRAMETAG:uint = 47;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEFONT2:uint = 48;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_GENCOMMAND:uint = 49;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINECOMMANDOBJ:uint = 50;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_CHARACTERSET:uint = 51;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_FONTREF:uint = 52;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEFUNCTION:uint = 53;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_PLACEFUNCTION:uint = 54;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_GENTAGOBJECT:uint = 55;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_EXPORTASSETS:uint = 56;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_IMPORTASSETS:uint = 57;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_ENABLEDEBUGGER:uint = 58;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Flash 6 tags<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DOINITACTION:uint = 59;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEVIDEOSTREAM:uint = 60;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_VIDEOFRAME:uint = 61;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEFONTINFO2:uint = 62;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEBUGID:uint = 63;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_ENABLEDEBUGGER2:uint = 64;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_SCRIPTLIMITS:uint = 65;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Flash 7 tags<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_SETTABINDEX:uint = 66;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Flash 8 tags<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_FILEATTRIBUTES:uint = 69;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_PLACEOBJECT3:uint = 70;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_IMPORTASSETS2:uint = 71;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DOABC:uint = 72;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEFONTALIGNZONES:uint = 73;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_CSMTEXTSETTINGS:uint = 74;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEFONT3:uint = 75;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_SYMBOLCLASS:uint = 76;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_METADATA:uint = 77;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_SCALINGGRID:uint = 78;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DOABC2:uint = 82;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINESHAPE4:uint = 83;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEMORPHSHAPE2:uint = 84;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Flash 9 tags<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINESCENEANDFRAMELABELDATA:uint = 86;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEBINARYDATA:uint = 87;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEFONTNAME:uint = 88;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_STARTSOUND2:uint = 89;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEBITSJPEG4:uint = 90;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Flash 10 tags<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static const TAG_DEFINEFONT4:uint = 91;</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * tagType =&gt; tag 名称&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; private static const TAG_NAMES:Array =["End","ShowFrame","DefineShape","FreeCharacter","PlaceObject","RemoveObject","DefineBits","DefineButton","JPEGTables","SetBackgroundColor","DefineFont","DefineText","DoAction","DefineFontInfo","DefineSound","StartSound","StopSound","DefineButtonSound","SoundStreamHead","SoundStreamBlock","DefineBitsLossless","DefineBitsJPEG2","DefineShape2","DefineButtonCxform","Protect","PathsArePostScript","PlaceObject2","27
+ (invalid)","RemoveObject2","SyncFrame","30 (invalid)","FreeAll","DefineShape3","DefineText2","DefineButton2","DefineBitsJPEG3","DefineBitsLossless2","DefineEditText","DefineVideo","DefineSprite","NameCharacter","ProductInfo","DefineTextFormat","FrameLabel","DefineBehavior","SoundStreamHead2","DefineMorphShape","FrameTag","DefineFont2","GenCommand","DefineCommandObj","CharacterSet","FontRef","DefineFunction","PlaceFunction","GenTagObject","ExportAssets","ImportAssets","EnableDebugger","DoInitAction","DefineVideoStream","VideoFrame","DefineFontInfo2","DebugID","EnableDebugger2","ScriptLimits","SetTabIndex","67
+ (invalid)","68 (invalid)","FileAttributes","PlaceObject3","ImportAssets2","DoABC","DefineFontAlignZones","CSMTextSettings","DefineFont3","SymbolClass","Metadata","ScalingGrid","79 (invalid)","80 (invalid)","81 (invalid)","DoABC2","DefineShape4","DefineMorphShape2","85
+ (invalid)","DefineSceneAndFrameLabelData","DefineBinaryData","DefineFontName","StartSound2","DefineBitsJPEG4","DefineFont4"];</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * tagType =&gt; tag class<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; private static const TAG_CLASS:Array = [EndTag,ShowFrameTag,DefineShapeTag,FreeCharacterTag,PlaceObjectTag,RemoveObjectTag,DefineBitsTag,DefineButtonTag,JPEGTablesTag,SetBackgroundColorTag,DefineFontTag,DefineTextTag,DoActionTag,DefineFontInfoTag,DefineSoundTag,StartSoundTag,StopSoundTag,DefineButtonSoundTag,SoundStreamHeadTag,SoundStreamBlockTag,DefineBitsLosslessTag,DefineBitsJPEG2Tag,DefineShape2Tag,DefineButtonCxformTag,ProtectTag,PathsArePostScriptTag,PlaceObject2Tag,null,RemoveObject2Tag,SyncFrameTag,null,FreeAllTag,DefineShape3Tag,DefineText2Tag,DefineButton2Tag,DefineBitsJPEG3Tag,DefineBitsLossless2Tag,DefineEditTextTag,DefineVideoTag,DefineSpriteTag,NameCharacterTag,ProductInfoTag,DefineTextFormatTag,FrameLabelTag,DefineBehaviorTag,SoundStreamHead2Tag,DefineMorphShapeTag,FrameTagTag,DefineFont2Tag,GenCommandTag,DefineCommandObjTag,CharacterSetTag,FontRefTag,DefineFunctionTag,PlaceFunctionTag,GenTagObjectTag,ExportAssetsTag,ImportAssetsTag,EnableDebuggerTag,DoInitActionTag,DefineVideoStreamTag,VideoFrameTag,DefineFontInfo2Tag,DebugIDTag,EnableDebugger2Tag,ScriptLimitsTag,SetTabIndexTag,null,null,FileAttributesTag,PlaceObject3Tag,ImportAssets2Tag,DoABCTag,DefineFontAlignZonesTag,CSMTextSettingsTag,DefineFont3Tag,SymbolClassTag,MetadataTag,ScalingGridTag,null,null,null,DoABCTag,DefineShape4Tag,DefineMorphShape2Tag,null,DefineSceneAndFrameLabelDataTag,DefineBinaryDataTag,DefineFontNameTag,StartSound2Tag,DefineBitsJPEG4Tag,DefineFont4Tag];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * 根据编号获取tag名称&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * @param tagType<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * @return&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static function getTagNameByTagType(tagType:int):String<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return TAG_NAMES[tagType] || null;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /**<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * 根据变化获取tag class&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * @param tagType<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * @return&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static function getTagClassByTagType(tagType:int):Class<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return TAG_CLASS[tagType] || null;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp; }<br>
+}</p>
+                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>

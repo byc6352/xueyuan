@@ -1,0 +1,210 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>swf文件格式解析入门（文件头解析） - yoshikun的专栏 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+这里是使用as3语言来对swf文件做解析，其它语言可以参考。</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+一，准备工作<br>
+从Adobe官网下载一份swf文件格式说明文档<br><a style="color: rgb(63, 167, 203);" href="http://www.adobe.com/content/dam/Adobe/en/devnet/swf/pdf/swf_file_format_spec_v10.pdf" rel="nofollow" data-token="454204dfed384a59a5a0ed7855ccf876">http://www.adobe.com/content/dam/Adobe/en/devnet/swf/pdf/swf_file_format_spec_v10.pdf</a><br>
+avm2虚拟机说明文档<br><a style="color: rgb(63, 167, 203);" href="http://www.adobe.com/content/dam/Adobe/en/devnet/actionscript/articles/avm2overview.pdf" rel="nofollow" data-token="60c816f959eeefd44c07fade8651e24e">http://www.adobe.com/content/dam/Adobe/en/devnet/actionscript/articles/avm2overview.pdf</a></p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+采用flash builder新建一个项目。<br>
+// 嵌入测试的swf资源<br>
+[Embed (source = "../testswf/test.swf", mimeType = "application/octet-stream")]<br>
+private var content:Class;</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+// 初始化字节对象<br>
+var bytes:ByteArray = new content() as ByteArray;<br>
+// 设置为主机字节序<br>
+bytes.endian = Endian.LITTLE_ENDIAN;</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+二，开始解析工作<br>
+swf文件格式为：[header][FileAttributes tag][Tag][Tag]...[Endtag]<br>
+我们首先来解析header部分，如果这个部分会解析了，下面就很顺利了。<br>
+由于以上的文档都是flash player 9.0的时候写的，有部分10的特性没写在里面。<br>
+解析的时候如果遇到未知的类型，可以网上查查</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+1,解析文件头<br>
+swf文件是采用主机字节序</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+SWF File Header<br>
+Field&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Comment<br>
+Signature&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UI8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Signature byte:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; “F” 未压缩<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; “C” 压缩<br>
+Signature&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UI8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 固定为“W”<br>
+Signature&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UI8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 固定为“S”<br>
+Version&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UI8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 版本号 (如： 0x06 表示swf6)<br>
+FileLength&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UI32&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 该swf文件的长度，单位：字节<br>
+FrameSize&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RECT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; swf的舞台大小，单位：twips 1px = 20twips<br>
+FrameRate&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UI16&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 帧率，这里总共有16位，只有后面8位有效<br>
+FrameCount&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UI16&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 总帧数</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+先读取3个字节的文件头<br>
+var sign:String = bytes.readUTFBytes(3);<br>
+if (sign != 'CWS' &amp;&amp; sign != 'FWS')<br>
+&nbsp;&nbsp;&nbsp; throw new Error ("文件头错误");<br>
+读取文件版本<br>
+version = bytes.readByte();<br>
+读取文件长度<br>
+fileLength = bytes.readInt();</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+如果文件签名是CWS,即是压缩过的，则需要进行解压缩<br>
+解压缩是从FrameSize这个地方开始到文件末尾<br>
+if (sign == 'CWS'){<br>
+&nbsp;&nbsp;&nbsp; var tempBytes:ByteArray = new ByteArray();<br>
+&nbsp;&nbsp;&nbsp; tempBytes.writeBytes(bytes, bytes.position);<br>
+&nbsp;&nbsp;&nbsp; tempBytes.uncompress();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; var temp:int = bytes.position;<br>
+&nbsp;&nbsp;&nbsp; bytes.length = bytes.position;<br>
+&nbsp;&nbsp;&nbsp; bytes.writeBytes(tempBytes);<br>
+&nbsp;&nbsp;&nbsp; tempBytes.length = 0;<br>
+&nbsp;&nbsp;&nbsp; bytes.position = temp;<br>
+}</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+然后读取FrameSize</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+Bit Values 格式<br>
+Type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Comment<br>
+SB[nBits]&nbsp;&nbsp; 有符号位值 (nBits表示用多少位来存储这个值)<br>
+UB[nBits]&nbsp;&nbsp; 无符号位值 (nBits表示用多少位来存储这个值)</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+RECT 格式<br>
+Field&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Comment<br>
+Nbits&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UB[5]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bits used for each subsequentfield<br>
+Xmin&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SB[Nbits]&nbsp;&nbsp; x minimum position for rectangle in twips<br>
+Xmax&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SB[Nbits]&nbsp;&nbsp; x maximum position for rectangle in twips<br>
+Ymin&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SB[Nbits]&nbsp;&nbsp; y minimum position for rectangle in twips<br>
+Ymax&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SB[Nbits]&nbsp;&nbsp; y maximum position forrectangle in twips</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+第一个Nbits为5位长度的UB，这个值就是下面的[Nbits]值<br>
+这里就需要先写个函数，读取指定字节长度的值<br>
+注意：这里的单位都是twips 1px = 20twips<br>
+舞台的宽=Xmax-Xmin<br>
+舞台的高=Ymax-Ymin</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+/**<br>
+* 读取一定长度的位&nbsp;<br>
+* 无符号的<br>
+*&nbsp;<br>
+* @param bytes 二进制序列<br>
+* @param bitStartPosition 开始读取的位置，从0开始算<br>
+* @param bitLength&nbsp;&nbsp;&nbsp;&nbsp; 读取长度<br>
+* @return 无符号数字<br>
+*&nbsp;<br>
+*/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+public static function readUBits(bytes:ByteArray, bitStartPosition:int, bitLength:int):uint<br>
+{<br>
+&nbsp;&nbsp;&nbsp; var bitBuffer:int;<br>
+&nbsp;&nbsp;&nbsp; var bitCursor:int;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; var remainLength:int;<br>
+&nbsp;&nbsp;&nbsp; var result:uint=0;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; bitCursor= bitStartPosition % 8;<br>
+&nbsp;&nbsp;&nbsp; bytes.position = bitStartPosition / 8;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; if (bitCursor == 0)<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bitBuffer = bytes.readUnsignedByte();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bitCursor = 8;<br>
+&nbsp;&nbsp;&nbsp; }else{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bitBuffer = bytes.readUnsignedByte();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bitBuffer = bitBuffer &amp; (0xFF &gt;&gt; bitCursor);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bitCursor = 8 - bitCursor;<br>
+&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; while(bytes.bytesAvailable &gt; 0)<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; remainLength = bitLength - bitCursor;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (remainLength &gt; 0){<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; result = result | (bitBuffer &lt;&lt; remainLength);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bitLength -= bitCursor;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bitBuffer = bytes.readUnsignedByte();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bitCursor = 8;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }else{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; result = result | (bitBuffer &gt;&gt;-remainLength);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return result;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; return 0;<br>
+}</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+<br>
+/**<br>
+* 读取一定长度的位&nbsp;<br>
+* 有符号的<br>
+*&nbsp;<br>
+* @param bytes 二进制序列<br>
+* @param bitStartPosition 开始读取的位置，从0开始算<br>
+* @param bitLength 读取长度<br>
+* @return 有符号数字<br>
+*&nbsp;<br>
+*/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+public static function readSBits(bytes:ByteArray, bitStartPosition:int, bitLength:int):int{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; var result:int = readUBits(bytes, bitStartPosition, bitLength);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; var offset:int = (32 - bitLength);<br>
+&nbsp;&nbsp;&nbsp; // 补齐符号位<br>
+&nbsp;&nbsp;&nbsp; result = ((result &lt;&lt; offset) &gt;&gt; offset);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; return result;<br>
+}</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+<br>
+/**<br>
+* 读取rect结构<br>
+*&nbsp;<br>
+* @param bytes<br>
+* @param rect 如果传入，则使用该对象<br>
+* @return&nbsp;<br>
+*&nbsp;<br>
+*/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+public static function readRect(bytes:ByteArray, rect:Rect = null):Rect<br>
+{<br>
+&nbsp;&nbsp;&nbsp; if (rect == null)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; rect = new Rect();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; var start:int = bytes.position* 8;<br>
+&nbsp;&nbsp;&nbsp; var length:uint = readUBits(bytes, start, 5);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; rect.xMinTwips = readSBits(bytes, start + 5, length);<br>
+&nbsp;&nbsp;&nbsp; rect.xMaxTwips = readSBits(bytes, start + 5 + length, length);<br>
+&nbsp;&nbsp;&nbsp; rect.yMinTwips = readSBits(bytes, start + 5 + length * 2, length);<br>
+&nbsp;&nbsp;&nbsp; rect.yMaxTwips = readSBits(bytes, start + 5 + length*3, length);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; return rect;<br>
+}</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+<br>
+然后读取帧率<br>
+bytes.position++;// 帧率后8位有效，跳过1个字节（8位）<br>
+frameRate = bytes.readByte();</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+读取总帧数<br>
+totalFrames = bytes.readShort();</p>
+<p style="color: rgb(69, 69, 69); line-height: 21px; font-family: tahoma, helvetica, arial; font-size: 14px;">
+<br>
+文件头就解析完成了</p>
+                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>

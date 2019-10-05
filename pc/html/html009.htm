@@ -1,0 +1,128 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fiddler的安装与使用 - CoderYYN - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                                <div class="article-copyright">
+                <span class="creativecommons">
+                <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                    </a>
+            <span>
+                版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。            </span>
+               <div class="article-source-link2222">
+                    本文链接：<a href="https://blog.csdn.net/ychgyyn/article/details/82154433">https://blog.csdn.net/ychgyyn/article/details/82154433</a>
+                </div>
+            </span>
+                    </div>
+                                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <div class="markdown_views prism-tomorrow-night" id="content_views">
+                    <!-- flowchart 箭头图标 勿删 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-linecap="round" d="M 5 0 L 0 2.5 L 5 5 Z" />
+                    </svg>
+                                            <h1><a name="t0"></a><a id="Fiddler_0"></a>Fiddler的简介</h1>
+<ul>
+<li>Fiddler是位于客户端和服务器端之间的代理，也是目前最常用的抓包工具之一 。它能够记录客户端和服务器之间的所有 请求，可以针对特定的请求，分析请求数据、设置断点、调试web应用、修改请求的数据，甚至可以修改服务器返回的数据，功能非常强大，是web调试的利器。</li>
+<li>看到这么多的应用，是不是就迫不及待的想要开始你的抓包之旅呢，不要急，俗话说的好：<strong>工欲善其事，必先利其器</strong>，我们先来安装Fiddler吧。</li>
+</ul>
+<h1><a name="t1"></a><a id="Fiddler_4"></a>Fiddler的下载</h1>
+<ul>
+<li>打开官网，官网下载地址是<a href="https://www.telerik.com/download/fiddler" rel="nofollow" data-token="e4832e239f3101fec495cdd48477d8be">https://www.telerik.com/download/fiddler</a></li>
+<li>打开以后选择你的相关信息如下图：<br>
+<img alt="下载" src="images/html00901.jpg"></li>
+<li>然后点击Download按钮开始下载</li>
+</ul>
+<h1><a name="t2"></a><a id="Fiddler_10"></a>Fiddler的安装</h1>
+<ul>
+<li>下载完成后双击安装包，如下图：<br>
+<img alt="下载1" src="images/html00902.jpg"></li>
+<li>点击<strong>I Agree</strong>按钮，然后选择你想要存放的安装目录，如果不需要修改，使用默认的即可。<br>
+<img alt="下载2" src="images/html00903.jpg"></li>
+<li>点击<strong>Install</strong>按钮，等待一会时间后即可安装成功。<br>
+<img alt="下载3" src="images/html00904.jpg"></li>
+<li>点击<strong>Close</strong>按钮</li>
+<li>到这里我们就初步安装成功了</li>
+</ul>
+<h1><a name="t3"></a><a id="Fiddler_20"></a>Fiddler的配置</h1>
+<h2><a name="t4"></a><a id="_21"></a>电脑端监听</h2>
+<ul>
+<li>
+<p>我们双击打开软件，进入到如下的一个界面，然后点击某一个请求，你会发现请求的内容是一堆明显不对的文字，然后该请求的左边是一个锁的样式，联想到https加密，你会发现原因可能是没有配置Fiddler。然后解释一下右边的默认返回内容，第一句是**“这是一个CONNECT隧道，加密的HTTPS流量通过该隧道流动。”**，就证实了我们的猜测，果然是因为https加密的原因。<br>
+<img alt="配置1" src="images/html00905.jpg"></p>
+</li>
+<li>
+<p>那么如何配置FIddler来解析这些加密的请求呢？方法一是查官网的安装文档，二是看提示，软件公司还是很人性化的在返回内容里面提示了需要在哪里设置，就是第二行那一句：<br>
+<strong>"enable the Tools &gt; Options &gt; HTTPS &gt; Decrypt HTTPS traffic option."</strong></p>
+</li>
+<li>
+<p>我们按照提示来进行设置，先在左上角的工具栏里面找到<strong>Tools</strong>，然后依次选择<strong>Options、HTTPS <strong>，然后勾选</strong>Decrypt HTTPS traffic</strong>选项，勾选后安装证书。<br>
+<img alt="配置2" src="images/html00906.jpg"></p>
+</li>
+<li>
+<p><strong>安装证书两种方法：</strong></p>
+<ul>
+<li>勾选后点击右边的Actions按钮选择**“Trust Root Certificate”**选项，然后全部选择是就行了。</li>
+<li>勾选后点击右边的Actions按钮选择第二个选项将证书导出到桌面，然后再在对应的浏览器里面添加即可。</li>
+</ul>
+</li>
+<li>
+<p>然后我们再打开一个新的网页(例如百度)，查看请求<br>
+<img alt="这里写图片描述" src="images/html00907.jpg"></p>
+</li>
+<li>
+<p>至此，已经可以监听PC端浏览器的请求了。</p>
+</li>
+</ul>
+<h2><a name="t5"></a><a id="_37"></a>手机端监听</h2>
+<p>但是如果你想要对手机上的app进行抓包怎么办呢，那么你还需要进行以下操作：</p>
+<ul>
+<li>
+<p>首先你的Fiddler所在的电脑和手机必须处在同一个局域网内(即连着同一个路由器)。</p>
+</li>
+<li>
+<p>查看你的本机IP地址，在Fiddler的右上角有一个Online按钮，点击一下会显示你的IP信息</p>
+</li>
+<li>
+<p>配置连接信息：<strong>Tools &gt; Options &gt;Connections</strong><br>
+- 端口默认是<strong>8888</strong>，你可以进行修改。<br>
+- 勾选<strong>Allow remote computers to connect</strong>选项，然后重启Fiddler，再次打开时会弹出一个信息，选择ok即可。<br>
+<img alt="配置" src="images/html00908.jpg"></p>
+</li>
+<li>
+<p>打开你的手机，找到你所连接的WIFI，长按选择修改网络，输入密码后往下拖动，然后勾选<strong>显示高级选项</strong>，然后在代理一栏选择手动，再将你先前查看的IP地址和端口号输入进去，然后保存。<br>
+<img alt="这里写图片描述" src="images/html00909.jpg"></p>
+</li>
+<li>
+<p>最后安装手机证书，在手机浏览器一栏输入电脑的IP地址和端口号<br>
+这里我是<strong>192.168.1.157:8888</strong><br>
+进入一个网页，点击最下面那个<strong>FiddlerRoot certificate</strong>下载证书，下载成功后在设置里面安装，安装步骤：<strong>打开高级设置-&gt;安全-&gt;从SD卡安装证书-&gt;找到证书文件-&gt;点击后为证书命名点击确定即可安装成功</strong><br>
+(我的手机是华为的，具体过程请根据实际机型百度查找，关键词是<strong>从SD卡安装证书</strong>)</p>
+</li>
+<li>
+<p>测试一下，比如在手机上打开抖音app，找到评论的那一个请求。<br>
+<img alt="抖音" src="images/html00910.jpg"></p>
+</li>
+<li>
+<p>可以看到我们已经成功的找到了评论所对应的那个请求</p>
+</li>
+</ul>
+<p><strong>到这里就已经大功告成了</strong></p>
+<p>我的个人博客网站是：<a href="http:www.coderyyn.cn" rel="nofollow" data-token="03c5aa65eb6ea93ac0b0eda6854d0bd7">www.coderyyn.cn</a><br>
+上面会不定期分享有关<strong>爬虫、算法、环境搭建</strong>以及有趣的帖子<br>
+欢迎大家一起交流学习</p>
+<p><strong>转载请注明</strong></p>
+
+                                    </div>
+                <link href="https://csdnimg.cn/release/phoenix/mdeditor/markdown_views-095d4a0b23.css" rel="stylesheet">
+                    </div>
+
+
+</div>
+
+
+</body></html>
