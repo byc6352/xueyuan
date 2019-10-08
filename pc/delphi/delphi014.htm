@@ -1,0 +1,45 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delphi中枚举类型的应用 - 落叶飘香 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            <div class="NewsContent" id="NewsContentLabel">
+<div class="table-box"><table><tbody><tr><td bgcolor="#c0c0c0">
+            <p><font face="Verdana">枚举类型<br>　　Pascal程序不仅用于数值处理，还更广泛地用于处理非数值的数据。例如，性别、月份、星期几、颜色、单位名、学历、职业等。<br>&nbsp; <br>1、枚举类型的定义<br>&nbsp;&nbsp; 格式:　type 枚举类型标识符=(标识符1,标识符2,…,标识符n)</font></p>
+            <p><font face="Verdana">2、枚举类型数据特点 </font></p>
+            <p><font face="Verdana">① 枚举元素只能是标识符； </font></p>
+            <p><font face="Verdana">例如，下列类型定义是合法的：<br>　　&nbsp;&nbsp;&nbsp; type&nbsp; days=(sun,mon,tue,wed,thu,fri,sat);<br>　　&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; colors=(red,yellow,blue,white,black,green);<br>　　&nbsp;&nbsp;&nbsp;&nbsp; 而下列类型定义是错误的:<br>　　&nbsp;&nbsp; type colortype=('red','yellow','blue','white');<br>　　&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; numbers=(1,3,5,7,9); </font></p>
+            <p><font face="Verdana">定义枚举类型时列出的所有枚举元素构成了这种枚举类型的值域（取值范围）。<br>&nbsp; </font></p>
+            <p><font face="Verdana">② 枚举类型属于顺序类型<br>　&nbsp; 根据定义类型时各枚举元素的排列顺序确定它们的序号，且序号从0开始。 </font></p>
+            <p><font face="Verdana">例如，定义type days=(sun,mon,tue,wed,thu,fri,sat); </font></p>
+            <p><font face="Verdana">则， ord(sun)=0,ord(mon)=1,……，以此类推。 </font></p>
+            <p><font face="Verdana">枚举类型中的第一个元素无前趋，最后一个元素无后继。 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pred(sat)=fri; succ(sun)=mon; ord(sat)=6;&nbsp;<br>&nbsp; </font></p>
+            <p><font face="Verdana">③ 同一个枚举元素不能出现在两个或两个以上的枚举类型定义中。如下列定义是错误的:<br>　　 type color1=(red,yellow,white);<br>　　　　&nbsp; color2=(blue,red,black);　 </font></p>
+            <p><font face="Verdana">&nbsp;因为red属于枚举类型color1和 color2<br>&nbsp; <br>④ 枚举类型变量只能进行赋值运算和关系运算，不能进行算术运算和逻辑运算。<br>　　在枚举元素比较时，实际上是对其序号的比较。 </font></p>
+            <p><font face="Verdana">　例如定义如下：<br>　　&nbsp; type days=(sun,mon,tue,wed,thu,fri,sat);<br>　　　　&nbsp; colors=(red,yellow,blue,white,black,green);<br>　　&nbsp; var color:colors;<br>　　　&nbsp; 　weekday:days;<br>　则下面语句是合法的:&nbsp; weekday:=mon;<br>　　&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if weekday=sun then write('rest');<br>　而下面语句是不合法的: </font></p>
+            <p><font face="Verdana">mon:=1;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 错把枚举值当成变量名； </font></p>
+            <p><font face="Verdana">weekday:=blue；&nbsp;&nbsp; 枚举值blue不属于枚举变量weekday的值域； </font></p>
+            <p><font face="Verdana">read(color);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 枚举类型变量 不能用读语句进行赋值； </font></p>
+            <p><font face="Verdana">write(weekday); writeln(blue);不能通过写语句输出枚举类型的变量值和枚举值。<br>&nbsp; </font></p>
+            <p><font face="Verdana">⑤ 可以把变量的说明与类型的定义合并在一起，如:<br>　　var holiday,workday:(sun,mon,tue,wed,thu,fri,sat);<br>　　　&nbsp; color:(red,yellow,blue,white,black,green); </font></p>
+            <p><font face="Verdana">对枚举数据的输入与输出可通过间接方式进行。输入时，一般可输入一个代码，通过程序进行转换，输出时，也只是打印出与枚举元素相对应的字符串。这在后面的例题中将有使用示例。<br>&nbsp; <br>二、枚举类型的应用<br>例1、输入今天是星期几的序号，输出明天是星期几的英文单词（星期天序号为0）。<br>　　type weekday=(sun,mon,tue,wed,thu,fri,sat);<br>　　 var i : integer;<br>　　　　 today,tomorrow : weekday;<br>　　begin<br>　　　writeln('What date is it'); readln(i);<br>　　　case i of&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { 根据输入转换成枚举型 }<br>　　　　0:today:=sun;<br>　　　　1:today:=mon;<br>　　　　2:today:=tue;<br>　　　　3:today:=wed;<br>　　　　4:today:=thu;<br>　　　　5:today:=fri;<br>　　　　6:today:=sat;<br>　　　end;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </font></p>
+            <p><font face="Verdana">if (today=sat) then tomorrow:=sun&nbsp; else tomorrow:=succ(today);<br>　　&nbsp; write('The tomorrow is ');&nbsp;&nbsp;&nbsp; <br>　　　case tomorrow of<br>　　　　sun:writeln('sunday');<br>　　　　mon:writeln('monday');<br>　　　　tue:writeln('tuesday');<br>　　　　wed:writeln('wednesay');<br>　　　　thu:writeln('thursday');<br>　　　　fri:writeln('friday');<br>　　　　sat:writeln('saturday');<br>　　　end;<br>　　end.<br>&nbsp;&nbsp;&nbsp; 枚举类型是一种有序类型，所以枚举类型的变量可以作为循环变量。 </font></p>
+            <p><font face="Verdana">&nbsp;&nbsp;&nbsp; 学习枚举类型时，注意枚举元素与变量的区别，以及枚举与变量的输入输出方法的处理。</font></p>
+            </td>
+        </tr></tbody></table></div></div>
+<font>&nbsp;</font>                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>
