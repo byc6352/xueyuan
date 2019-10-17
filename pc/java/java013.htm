@@ -1,0 +1,264 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AS3应用程序模块化开发与ApplicationDomain - （转载） - 诸葛应用 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+<span>　当程序越来越大，我们需要把它拆分成多个swf，在需要的时候动态加载。拆分时应该尽量把不同的类编译进唯一的swf，避免因swf文件增多而使整个程序的文件尺寸增大。按此原则可以拆分出以下两种swf，借助 ApplicationDomain 共享其代码和资源。</span></p>
+<ul style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; margin-left: 0px; list-style-type: none;"><li style="border-width: 0px; margin-left: 30px; list-style-type: disc;">
+<strong>模块(Module)</strong><br>
+按照程序逻辑，可以拆分出多个“功能模块”，如“注册”、“管理”等等；按照游戏或社区类程序的关卡或场景，可以拆分出不同的“场景模块”。这些模块不是主程序运行必须的，只在需要的时候加载。</li><li style="border-width: 0px; margin-left: 30px; list-style-type: disc;">
+<strong>运行时共享库(RSL)</strong><br>
+主场景或者多个模块通用的资源，比如位图、声音、设计好的页面元素等，可作为“库”在主程序运行前加载。可以整套更换的皮肤(skin)只需先加载一套。</li></ul><p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+　　ApplicationDomain 是存放AS3定义(包括类、方法、接口等)的容器。使用Loader类加载swf时可以通过指定 ApplicationDomain 参数将swf加载到不同的域(Domain)：</p>
+<div style="text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px;">
+<div><span style="color: rgb(0, 128, 0);">var</span>&nbsp;<span style="color: rgb(0, 0, 255);">loader</span>&nbsp;<span style="color: rgb(128, 128, 128);">:</span>&nbsp;<span style="color: rgb(0, 0, 255);">Loader</span>&nbsp;<span style="color: rgb(128, 128, 128);">=</span>&nbsp;<span style="color: rgb(0, 128, 0);">new</span>&nbsp;<span style="color: rgb(0, 0, 255);">Loader</span><span style="color: rgb(128, 128, 0);">()</span><span style="color: rgb(128, 128, 128);">;<br></span><span style="color: rgb(0, 128, 0);">var</span>&nbsp;<span style="color: rgb(0, 0, 255);">context</span>&nbsp;<span style="color: rgb(128, 128, 128);">:</span>&nbsp;<span style="color: rgb(0, 0, 255);">LoaderContext</span>&nbsp;<span style="color: rgb(128, 128, 128);">=</span>&nbsp;<span style="color: rgb(0, 128, 0);">new</span>&nbsp;<span style="color: rgb(0, 0, 255);">LoaderContext</span><span style="color: rgb(128, 128, 0);">()</span><span style="color: rgb(128, 128, 128);">;<br></span><span style="color: rgb(128, 128, 128);"><br></span><span style="color: rgb(0, 0, 255);">context</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">applicationDomain</span>&nbsp;<span style="color: rgb(128, 128, 128);">=</span>&nbsp;<span style="color: rgb(0, 128, 0);">new</span>&nbsp;<span style="color: rgb(0, 0, 255);">ApplicationDomain</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">ApplicationDomain</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">currentDomain</span><span style="color: rgb(128, 128, 0);">)</span><span style="color: rgb(128, 128, 128);">;<br></span><span style="color: rgb(128, 128, 128);"><br></span><span style="color: rgb(0, 0, 255);">context</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">applicationDomain</span>&nbsp;<span style="color: rgb(128, 128, 128);">=</span>&nbsp;<span style="color: rgb(0, 0, 255);">ApplicationDomain</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">currentDomain</span><span style="color: rgb(128, 128, 128);">;<br></span><span style="color: rgb(128, 128, 128);"><br></span><span style="color: rgb(0, 0, 255);">context</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">applicationDomain</span>&nbsp;<span style="color: rgb(128, 128, 128);">=</span>&nbsp;<span style="color: rgb(0, 128, 0);">new</span>&nbsp;<span style="color: rgb(0, 0, 255);">ApplicationDomain</span><span style="color: rgb(128, 128, 0);">()</span><span style="color: rgb(128, 128, 128);">;<br></span><span style="color: rgb(0, 0, 255);">loader</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 128, 128);">load</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(0, 128, 0);">new</span>&nbsp;<span style="color: rgb(0, 0, 255);">URLRequest</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(139, 0, 0);">"</span><span style="color: rgb(255, 0, 0);">loaded.swf</span><span style="color: rgb(139, 0, 0);">"</span><span style="color: rgb(128, 128, 0);">)</span><span style="color: rgb(128, 128, 128);">,</span>&nbsp;<span style="color: rgb(0, 0, 255);">context</span><span style="color: rgb(128, 128, 0);">)</span><span style="color: rgb(128, 128, 128);">;</span></div>
+</div>
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+　　ApplicationDomain使用类似于显示列表(DisplayList)的树形结构。 相对于舞台(Stage) ，可以认为 ApplicationDomain 最根部的是系统域(system domain)，包含 Flash Player 核心类定义。主程序所在的域(以下简称主域)就是它唯一的子域，类似于Stage下的文档类(Document Class)。<br>
+一个fla文档类里代码：</p>
+<div style="text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px;">
+<div><span style="color: rgb(0, 128, 0);">this</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">stage</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">addChild</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">mySprite</span><span style="color: rgb(128, 128, 0);">)</span><span style="color: rgb(128, 128, 128);">;<br></span><span style="color: rgb(0, 128, 0);">this</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">addChild</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">myMC</span><span style="color: rgb(128, 128, 0);">)</span><span style="color: rgb(128, 128, 128);">;<br></span><span style="color: rgb(0, 128, 0);">this</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">addChild</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">myShape</span><span style="color: rgb(128, 128, 0);">)</span><span style="color: rgb(128, 128, 128);">;</span></div>
+</div>
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+　　运行后的显示列表：<br><img title="AS3应用程序模块化开发与ApplicationDomain&nbsp;<wbr>-&nbsp;<wbr>（转载）" style="border-width: 0px; margin-left: 0px; list-style-type: none;" alt="01.gif" src="images/java01301.gif"><br>
+ApplicationDomain 的类似结构：<br><img title="AS3应用程序模块化开发与ApplicationDomain&nbsp;<wbr>-&nbsp;<wbr>（转载）" style="border-width: 0px; margin-left: 0px; list-style-type: none;" alt="02.gif" src="images/java01302.gif"></p>
+<ul style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; margin-left: 0px; list-style-type: none;"><li style="border-width: 0px; margin-left: 30px; list-style-type: disc;">
+<strong>加载到子域(模块)</strong><br>
+类似于“继承”，子域可以直接获得父域所有的类定义，反之父域得不到子域的。和继承关系不同的是，如果子域中有和父域同名的类，子域定义会被忽略而使用父域的定义。</li><li style="border-width: 0px; margin-left: 30px; list-style-type: disc;">
+<strong>加载到同域(运行时共享库)</strong><br>
+类似集合里的合并关系。被加载swf里的所有类定义被合并到当前域中可以直接使用。和加载到子域相同，和当前域同名的定义也会被忽略。</li><li style="border-width: 0px; margin-left: 30px; list-style-type: disc;">
+<strong>加载到新域(独立运行的程序或模块)</strong><br>
+swf载入指定域之前，先要检查该域及其父域中是否存在同名类，重复定义一概忽略。如果加载别人写的程序，或者使用旧版本的主程序加载新版本的模块，为避免类名冲突就要加载到新域独立运行以使用自己的类。</li></ul><p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+　　模块加载到同域不是一样可以吗？为何要加载到子域呢？好处就在于，卸载一个加载到子域的模块时，只要确保清除所有到该模块的引用，模块的所有类定义将被垃圾回收(Garbage Collection)。<br>
+有两种方式可以访问 ApplicationDomain :</p>
+<ul style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; margin-left: 0px; list-style-type: none;"><li style="border-width: 0px; margin-left: 30px; list-style-type: disc;">
+<strong>ApplicationDomain.currentDomain</strong><br>
+currentDomain是ApplicationDomain的静态变量，表示<strong>当前代码</strong>所在的域。该变量很奇特，在主程序里指向主域，在加载到子域的模块里则指向该模块所在的子域。虽然 ApplicationDomain 有个 parentDomain 属性，但子域已经自动获得了父域的类定义，所以通过 ApplicationDomain.currentDomain 就可以获取父域定义了——包括主程序和加载到主域的共享库。(注：系统域不可直接访问，主域和所有新域即系统域子域的parentDomain属性为
+ null)</li><li style="border-width: 0px; margin-left: 30px; list-style-type: disc;">
+<strong>LoaderInfo类的applicationDomain属性</strong><br>
+此方式可以访问任何方式加载的swf的 ApplicationDomain。对于主程序来说，加载到同域的库定义已经存在于 ApplicationDomain.currentDomain ，而模块的类主程序一般用不到。所以这种方式个人不推荐使用。</li></ul><p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+　　ApplicationDomain 的 hasDefinition() 方法判断某定义是否存在，getDefinition() 方法获取指定的定义。下面以一个&nbsp;<a style="color: rgb(206, 53, 53); text-decoration: none;" href="http://eidiot.net/lessons/appdomain/demo/" rel="nofollow" data-token="5617b5cd93d2800f91bdb1d1dd4afcb8"><span style="color: rgb(85, 119, 153);">例子</span></a>&nbsp;来介绍
+ ApplicationDomain 的具体用法和应用程序的拆分。<br><a style="color: rgb(206, 53, 53); text-decoration: none;" href="http://eidiot.net/lessons/appdomain/demo/" rel="nofollow" data-token="5617b5cd93d2800f91bdb1d1dd4afcb8"><span style="color: rgb(85, 119, 153);">本例</span></a>&nbsp;有四个swf，shell.swf是主程序，lib.swf是共享库，login.swf和result.swf分别是“登录”和“结果”模块，所有的视图元件都在共享库中。实际开发时可能有很多库，比如“位图库”、“音效库”、“模型通用库”等。“通用库”里存放多个模块共用的资源，比如此例中的背景元素。而各个模块独有的资源还是放在各自的swf中。<br>
+主程序首先将共享库加载到同域，完成后将“登录模块”加载到子域。主程序可以像操作普通的视觉对象(DisplayObject)一样操作加载的模块：监听事件、调用方法。因为编译器不会识别未定义的类，为使用强类型，建议为主类和模型定义相应的接口，使用少量的重复代码协助编程。</p>
+<div style="text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px;">
+<div><span style="color: rgb(0, 128, 0);">private</span>&nbsp;<span style="color: rgb(0, 128, 0);">function</span>&nbsp;<span style="color: rgb(0, 0, 255);">showModule</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">p_module</span>&nbsp;<span style="color: rgb(128, 128, 128);">:</span>&nbsp;<span style="color: rgb(0, 0, 255);">IModule</span><span style="color: rgb(128, 128, 0);">)</span>&nbsp;<span style="color: rgb(128, 128, 128);">:</span>&nbsp;<span style="color: rgb(0, 128, 0);">void</span><span style="color: rgb(128, 128, 128);"><br></span><span style="color: rgb(128, 128, 0);">{</span><span style="color: rgb(128, 128, 128);"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 128, 0);">if</span>&nbsp;<span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(0, 128, 0);">this</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">m_moduleList</span><span style="color: rgb(128, 128, 0);">[</span><span style="color: rgb(128, 0, 0);">0</span><span style="color: rgb(128, 128, 0);">]</span>&nbsp;<span style="color: rgb(128, 128, 128);">==</span>&nbsp;<span style="color: rgb(139, 0, 0);">"</span><span style="color: rgb(255, 0, 0);">login.swf</span><span style="color: rgb(139, 0, 0);">"</span><span style="color: rgb(128, 128, 0);">)</span><span style="color: rgb(128, 128, 128);"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(128, 128, 0);">{</span><span style="color: rgb(128, 128, 128);"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">p_module</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 128, 128);">show</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(0, 128, 0);">this</span><span style="color: rgb(128, 128, 0);">)</span><span style="color: rgb(128, 128, 128);">;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">p_module</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">addEventListener</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(139, 0, 0);">"</span><span style="color: rgb(255, 0, 0);">login</span><span style="color: rgb(139, 0, 0);">"</span><span style="color: rgb(128, 128, 128);">,</span>&nbsp;<span style="color: rgb(0, 128, 0);">this</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">onLogin</span><span style="color: rgb(128, 128, 0);">)</span><span style="color: rgb(128, 128, 128);">;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(128, 128, 0);">}</span>&nbsp;<span style="color: rgb(0, 128, 0);">else</span><span style="color: rgb(128, 128, 128);"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(128, 128, 0);">{</span><span style="color: rgb(128, 128, 128);"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">p_module</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 128, 128);">show</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(0, 128, 0);">this</span><span style="color: rgb(128, 128, 128);">,</span>&nbsp;<span style="color: rgb(0, 128, 0);">this</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">m_userName</span><span style="color: rgb(128, 128, 0);">)</span><span style="color: rgb(128, 128, 128);">;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(128, 128, 0);">}</span><span style="color: rgb(128, 128, 128);"><br></span><span style="color: rgb(128, 128, 0);">}</span></div>
+</div>
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+　　模块“继承”了主程序和共享库的所有类和资源，可以通过 ApplicationDomain.currentDomain.getDefinition() 来获取相应的类。注意获取不存在的类会抛出一个 ReferenceError。</p>
+<div style="text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px;">
+<div><span style="color: rgb(0, 0, 255);">protected</span>&nbsp;<span style="color: rgb(0, 128, 0);">function</span>&nbsp;<span style="color: rgb(0, 0, 255);">getClass</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">p_name</span>&nbsp;<span style="color: rgb(128, 128, 128);">:</span>&nbsp;<span style="color: rgb(0, 128, 128);">String</span><span style="color: rgb(128, 128, 0);">)</span>&nbsp;<span style="color: rgb(128, 128, 128);">:</span>&nbsp;<span style="color: rgb(0, 0, 255);">Class</span><span style="color: rgb(128, 128, 128);"><br></span><span style="color: rgb(128, 128, 0);">{</span><span style="color: rgb(128, 128, 128);"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 128, 0);">try</span><span style="color: rgb(128, 128, 128);"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(128, 128, 0);">{</span><span style="color: rgb(128, 128, 128);"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 128, 0);">return</span>&nbsp;<span style="color: rgb(0, 0, 255);">ApplicationDomain</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">currentDomain</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">getDefinition</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">p_name</span><span style="color: rgb(128, 128, 0);">)</span>&nbsp;<span style="color: rgb(0, 0, 255);">as</span>&nbsp;<span style="color: rgb(0, 0, 255);">Class</span><span style="color: rgb(128, 128, 128);">;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(128, 128, 0);">}</span>&nbsp;<span style="color: rgb(0, 128, 0);">catch</span>&nbsp;<span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">p_e</span>&nbsp;<span style="color: rgb(128, 128, 128);">:</span>&nbsp;<span style="color: rgb(0, 0, 255);">ReferenceError</span><span style="color: rgb(128, 128, 0);">)</span><span style="color: rgb(128, 128, 128);"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(128, 128, 0);">{</span><span style="color: rgb(128, 128, 128);"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 128, 128);">trace</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(139, 0, 0);">"</span><span style="color: rgb(255, 0, 0);">定义</span>&nbsp;<span style="color: rgb(139, 0, 0);">"</span>&nbsp;<span style="color: rgb(128, 128, 128);">+</span>&nbsp;<span style="color: rgb(0, 0, 255);">p_name</span>&nbsp;<span style="color: rgb(128, 128, 128);">+</span>&nbsp;<span style="color: rgb(139, 0, 0);">"</span>&nbsp;<span style="color: rgb(255, 0, 0);">不存在</span><span style="color: rgb(139, 0, 0);">"</span><span style="color: rgb(128, 128, 0);">)</span><span style="color: rgb(128, 128, 128);">;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 128, 0);">return</span>&nbsp;<span style="color: rgb(0, 128, 0);">null</span><span style="color: rgb(128, 128, 128);">;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(128, 128, 0);">}</span><span style="color: rgb(128, 128, 128);"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 128, 0);">return</span>&nbsp;<span style="color: rgb(0, 128, 0);">null</span><span style="color: rgb(128, 128, 128);">;<br></span><span style="color: rgb(128, 128, 0);">}</span></div>
+</div>
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+　　登录模块获取库中的界面元素，并在点击按钮后抛出事件。Event类不允许带参数，必须使用继承Event的自定义事件抛出参数。主程序可以把模块的自定义事件也编译进去(这样就增大了整个程序的文件尺寸)，或者让监听模块事件的函数接受一个Objcet参数，以获取其动态属性。</p>
+<div style="text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px;">
+<div><span style="color: rgb(0, 128, 0);">private</span>&nbsp;<span style="color: rgb(0, 128, 0);">function</span>&nbsp;<span style="color: rgb(0, 0, 255);">onLogin</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">p_e</span>&nbsp;<span style="color: rgb(128, 128, 128);">:</span>&nbsp;<span style="color: rgb(0, 128, 128);">Object</span><span style="color: rgb(128, 128, 0);">)</span>&nbsp;<span style="color: rgb(128, 128, 128);">:</span>&nbsp;<span style="color: rgb(0, 128, 0);">void</span><span style="color: rgb(128, 128, 128);"><br></span><span style="color: rgb(128, 128, 0);">{</span><span style="color: rgb(128, 128, 128);"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 128, 0);">this</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">m_userName</span>&nbsp;<span style="color: rgb(128, 128, 128);">=</span>&nbsp;<span style="color: rgb(0, 0, 255);">p_e</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">userName</span><span style="color: rgb(128, 128, 128);">;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 128, 0);">var</span>&nbsp;<span style="color: rgb(0, 128, 128);">login</span>&nbsp;<span style="color: rgb(128, 128, 128);">:</span>&nbsp;<span style="color: rgb(0, 0, 255);">IModule</span>&nbsp;<span style="color: rgb(128, 128, 128);">=</span>&nbsp;<span style="color: rgb(0, 0, 255);">p_e</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">currentTarget</span><span style="color: rgb(128, 128, 128);">;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 128, 128);">login</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">removeEventListener</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(139, 0, 0);">"</span><span style="color: rgb(255, 0, 0);">login</span><span style="color: rgb(139, 0, 0);">"</span><span style="color: rgb(128, 128, 128);">,</span>&nbsp;<span style="color: rgb(0, 128, 0);">this</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">onLogin</span><span style="color: rgb(128, 128, 0);">)</span><span style="color: rgb(128, 128, 128);">;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 128, 128);">login</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 128, 128);">dispose</span><span style="color: rgb(128, 128, 0);">()</span><span style="color: rgb(128, 128, 128);">;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 128, 0);">this</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">loadSwf</span><span style="color: rgb(128, 128, 0);">()</span><span style="color: rgb(128, 128, 128);">;<br></span><span style="color: rgb(128, 128, 0);">}</span></div>
+</div>
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+　　主程序收到事件之后卸载注册模块，加载“结果模块”到子域，并将登录模块传出的”userName”参数传给结果模块。</p>
+<div style="text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px;">
+<div><span style="color: rgb(0, 128, 0);">public</span>&nbsp;<span style="color: rgb(0, 128, 0);">function</span>&nbsp;<span style="color: rgb(0, 128, 128);">show</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">p_parent</span>&nbsp;<span style="color: rgb(128, 128, 128);">:</span>&nbsp;<span style="color: rgb(0, 0, 255);">DisplayObjectContainer</span><span style="color: rgb(128, 128, 128);">,
+ ...</span>&nbsp;<span style="color: rgb(0, 0, 255);">rest</span><span style="color: rgb(128, 128, 0);">)</span>&nbsp;<span style="color: rgb(128, 128, 128);">:</span>&nbsp;<span style="color: rgb(0, 128, 0);">void</span><span style="color: rgb(128, 128, 128);"><br></span><span style="color: rgb(128, 128, 0);">{</span><span style="color: rgb(128, 128, 128);"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 128, 0);">var</span>&nbsp;<span style="color: rgb(0, 0, 255);">libClass</span>&nbsp;<span style="color: rgb(128, 128, 128);">:</span>&nbsp;<span style="color: rgb(0, 0, 255);">Class</span>&nbsp;<span style="color: rgb(128, 128, 128);">=</span>&nbsp;<span style="color: rgb(0, 128, 0);">this</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">getClass</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(139, 0, 0);">"</span><span style="color: rgb(255, 0, 0);">net.eidiot.appDomainDemo.Libaray</span><span style="color: rgb(139, 0, 0);">"</span><span style="color: rgb(128, 128, 0);">)</span><span style="color: rgb(128, 128, 128);">;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 128, 0);">if</span>&nbsp;<span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">libClass</span>&nbsp;<span style="color: rgb(128, 128, 128);">!=</span>&nbsp;<span style="color: rgb(0, 128, 0);">null</span><span style="color: rgb(128, 128, 0);">)</span>&nbsp;<span style="color: rgb(0, 128, 0);">this</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">initUi</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">libClass</span><span style="color: rgb(128, 128, 128);">,</span>&nbsp;<span style="color: rgb(0, 0, 255);">rest</span><span style="color: rgb(128, 128, 0);">)</span><span style="color: rgb(128, 128, 128);">;<br></span><span style="color: rgb(128, 128, 0);">}</span><span style="color: rgb(128, 128, 128);"><br></span><span style="color: rgb(0, 0, 255);">override</span>&nbsp;<span style="color: rgb(0, 0, 255);">protected</span>&nbsp;<span style="color: rgb(0, 128, 0);">function</span>&nbsp;<span style="color: rgb(0, 0, 255);">initUi</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">p_libClass</span>&nbsp;<span style="color: rgb(128, 128, 128);">:</span>&nbsp;<span style="color: rgb(0, 0, 255);">Class</span><span style="color: rgb(128, 128, 128);">,</span>&nbsp;<span style="color: rgb(0, 0, 255);">p_rest</span>&nbsp;<span style="color: rgb(128, 128, 128);">:</span>&nbsp;<span style="color: rgb(0, 128, 128);">Array</span>&nbsp;<span style="color: rgb(128, 128, 128);">=</span>&nbsp;<span style="color: rgb(0, 128, 0);">null</span><span style="color: rgb(128, 128, 0);">)</span>&nbsp;<span style="color: rgb(128, 128, 128);">:</span>&nbsp;<span style="color: rgb(0, 128, 0);">void</span><span style="color: rgb(128, 128, 128);"><br></span><span style="color: rgb(128, 128, 0);">{</span><span style="color: rgb(128, 128, 128);"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 128, 0);">this</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">addUi</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(0, 128, 0);">this</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">getClass</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">p_libClass</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">BG_NAME</span><span style="color: rgb(128, 128, 0);">)</span><span style="color: rgb(128, 128, 128);">,</span>&nbsp;<span style="color: rgb(139, 0, 0);">"</span><span style="color: rgb(255, 0, 0);">结果</span><span style="color: rgb(139, 0, 0);">"</span><span style="color: rgb(128, 128, 0);">)</span><span style="color: rgb(128, 128, 128);">;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 128, 0);">var</span>&nbsp;<span style="color: rgb(0, 0, 255);">resultFunc</span>&nbsp;<span style="color: rgb(128, 128, 128);">:</span>&nbsp;<span style="color: rgb(0, 128, 128);">Function</span>&nbsp;<span style="color: rgb(128, 128, 128);">=</span>&nbsp;<span style="color: rgb(0, 0, 255);">p_libClass</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 128, 128);">getResult</span><span style="color: rgb(128, 128, 128);">;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 128, 0);">var</span>&nbsp;<span style="color: rgb(0, 0, 255);">userName</span>&nbsp;<span style="color: rgb(128, 128, 128);">:</span>&nbsp;<span style="color: rgb(0, 128, 128);">String</span>&nbsp;<span style="color: rgb(128, 128, 128);">=</span>&nbsp;<span style="color: rgb(0, 0, 255);">p_rest</span><span style="color: rgb(128, 128, 0);">[</span><span style="color: rgb(128, 0, 0);">0</span><span style="color: rgb(128, 128, 0);">]</span><span style="color: rgb(128, 128, 128);">;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 128, 0);">this</span><span style="color: rgb(128, 128, 128);">.</span><span style="color: rgb(0, 0, 255);">addChild</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">resultFunc</span><span style="color: rgb(128, 128, 0);">(</span><span style="color: rgb(0, 0, 255);">userName</span><span style="color: rgb(128, 128, 0);">))</span><span style="color: rgb(128, 128, 128);">;<br></span><span style="color: rgb(128, 128, 0);">}</span></div>
+</div>
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+　　注意initUi()方法分别使用了共享库中Libaray类的静态属性BG_NAME和静态方法getResult()。但是直接调用此静态方法会报错，可以先用 resultFunc 变量取出此方法。详细内容请参考&nbsp;<a style="color: rgb(206, 53, 53); text-decoration: none;" href="http://eidiot.net/lessons/appdomain/AppDomainDemo.rar" rel="nofollow" data-token="8c30bb04fac67483a70ec066cd8ed9dc"><span style="color: rgb(85, 119, 153);">源代码</span></a>。</p>
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+&nbsp;</p>
+<div class="table-box"><table width="100%" style="text-align: left; color: rgb(73, 73, 73); font-family: simsun; font-size: 14px; margin-left: 0px;" border="0" cellspacing="0" cellpadding="0"><tbody><tr><td align="left" style='line-height: 18px; font-family: Verdana, "宋体", sans-serif; margin-left: 0px;'>
+使用 ApplicationDomain 类</td>
+</tr><tr><td align="left" style='line-height: 18px; font-family: Verdana, "宋体", sans-serif; margin-left: 0px;'>
+&nbsp;</td>
+</tr><tr><td style='line-height: 18px; font-family: Verdana, "宋体", sans-serif; margin-left: 0px;' colspan="4">
+<img width="1" height="4" title="AS3应用程序模块化开发与ApplicationDomain&nbsp;<wbr>-&nbsp;<wbr>（转载）" style="border-width: 0px; margin-left: 0px; list-style-type: none;" alt="" src="images/java01303.gif"></td>
+</tr><tr><td style='line-height: 18px; font-family: Verdana, "宋体", sans-serif; margin-left: 0px;' colspan="4">
+<img width="100%" height="1" title="AS3应用程序模块化开发与ApplicationDomain&nbsp;<wbr>-&nbsp;<wbr>（转载）" style="border-width: 0px; margin-left: 0px; list-style-type: none;" alt="" src="images/java01304.gif"></td>
+</tr><tr><td style='line-height: 18px; font-family: Verdana, "宋体", sans-serif; margin-left: 0px;' colspan="4">
+<img width="1" height="11" title="AS3应用程序模块化开发与ApplicationDomain&nbsp;<wbr>-&nbsp;<wbr>（转载）" style="border-width: 0px; margin-left: 0px; list-style-type: none;" alt="" src="images/java01305.gif"></td>
+</tr></tbody></table></div><h1 style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; margin-left: 0px; list-style-type: none;">
+使用 ApplicationDomain 类</h1>
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+ApplicationDomain 类的用途是存储 ActionScript 3.0 定义表。SWF 文件中的所有代码被定义为存在于应用程序域中。可以使用应用程序域划分位于同一个安全域中的类。这允许同一个类存在多个定义，并且还允许子级重用父级定义。</p>
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+在使用&nbsp;<span>Loader</span>&nbsp;类 API 加载用 ActionScript 3.0 编写的外部 SWF 文件时，可以使用应用程序域。（请注意，在加载图像或用 ActionScript 1.0 或 ActionScript 2.0 编写的 SWF 文件时不能使用应用程序域。）包含在已加载类中的所有 ActionScript 3.0 定义都存储在应用程序域中。加载 SWF 文件时，通过将&nbsp;<span>Loader</span>Context
+ 对象的&nbsp;<code>applicationDomain</code>&nbsp;参数设置为&nbsp;<code>ApplicationDomain.currentDomain</code>，可以指定文件包含在&nbsp;<span>Loader</span>&nbsp;对象所在的相同应用程序域中。通过将加载的 SWF 文件放在同一个应用程序域中，可以直接访问它的类。如果加载的 SWF 文件包含嵌入的媒体（可通过其关联的类名称访问），或者您要访问加载的 SWF
+ 文件的方法，则这种方式会很有用。如以下示例所示：</p>
+<div style="text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px;">
+<pre>package { import flash.display.<span style='font-family: "Courier New";'><span>Loader</span>; import flash.display.Sprite; import flash.events.*; import flash.net.URLRequest; import flash.system.ApplicationDomain; import flash.system.<span>Loader</span>Context; public class ApplicationDomainExample&nbsp;extends Sprite { private var ldr:<span>Loader</span>; public function ApplicationDomainExample() { ldr = new<span>Loader</span>(); var req:URLRequest = new URLRequest("Greeter.swf"); var ldrContext:<span>Loader</span>Context = new&nbsp;<span>Loader</span>Context(false, ApplicationDomain.currentDomain); ldr.content<span>Loader</span></span>Info.addEventListener(Event.COMPLETE, completeHandler); ldr.load(req, ldrContext); } private function completeHandler(event:Event):void { ApplicationDomain.currentDomain.getDefinition("Greeter"); var myGreeter:Greeter = Greeter(event.target.content); var message:String = myGreeter.welcome("Tommy"); trace(message); // Hello, Tommy } } }</pre>
+</div>
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+使用应用程序域时，还要记住以下几点：</p>
+<ul style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; margin-left: 0px; list-style-type: none;"><li style="border-width: 0px; margin-left: 30px; list-style-type: disc;">
+SWF 文件中的所有代码被定义为存在于应用程序域中。主应用程序在"当前域"中运行。"系统域"中包含所有应用程序域（包括当前域），也就是，它包含所有 Flash Player 类。</li><li style="border-width: 0px; margin-left: 30px; list-style-type: disc;">
+所有应用程序域（除系统域外）都有关联的父域。主应用程序的应用程序域的父域是系统域。已加载的类仅在其父级中没有相关定义时才进行定义。不能用较新的定义覆盖已加载类的定义。</li></ul><p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+下图显示了某个应用程序在单个域 (domain1.com) 中加载多个 SWF 文件的内容。根据加载内容的不同，可以使用不同的应用程序域。紧跟的文本说明用于为应用程序中的每个 SWF 文件设置适当应用程序域的逻辑。</p>
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+&nbsp;</p>
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+主应用程序文件为 application1.swf。它包含从其它 SWF 文件加载内容的&nbsp;<span>Loader</span>&nbsp;对象。在此方案下，当前域为 Application domain 1。用法 A、用法 B 和用法 C 说明了为应用程序中的每个 SWF 文件设置适当应用程序域的不同方法。</p>
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+<strong>用法 A</strong>：通过创建系统域的子级划分子级 SWF 文件。在示意图中，Application domain 2 创建为系统域的子级。application2.swf 文件在 Application domain 2 中加载，因此其类定义从 application1.swf 中定义的类中划分出来。</p>
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+此方法的一个用处是使旧版应用程序能够动态加载相同应用程序的更新版本，而不会发生冲突。之所以不发生冲突，是因为尽管使用的是同样的类名称，但它们划分到不同的应用程序域中。</p>
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+以下代码将创建作为系统域子级的应用程序域：</p>
+<div style="text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px;">
+<pre>request.url = "application2.swf"; request.applicationDomain = new ApplicationDomain();</pre>
+</div>
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+<strong>用法 B：</strong>在当前类定义中添加新的类定义。module1.swf 的应用程序域设置为当前域 (Application domain 1)。这可让您将新的类定义添加到应用程序的当前一组类定义中。这可用于主应用程序的运行时共享库。加载的 SWF 被视为远程共享库 (RSL)。使用此方法可以在应用程序启动之前使用预加载器加载 RSL。</p>
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+以下代码将某应用程序域设置为当前域：</p>
+<div style="text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px;">
+<pre>request.url = "module1.swf"; request.applicationDomain = ApplicationDomain.currentDomain;</pre>
+</div>
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+<strong>用法 C：</strong>通过创建当前域的新子域，使用父级的类定义。module3.swf 的应用程序域是当前域的子级，并且子级使用所有类的父级的版本。此方法的一个用处可能是作为一个使用主应用程序的类型的多屏幕丰富 Internet 应用程序 (RIA) 模块，该模块作为主应用程序的子级加载。如果能够确保所有类始终更新为向后兼容，并且正在加载的应用程序始终比其加载的软件的版本新，则子级将使用父级版本。如果可以确保不继续拥有对子级 SWF 的引用，则拥有了新的应用程序域还使您能够卸载所有的类定义以便于垃圾回收。</p>
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+此方法使加载的模块可以共享加载者的 singleton 对象和静态类成员。</p>
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+以下代码将创建当前域的新子域：</p>
+<div style="text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px;">
+<pre>request.url = "module3.swf"; request.applicationDomain = new ApplicationDomain(ApplicationDomain.currentDomain);</pre>
+</div>
+<p style="border-width: 0px; text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px; list-style-type: none;">
+&nbsp;</p>
+<div style="text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px;">
+<a style="color: rgb(206, 53, 53); text-decoration: none;" href="http://eidiot.net/lessons/appdomain/demo" rel="nofollow" data-token="d2d673e0379bc6b40c661435603f6cfd"><span style="color: rgb(85, 119, 153);">实例效果演示</span></a><br><a style="color: rgb(206, 53, 53); text-decoration: none;" href="http://eidiot.net/lessons/appdomain/AppDomainDemo.rar" rel="nofollow" data-token="8c30bb04fac67483a70ec066cd8ed9dc"><span style="color: rgb(85, 119, 153);">下载源文件</span></a>&nbsp;(rar 278K)</div>
+<div style="text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px;">
+-----------------------------------------------------</div>
+<div style="text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px;">
+<div>
+<h4 style="border-width: 0px; margin-left: 0px; list-style-type: none;">
+getDefinition - 模块化你的程序</h4>
+<div>[ 2008-08-19 13:15:51 | 作者: L4cd.Net ]</div>
+<div>字号:&nbsp;<a title="字号: 大" style="color: rgb(206, 53, 53); text-decoration: underline;"><span style="color: rgb(24, 72, 181);">大</span></a>&nbsp;|&nbsp;<a title="字号: 中" style="color: rgb(206, 53, 53); text-decoration: underline;"><span style="color: rgb(24, 72, 181);">中</span></a>&nbsp;|&nbsp;<a title="字号: 小" style="color: rgb(206, 53, 53); text-decoration: underline;"><span style="color: rgb(24, 72, 181);">小</span></a></div>
+<div>为了加快程序的加载..<br>
+我们通常会把不同的功能模块做成不同的swf,要需要的时候再进行加载.<br><br>
+开始的时候..我们通常会直接使用loader加载,,然后用addChild把loader显示出来..<br>
+这样就完成了最简单的"模块"化了..<br><br>
+当然进一步..我们会发现上面的方法已经满足不了我们的需求..<br>
+有时候我们需要的不是一个实例对象,我们想得到的是一个类..让我们可以像调用自身库中的类一样可以实例化..复制..等等<br><br>
+这时候我们就可以使用ApplicationDomain(应用程序域),把加载进来的swf中的库的东西当自己的库一样使用<br><br>
+概念性的东西还是不好说...<br>
+直接看代码吧..下面的代码就是一个最简单的例子<br><div>//还是需要loader先进行加载<br>
+var loader:Loader = new Loader()<br>
+loader.contentLoaderInfo.addEventListener(Event.COMPLETE,loaderComplete)<br><br>
+//sub.swf是一个外部swf,该swf库里有一个链接名叫"k_abc"元件<br>
+loader.load(new URLRequest("sub.swf"))<br><br>
+function loaderComplete(e:Event):void{<br>
+&nbsp;&nbsp;//创建一个应用程序域<br>
+&nbsp;&nbsp;var app:ApplicationDomain = loader.contentLoaderInfo.applicationDomain<br>
+&nbsp;&nbsp;//使用getDefinition返回sub.swf的库中链接名为k_abc的Class<br>
+&nbsp;&nbsp;var c:Class = app.getDefinition("k_abc") as Class<br><br>
+&nbsp;&nbsp;//接下来就不多说了..像普通的类一样操作就可以了...<br>
+&nbsp;&nbsp;var a = new c()<br>
+&nbsp;&nbsp;addChild(a)<br>
+}<br></div>
+</div>
+</div>
+</div>
+<div style="text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px;">
+<span>-----------------------------------------------</span></div>
+<div style="text-align: left; color: rgb(73, 73, 73); line-height: 21px; font-family: simsun; font-size: 14px;">
+&nbsp;Flex实时加载Skin
+<div>
+<div class="table-box"><table style="margin-left: 0px;" cellspacing="0" cellpadding="0"><tbody><tr><td style='line-height: 18px; font-family: Verdana, "宋体", sans-serif; margin-left: 0px;'>
+转载自<a style="color: rgb(206, 53, 53); text-decoration: none;" href="http://hi.baidu.com/ming871/blog/item/c331ebea4c2979d5d439c916.html" rel="nofollow" data-token="f848d276c12213b3067b202b7af67d4d"><span style="color: rgb(24, 72, 181);">http://hi.baidu.com/ming871/<span>blog</span>&nbsp;...
+ 2979d5d439c916.html</span></a><br>
+Flex实时<span>加载</span>Skin2008-08-13 21:36一篇<span>翻译</span>的文章，来自 The Kiwi Project ，这种方法很有用，但是唯一的问题就是，在加载皮肤的过程中，用户等待的问题。如果皮肤文件比较大，没有加载上来之前，<span>程序</span>可以说是无反应的，这样需要我们以某种方式提醒用户当前程序的工作。<br><br><br>
+实时加载 Flex 皮肤<br>
+目前，有很多关于如何在你的 Flex 程序中绘制皮肤的资源。<br>
+概述：Flex 支持两种绘制皮肤的方法：贴图和编程。贴图皮肤是在Flash、Photoshop、Firework等软件中创建皮肤资源图像，然后将他们导入（embed）到 Flex 程序中；编程皮肤是建立一个通过程序定义一个控件皮肤的 ActionScript 类。你可能猜到，贴图皮肤比较简单，编程皮肤可以实现更加丰富的<span>效果</span>。<br>
+这两个方法都有一个共同的缺点是，皮肤资源（对于贴图来说是 SWF/PNG/GIF 等文件，对于编程来说是那个 AS 类）必须在程序编译时就被包括。怎么改进呢？在这篇文章中我将演示一个如何实时加载贴图皮肤的巧妙方法。<br>
+为了使这个例子尽可能的简单，我仅建立一个只有一个按钮的 Flex 程序，这个按钮的皮肤是动态添加的。本程序将实时取得一个皮肤 SWF 文件，加载皮肤，然后把它们应用到按钮上。<br><br>
+第一步：为皮肤资源建立一个外壳 SWF<br>
+目的，有了这个外壳 SWF，我的 Flex 程序就可以实时加载皮肤中适当的资源<br>
+package<br>
+{<br>
+import&nbsp;<span>flash</span>.display.Sprite;<br><br>
+public&nbsp;<span>class</span>&nbsp;Wrapper extends Sprite<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[Embed(source="<span>flex</span>_skins.<span>swf</span>",symbol="RadioButton_upIcon")]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;public var rbUpSkin: Class;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[Embed(source="flex_skins.swf",symbol="RadioButton_downIcon")]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;public var rbDownSkin: Class;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[Embed(source="flex_skins.swf",symbol="RadioButton_disabledIcon")]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;public var rbDisabledSkin: Class;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[Embed(source="flex_skins.swf",symbol="RadioButton_overIcon")]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;public var rbOverSkin: Class;<br>
+}<br>
+}<br>
+译者注：上面代码需要用 mxmlc 编译，不用使用 Flex Builder 去建项目。<br><br>
+第二步：将这个外壳 SWF 放到服务器上<br>
+Flex 程序需要从某个地方加载皮肤呀。<br><br>
+第三步：在 Flex 程序中使用 Loader 加载外壳 SWF<br>
+我建了一个比较实用的类 ClassLoader 来加载 SWF 文件，并且将其转化为类。以下是一些关键行：<br>
+loader = new Loader();<br>
+loader.contentLoaderInfo.addEventListener(Event.COMPLETE, completeHandler);<br>
+loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, ioErrorHandler);<br>
+loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);<br>
+...<br><br>
+request = new URLRequest(swfLib);<br>
+var context<img title="AS3应用程序模块化开发与ApplicationDomain&nbsp;<wbr>-&nbsp;<wbr>（转载）" style="border-width: 0px; margin-left: 0px; list-style-type: none;" alt="" src="images/java01306.gif" border="0">oaderContext
+ = new LoaderContext();<br>
+context.applicationDomain = new ApplicationDomain(ApplicationDomain.currentDomain);<br>
+loader.load(request, context);<br><br>
+第四步：从加载的 SWF 中生成类，然后实例化<br>
+var wrapperClass:Class = loader.contentLoaderInfo.applicationDomain.getDefinition(className) as Class;<br>
+var wrapper:Object = new wrapperClass();<br><br>
+第五步：利用 setStyle 应用皮肤<br>
+这个很简单了。<br>
+StyleManager.getStyleDeclaration("Button").setStyle("upSkin", wrapper.rbUpSkin);<br>
+StyleManager.getStyleDeclaration("Button").setStyle("downSkin", wrapper.rbDownSkin);<br>
+StyleManager.getStyleDeclaration("Button").setStyle("disabledSkin", wrapper.rbDisabledSkin);<br>
+StyleManager.getStyleDeclaration("Button").setStyle("overSkin", wrapper.rbOverSkin);<br><br>
+第六步：运行程序<br><br>
+那么为什么要这么做呢？动态的皮肤提供给你一个难以置信而格外有力的功能：你可以让你的用户在你的程序上使用他们自己的皮肤。想象一下一个像 Winamp 的 Flex Mp3&nbsp;<span>播放器</span>。 开发人员并不需要为程序建立一个皮肤库，任何人都可以发布一个 UI 通过设置皮肤 SWF （可能在一个配置窗口中）让用户选择任一在社区中提供的皮肤。同样重要的，开发者也有能力来控制哪个皮肤可以被替换，哪个皮肤只能使用原来的皮肤（仅仅对相应的控件调用
+ setStyle 即可）。最后，将皮肤放到程序的外面，可以有效的保持程序的体积不会太大，肯定要比包含皮肤时要小。</td>
+</tr></tbody></table></div></div>
+</div>
+                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>
