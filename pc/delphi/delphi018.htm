@@ -1,0 +1,68 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>delphi 将webbrowser的cookie给idhttp用 - ann和她的delphi - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content">
+                                                <div class="article-copyright">
+                <span class="creativecommons">
+                <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                    </a>
+            <span>
+                版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。            </span>
+               <div class="article-source-link2222">
+                    本文链接：<a href="https://blog.csdn.net/ann_0801/article/details/56005190">https://blog.csdn.net/ann_0801/article/details/56005190</a>
+                </div>
+            </span>
+                    </div>
+                                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            
+<p><span style="font-size: 14px;"><strong>&nbsp; &nbsp; &nbsp;&nbsp;</strong>最近开发需要向网站进行数据抓包等，先用webbrowser请求网页，获取元素取值后再用idhttp向网页进行get操作。因为涉及到验签、登录等，一直不成功，后来用网络数据抓包工具发现在用webbrowser和IDhttp请求时数据相同，只是cookie不同。</span></p>
+<p><span style="font-size: 14px;">1、数据抓包设置cookie: Set-Cookie: JSESSIONID=4nLLYm1XrVtMWJL5VvG2y13RyXJbvhv2kth3SJ5hGpbL7Jv4ZTQk!1183038173!NONE; path=/; HttpOnly<br></span></p>
+<p><span style="font-size: 14px;">2、webbrowser请求时的Cookie: JSESSIONID=QTnTYq6QyCvCBdyhtBRLP4K4WLzxGQ2LCSbDSNBF8zKDPqt1WMDJ!1003383531!-543092864; http:xxxxxxx=3071348908.44105.0000</span></p>
+<p><span style="font-size: 14px;">3、idhttp请求时的Cookie: &nbsp;http:xxxxxxx=3071348908.44105.0000。</span></p>
+<p><span style="color: rgb(255, 0, 0); font-size: 14px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp;原来</strong></span><span style="line-height: 24px; font-family: Helvetica, Tahoma, Arial, sans-serif;"><span style="color: rgb(255, 0, 0); font-size: 14px;"><strong>(CookieWEB.document&nbsp;as&nbsp;ihtmldocument2).cookie是无法获取webbrowser的所有cookie的，需要借助"'wininet.dll"才能获取完整的cookie,然后赋值给idhttp就可以成功了。</strong></span></span></p>
+<p><span style="line-height: 24px; font-family: Helvetica, Tahoma, Arial, sans-serif; font-size: 14px;"><span style="color: rgb(51, 102, 255);">function GetCookie(url: string): string;<br>
+const<br>
+&nbsp; INTERNET_COOKIE_HTTPONLY &nbsp; &nbsp; = $00002000;<br>
+&nbsp; INTERNET_COOKIE_THIRD_PARTY &nbsp;= $00000010;<br>
+&nbsp; INTERNET_FLAG_RESTRICTED_ZONE= $00020000;<br>
+var<br>
+&nbsp; hModule:THandle;<br>
+&nbsp; InternetGetCookieEx:function(lpszUrl, lpszCookieName,lpszCookieData: PChar; var lpdwSize: DWORD;dwFlags:DWORD;lpReserved: Pointer): BOOL;StdCall;<br>
+&nbsp; CookieSize:DWORD;<br>
+&nbsp; cookiedata:PWideChar;<br>
+&nbsp; thebool:bool;<br>
+begin<br>
+&nbsp; result := '';<br>
+&nbsp; hModule:=GetModuleHandle('wininet.dll');<br>
+&nbsp; if hModule&lt;&gt;0 then<br>
+&nbsp; begin<br>
+&nbsp; &nbsp; @InternetGetCookieEx:=GetProcAddress(hModule,'InternetGetCookieExW');<br>
+&nbsp; &nbsp; if @InternetGetCookieEx&lt;&gt;nil then<br>
+&nbsp; &nbsp; begin<br>
+&nbsp; &nbsp; &nbsp; CookieSize:=10240;<br>
+&nbsp; &nbsp; &nbsp; Cookiedata := AllocMem(CookieSize);<br>
+&nbsp; &nbsp; &nbsp; thebool:=InternetGetCookieEx(PWideChar(url),nil,CookieData,CookieSize,INTERNET_COOKIE_HTTPONLY,nil);<br>
+&nbsp; &nbsp; &nbsp; if thebool then result := CookieData;<br>
+&nbsp; &nbsp; &nbsp; FreeMem(Cookiedata);<br>
+&nbsp; &nbsp; end;<br>
+&nbsp; &nbsp; FreeLibrary(hModule);<br>
+&nbsp; end;<br>
+end;</span><br></span></p>
+<p><strong><span style="font-size: 12px;"><strong><span style="font-size: 12px;"><br></span></strong></span></strong></p>
+<strong><span style="font-size: 12px;"></span></strong>
+                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>
