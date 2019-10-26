@@ -1,0 +1,447 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swf Decrypt详解 - weixin_33750452的博客 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            <div class="blogpost-body" id="cnblogs_post_body"><p>http://www.2cto.com/Article/201507/414477.html</p>
+<p>攻击在持续，攻击的技术在演进。防御者需要持续的跟进研究和投入。最近Flash 0day频繁出现，将我们更多的目光集中到flash上。</p>
+<p>Flash作为脚本语言，可以编译，不少的恶意flash文件通过各种<a class="keylink" href="http://www.2cto.com/Article/jiami/" rel="nofollow" data-token="ac3034c67b46f10e0721a30f9d74ef59">加密</a>、混淆、动态解密来对抗人工分析和引擎检测。通过动态执行，常见的动态解密的swf都可以解决。不过遇到很多条件判断、环境依赖的限制，往往又无法稳定dump出解密的swf文件和关键的数据(shellcode)。如果能在静态的方法对混淆、加密的swf文件直接进行反混淆、反编译，则将能有效提升检测效果。</p>
+<p>市面上可以对swf进行加密的软件很多，如swfencrypt、doswf、secureswf、dcomsoft等，我们这次对doswf以及secureswf进行简单的分析，与各位小伙伴分享。</p>
+<p>恶意的SWF常常通过doswf加密和secure swf混淆，真正利用的部分被加密、混淆，通过研究doswf的加密方式以及secureswf的混淆方式，可以直接通过静态的方法进行相应的解密和反混淆，直接检测最核心的恶意代码部分，有效提升引擎检测率。（用户可使用文件B超<a class="keylink" href="http://www.2cto.com/os/" rel="nofollow" data-token="33044bb176567e5eb788c196ec42c482">系统</a>&nbsp;http://b-chao.com 和云盾-星云APT检测产品享受到我们的技术成果）</p>
+<p><a class="keylink" href="http://www.2cto.com/os/dos/" rel="nofollow" data-token="1fdc86282669dee4a5fae160b2392ac0">dos</a>wf</p>
+<p>doswf是国人开发的一款flash加密混淆软件，从官网可以看出该软件已经停止了开发，当前最新版本为5.4.3。</p>
+<p>我们对比了版本4.9.7和最新版本之间加密效果的区别，发现两者相差不大，在介绍完整体的加密流程之后，再将它们之间的差异展示出来。</p>
+<p>Crypt Flow</p>
+<p>经过doswf加密的swf文件，都存在DefineBinaryData的tag，因为原始swf文件将会存放在这个二进制数据中，二进制数据经过解密后通过loadbytes进行加载。</p>
+<p><img title="crypt flow.png" alt="" src="images/flash01501.gif"></p>
+<p><img title="crypt flow.png" alt="" src="images/flash01502.jpg"></p>
+<p>&nbsp;</p>
+<p>这个二进制数据的头部结构如下(B标示字节)：</p>
+<p><img title="屏幕快照 2015-07-03 上午9.48.20.png" alt="" src="images/flash01503.gif"></p>
+<p><img title="屏幕快照 2015-07-03 上午9.48.20.png" alt="" src="images/flash01504.jpg"></p>
+<p>&nbsp;</p>
+<p>原始swf文件从起始以offset为步长，每次对block_sz的块进行处理，块中的数据并不是逐一字节处理的，而是依据一个特定值跳跃处理，在整个文件处理完成后进行压缩，压缩后的数据再加上上面的头部信息就形成了完整的二进制数据了。</p>
+<p>上面的描述简化了一些不重要的因素，如doswf加密时还会嵌入两个额外的swf文件，所以当解密二进制数据后，会发现解密后的数据中包含三个swf，这时只要根据硬编码特征”FWS”、”CWS”就可以将所有包含的swf文件完整dump出来。</p>
+<p>关键解密代码：</p>
+<p><img title="crypt flow2.png" alt="" src="images/flash01505.gif"></p>
+<p><img title="crypt flow2.png" alt="" src="images/flash01506.jpg"></p>
+<p>&nbsp;</p>
+<p>版本4.9.7和最新版本解密代码的差异：</p>
+<p><img title="crypt flow3.png" alt="" src="images/flash01507.gif"></p>
+<p><img title="crypt flow3.png" alt="" src="images/flash01508.jpg"></p>
+<p>&nbsp;</p>
+<p>可以看到，差异在于头字节结构的几个值得获取、大小端以及跳跃值的不同。</p>
+<p>我们拿CVE-2012-0779样本（md5：2b98d285c8b581855d59ac368956ee78）进行测试，这是一个doswf4.9.7版本加壳的样本：</p>
+<p><img title="crypt flow4.png" alt="" src="images/flash01509.gif"></p>
+<p><img title="crypt flow4.png" alt="" src="images/flash01510.jpg"></p>
+<p>&nbsp;</p>
+<p>检测dump出的数据，可以发现里面包含有三个swf文件。</p>
+<p><img title="crypt flow5.png" alt="" src="images/flash01511.gif"></p>
+<p><img title="crypt flow5.png" alt="" src="images/flash01512.jpg"></p>
+<p>&nbsp;</p>
+<p>Decrypt Code</p>
+<p>目前放出针对旧版的解密代码(新版自行解决，根据前面的提示很容易更改)，仅支持解压后的doswf解密</p>
+<pre class="xml" name="code">/*
+&nbsp;*&nbsp;Decoder&nbsp;for&nbsp;DoSWF.
+&nbsp;*&nbsp;This&nbsp;extracts&nbsp;the&nbsp;DefineBinary&nbsp;tag&nbsp;from&nbsp;argv[1]&nbsp;to&nbsp;argv[2].&nbsp;To&nbsp;un-zlib&nbsp;that&nbsp;using&nbsp;python:
+&nbsp;*
+&nbsp;*&nbsp;python&nbsp;-u&nbsp;-c&nbsp;\
+&nbsp;*&nbsp;&nbsp;&nbsp;"import&nbsp;sys,&nbsp;zlib;&nbsp;sys.stdout.write(zlib.decompress(sys.stdin.read()))"&nbsp;\
+&nbsp;*&nbsp;&nbsp;&nbsp;&lt;&nbsp;definebinary.z&nbsp;&gt;&nbsp;definebinary.txt
+&nbsp;*
+&nbsp;*&nbsp;Then&nbsp;trim&nbsp;off&nbsp;the&nbsp;first&nbsp;6&nbsp;bytes&nbsp;to&nbsp;get&nbsp;to&nbsp;the&nbsp;SWF&nbsp;header.
+&nbsp;*/
+&nbsp;
+#include&nbsp;
+#include&nbsp;
+#include&nbsp;
+#include&nbsp;
+#include&nbsp;
+&nbsp;
+#pragma&nbsp;warning(disable:4996)
+&nbsp;
+#ifdef&nbsp;_DEBUG
+#define&nbsp;DBGBREAK()&nbsp;__debugbreak()
+#else
+#define&nbsp;DBGBREAK()
+#endif
+&nbsp;
+#define&nbsp;LOG(...)&nbsp;fprintf(stderr,&nbsp;__VA_ARGS__)
+//#define&nbsp;DIE(...)&nbsp;(LOG(__VA_ARGS__),&nbsp;DBGBREAK(),&nbsp;exit(1),&nbsp;0)
+#define&nbsp;DIE(...)&nbsp;(LOG(__VA_ARGS__),&nbsp;exit(1),1)
+&nbsp;
+typedef&nbsp;unsigned&nbsp;char&nbsp;byte;
+void&nbsp;decompress_string(byte*&nbsp;data,&nbsp;int&nbsp;length,&nbsp;byte&nbsp;*out,&nbsp;int&nbsp;*outlength,&nbsp;int&nbsp;avaout);
+&nbsp;
+void&nbsp;handle_DefineBinary(FILE&nbsp;*fi,&nbsp;FILE&nbsp;*fo,&nbsp;int&nbsp;taglen,&nbsp;byte&nbsp;*buffer)
+{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LOG("*&nbsp;dumping&nbsp;DefineBinary&nbsp;section\n");
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;byte&nbsp;*end&nbsp;=&nbsp;buffer&nbsp;+&nbsp;taglen;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;byte&nbsp;*ptr&nbsp;=&nbsp;buffer,&nbsp;*old;
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#define&nbsp;GET(type)&nbsp;(&nbsp;\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((ptr+sizeof(type)&nbsp;&gt;=&nbsp;end)&nbsp;?&nbsp;DIE("eof\n")&nbsp;:&nbsp;0),&nbsp;\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;old&nbsp;=&nbsp;ptr,&nbsp;\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ptr&nbsp;+=&nbsp;sizeof(type),&nbsp;\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*(type&nbsp;*)old)
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;short&nbsp;tag&nbsp;=&nbsp;GET(short);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;reserved&nbsp;=&nbsp;GET(int);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LOG("2*&nbsp;dumping&nbsp;DefineBinary&nbsp;section,tag=%u,reserved=%d\n",&nbsp;tag,&nbsp;reserved);
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;byte&nbsp;block_size&nbsp;=&nbsp;GET(byte)&nbsp;-&nbsp;1;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;byte&nbsp;key&nbsp;=&nbsp;GET(byte)&nbsp;-&nbsp;1;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;offset&nbsp;=&nbsp;__bswap_32&nbsp;(GET(int))&nbsp;-&nbsp;2;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;length&nbsp;=&nbsp;__bswap_32&nbsp;(GET(int))&nbsp;-&nbsp;2;
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;byte&nbsp;*data&nbsp;=&nbsp;buffer+taglen-length;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LOG("3*&nbsp;dumping&nbsp;DefineBinary&nbsp;section,&nbsp;block_size=%d,offset=%d,data[0]=%x\n",&nbsp;block_size,&nbsp;offset,data[0]);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(int&nbsp;count&nbsp;=&nbsp;0;&nbsp;count&nbsp;&lt;&nbsp;length;)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(int&nbsp;i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;block_size;&nbsp;i&nbsp;+=&nbsp;5)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data[count]&nbsp;=&nbsp;data[count]&nbsp;^&nbsp;key;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++count;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(count&nbsp;&gt;=&nbsp;length)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;count&nbsp;=&nbsp;count&nbsp;+&nbsp;offset;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LOG("4*&nbsp;dumping&nbsp;DefineBinary&nbsp;section\n");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//fwrite(data,&nbsp;1,&nbsp;length,&nbsp;fo);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LOG("5*&nbsp;dumping&nbsp;DefineBinary&nbsp;section\n");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;outl&nbsp;=&nbsp;length*5;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;byte&nbsp;*outd&nbsp;=&nbsp;new&nbsp;byte[outl];
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;decompress_string(data,&nbsp;length,&nbsp;outd,&nbsp;&amp;outl,&nbsp;outl);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fwrite(outd,&nbsp;1,&nbsp;outl,&nbsp;fo);
+&nbsp;
+}
+&nbsp;
+void&nbsp;decompress_string(byte*&nbsp;data,&nbsp;int&nbsp;length,&nbsp;byte&nbsp;*out,&nbsp;int&nbsp;*outlength,&nbsp;int&nbsp;avaout)
+{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;z_stream&nbsp;zs;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;z_stream&nbsp;is&nbsp;zlib's&nbsp;control&nbsp;structure
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;memset(&amp;zs,&nbsp;0,&nbsp;sizeof(zs));
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(inflateInit(&amp;zs)&nbsp;!=&nbsp;Z_OK)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LOG("init&nbsp;error!\n");
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;zs.next_in&nbsp;=&nbsp;data;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;zs.avail_in&nbsp;=&nbsp;length;
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;ret;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;zs.next_out&nbsp;=&nbsp;out;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;zs.avail_out&nbsp;=&nbsp;avaout;
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ret&nbsp;=&nbsp;inflate(&amp;zs,&nbsp;0);
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;inflateEnd(&amp;zs);
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(ret&nbsp;!=&nbsp;Z_STREAM_END)&nbsp;{&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;an&nbsp;error&nbsp;occurred&nbsp;that&nbsp;was&nbsp;not&nbsp;EOF
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LOG("inflate&nbsp;end&nbsp;error,ret=%d!\n",&nbsp;ret);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*outlength&nbsp;=&nbsp;zs.total_out;
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return;
+}
+&nbsp;
+&nbsp;
+int&nbsp;main(int&nbsp;argc,&nbsp;char&nbsp;*argv[])
+{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(argc&nbsp;!=&nbsp;3)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DIE("syntax:&nbsp;UndoSWF&nbsp;&nbsp;\n");
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FILE&nbsp;*fi&nbsp;=&nbsp;fopen(argv[1],&nbsp;"rb");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(!fi)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DIE("can't&nbsp;open&nbsp;%s\n",&nbsp;argv[1]);
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FILE&nbsp;*fo&nbsp;=&nbsp;fopen(argv[2],&nbsp;"wb");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(!fo)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DIE("can't&nbsp;create&nbsp;%s\n",&nbsp;argv[2]);
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;char&nbsp;header[9];
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(fread(header,&nbsp;1,&nbsp;9,&nbsp;fi)&nbsp;!=&nbsp;9)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DIE("can't&nbsp;read&nbsp;header\n");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(memcmp(header,&nbsp;"FWS",&nbsp;3))
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DIE("invalid&nbsp;header\n");
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;rectbits&nbsp;=&nbsp;header[8]&nbsp;&gt;&gt;&nbsp;3;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;hdrbits&nbsp;=&nbsp;8*8&nbsp;+&nbsp;5+rectbits*4;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;hdrbytes&nbsp;=&nbsp;(hdrbits+7)/8&nbsp;+&nbsp;4;
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LOG("header&nbsp;size:&nbsp;%d\n",&nbsp;hdrbytes);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(fseek(fi,&nbsp;hdrbytes-9,&nbsp;SEEK_CUR)&nbsp;&lt;&nbsp;0)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DIE("can't&nbsp;skip&nbsp;%d&nbsp;bytes\n",&nbsp;hdrbytes-9);
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(;;)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned&nbsp;short&nbsp;hdr;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(fread(&amp;hdr,&nbsp;1,&nbsp;2,&nbsp;fi)&nbsp;!=&nbsp;2)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DIE("can't&nbsp;read&nbsp;tag&nbsp;hdr\n");
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(hdr&nbsp;==&nbsp;0)&nbsp;break;
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;taglen&nbsp;&nbsp;=&nbsp;hdr&nbsp;&amp;&nbsp;0x3f;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;tagtype&nbsp;=&nbsp;hdr&nbsp;&gt;&gt;&nbsp;6;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bool&nbsp;longtag&nbsp;=&nbsp;taglen&nbsp;==&nbsp;0x3f;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(longtag)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(fread(&amp;taglen,&nbsp;1,&nbsp;4,&nbsp;fi)&nbsp;!=&nbsp;4)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DIE("can't&nbsp;read&nbsp;tag&nbsp;len\n");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LOG("tag&nbsp;type=0x%02x&nbsp;len=0x%x&nbsp;%s\n",&nbsp;tagtype,&nbsp;taglen,&nbsp;longtag&nbsp;?&nbsp;"long"&nbsp;:&nbsp;"short");
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;byte&nbsp;*buffer&nbsp;=&nbsp;new&nbsp;byte[taglen];
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(fread(buffer,&nbsp;1,&nbsp;taglen,&nbsp;fi)&nbsp;!=&nbsp;taglen)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DIE("can't&nbsp;read&nbsp;tag&nbsp;data\n");
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(tagtype&nbsp;==&nbsp;0x57)&nbsp;handle_DefineBinary(fi,&nbsp;fo,&nbsp;taglen,&nbsp;buffer);
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;delete&nbsp;buffer;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fclose(fi);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fclose(fo);
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;0;
+}</pre>
+<p>测试的样本由MD5: 2b98d285c8b581855d59ac368956ee78 解压之后的样本。</p>
+<p>SecureSwf</p>
+<p>Secureswf加密软件，号称break掉所有的flash反编译软件，支持对资源加密、 支持对as code级别做混淆，通过添加各种jump 、反复跳转指令、垃圾指令填充 阻止反编译软件反编译 增加分析人员分析出具体的actionscript原理难度。</p>
+<p>之前拿到CVE-2015-3105 样本就是用secure swf混淆过的，刚好可以分析下</p>
+<p>MD5: 58d1022923950ad1452c72f46b1ee3d0。</p>
+<p>DUS function</p>
+<p>以这个dus函数为例做反混淆：</p>
+<p><img title="dus function.png" alt="" src="images/flash01513.gif"></p>
+<p><img title="dus function.png" alt="" src="images/flash01514.jpg"></p>
+<p>对应的abc code：</p>
+<pre class="xml" name="code">code
+getlocal_0
+pushscope
+pushbyte&nbsp;0
+newfunction&nbsp;30
+pop
+jump&nbsp;ofs0017
+convert_i
+declocal&nbsp;4
+urshift
+rshift
+declocal_i&nbsp;2
+declocal&nbsp;2
+astypelate
+newactivation
+increment
+ofs0017:getlocal&nbsp;4
+iffalse&nbsp;ofs0025
+decrement_i
+increment_i
+increment_i
+increment_i
+pushbyte&nbsp;7
+multiply_i
+decrement_i
+ofs0025:setlocal_3
+getlocal&nbsp;5
+iftrue&nbsp;ofs0065
+getlocal_1
+getlocal&nbsp;5
+iftrue&nbsp;ofs00ac
+pushbyte&nbsp;4
+getlocal&nbsp;5
+iffalse&nbsp;ofs005a
+increment_i
+pushbyte&nbsp;52
+subtract_i
+pushbyte&nbsp;114
+add_i
+pushbyte&nbsp;49
+jump&nbsp;ofs0055
+nextvalue
+setlocal_2
+setlocal_3
+kill&nbsp;3
+declocal&nbsp;4
+setlocal&nbsp;4
+declocal&nbsp;4
+getlocal_3
+istypelate
+ofs0055:add_i
+decrement_i
+pushbyte&nbsp;15
+subtract_i
+ofs005a:modulo
+getlocal&nbsp;4
+iftrue&nbsp;ofs00ab
+iffalse&nbsp;ofs0065
+ofs0065:getlocal_1
+getlocal&nbsp;4
+iftrue&nbsp;ofs00ac
+getlex&nbsp;Qname(PrivateNamespace("dphgjxukp"),"var_5")
+pushbyte&nbsp;8
+getlocal&nbsp;4
+iffalse&nbsp;ofs0092
+pushbyte&nbsp;39
+multiply_i
+jump&nbsp;ofs008b
+inclocal&nbsp;2
+inclocal_i&nbsp;2
+declocal&nbsp;3
+getlocal_3
+declocal_i&nbsp;2
+convert_i
+multiply_i
+inclocal_i&nbsp;4
+increment_i
+ofs008b:negate_i
+negate_i
+pushbyte&nbsp;115
+subtract_i
+increment_i
+decrement_i
+ofs0092:add
+subtract
+getlocal&nbsp;5
+not
+iffalse&nbsp;ofs00ab
+pushbyte&nbsp;4
+getlocal&nbsp;4
+iffalse&nbsp;ofs00aa
+increment_i
+pushbyte&nbsp;35
+multiply_i
+pushbyte&nbsp;29
+subtract_i
+ofs00aa:divide
+ofs00ab:convert_u
+ofs00ac:setlocal_3
+getlocal&nbsp;4
+iftrue&nbsp;ofs00b9
+getlex&nbsp;Qname(PrivateNamespace("dphgjxukp"),"var_1")
+getlocal_3
+getlocal_2
+setproperty&nbsp;MultinameL([PrivateNamespace("dphgjxukp"),ProtectedNamespace("dphgjxukp"),StaticProtectedNs("dphgjxukp"),StaticProtectedNs("flash.display:Sprite"),StaticProtectedNs("flash.display:DisplayObjectContainer"),StaticProtectedNs("flash.display:InteractiveObject"),StaticProtectedNs("flash.display:DisplayObject"),StaticProtectedNs("flash.events:EventDispatcher"),StaticProtectedNs("Object"),PackageNamespace("flash.display"),PackageNamespace("flash.text"),PackageNamespace("flash.utils"),PackageNamespace("flash.net"),PackageNamespace("flash.system"),PackageNamespace(""),PackageInternalNs(""),PrivateNamespace("FilePrivateNS:dphgjxukp"),Namespace("http://adobe.com/AS3/2006/builtin")])
+ofs00b9:returnvoid
+returnvoid</pre>
+<p>Type1 jump</p>
+<pre class="xml" name="code">getlocal_0
+pushscope
+pushbyte&nbsp;0
+newfunction&nbsp;30
+pop
+jump&nbsp;ofs0017
+convert_i
+declocal&nbsp;4
+urshift
+rshift
+declocal_i&nbsp;2
+declocal&nbsp;2
+astypelate
+newactivation
+increment
+ofs0017:getlocal&nbsp;4</pre>
+<p>jump之间都是垃圾指令 可以直接改成</p>
+<pre class="xml" name="code">getlocal_0
+pushscope
+pushbyte&nbsp;0
+newfunction&nbsp;30
+pop
+getlocal&nbsp;4</pre>
+<p>把这段abccode中所有jump之间的直接去掉。</p>
+<p>Type2 getlocal n</p>
+<p>混淆指令里面充斥着getlocal n指令 获取寄存器的value 并PUSH STACK，紧接着跟着判断，如：</p>
+<pre class="xml" name="code">getlocal&nbsp;4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;reg4.value&nbsp;push&nbsp;stack&nbsp;
+iffalse&nbsp;ofs0013&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;pop&nbsp;reg4.value&nbsp;judge&nbsp;this&nbsp;value&nbsp;if&nbsp;is&nbsp;false
+&nbsp;
+pushbyte&nbsp;0
+newfunction&nbsp;30
+pop
+getlocal&nbsp;4
+iffalse&nbsp;ofs0013
+increment_i
+increment_i
+pushbyte&nbsp;7
+multiply_i
+decrement_i
+ofs0013:setlocal_3</pre>
+<p>local4 初始化值应该为0 ，则可以直接简化成</p>
+<pre class="xml" name="code">pushbyte&nbsp;0
+newfunction&nbsp;30
+pop
+setlocal_3</pre>
+<p>后面以此类似：</p>
+<pre class="xml" name="code">getlocal&nbsp;5
+iftrue&nbsp;ofs0053</pre>
+<p>local5 为0，则不会跳转，直接简化这两条指令。</p>
+<p>所以没有经过setlocal n的n对应的getlocal n获取的值应该都是0，带着这样的设定来精简指令就很容易了。</p>
+<pre class="xml" name="code">getlocal&nbsp;13
+not
+iffalse&nbsp;ofs00d9&nbsp;//条件不成立&nbsp;&nbsp;直接去掉这样的三条指令
+&nbsp;
+getlocal&nbsp;13
+iftrue&nbsp;ofs00ed&nbsp;//条件不成立&nbsp;直接去掉这样的2条指令
+&nbsp;
+getlocal&nbsp;12
+iffalse&nbsp;ofs0159//条件成立&nbsp;直接去掉当前2条指令到ofs0159&nbsp;直接的所有指令(中间代码没有其他地方跳转过来)</pre>
+<p>Type3 garbage ins</p>
+<pre class="xml" name="code">getlocal_1
+pushbyte&nbsp;4
+modulo
+iffalse&nbsp;ofs0053
+ofs0053:
+&nbsp;
+local1&nbsp;为0，modulo之后&nbsp;0/4&nbsp;为0&nbsp;，push&nbsp;stack，iffalse&nbsp;pop&nbsp;stack，条件成立，无意义片段。
+&nbsp;
+还有一些：
+decrement_i
+increment_i</pre>
+<p>decrypt dus function</p>
+<p><img title="dus function2.png" alt="" src="images/flash01515.gif"></p>
+<p><img title="dus function2.png" alt="" src="images/flash01516.jpg"></p>
+<p>&nbsp;</p>
+<p>Rxgpittdkc function</p>
+<p>在以这个函数为例，按照上面的步骤，先去除jump 垃圾指令，在去除getloca n之类的垃圾指令：</p>
+<p><img title="rxg function.png" alt="" src="images/flash01517.gif"></p>
+<p><img title="rxg function.png" alt="" src="images/flash01518.jpg"></p>
+<p>&nbsp;</p>
+<p>Dphgjxukp function</p>
+<p>Type4 kill ins</p>
+<pre class="xml" name="code">getlocal_1&nbsp;//&nbsp;reg1.value&nbsp;push&nbsp;stack
+getlocal_0&nbsp;//&nbsp;reg0.value&nbsp;push&nbsp;stack
+getlocal_2&nbsp;//&nbsp;reg2.value&nbsp;push&nbsp;stack
+kill&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//kill&nbsp;reg1.value
+kill&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//kill&nbsp;reg0.value
+kill&nbsp;2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//kill&nbsp;reg2.value
+setlocal_2&nbsp;//pop&nbsp;stack,set&nbsp;value&nbsp;to&nbsp;reg2.value
+setlocal_0&nbsp;//pop&nbsp;stack,set&nbsp;value&nbsp;to&nbsp;reg0.value
+setlocal_1&nbsp;//pop&nbsp;stack,set&nbsp;value&nbsp;to&nbsp;reg1.value</pre>
+<p>这样的指令集也是垃圾指令。</p>
+<p>Type5 as function flow change</p>
+<p>Secure Swf会对简单的as 函数调用从abc 层面流程进行混乱。比如这个dphgjxukp 函数 还原之后真正的代码如下：</p>
+<p>niraodwx();</p>
+<p>init();</p>
+<p>return;</p>
+<p>解混淆之后：</p>
+<p><img title="type5.png" alt="" src="images/flash01519.gif"></p>
+<p><img title="type5.png" alt="" src="images/flash01520.jpg"></p>
+<p>&nbsp;</p>
+<p>可以看到jpexs对这样的反编译是混乱的，可以把相应的跳转换成jump。比如getlocal_2 iffalse 换成jump ofs0044 ,以此类似，最终得到的反编译结果。</p>
+<p><img title="type5－2.png" alt="" src="images/flash01521.gif"></p>
+<p><img title="type5－2.png" alt="" src="images/flash01522.jpg"></p>
+<p>&nbsp;</p>
+<p>可以看到这个swf混淆的还是很容易解密出来的，更多的人工体力活可以通过编写自动化的脚本来实现。(有钱的主可以购买avs actionscript view的149USD的插件 直接反编译secureswf)。</p></div>                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>

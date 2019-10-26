@@ -1,0 +1,85 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>session和sessionID以及cookie的关系 - Qian_mos的博客 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                                <div class="article-copyright">
+                <span class="creativecommons">
+                <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                    </a>
+            <span>
+                版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。            </span>
+               <div class="article-source-link2222">
+                    本文链接：<a href="https://blog.csdn.net/Qian_mos/article/details/89320241">https://blog.csdn.net/Qian_mos/article/details/89320241</a>
+                </div>
+            </span>
+                    </div>
+                                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <div class="markdown_views prism-atom-one-dark" id="content_views">
+                    <!-- flowchart 箭头图标 勿删 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-linecap="round" d="M 5 0 L 0 2.5 L 5 5 Z" />
+                    </svg>
+                                            <ol>
+<li>session的建立<br>
+session存在于服务器中，需要有httpservletrequest的request对象调用getsession方法来创建session对象，session对象可以存放用户的状态信息。<br>
+** request.getSession(true)** 生成调用session，.为true时表示可以创建一个session。eg： <strong>HttpSession session = request.getSession();</strong><br>
+session的默认有效时间-----tomcat服务器session默认有效时间为30min，但是可以在web.xml配置文件中进行修改。</li>
+</ol>
+<pre class="prettyprint"><code class="has-numbering">&lt;session-config&gt;
+        &lt;session-timeout&gt;30&lt;/session-timeout&gt;
+&lt;/session-config&gt;
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li></ul></pre>
+<ol start="2">
+<li>
+<p>session设置属性的方法：session.setAttribute(str name, value)</p>
+</li>
+<li>
+<p>设置时间方法：表示在interval时间内不操作，session就会失效。<br>
+<strong>session.setMaxInactiveInterval(interval)</strong></p>
+</li>
+<li>
+<p>注意：<br>
+1.session是存在服务器的内存中的<br>
+2.一个浏览器独享一个session域对象<br>
+3.session中可以存放多个属性<br>
+4.session中可以存放对象<br>
+5.如果session设置的属性存在重名，则会替换为新的值</p>
+</li>
+<li>
+<p><strong>sessionID</strong>：客户端发送请求时，服务器会生成一个session对象，session对象生成一个对应的sessionID返回给客户端，客户端再次请求时会在cookie中携带该sessionID随请求一起发送给服务器，服务器对sessionID进行验证是否有效。</p>
+</li>
+<li>
+<p><strong>sessionID失效</strong>：在cookie为会话级时，sessionID在浏览器关闭时就会失效。会话级cookie的失效时间就是浏览器关闭时。</p>
+</li>
+</ol>
+<p>----<strong>cookie</strong>可以设置有效时期，在有效时期内关闭浏览器session会话会失效，也就是sessionID没了，但是也有说法说cookie不随浏览器关闭而失效，这是为什么呢？？<br>
+因为cookie分为两种，<mark>一个是会话cookie，存在于浏览器进程里</mark>，当浏览器关闭时，会话cookie不存在了，所以说sessionID存在于会话cookie中时会随着浏览器关闭而失效，<strong>sessionID是cookie的一个属性</strong>。<mark>还有一种是存在硬盘的cookie</mark>，不会随浏览器关闭而失效。<strong>cookie默认失效时间是浏览器关闭。</strong></p>
+<p><strong>cookie设置失效时间</strong>：对于会话cookie可以设置失效时间吗？对于存在硬盘的cookie怎么设置失效时间呢？？<br>
+<mark>cookie.setMaxAge(0)</mark> //表示不会记录cookie<br>
+cookie.setMaxAge(-1) ///表示这是会话级cookie，关闭浏览器时就会失效。<br>
+<mark>cookie.setMaxAge(60)</mark>  //设置了失效时间60秒，该cookie会存在硬盘中</p>
+<p><strong>客户端怎么区分cookie是会话cookie还是硬盘cookie</strong>？？看设置的失效时间。设置了过期时间的cookie会存放在硬盘中，关闭浏览器再打开，cookie仍然有效，直到时间过期。存在硬盘中的cookie可以在浏览器不同的进程中共享。</p>
+<p>有人问seesionid可以用于保存用户登录状态，且存在cookie中，那么如果将sessionID存在cookie对象里，并且此时将cookie的失效时间设置为30分钟，那么浏览器关闭时，sessionID是否过期？？<br>
+----<strong>不会的</strong>，因为此时的cookie存在硬盘，sessionID也会存放在硬盘cookie中，cookie没有失效，sessionID值还是可以找到，因此关闭浏览器再次登录时仍然可以进入原来的网页。</p>
+<p><strong>自动登录问题</strong><br>
+有时候出现的打开某个网页<strong>自动登录</strong>，那么这里面是利用什么技术实现的？和sessionID有关系吗？<br>
+------<strong>cookie实现</strong>。此时利用硬盘cookie，sessionID没有随着浏览器的关闭而关闭。直到cookie失效或者服务器的session对象失效为止。<br>
+------<strong>cookie+token实现</strong>。引入token实际上是为了安全。那么怎样生成token呢？一：利用设备号/设备Mac地址生成；二：将用户名和时间一起生成token，或者将sessionID加密生成token，将token保存在cookie中。用户访问网站时，后台读取Cookie，获取uid和Token，去数据库对比，如果都存在，且在有效期内，则通过uid直接获取用户信息并保存session，直接跳转到首页。资料： <a href="https://www.cnblogs.com/jacksoft/p/5216862.html" rel="nofollow" data-token="c4891a12385a006b313c68ba3124b73d">https://www.cnblogs.com/jacksoft/p/5216862.html</a></p>
+<p><strong>此时对cookie设置禁止，sessionID无法存在cookie中，那么怎么保存登录状态信息</strong>？<br>
+可以利用URL回写的方式实现</p>
+
+                                    </div>
+                <link href="https://csdnimg.cn/release/phoenix/mdeditor/markdown_views-e9f16cbbc2.css" rel="stylesheet">
+                    </div>
+
+
+</div>
+
+
+</body></html>

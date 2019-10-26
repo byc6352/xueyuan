@@ -1,0 +1,676 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delphi编程建议遵守的规范2---命名规范 </title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div id="post_detail">
+    <!--done-->
+    <div id="topics">
+        <div class="post">
+            <h1 class="postTitle">
+                
+<a class="postTitle2" id="cb_post_title_url" href="https://www.cnblogs.com/xumenger/p/4335413.html">Delphi编程建议遵守的规范2---命名规范</a>
+
+            </h1>
+            <div class="clear"></div>
+            <div class="postBody">
+                
+<div class="blogpost-body " id="cnblogs_post_body" deep="8">
+    <p><strong>1.1.形参命名建议</strong></p>
+<p class="p17">&nbsp; &nbsp; &nbsp; &nbsp; 所有形参的名称都应当表达出它的用途。如果合适的话，形参的名称最好以字母a&nbsp;为前缀，例如：</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div class="syntaxhighlighter  delphi" id="highlighter_684981"><div class="toolbar"><span><a class="toolbar_item command_help help" href="#">?</a></span></div><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="delphi keyword">procedure</code> <code class="delphi plain">SomeProc(aUserName:</code><code class="delphi keyword">string</code><code class="delphi plain">; aUserAge:</code><code class="delphi keyword">integer</code><code class="delphi plain">);</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>　　 &nbsp;&nbsp;当参数名与类的特性或字段同名时，前缀a&nbsp;就有必要了</p>
+<p><strong>1.2.命名冲突</strong></p>
+<p>&nbsp; &nbsp;&nbsp;当两个单元中含有相同名称的过程时，如果调用该过程，实际被调用的是Uses&nbsp;子句中较后出现的那个单元中的过程。为避免这种情况，可在方法名前加想要的单元名</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div class="syntaxhighlighter  delphi" id="highlighter_708558"><div class="toolbar"><span><a class="toolbar_item command_help help" href="#">?</a></span></div><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="delphi plain">SysUtils</code><code class="delphi value">.</code><code class="delphi plain">FindClose(SR);</code></div><div class="line number2 index1 alt1"><code class="delphi plain">或Windows</code><code class="delphi value">.</code><code class="delphi plain">FindClose(Handle);</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p><strong>1.3.局部变量依据数据类型不同，应该用不同的前缀标识，各类型前缀对应关系如下：</strong></p>
+<table>
+<tbody>
+<tr>
+<td width="132" valign="top">
+<p class="p17">变量类型</p>
+</td>
+<td width="108" valign="top">
+<p class="p17">前缀</p>
+</td>
+<td width="264" valign="top">
+<p class="p17">举例</p>
+</td>
+</tr>
+<tr>
+<td width="132" valign="top">
+<p class="p17">Integer变量</p>
+</td>
+<td width="108" valign="top">
+<p class="p17">小写i</p>
+</td>
+<td width="264" valign="top">
+<p class="p17">iCount</p>
+</td>
+</tr>
+<tr>
+<td width="132" valign="top">
+<p class="p17">Shortint变量</p>
+</td>
+<td width="108" valign="top">
+<p class="p17">小写si</p>
+</td>
+<td width="264" valign="top">
+<p class="p17">siCount</p>
+</td>
+</tr>
+<tr>
+<td width="132" valign="top">
+<p class="p17">Cardinal变量</p>
+</td>
+<td width="108" valign="top">
+<p class="p17">小写ci</p>
+</td>
+<td width="264" valign="top">
+<p class="p17">ciCount</p>
+</td>
+</tr>
+<tr>
+<td width="132" valign="top">
+<p class="p17">Longint变量</p>
+</td>
+<td width="108" valign="top">
+<p class="p17">小写l</p>
+</td>
+<td width="264" valign="top">
+<p class="p17">lEntrustNo</p>
+</td>
+</tr>
+<tr>
+<td width="132" valign="top">
+<p class="p17">Int64变量</p>
+</td>
+<td width="108" valign="top">
+<p class="p17">小写i64</p>
+</td>
+<td width="264" valign="top">
+<p class="p17">i64SerialNo</p>
+</td>
+</tr>
+<tr>
+<td width="132" valign="top">
+<p class="p17">Byte变量</p>
+</td>
+<td width="108" valign="top">
+<p class="p17">小写bt</p>
+</td>
+<td width="264" valign="top">
+<p class="p17">btFlag</p>
+</td>
+</tr>
+<tr>
+<td width="132" valign="top">
+<p class="p17">Word变量</p>
+</td>
+<td width="108" valign="top">
+<p class="p17">小写w</p>
+</td>
+<td width="264" valign="top">
+<p class="p17">wCount</p>
+</td>
+</tr>
+<tr>
+<td width="132" valign="top">
+<p class="p17">DWORD变量</p>
+</td>
+<td width="108" valign="top">
+<p class="p17">小写dw</p>
+</td>
+<td width="264" valign="top">
+<p class="p17">dwCount</p>
+</td>
+</tr>
+<tr>
+<td width="132" valign="top">
+<p class="p17">Boolean变量</p>
+</td>
+<td width="108" valign="top">
+<p class="p17">小写b</p>
+</td>
+<td width="264" valign="top">
+<p class="p17">bFound</p>
+</td>
+</tr>
+<tr>
+<td width="132" valign="top">
+<p class="p17">Char变量</p>
+</td>
+<td width="108" valign="top">
+<p class="p17">小写c</p>
+</td>
+<td width="264" valign="top">
+<p class="p17">cKind</p>
+</td>
+</tr>
+<tr>
+<td width="132" valign="top">
+<p class="p17">String变量</p>
+</td>
+<td width="108" valign="top">
+<p class="p17">小写s</p>
+</td>
+<td width="264" valign="top">
+<p class="p17">sName</p>
+</td>
+</tr>
+<tr>
+<td width="132" valign="top">
+<p class="p17">Float变量</p>
+</td>
+<td width="108" valign="top">
+<p class="p17">小写e</p>
+</td>
+<td width="264" valign="top">
+<p class="p17">eLastPrice</p>
+</td>
+</tr>
+<tr>
+<td width="132" valign="top">
+<p class="p17">Double变量</p>
+</td>
+<td width="108" valign="top">
+<p class="p17">小写e</p>
+</td>
+<td width="264" valign="top">
+<p class="p17">eCurrentBalance</p>
+</td>
+</tr>
+<tr>
+<td width="132" valign="top">
+<p class="p17">Handle变量</p>
+</td>
+<td width="108" valign="top">
+<p class="p17">小写h</p>
+</td>
+<td width="264" valign="top">
+<p class="p17">hDllHandle</p>
+</td>
+</tr>
+<tr>
+<td width="132" valign="top">
+<p class="p17">PChar变量</p>
+</td>
+<td width="108" valign="top">
+<p class="p17">小写sz</p>
+</td>
+<td width="264" valign="top">
+<p class="p17">szBuffer</p>
+</td>
+</tr>
+<tr>
+<td width="132" valign="top">
+<p class="p17">X坐标</p>
+</td>
+<td width="108" valign="top">
+<p class="p17">小写x</p>
+</td>
+<td width="264" valign="top">
+<p class="p17">xPos</p>
+</td>
+</tr>
+<tr>
+<td width="132" valign="top">
+<p class="p17">Y坐标</p>
+</td>
+<td width="108" valign="top">
+<p class="p17">小写y</p>
+</td>
+<td width="264" valign="top">
+<p class="p17">yPos</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>1.4.全局变量一般以大写字母“G”打头，并遵循其他变量的命名规则。</strong></p>
+<p><strong>1.5.枚举类型</strong></p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;枚举类型名代表美剧的用途，名称前面要加T字符作为前缀，表示这是个数据类型。枚举类型的标识符列表的前缀应包含2-3个小写字符，小鞋子富取法一般的类型名的每个单词道，例子</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div class="syntaxhighlighter  delphi" id="highlighter_286019"><div class="toolbar"><span><a class="toolbar_item command_help help" href="#">?</a></span></div><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="delphi plain">TSongType=(stRock, stClassical, stCountry, stAlternative, stHeavyMetal, stRB);</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>　　 &nbsp;枚举类型的变量实例的名称与类型相同，但没有前缀T&nbsp;，也可以给变量一个更加特殊名称，诸如：GoodSongType、BadSongType等等。</p>
+<p><strong>1.6.数组类型</strong></p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;数组类型名应表达出该数组的用途。类型名必须加字母“<span style='font-family: "Times New Roman";'>T</span><span style="font-family: 宋体;">”为前缀。如果要声明一个指向数组类型的指针，则必须加字母</span><span style='font-family: "Times New Roman";'>P</span>&nbsp;为前缀，且声明在类型声明之前。例</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div class="syntaxhighlighter  delphi" id="highlighter_64569"><div class="toolbar"><span><a class="toolbar_item command_help help" href="#">?</a></span></div><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="delphi keyword">type</code></div><div class="line number2 index1 alt1"><code class="delphi spaces">&nbsp;&nbsp;</code><code class="delphi plain">PCycleArray = ^TCycleArray;&nbsp;&nbsp;&nbsp; </code><code class="delphi comments">//PCycleArray是TCycleArray类型的指针&nbsp;&nbsp;&nbsp;&nbsp; </code></div><div class="line number3 index2 alt2"><code class="delphi spaces">&nbsp;&nbsp;</code><code class="delphi plain">TCycleArray=</code><code class="delphi keyword">array</code><code class="delphi plain">[</code><code class="delphi value">1..100</code><code class="delphi plain">] </code><code class="delphi keyword">of</code> <code class="delphi keyword">integer</code><code class="delphi plain">;</code></div><div class="line number4 index3 alt1"><code class="delphi keyword">Var</code></div><div class="line number5 index4 alt2"><code class="delphi spaces">&nbsp;&nbsp;</code><code class="delphi plain">CycleArray: TCycleArray;&nbsp;&nbsp;&nbsp; </code><code class="delphi comments">//实际上，数组类型的变量实例与类型名称相同，但没有“T”前缀</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p><strong>1.7.记录类型</strong></p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;记录类型名应表达出记录的用途。类型名必须加字母<span style='font-family: "Times New Roman";'>T</span><span style="font-family: 宋体;">为前缀。如果要声明一个指向记录类型的指计，则必须加字母</span><span style='font-family: "Times New Roman";'>P</span><span style="font-family: 宋体;">为前缀，且其声明在类型声明之前。例</span></p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div class="syntaxhighlighter  delphi" id="highlighter_915444"><div class="toolbar"><span><a class="toolbar_item command_help help" href="#">?</a></span></div><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="delphi keyword">type</code></div><div class="line number2 index1 alt1"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">PEmployee = ^TEmployee;</code></div><div class="line number3 index2 alt2"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">TEmployee = </code><code class="delphi keyword">record</code></div><div class="line number4 index3 alt1"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">EmployeeName: </code><code class="delphi keyword">string</code><code class="delphi plain">;</code></div><div class="line number5 index4 alt2"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">EmployeeRate: </code><code class="delphi keyword">Double</code><code class="delphi plain">;</code></div><div class="line number6 index5 alt1"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi keyword">end</code><code class="delphi plain">;</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>&nbsp;</p>
+<p><strong>1.8.类类型</strong></p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;类的名称应当表达出类的用途。一般的类名前要加字母“<span style='font-family: "Times New Roman";'>T</span><span style="font-family: 宋体;">”，如果是接口类那么类名前要加“</span><span style='font-family: "Times New Roman";'>I</span><span style="font-family: 宋体;">”，错误异常类的类名前要加“</span><span style='font-family: "Times New Roman";'>E</span><span style="font-family: 宋体;">”，而类引用类型（</span><span style='font-family: "Times New Roman";'>Class-reference</span>&nbsp;type<span style="font-family: 宋体;">）则要在类名后加“</span><span style='font-family: "Times New Roman";'>Class</span><span style="font-family: 宋体;">”，抽象类一般是在类名前还要加“</span><span style='font-family: "Times New Roman";'>Custom</span><span style="font-family: 宋体;">”。</span></p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;类的实例名称通常与类名相同，只不过没有前缀“T”。</p>
+<p><strong>1.9.类的成员变量</strong></p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;类的成员变量的命名遵循与变量相同的规则，只不过要加前缀F&nbsp;，表示这是类的成员。</p>
+<p class="p17">所有成员变量必须为私有。如果要在类的作用域之外访问字段，可借助于类的属性来实现。</p>
+<p class="p17"><strong>1.10.属性访问方法</strong></p>
+<p class="p17">&nbsp; &nbsp; &nbsp; &nbsp;所有属性访问方法应当定义在类的私有或保护部分。属性访问方法遵循与过程和函数相同的规则。用于读的方法应当加“Get”前缀，用于写的方法应当加“Set”前缀，并且有一个叫Value的参数，其类型与属性的类型相同。例如：</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div class="syntaxhighlighter  delphi" id="highlighter_930055"><div class="toolbar"><span><a class="toolbar_item command_help help" href="#">?</a></span></div><table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="delphi plain">TSomeClass = </code><code class="delphi keyword">class</code><code class="delphi plain">(TObject)</code></div><div class="line number2 index1 alt1"><code class="delphi keyword">private</code></div><div class="line number3 index2 alt2"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi plain">FSomeField: </code><code class="delphi keyword">Integer</code><code class="delphi plain">;</code></div><div class="line number4 index3 alt1"><code class="delphi keyword">protected</code></div><div class="line number5 index4 alt2"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi keyword">function</code> <code class="delphi plain">GetSomeField: </code><code class="delphi keyword">Integer</code><code class="delphi plain">;</code></div><div class="line number6 index5 alt1"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi keyword">procedure</code> <code class="delphi plain">SetSomeField(Value: </code><code class="delphi keyword">Integer</code><code class="delphi plain">);</code></div><div class="line number7 index6 alt2"><code class="delphi keyword">public</code></div><div class="line number8 index7 alt1"><code class="delphi spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="delphi keyword">property</code> <code class="delphi plain">SomeField: </code><code class="delphi keyword">Integer</code> <code class="delphi plain">read GetSomeField </code><code class="delphi keyword">write</code> <code class="delphi plain">SetSomeField;</code></div><div class="line number9 index8 alt2"><code class="delphi keyword">end</code><code class="delphi plain">;</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p><strong>1.11.&nbsp;属性</strong></p>
+<p class="p17">&nbsp; &nbsp; &nbsp; &nbsp;属性作为成员变量的访问器，遵循与成员变量相同的命名规则，只不过没有F前缀。属性名应为名词，而不是动词。属性是数据，而方法是动作。数组属性名应当是复数，而一般的属性应当是单数。</p>
+<p class="p17"><strong>1.12.组件实例命名</strong></p>
+<p class="p17">&nbsp; &nbsp; &nbsp; &nbsp;组件实例的名称应当能够描述其实际意义。使用前缀而不使用后缀的原因是在搜寻时，在对象检查器和代码探索器中搜寻构件的名字比搜寻构件的类型更容易。在这个标准中，组件实例名包括两个部分：前缀和性质标识名。</p>
+<p class="p17"><strong>1.13.组件的前缀</strong></p>
+<p class="p17">&nbsp; &nbsp; &nbsp; &nbsp;组件的前缀多是表现组件类型的字母缩写。参见下面表中的组件前缀：</p>
+<table>
+<tbody>
+<tr>
+<td width="340" valign="center">
+<p class="p0">组件类名</p>
+</td>
+<td width="216" valign="center">
+<p class="p0">组件前缀</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TActionList,&nbsp;TAction<span style="font-family: 宋体;">表示动作的列表项</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">act</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TButton,&nbsp;TSpeedButton,&nbsp;TBitBtn<span style="font-family: 宋体;">等所有的按钮类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">btn</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TCheckBox,&nbsp;TDBCheckBox<span style="font-family: 宋体;">等所有的检查框</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">chk</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TradioButton<span style="font-family: 宋体;">单选按钮类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">rdo</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TToolBar<span style="font-family: 宋体;">工具条</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">tb</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TMainMenu<span style="font-family: 宋体;">所有的主菜单类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">mm</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TMainMenuItem<span style="font-family: 宋体;">所有的菜单项类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">mi</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TpopupMenu<span style="font-family: 宋体;">所有的弹出式菜单类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">pm</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TPopupMenuItem<span style="font-family: 宋体;">所有的弹出式菜单项类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">pmi</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TLabel,&nbsp;TStaticText<span style="font-family: 宋体;">等所有用来显示的标签类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">lbl</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TPanel<span style="font-family: 宋体;">等所有的面板类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">pnl</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TpageControl<span style="font-family: 宋体;">等所有的页式控件类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">pgc</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TEdit,&nbsp;TMaskEdit<span style="font-family: 宋体;">等所有的单行编辑框类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">edt</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TMemo,&nbsp;TRichEdit<span style="font-family: 宋体;">等所有的多行编辑框类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">mmo</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TDrawGrid,&nbsp;TStringGrid<span style="font-family: 宋体;">等所有的网格类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">grd</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TAnimate<span style="font-family: 宋体;">等所有的动画类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">ani</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TImageList<span style="font-family: 宋体;">等所有的图片列表类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">il</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TImage<span style="font-family: 宋体;">等图片类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">img</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TChart<span style="font-family: 宋体;">图表类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">cht</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TComboBox,&nbsp;TDBComboBox<span style="font-family: 宋体;">等所有的下拉式列表框类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">cbo</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TListBox,&nbsp;TDBList<span style="font-family: 宋体;">等所有的列表框类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">lst</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TtreeView</p>
+</td>
+<td width="216" valign="center">
+<p class="p0">tv</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TlistView</p>
+</td>
+<td width="216" valign="center">
+<p class="p0">lv</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">ThotKey</p>
+</td>
+<td width="216" valign="center">
+<p class="p0">hk</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TSplitter<span style="font-family: 宋体;">等所有的分隔符类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">spt</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TopenDialog<span style="font-family: 宋体;">等所有的对话框组件类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">dlg</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TTable<span style="font-family: 宋体;">等所有的数据表类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">tbl</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TQuery<span style="font-family: 宋体;">等所有的</span><span style="font-family: Verdana;">SQL</span><span style="font-family: 宋体;">查询类组件</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">qry</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TClientDataSet<span style="font-family: 宋体;">所有的客户数据集组件</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">cds</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TdataSource</p>
+</td>
+<td width="216" valign="center">
+<p class="p0">ds</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">Tdatabase</p>
+</td>
+<td width="216" valign="center">
+<p class="p0">db</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TSockConnection,TDCOMConnection<span style="font-family: 宋体;">等连接组件类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">con</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TQuickRep,&nbsp;TFastReport<span style="font-family: 宋体;">等所有的报表组件类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">rpt</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TDDEClientConv,TDDEClientItem<span style="font-family: 宋体;">等所有的</span><span style="font-family: Verdana;">DDE</span><span style="font-family: 宋体;">组件类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">dde</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TMonthCalendar<span style="font-family: 宋体;">等所有的日历类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">cal</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TGroupBox<span style="font-family: 宋体;">等控件类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">grp</p>
+</td>
+</tr>
+<tr>
+<td width="340" valign="center">
+<p class="p0">TForm<span style="font-family: 宋体;">等窗体类</span></p>
+</td>
+<td width="216" valign="center">
+<p class="p0">frm</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>
+<p><span style="font-family: 宋体;">&nbsp; &nbsp;</span>如上所示，组件类型前缀是从分析描述组件的类型性质而来的。通常情况下，下面的规则描述如何定义一个组件类型前缀：</p>
+<p>&nbsp;</p>
+<ul>
+<li>从组件类型名中移去<span style="font-family: Verdana;">T</span><span style="font-family: 宋体;">前缀。例如</span><span style="font-family: Verdana;">TButton</span><span style="font-family: 宋体;">变成</span><span style="font-family: Verdana;">Button</span><span style="font-family: 宋体;">。</span>&nbsp;</li>
+<li>除了第一个元音，删去所有元音字母。例如，<span style="font-family: Verdana;">Button</span><span style="font-family: 宋体;">变成</span><span style="font-family: Verdana;">bttn</span><span style="font-family: 宋体;">，</span><span style="font-family: Verdana;">Edit</span><span style="font-family: 宋体;">变成</span><span style="font-family: Verdana;">edt</span><span style="font-family: 宋体;">。</span>&nbsp;</li>
+<li>压缩双字母。例如，<span style="font-family: Verdana;">bttn</span><span style="font-family: 宋体;">变成</span><span style="font-family: Verdana;">btn</span><span style="font-family: 宋体;">。</span>&nbsp;</li>
+<li>如发生冲突，则在某一组件前缀中加入一个元音。例如在<span style="font-family: Verdana;">TBatton</span><span style="font-family: 宋体;">组件的前缀中加入元音变为</span><span style="font-family: Verdana;">batn</span><span style="font-family: 宋体;">，以区别</span><span style="font-family: Verdana;">TButton</span><span style="font-family: 宋体;">的前缀。</span>&nbsp;</li>
+</ul>
+<p>&nbsp;</p>
+<p class="p17">&nbsp; &nbsp; &nbsp; &nbsp;不过，上述规则首先得保证前缀名称必须符合习惯，做到见名知意，如:TDDEClientConv控件的前缀就是一个例外。&nbsp;</p>
+<p>&nbsp;</p>
+<p class="p17">&nbsp; &nbsp; &nbsp; &nbsp;注意：组件的前缀是为了表示出组件的类型，是按钮，还是标签等等，因此没有必要为每一个特别组件类建立一个组件前缀，如:&nbsp;TMyButton的组件前缀仍为btn。</p>
+<p>&nbsp;</p>
+<p><strong><span style="font-family: 宋体;">1.14.</span>窗体类型的命名标准</strong></p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;窗体或对话框类型的名称应当表达出窗体的用途，如果是窗体要加“<span style='font-family: "Times New Roman";'>Tfrm</span><span style="font-family: 宋体;">”前缀，如果是对话框要加“</span><span style='font-family: "Times New Roman";'>Tdlg</span><span style="font-family: 宋体;">”，后跟描述性名</span></p>
+<p><strong><span style="font-family: 宋体;">1.15.</span>窗体实例的命名标准</strong></p>
+<p>&nbsp; &nbsp; &nbsp;&nbsp;窗体实例的名称与相应的类型名称相同，但没有前缀<span style='font-family: "Times New Roman";'>T&nbsp;</span><span style="font-family: 宋体;">。使用前缀法命名窗体和对话框的好处在于可以在</span><span style='font-family: "Times New Roman";'>Object</span>&nbsp;Inspector<span style="font-family: 宋体;">（属性观察器）中快速找到需要的组件类型</span></p>
+<p><strong><span style="font-family: 宋体;">1.16.数据模块的命名</span></strong></p>
+<p><span style="font-family: 宋体;">&nbsp; &nbsp;</span>数据模块类型名称应表达出它的用途，且要加前缀“<span style='font-family: "Times New Roman";'>Tdm</span><span style="font-family: 宋体;">”，后跟描述性名称</span></p>
+<p>&nbsp;</p>
+<p><strong><span style="font-family: 宋体;">1.17.数据模块实例的命名</span></strong></p>
+<p class="p0">&nbsp; &nbsp; &nbsp; &nbsp;数据模块实例的名称应当与相应的类型名称相同，但没有前缀<span style='font-family: "Times New Roman";'>T&nbsp;</span></p>
+<p class="p0">&nbsp;</p>
+<p class="p0"><span style='font-family: "Times New Roman";'>&nbsp; &nbsp; &nbsp; 当然这只是其中的一部分，还有很多规范需要制定和遵。另外这只是建议性的规范，并不是强制性的东西，可以根据自己的团队情况去指定符合自己的标准和规则</span></p>
+<p>&nbsp;</p>
+</div>
+<div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block"><div id="BlogPostCategory">
+    分类: 
+            <a href="https://www.cnblogs.com/xumenger/category/716628.html" target="_blank">Delphi之开发规范</a>,             <a href="https://www.cnblogs.com/xumenger/category/716739.html" target="_blank">项目管理之开发规范</a></div>
+<div id="EntryTag">
+    标签: 
+            <a href="https://www.cnblogs.com/xumenger/tag/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>,             <a href="https://www.cnblogs.com/xumenger/tag/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/">编程语言</a>,             <a href="https://www.cnblogs.com/xumenger/tag/Delphi/">Delphi</a></div>
+
+    <div id="blog_post_info">
+<div id="green_channel">
+        <a id="green_channel_digg" onclick="DiggIt(4335413,cb_blogId,1);green_channel_success(this,'谢谢推荐！');" href="javascript:void(0);">好文要顶</a>
+        <a id="green_channel_follow" onclick="follow('6ca9a7d1-9596-e411-b908-9dcfd8948a71');" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a title="分享至新浪微博" id="green_channel_weibo" onclick="ShareToTsina()" href="javascript:void(0);"><img alt="" src="images/delphi02001.png"></a>
+    <a title="分享至微信" id="green_channel_wechat" onclick="shareOnWechat()" href="javascript:void(0);"><img alt="" src="images/delphi02002.png"></a>
+</div>
+<div id="author_profile">
+    <div class="author_profile_info" id="author_profile_info">
+            <a href="https://home.cnblogs.com/u/xumenger/" target="_blank"><img class="author_avatar" alt="" src="images/delphi02003.png"></a>
+        <div class="author_profile_info" id="author_profile_detail">
+            <a href="https://home.cnblogs.com/u/xumenger/">xumenger</a><br>
+            <a href="https://home.cnblogs.com/u/xumenger/followees/">关注 - 6</a><br>
+            <a href="https://home.cnblogs.com/u/xumenger/followers/">粉丝 - 38</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow">
+                <a onclick="follow('6ca9a7d1-9596-e411-b908-9dcfd8948a71');return false;" href="javascript:void(0);">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(4335413,'Digg')">
+        <span class="diggnum" id="digg_count">0</span>
+    </div>
+    <div class="buryit" onclick="votePost(4335413,'Bury')">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+    <div class="clear"></div>
+    <div id="post_next_prev">
+
+    <a class="p_n_p_prefix" href="https://www.cnblogs.com/xumenger/p/4335337.html">« </a> 上一篇：    <a title="发布于 2015-03-13 15:54" href="https://www.cnblogs.com/xumenger/p/4335337.html">Delphi编程建议遵守的规范1---缩进、各种语句的用法</a>
+    <br>
+    <a class="p_n_p_prefix" href="https://www.cnblogs.com/xumenger/p/4335826.html">» </a> 下一篇：    <a title="发布于 2015-03-13 19:28" href="https://www.cnblogs.com/xumenger/p/4335826.html">Delphi开发中各种文件扩展名代表什么文件</a>
+
+</div>
+</div>
+            </div>
+            <div class="postDesc">posted @ 
+<span id="post-date">2015-03-13 16:15</span>&nbsp;<a href="https://www.cnblogs.com/xumenger/">xumenger</a> 阅读(<span id="post_view_count">346</span>) 评论(<span id="post_comment_count">0</span>) <a href="https://i.cnblogs.com/EditPosts.aspx?postid=4335413" rel="nofollow"> 编辑</a> <a onclick="AddToWz(4335413); return false;" href="javascript:void(0)">收藏</a>
+</div>
+        </div>
+	    
+	    
+    </div><!--end: topics 文章、评论容器-->
+</div>
+
+</div>
+
+
+</body></html>

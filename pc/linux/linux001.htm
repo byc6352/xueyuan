@@ -1,0 +1,61 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>搭建socks5代理</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                        <div class="article-source-link">
+                    原文链接：<a href="https://segmentfault.com/a/1190000017301882" target="_blank" rel="noopener">https://segmentfault.com/a/1190000017301882</a>
+                </div>
+                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            
+    <div class="article fmt article__content">
+                    
+<p>推荐使用CentOS作为代理服务器server</p>
+<h2><a name="t0"></a>准备工作</h2>
+<p>安装go环境</p>
+<pre><code class="hljs sql">yum <span class="hljs-keyword">install</span> <span class="hljs-keyword">go</span>
+</code></pre>
+<p>创建GOPATH</p>
+<pre><code class="hljs perl"><span class="hljs-keyword">mkdir</span> /usr/<span class="hljs-keyword">local</span>/go
+</code></pre>
+<p>修改/etc/bashrc, 添加以下两行</p>
+<pre><code class="hljs bash"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-built_in">export</span> GOPATH=/usr/<span class="hljs-built_in">local</span>/go</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-built_in">export</span> PATH=<span class="hljs-variable">$PATH</span>:<span class="hljs-variable">$GOPATH</span>/bin</div></div></li></ol></code></pre>
+<p>重载bashrc</p>
+<pre><code class="hljs bash"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">$ <span class="hljs-built_in">source</span> /etc/bashrc</div></div></li></ol></code></pre>
+<h2><a name="t1"></a>安装 shadowsocks-server</h2>
+<pre><code class="hljs vbscript">go <span class="hljs-keyword">get</span> github.com/shadowsocks/shadowsocks-go/cmd/shadowsocks-<span class="hljs-built_in">server</span>
+</code></pre>
+<p>运行 <code>shadowsocks-server -v</code> 若出现以下信息则安装成功：</p>
+<pre><code class="hljs vbscript"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">Usage of shadowsocks-<span class="hljs-built_in">server</span>:</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  -A    anonymize client ip addresses <span class="hljs-keyword">in</span> all output</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  -c <span class="hljs-built_in">string</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        specify config file (<span class="hljs-keyword">default</span> <span class="hljs-string">"config.json"</span>)</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  -core <span class="hljs-built_in">int</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        maximum number of CPU cores <span class="hljs-keyword">to</span> use, <span class="hljs-keyword">default</span> <span class="hljs-keyword">is</span> determinied by Go runtime</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  -d    print debug message</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  -k <span class="hljs-built_in">string</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        password</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  -m <span class="hljs-built_in">string</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        encryption method, <span class="hljs-keyword">default</span>: aes<span class="hljs-number">-256</span>-cfb</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  -manager-address <span class="hljs-built_in">string</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        shadowsocks manager listening address</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  -p <span class="hljs-built_in">int</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="15"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        <span class="hljs-built_in">server</span> port</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="16"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  -t <span class="hljs-built_in">int</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="17"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        timeout <span class="hljs-keyword">in</span> seconds (<span class="hljs-keyword">default</span> <span class="hljs-number">300</span>)</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="18"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  -u    UDP Relay</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="19"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  -version</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="20"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        print version</div></div></li></ol></code></pre>
+<h2><a name="t2"></a>运行socks5代理服务</h2>
+<pre><code class="hljs vbscript">shadowsocks-<span class="hljs-built_in">server</span> -m aes<span class="hljs-number">-256</span>-cfb -p <span class="hljs-number">30100</span> -t <span class="hljs-number">600</span> -k hellovpn -u &gt; ./<span class="hljs-built_in">log</span> &amp;
+</code></pre>
+<p>说明：</p>
+<pre><code class="hljs diff"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-deletion">-m 加密方法</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-deletion">-p 服务端口</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-deletion">-t 超时时间</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-deletion">-k 密码</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-deletion">-u 开启UDP转发</span></div></div></li></ol></code></pre>
+<h2><a name="t3"></a>客户端下载</h2>
+<p>MacOS</p>
+<ul><li><a href="https://github.com/shadowsocks/ShadowsocksX-NG/releases" rel="nofollow" data-token="bd5fd0bd46cb3c007b5be5afd3a85b14">https://github.com/shadowsock...</a></li></ul><p>Linux</p>
+<ul><li><a href="https://github.com/shadowsocks/shadowsocks-qt5/wiki/Installation" rel="nofollow" data-token="1539cac82c00a37b6fd8c5035b4cd23f">https://github.com/shadowsock...</a></li></ul><p>Windows</p>
+<ul><li><a href="https://github.com/shadowsocks/shadowsocks-windows/releases" rel="nofollow" data-token="8c7a226b2ec8df6b5c6b967250be8c4a">https://github.com/shadowsock...</a></li></ul><p>Android</p>
+<ul><li><a href="https://github.com/Jigsaw-Code/outline-client/" rel="nofollow" data-token="eae2dec70f6a7ae88a5deb97d0531c92">https://github.com/Jigsaw-Cod...</a></li>
+<li><a href="https://play.google.com/store/apps/details?id=org.outline.android.client" rel="nofollow" data-token="947ac4e6c22f9e0cfaed629998d5a91a">https://play.google.com/store...</a></li>
+<li><a href="https://github.com/Jigsaw-Code/outline-releases/blob/master/client/Outline.apk?raw=true" rel="nofollow" data-token="13a5c5eaa24f9b9ba0c79eb04e065d3c">https://github.com/Jigsaw-Cod...</a></li>
+</ul><p>iOS</p>
+<ul><li><a href="https://itunes.apple.com/app/outline-app/id1356177741" rel="nofollow" data-token="fff49d29ad3e4cdb41c92d1a966cfe9d">https://itunes.apple.com/app/...</a></li></ul><blockquote>客户端秘钥串生成方法参见 [Quick Guide<br>](<a href="https://shadowsocks.org/en/config/quick-guide.html)" rel="nofollow" data-token="05fc332262510c3752dd0a30d9573168">https://shadowsocks.org/en/co...</a> 文档中 URI and QR code 部分</blockquote>
+
+                </div>
+                                      </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>

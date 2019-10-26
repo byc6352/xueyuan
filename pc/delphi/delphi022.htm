@@ -1,0 +1,58 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delphi中URL的编码与解码，即urlencode的使用 - 小宇飞刀的BLOG - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content">
+                                                <div class="article-copyright">
+                <span class="creativecommons">
+                <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                    </a>
+            <span>
+                版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。            </span>
+               <div class="article-source-link2222">
+                    本文链接：<a href="https://blog.csdn.net/xieyunc/article/details/81568144">https://blog.csdn.net/xieyunc/article/details/81568144</a>
+                </div>
+            </span>
+                    </div>
+                                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            <p><em><strong>一、URL简介</strong></em><br>
+&nbsp;&nbsp;&nbsp; URL是网页的地址，比如&nbsp;<a href="http://www.w3school.com.cn/" rel="nofollow" data-token="75a4fdf04415d30d8180d4b37b013558">http://www.shanhaiMy.com</a>。Web 浏览器通过 URL 从 web 服务器请求页面。<br>
+&nbsp;&nbsp;&nbsp; 由于URL字符串常常会包含非ASCII字符，URL在传输过程中，往往出现错误。因此，可以将非字符串字符，让一些特殊ASCII字符组合，代替非ASCII字符。这就是编码转换，当字符串传输后，可以返回原RUL字符串（解码）。<br>
+&nbsp;&nbsp;&nbsp; URL只能使用 ASCII 字符集来通过因特网进行发送。URL编码，就是会将RUL字符转换为可通过因特网传输的格式。<br>
+&nbsp;&nbsp;&nbsp; URL编码使用“%”其后跟随两位的十六进制数来替换非 ASCII 字符。比如“®”用“%A9”代替。<br>
+&nbsp;&nbsp;&nbsp; URL不能包含空格。URL编码通常使用“+”来替换空格。</p>
+
+<p><em><strong>二、RUL编码与解码</strong></em><br>
+&nbsp;&nbsp;&nbsp; 1、uses HttpApp;</p>
+
+<p>&nbsp;&nbsp;&nbsp; 2、编码，先UTF8编码，然后再URL编码，不然和标准的url_encode()编码结果不一致，查询结果自然不是预期的<br>
+&nbsp;&nbsp;&nbsp; S2 := HttpEncode(UTF8Encode(S1));</p>
+
+<p>&nbsp;&nbsp;&nbsp; 3、解码，先URL解码，然后再UTF8解码，否则结果是乱码。<br>
+&nbsp;&nbsp;&nbsp; S1 := UTF8Decode(HttpDecode(S2));</p>
+
+<p><em><strong>三、RUL编码与解码举例</strong></em></p>
+
+<p>方法一：</p>
+
+<pre class="has" name="code"><code class="language-Delphi hljs"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">uses</span> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  Httpapp; </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">...</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  S := HttpEncode(UTF8EnCode(<span class="hljs-string">'中文'</span>));</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  <span class="hljs-comment">//或者：</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  <span class="hljs-comment">//S := HttpEncode(AnsiToUtf8('中文'));</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">end</span>;</div></div></li></ol></code></pre>
+
+<p>方法二：</p>
+
+<pre class="has" name="code"><code class="language-Delphi hljs"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">uses</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">&nbsp;&nbsp;IdURI;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">..</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">&nbsp;&nbsp;S&nbsp;:=&nbsp;TIdURI.URLEncode(str);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">//</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">&nbsp;&nbsp;S&nbsp;:=&nbsp;TIdURI.URLDecode(str);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">end</span>;</div></div></li></ol></code></pre>
+
+<p>&nbsp;</p>                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>

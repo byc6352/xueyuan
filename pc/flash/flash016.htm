@@ -1,0 +1,148 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>swf文件修改总结</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                                <div class="article-copyright">
+                <span class="creativecommons">
+                <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                    </a>
+            <span>
+                版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。            </span>
+               <div class="article-source-link2222">
+                    本文链接：<a href="https://blog.csdn.net/byc6352/article/details/102638409">https://blog.csdn.net/byc6352/article/details/102638409</a>
+                </div>
+            </span>
+                    </div>
+                                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <div class="markdown_views prism-atom-one-dark" id="content_views">
+                    <!-- flowchart 箭头图标 勿删 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-linecap="round" d="M 5 0 L 0 2.5 L 5 5 Z" />
+                    </svg>
+                                              <h1 align="center"><a name="t0"></a><font color="blue" size="5">swf文件修改总结</font></h1>
+  <h2><a name="t1"></a>目标： </h2>
+  <h5><font color="red" size="4">有一个网页内嵌swf文件，没有源代码，需要修改其功能。</font></h5>
+ <h2><a name="t2"></a>步骤：</h2>
+ <h3><a name="t3"></a>一、下载网页中的swf文件 </h3>
+ <p>&nbsp;&nbsp;&nbsp;&nbsp;使用网页资源下载工具<b>(mybrowse.exe)</b>，此工具能把浏览过的网页及其资源原封不动全部下载到本地电脑（此工具在本文章末工具包里面提供）。</p>
+<p><img alt="我的浏览器" src="images/flash01601.jpg"></p>
+ <h3><a name="t4"></a>二、解密client.swf </h3>
+ <p> 用JPEXS逆向工具打开client.swf，看不到资源文件和脚本。说明已被加密过。需要解密！</p>
+<p><img alt="JPEXS" src="images/flash01602.jpg"></p>
+  <h6>JPEXS简介：</h6>
+   <p>&nbsp;&nbsp;&nbsp;&nbsp;JPEXS是目前最好用的开源免费swf逆向工具。官网地址为：</p>
+   <p><a href="https://www.free-decompiler.com/flash/" rel="nofollow" data-token="077add17f85b62ade509295f4fb34fbb">https://www.free-decompiler.com/flash/</a></p>
+<p><img alt="JPEXS" src="images/flash01603.jpg"></p>
+  <p>&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  <h6>解密工具(swfdump.exe)简介：</h6>
+   <p>&nbsp;&nbsp;&nbsp;&nbsp;尝试了多款swf解密工具，最终用swfdump.exe解密成功！swfdump.exe暴力直接！无论swf文件用什么工具加密的，swfdump.exe都能解密！</p>
+   <p>解密原理：因为swf文件必须先解密释放到内存中才能运行，swfdump.exe能够查找swf文件在进程内存中的特征字符串，然后把符合swf文件特征的整块内存复制保存下来，此内存块即为swf文件在内存中的解密文件！</p>
+   <p>（swfdump.exe在文章末工具包里面有提供。）</p>
+   <h5><font color="red">解密方法:</font></h5>
+    <p><b>步骤一、先用flash播放器加载client.swf文件到内存中。(flash播放器为：flashplayer_sa.exe文章末工具包里有提供)</b></p>
+<p><img alt="flashplayer播放器" src="images/flash01604.jpg"></p>
+<p><b>步骤二、打开CMD，执行以下命令：</b></p>
+<pre class="prettyprint"><code class="prism language-powershell has-numbering">swfdump<span class="token punctuation">.</span>exe flashplayer_sa<span class="token punctuation">.</span>exe
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>flashplayer_sa.exe为加载client.swf文件的进程名。运行结果：</p>
+<p><img alt="swfdump.exe" src="images/flash01605.jpg"></p>
+<p>提取已解密的swf文件：</p>
+<p><img alt="swfdump.exe" src="images/flash01606.jpg"></p>
+<p>至此，文件解密工作大功告成！用JPEXS打开，结果为：（可以看到全部资源文件和脚本了！）</p>
+<p><img alt="JPEXS" src="images/flash01607.jpg"></p>
+ <h3><a name="t5"></a>三、使用JPEXS对swf文件进行指令级修改。 </h3>
+  <h6>一、在关键地方插入trace()调试指令代码。以下是调试通过的代码：</h6>
+<pre class="prettyprint"><code class="prism language-powershell has-numbering">/<span class="token operator">/</span>trace<span class="token punctuation">(</span><span class="token string">"start crpt:"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+findpropstrict Qname<span class="token punctuation">(</span>PackageNamespace<span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">"trace"</span><span class="token punctuation">)</span>
+pushstring <span class="token string">"start crpt:"</span>
+callpropvoid Qname<span class="token punctuation">(</span>PackageNamespace<span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">"trace"</span><span class="token punctuation">)</span> 1
+
+
+<span class="token operator">/</span><span class="token operator">/</span>trace<span class="token punctuation">(</span>_local_<span class="token punctuation">)</span><span class="token punctuation">;</span>
+findpropstrict Qname<span class="token punctuation">(</span>PackageNamespace<span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">"trace"</span><span class="token punctuation">)</span>
+getlocal_1
+callpropvoid Qname<span class="token punctuation">(</span>PackageNamespace<span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">"trace"</span><span class="token punctuation">)</span> 1
+
+<span class="token operator">/</span><span class="token operator">/</span>trace<span class="token punctuation">(</span><span class="token string">"price:"</span><span class="token operator">+</span>this<span class="token punctuation">.</span>K174936A5B31DB7B1424E2CBCE10F7E322C6AA2445899K<span class="token punctuation">)</span><span class="token punctuation">;</span>
+findpropstrict Qname<span class="token punctuation">(</span>PackageNamespace<span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">"trace"</span><span class="token punctuation">)</span>
+pushstring <span class="token string">"price: "</span>
+getlex Qname<span class="token punctuation">(</span>PackageNamespace<span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">"K174936A5B31DB7B1424E2CBCE10F7E322C6AA2445899K"</span><span class="token punctuation">)</span>
+add
+callpropvoid Qname<span class="token punctuation">(</span>PackageNamespace<span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">"trace"</span><span class="token punctuation">)</span> 1
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li></ul></pre>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;JPEXS目前只允许修改SWF字节码，直接修改源代码可能会导致发生不可预料的错误！修改地方为软件右边区域：</p>
+<p><img alt="JPEXS修改字节码演示" src="images/flash01608.jpg"></p>
+  <h6>二、修改类私有变量为公共变量：</h6>
+  <p>&nbsp;&nbsp;&nbsp;&nbsp;修改的目的是方便在另一个对象里面访问并取得该变量的值。</p>
+<pre class="prettyprint"><code class="prism language-powershell has-numbering">/<span class="token operator">/</span>原私用变量： private <span class="token keyword">var</span> K174936A5B31DB7B1424E2CBCE10F7E322C6AA2445899K<span class="token punctuation">;</span>
+
+trait slot Qname<span class="token punctuation">(</span>PrivateNamespace<span class="token punctuation">(</span>null<span class="token punctuation">,</span><span class="token string">"51"</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">"K174936A5B31DB7B1424E2CBCE10F7E322C6AA2445899K"</span><span class="token punctuation">)</span>
+slotid 0
+<span class="token function">type</span> null
+value Undefined
+<span class="token keyword">end</span> <span class="token punctuation">;</span> trait
+
+<span class="token operator">/</span><span class="token operator">/</span>修改为公共变量： public <span class="token keyword">var</span> K174936A5B31DB7B1424E2CBCE10F7E322C6AA2445899K<span class="token punctuation">;</span>
+
+trait slot Qname<span class="token punctuation">(</span>PackageNamespace<span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">"K174936A5B31DB7B1424E2CBCE10F7E322C6AA2445899K"</span><span class="token punctuation">)</span>
+slotid 0
+<span class="token function">type</span> Qname<span class="token punctuation">(</span>PackageNamespace<span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">"int"</span><span class="token punctuation">)</span>
+value Integer<span class="token punctuation">(</span>0<span class="token punctuation">)</span>
+<span class="token keyword">end</span> <span class="token punctuation">;</span> trait
+
+<span class="token operator">/</span><span class="token operator">/</span>相应的所有对该变量的调用都要做字节码的修改： 
+源代码：
+K174936A5B31DB7B1424E2CBCE10F7E322C6AA2445899K = _loc2_<span class="token punctuation">.</span>basePrice<span class="token punctuation">;</span>
+字节码：
+findproperty Qname<span class="token punctuation">(</span>PackageNamespace<span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">"K174936A5B31DB7B1424E2CBCE10F7E322C6AA2445899K"</span><span class="token punctuation">)</span>  <span class="token operator">/</span><span class="token operator">/</span>公共变量字节码
+getlocal_2
+getproperty Qname<span class="token punctuation">(</span>PackageNamespace<span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">"basePrice"</span><span class="token punctuation">)</span>
+initproperty Qname<span class="token punctuation">(</span>PackageNamespace<span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">"K174936A5B31DB7B1424E2CBCE10F7E322C6AA2445899K"</span><span class="token punctuation">)</span>  <span class="token operator">/</span><span class="token operator">/</span>公共变量字节码
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li></ul></pre>
+<h6>三、在另一个对象里面添加代码，获取以上公共变量的值。从而改变程序功能：</h6>
+<pre class="prettyprint"><code class="prism language-powershell has-numbering">/<span class="token operator">/</span>这是在另一个类里面的代码，增加一行，取得以上公共变量的值，并在此值的基础上加300：
+<span class="token operator">/</span><span class="token operator">/</span>源代码：
+ K174937672F20993E874DFB970BCFFEBDC0FAE6445900K = ȵ<span class="token punctuation">(</span>Ǻ<span class="token punctuation">.</span>§˳§<span class="token punctuation">.</span>§;§<span class="token punctuation">(</span>ȵ<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>K174936A5B31DB7B1424E2CBCE10F7E322C6AA2445899K<span class="token operator">+</span>300<span class="token punctuation">;</span>
+
+<span class="token operator">/</span><span class="token operator">/</span>字节码：
+findproperty Qname<span class="token punctuation">(</span>PrivateNamespace<span class="token punctuation">(</span>null<span class="token punctuation">,</span><span class="token string">"127"</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">"K174937672F20993E874DFB970BCFFEBDC0FAE6445900K"</span><span class="token punctuation">)</span>
+findpropstrict Qname<span class="token punctuation">(</span>PackageNamespace<span class="token punctuation">(</span><span class="token string">"ǹ"</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">"ȵ"</span><span class="token punctuation">)</span>
+getlex Qname<span class="token punctuation">(</span>PackageNamespace<span class="token punctuation">(</span><span class="token string">"ǻ"</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">"Ǻ"</span><span class="token punctuation">)</span>
+getproperty Qname<span class="token punctuation">(</span>PackageNamespace<span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">"˳"</span><span class="token punctuation">)</span>
+getlex Qname<span class="token punctuation">(</span>PackageNamespace<span class="token punctuation">(</span><span class="token string">"ǹ"</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">"ȵ"</span><span class="token punctuation">)</span>
+callproperty Qname<span class="token punctuation">(</span>PackageNamespace<span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">";"</span><span class="token punctuation">)</span> 1
+callproperty Qname<span class="token punctuation">(</span>PackageNamespace<span class="token punctuation">(</span><span class="token string">"ǹ"</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">"ȵ"</span><span class="token punctuation">)</span> 1
+getproperty Qname<span class="token punctuation">(</span>PackageNamespace<span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">"K174936A5B31DB7B1424E2CBCE10F7E322C6AA2445899K"</span><span class="token punctuation">)</span>
+pushshort 300
+add
+initproperty Qname<span class="token punctuation">(</span>PrivateNamespace<span class="token punctuation">(</span>null<span class="token punctuation">,</span><span class="token string">"127"</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">"K174937672F20993E874DFB970BCFFEBDC0FAE6445900K"</span><span class="token punctuation">)</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li></ul></pre>
+<h6>四、对相应条件语句做修改，从而使某些代码永远不会被执行：</h6>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;这个修改起来比较简单。</p>
+<pre class="prettyprint"><code class="prism language-powershell has-numbering">/<span class="token operator">/</span>源代码：
+ <span class="token keyword">if</span><span class="token punctuation">(</span>_loc4_ &lt; 60000<span class="token punctuation">)</span> <span class="token operator">/</span><span class="token operator">/</span>修改为：<span class="token keyword">if</span><span class="token punctuation">(</span>_loc4_ &lt; 1<span class="token punctuation">)</span>，从而使<span class="token keyword">if</span>条件语句不会被执行！
+<span class="token operator">/</span><span class="token operator">/</span>字节码：
+etlocal_3
+getlocal_3
+pushint 1    <span class="token operator">/</span><span class="token operator">/</span>原：pushint 60000
+ifnlt ofs006c
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li></ul></pre>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;修改完成后保存！经调试，成功改变了程序执行逻辑，达到了相要的效果！</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;以上工具软件，在以下地址下载：</p>
+<a href="https://download.csdn.net/download/byc6352/11887435" rel="nofollow" data-token="33b1d334b67268870004c35a4720b48f">https://download.csdn.net/download/byc6352/11887435</a>
+
+                                    </div>
+                <link href="https://csdnimg.cn/release/phoenix/mdeditor/markdown_views-e9f16cbbc2.css" rel="stylesheet">
+                    </div>
+
+
+</div>
+
+
+</body></html>

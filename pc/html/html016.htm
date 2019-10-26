@@ -1,0 +1,592 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delphi 数据类型列表 - findumars - 博客园</title>
+  <link href="images/style.css" rel="stylesheet">
+<link href="https://adservice.google.com/adsid/integrator.js?domain=" rel="preload"><script src="https://adservice.google.com/adsid/integrator.js?domain=" type="text/javascript"></script><script src="https://securepubads.g.doubleclick.net/gpt/pubads_impl_2019101701.js" async=""></script></head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div id="mainContent">
+	<div class="forFlow">
+		<div id="post_detail">
+<!--done-->
+<div id="topics">
+	<div class="post">
+		<h1 class="postTitle">
+			
+<a class="postTitle2" id="cb_post_title_url" href="https://www.cnblogs.com/findumars/p/7147604.html">Delphi 数据类型列表</a>
+
+		</h1>
+		<div class="clear"></div>
+		<div class="postBody">
+			
+<div class="blogpost-body " id="cnblogs_post_body">
+    <p>&nbsp;</p>
+<table border="1" cellpadding="2">
+<tbody>
+<tr>
+<td align="center" colspan="4">分类</td>
+<td align="center">范围</td>
+<td align="center">字节</td>
+<td align="center">备注</td>
+</tr>
+<tr>
+<td align="center" rowspan="24">简单类型</td>
+<td align="center" rowspan="17">序数</td>
+<td align="center" rowspan="9">整数</td>
+<td>Integer</td>
+<td>-2147483648 .. 2147483647</td>
+<td>4</td>
+<td>有符号32位</td>
+</tr>
+<tr>
+<td>Cardinal</td>
+<td>0 .. 4294967295</td>
+<td>4</td>
+<td>无符号32位</td>
+</tr>
+<tr>
+<td>Shortint</td>
+<td>-128 .. 127</td>
+<td>1</td>
+<td>有符号8位</td>
+</tr>
+<tr>
+<td>Smallint</td>
+<td>-32768 .. 32767</td>
+<td>2</td>
+<td>有符号16位</td>
+</tr>
+<tr>
+<td>Longint</td>
+<td>-2147483648 .. 2147483647</td>
+<td>4</td>
+<td>有符号32位</td>
+</tr>
+<tr>
+<td>Int64</td>
+<td>-2<sup>63&nbsp;</sup>.. 2<sup>63</sup></td>
+<td>8</td>
+<td>有符号64位</td>
+</tr>
+<tr>
+<td>Byte</td>
+<td>0 .. 255</td>
+<td>1</td>
+<td>无符号8位</td>
+</tr>
+<tr>
+<td>Word</td>
+<td>0 .. 65535</td>
+<td>2</td>
+<td>无符号16位</td>
+</tr>
+<tr>
+<td>Longword</td>
+<td>0 .. 4294967295</td>
+<td>4</td>
+<td>无符号32位</td>
+</tr>
+<tr>
+<td align="center" rowspan="2">字符</td>
+<td>AnsiChar(Char)</td>
+<td>ANSI字符集</td>
+<td>&nbsp;</td>
+<td>8位</td>
+</tr>
+<tr>
+<td>WideChar</td>
+<td>Unicode字符集</td>
+<td>&nbsp;</td>
+<td>16位</td>
+</tr>
+<tr>
+<td align="center" rowspan="4">布尔</td>
+<td>Boolean</td>
+<td>False &lt; True<br>Ord(False) = 0<br>Ord(True) = 1<br>Succ(False) = True<br>Pred(True) = False</td>
+<td>1</td>
+<td>&nbsp;</td>
+
+
+
+</tr>
+<tr>
+<td>ByteBool</td>
+<td rowspan="3">False &lt;&gt; True<br>Ord(False) = 0<br>Ord(True) &lt;&gt; 0<br>Succ(False) = True<br>Pred(False) = True</td>
+<td>1</td>
+<td>&nbsp;</td>
+
+
+
+</tr>
+<tr>
+<td>WordBool</td>
+<td>2</td>
+<td>&nbsp;</td>
+
+
+
+</tr>
+<tr>
+<td>LongBool</td>
+<td>4</td>
+<td>&nbsp;</td>
+
+
+
+</tr>
+<tr>
+<td align="center">枚举</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+</tr>
+<tr>
+<td align="center">子界</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+</tr>
+<tr>
+<td align="center" rowspan="7">实数</td>
+<td align="center" rowspan="7">　</td>
+<td>Real</td>
+<td>5.0×10<sup>-324</sup>&nbsp;.. 1.7×10<sup>308</sup></td>
+<td>8</td>
+<td>[精度]15..16</td>
+
+
+
+</tr>
+<tr>
+<td>Real48</td>
+<td>2.9×10<sup>-39</sup>&nbsp;.. 1.7×10<sup>38</sup></td>
+<td>6</td>
+<td>[精度]11..12;<br>向后兼容</td>
+
+
+
+</tr>
+<tr>
+<td>Single</td>
+<td>1.5×10<sup>-45</sup>&nbsp;.. 3.4×10<sup>38</sup></td>
+<td>4</td>
+<td>[精度]7..8</td>
+
+
+
+</tr>
+<tr>
+<td>Double</td>
+<td>5.0×10<sup>-324</sup>&nbsp;.. 1.7×10<sup>308</sup></td>
+<td>8</td>
+<td>[精度]15..16</td>
+
+
+
+</tr>
+<tr>
+<td>Extended</td>
+<td>3.6×10<sup>-4951</sup>&nbsp;.. 1.1×10<sup>4932</sup></td>
+<td>10</td>
+<td>[精度]19..20</td>
+
+
+
+</tr>
+<tr>
+<td>Comp</td>
+<td>-2<sup>63</sup>&nbsp;+ 1 .. 2<sup>63</sup>&nbsp;- 1</td>
+<td>8</td>
+<td>[精度]19..20</td>
+
+
+
+</tr>
+<tr>
+<td>Currency</td>
+<td>-922337203685477.5808 ..&nbsp;<br>922337203685477.5807</td>
+<td>8</td>
+<td>[精度]19..20</td>
+
+
+
+</tr>
+<tr>
+<td align="center" rowspan="4">字符串</td>
+<td align="center" rowspan="4">　</td>
+<td align="center" rowspan="4">　</td>
+<td>ShortString</td>
+<td>255个字符</td>
+<td>2..256B</td>
+<td>向后兼容</td>
+
+
+
+</tr>
+<tr>
+<td>AnsiString</td>
+<td>大约 2<sup>31</sup>&nbsp;个字符</td>
+<td>4B..2GB</td>
+<td>8位(ANSI)字符</td>
+
+
+
+</tr>
+<tr>
+<td>WideString</td>
+<td>大约 2<sup>30</sup>&nbsp;个字符</td>
+<td>4B..2GB</td>
+<td>多用户服务和<br>多语言应用程序;&nbsp;<br>和com定义的BSTR兼容</td>
+
+
+
+</tr>
+<tr>
+<td>其他</td>
+<td>String<br>String[0..255]<br>PChar<br>PAnsiString<br>PWideString</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+</tr>
+<tr>
+<td align="center" rowspan="8">结构类型</td>
+<td align="center">集合</td>
+<td align="center">　</td>
+<td>Set</td>
+<td>最多256个元素[0..255]</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+</tr>
+<tr>
+<td align="center" rowspan="2">数组</td>
+<td align="center">静态数组</td>
+<td>　</td>
+<td>　</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+</tr>
+<tr>
+<td align="center">动态数组</td>
+<td>　</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+</tr>
+<tr>
+<td align="center">记录</td>
+<td align="center">　</td>
+<td>Record</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+</tr>
+<tr>
+<td align="center">文件</td>
+<td align="center">　</td>
+<td>File</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+</tr>
+<tr>
+<td align="center">类</td>
+<td align="center">　</td>
+<td>Class</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+</tr>
+<tr>
+<td align="center">类引用</td>
+<td align="center">　</td>
+<td>Class reference</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+</tr>
+<tr>
+<td align="center">接口</td>
+<td align="center">　</td>
+<td>Interface</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+</tr>
+<tr>
+<td align="center" rowspan="2">指针类型</td>
+<td align="center">无类型指针</td>
+<td align="center">　</td>
+<td>Pointer</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+</tr>
+<tr>
+<td align="center">有类型指针</td>
+<td align="center">预定义类型指针</td>
+<td>PAnsiString<br>PString<br>PByteArray<br>PCurrency<br>PDouble<br>PExtended<br>PSingle<br>PInteger<br>POleVariant<br>PShortString<br>PTextBuf<br>PVarRec<br>PVariant<br>PWideString<br>PWordArray</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+</tr>
+<tr>
+<td align="center" rowspan="2">过程类型</td>
+<td align="center">程序过程类型</td>
+<td align="center">　</td>
+<td>Procedural</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+</tr>
+<tr>
+<td align="center">对象过程类型</td>
+<td align="center">　</td>
+<td>Procedural</td>
+<td>　</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+</tr>
+<tr>
+<td align="center" rowspan="2">变体类型</td>
+<td align="center" rowspan="2">　</td>
+<td align="center">　</td>
+<td>Variant</td>
+<td>　</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+</tr>
+<tr>
+<td align="center">　</td>
+<td>OleVariant</td>
+<td>　</td>
+<td>&nbsp;</td>
+
+
+
+</tr>
+
+
+
+</tbody>
+
+
+
+</table>
+<p>转自http://www.cnblogs.com/del/archive/2007/12/04/982167.html</p>
+</div>
+<div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block"><div id="BlogPostCategory">
+    分类: 
+            <a href="https://www.cnblogs.com/findumars/category/800995.html" target="_blank">Delphi-DataType</a></div>
+
+
+    <div id="blog_post_info">
+<div id="green_channel">
+        <a id="green_channel_digg" onclick="DiggIt(7147604,cb_blogId,1);green_channel_success(this,'谢谢推荐！');" href="javascript:void(0);">好文要顶</a>
+        <a id="green_channel_follow" onclick="follow('2c18b524-44f8-e011-b7b9-842b2b196315');" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a title="分享至新浪微博" id="green_channel_weibo" onclick="ShareToTsina()" href="javascript:void(0);"><img alt="" src="images/html01601.png"></a>
+    <a title="分享至微信" id="green_channel_wechat" onclick="shareOnWechat()" href="javascript:void(0);"><img alt="" src="images/html01602.png"></a>
+</div>
+<div id="author_profile">
+    <div class="author_profile_info" id="author_profile_info">
+            <a href="https://home.cnblogs.com/u/findumars/" target="_blank"><img class="author_avatar" alt="" src="images/html01603.png"></a>
+        <div class="author_profile_info" id="author_profile_detail">
+            <a href="https://home.cnblogs.com/u/findumars/">findumars</a><br>
+            <a href="https://home.cnblogs.com/u/findumars/followees/">关注 - 63</a><br>
+            <a href="https://home.cnblogs.com/u/findumars/followers/">粉丝 - 1128</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow">
+                <a onclick="follow('2c18b524-44f8-e011-b7b9-842b2b196315');return false;" href="javascript:void(0);">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(7147604,'Digg')">
+        <span class="diggnum" id="digg_count">0</span>
+    </div>
+    <div class="buryit" onclick="votePost(7147604,'Bury')">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+    <div class="clear"></div>
+    <div id="post_next_prev">
+
+    <a class="p_n_p_prefix" href="https://www.cnblogs.com/findumars/p/7147533.html">« </a> 上一篇：    <a title="发布于 2017-07-10 20:28" href="https://www.cnblogs.com/findumars/p/7147533.html">一个队列类的实现(比delphi自带的速度快70倍)(线程安全版本)</a>
+    <br>
+    <a class="p_n_p_prefix" href="https://www.cnblogs.com/findumars/p/7147611.html">» </a> 下一篇：    <a title="发布于 2017-07-10 20:49" href="https://www.cnblogs.com/findumars/p/7147611.html">delphi Form属性设置 设置可实现窗体无最大化，并且不能拖大拖小（写一个WM_EXITSIZEMOVE的空函数）</a>
+
+</div>
+</div>
+		</div>
+		<div class="postDesc">posted @ 
+<span id="post-date">2017-07-10 20:47</span>&nbsp;<a href="https://www.cnblogs.com/findumars/">findumars</a> Views(<span id="post_view_count">5260</span>) Comments(<span id="post_comment_count">0</span>) <a href="https://i.cnblogs.com/EditPosts.aspx?postid=7147604" rel="nofollow"> Edit</a> <a onclick="AddToWz(7147604); return false;" href="javascript:void(0)">收藏</a>
+</div>
+	</div>
+	
+	
+</div>
+<script src="https://common.cnblogs.com/highlight/9.12.0/highlight.min.js"></script>
+<script>markdown_highlight();</script>
+<script>
+    var allowComments = true, cb_blogId = 99729, cb_blogApp = 'findumars', cb_blogUserGuid = '2c18b524-44f8-e011-b7b9-842b2b196315';
+    var cb_entryId = 7147604, cb_entryCreatedDate = '2017-07-10 20:47', cb_postType = 1; 
+    loadViewCount(cb_entryId);
+</script><a name="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<script>
+    var commentManager = new blogCommentManager();
+    commentManager.renderComments(0);
+</script>
+
+<div class="commentform" id="comment_form">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav"><span id="span_refresh_tips"></span><a id="lnk_RefreshComments" onclick="return RefreshCommentList();" href="javascript:void(0);" clientidmode="Static" runat="server">刷新评论</a><a onclick="return RefreshPage();" href="#">刷新页面</a><a href="#top">返回顶部</a></div>
+    <div id="comment_form_container"><div class="login_tips">
+    注册用户登录后才能发表评论，请 
+    <a class="underline" onclick="return login('commentform');" href="javascript:void(0);" rel="nofollow">登录</a>
+     或 
+    <a class="underline" onclick="return register();" href="javascript:void(0);" rel="nofollow">注册</a>，
+    <a href="https://www.cnblogs.com/">访问</a> 网站首页。
+</div></div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+    <div id="ad_t2"><a onclick="ga('send', 'event', 'Link', 'click', 'T2-工控')" href="http://www.ucancode.com/index.htm" target="_blank">【推荐】超50万行VC++源码: 大型组态工控、电力仿真CAD与GIS源码库</a><br><a onclick="ga('send', 'event', 'Link', 'click', 'T2-京东云')" href="https://www.jdcloud.com/cn/activity/year-end?utm_source=DMT_cnblogs&amp;utm_medium=CH&amp;utm_campaign=q4vm&amp;utm_term=Virtual-Machines" target="_blank">【活动】京东云服务器_云主机低于1折，低价高性能产品备战双11</a><br><a onclick="ga('send', 'event', 'Link', 'click', 'T2-天翼云')" href="https://www.ctyun.cn/activity/#/201910/ecs?hmsr=%E7%9C%8B%E7%9C%8B-%E5%8D%9A%E5%AE%A2%E5%9B%AD-10.16-10%E6%9C%88%E7%89%B9%E6%83%A0&amp;hmpl=&amp;hmcu=&amp;hmkw=&amp;hmci=?track=|cp:cz_blog|tgdy:46861|ttjh:shouyedingbuyoucefenlan|key:czkk12|pf:pc" target="_blank">【推荐】天翼云双十一提前开抢，1核1G云主机3个月仅需59元</a><br><a onclick="ga('send', 'event', 'Link', 'click', 'T2-腾讯云')" href="https://cloud.tencent.com/act/double11/reserve?fromSource=gwzcw.3000742.3000742.3000742&amp;utm_medium=cpc&amp;utm_id=gwzcw.3000742.3000742.3000742" target="_blank">【优惠】腾讯云 11.1 1智惠上云，爆款提前购与双11活动同价</a><br><a href="https://www.getui.com/2019devfest?f=5&amp;p=10&amp;c=15&amp;ch=1&amp;hmsr=%E5%8D%9A%E5%AE%A2%E5%9B%AD&amp;hmpl=2019%E5%BC%80%E5%8F%91%E8%80%85%E8%8A%82&amp;hmcu=PC&amp;hmkw=&amp;hmci=" target="_blank">【福利】个推四大热门移动开发SDK全部免费用一年，限时抢！</a><br></div>
+    <div id="opt_under_post"></div>
+    <script src="https://www.googletagservices.com/tag/js/gpt.js" async="async"></script>
+    <script>
+        var googletag = googletag || {};
+        googletag.cmd = googletag.cmd || [];
+    </script>
+    <script>
+        googletag.cmd.push(function () {
+            googletag.defineSlot("/1090369/C1", [300, 250], "div-gpt-ad-1546353474406-0").addService(googletag.pubads());
+            googletag.defineSlot("/1090369/C2", [468, 60], "div-gpt-ad-1539008685004-0").addService(googletag.pubads());
+            googletag.pubads().enableSingleRequest();
+            googletag.enableServices();
+        });
+    </script>
+    <div class="c_ad_block" id="cnblogs_c1">
+        <div id="div-gpt-ad-1546353474406-0" style="width: 300px; height: 250px;" data-google-query-id="CIGS9ZbstuUCFcGYlgodJusPyw"><div id="google_ads_iframe_/1090369/C1_0__container__" style="border: 0pt currentColor; border-image: none;"><iframe name="google_ads_iframe_/1090369/C1_0" width="300" height="250" title="3rd party ad content" id="google_ads_iframe_/1090369/C1_0" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border: 0px currentColor; border-image: none; vertical-align: bottom;" data-load-complete="true" data-google-container-id="1" srcdoc=""></iframe></div></div>
+    </div>
+    <div id="under_post_news"><div class="recomm-block"><b>相关博文：</b><br>·  <a title="Delphi 数据类型列表" onclick="clickRecomItmem(2013707)" href="https://www.cnblogs.com/Bubalus/archive/2011/03/01/2013707.html" target="_blank">Delphi 数据类型列表</a><br>·  <a title="Delphi 数据类型列表 good" onclick="clickRecomItmem(5345897)" href="https://www.cnblogs.com/findumars/p/5345897.html" target="_blank">Delphi 数据类型列表 good</a><br>·  <a title="Delphi 数据类型列表" onclick="clickRecomItmem(982167)" href="https://www.cnblogs.com/del/archive/2007/12/04/982167.html" target="_blank">Delphi 数据类型列表</a><br>·  <a title="Delphi 数据类型列表" onclick="clickRecomItmem(3098915)" href="https://www.cnblogs.com/wwb0111/archive/2012/05/30/3098915.html" target="_blank">Delphi 数据类型列表</a><br>·  <a title="Delphi 数据类型列表" onclick="clickRecomItmem(2608943)" href="https://www.cnblogs.com/codespace/archive/2012/07/25/2608943.html" target="_blank">Delphi 数据类型列表</a><br>»  <a href="https://recomm.cnblogs.com/r?postId=7147604&amp;index=1" target="_blank">更多推荐...</a></div></div>
+    <div class="c_ad_block" id="cnblogs_c2">
+        <div id="div-gpt-ad-1539008685004-0" style="width: 468px; height: 60px;" data-google-query-id="CKCA9JbstuUCFcGYlgodJusPyw">
+            
+        <div id="google_ads_iframe_/1090369/C2_0__container__" style="border: 0pt currentColor; border-image: none;"><iframe name="google_ads_iframe_/1090369/C2_0" width="468" height="60" title="3rd party ad content" id="google_ads_iframe_/1090369/C2_0" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border: 0px currentColor; border-image: none; vertical-align: bottom;" data-load-complete="true" data-google-container-id="2" srcdoc=""></iframe></div></div>
+    </div>
+    <div id="under_post_kb">
+<div class="itnews c_ad_block">
+    <b>最新 IT 新闻</b>:
+    <br>
+ ·              <a href="//news.cnblogs.com/n/645664/" target="_blank">记录青春的人人网又回来了，情怀还能唤回用户吗？</a>
+            <br>
+ ·              <a href="//news.cnblogs.com/n/645663/" target="_blank">谷歌造出AI调香师：看一眼分子结构，就知道它闻起来什么味儿</a>
+            <br>
+ ·              <a href="//news.cnblogs.com/n/645662/" target="_blank">网传Keep裁员 Keep回应：合理优化80-120人</a>
+            <br>
+ ·              <a href="//news.cnblogs.com/n/645661/" target="_blank">星环科技完成约5亿元D2轮融资，中金资本等参投</a>
+            <br>
+ ·              <a href="//news.cnblogs.com/n/645660/" target="_blank">亚马逊市值蒸发800亿 贝索斯：继续烧钱</a>
+            <br>
+    » <a title="IT 新闻" href="https://news.cnblogs.com/" target="_blank">更多新闻...</a>
+</div></div>
+    <div class="c_ad_block" id="HistoryToday">
+<b>历史上的今天：</b>
+<br>
+
+2017-07-10    <a href="https://www.cnblogs.com/findumars/p/7147533.html">一个队列类的实现(比delphi自带的速度快70倍)(线程安全版本)</a>
+    <br>
+2017-07-10    <a href="https://www.cnblogs.com/findumars/p/7147523.html">Delphi7下安装TMS component控件</a>
+    <br>
+2016-07-10    <a href="https://www.cnblogs.com/findumars/p/5658210.html">Delphi通过GetFileVersionInfo和VerQueryValue等API函数取得详细EXE信息</a>
+    <br>
+2016-07-10    <a href="https://www.cnblogs.com/findumars/p/5657069.html">StrPCopy与StrPas功能正好相反，作用是与C语言字符串和Delphi的String相互转化</a>
+    <br>
+2016-07-10    <a href="https://www.cnblogs.com/findumars/p/5657049.html">半年五起收购 思科密集整合欲自我救赎（创新都来自小而美的公司，思科不想扼杀这股创新力）</a>
+    <br>
+</div>
+    <script type="text/javascript">
+        fixPostBody();
+        setTimeout(function () { incrementViewCount(cb_entryId); }, 50);
+        deliverAdT2();
+        deliverAdC1();
+        deliverAdC2();
+        loadNewsAndKb();
+        loadBlogSignature();
+LoadPostCategoriesTags(cb_blogId, cb_entryId);        LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+        GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+        loadOptUnderPost();
+        GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+    </script>
+</div></div>
+
+
+	</div><!--end: forFlow -->
+	</div>
+
+</div>
+
+
+</body></html>
