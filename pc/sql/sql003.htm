@@ -1,0 +1,125 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ACCESS查询当天数据的SQL语句(DateDiff函数) - 清山博客 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                                <div class="article-copyright">
+                <span class="creativecommons">
+                <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                    </a>
+            <span>
+                版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。            </span>
+               <div class="article-source-link2222">
+                    本文链接：<a href="https://blog.csdn.net/a497785609/article/details/6547154">https://blog.csdn.net/a497785609/article/details/6547154</a>
+                </div>
+            </span>
+                    </div>
+                                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            <p><span class="Apple-style-span" style="color: rgb(0, 0, 0); text-transform: none; text-indent: 0px; letter-spacing: normal; word-spacing: 0px; border-collapse: separate; font-size-adjust: none; font-stretch: normal;"><span class="Apple-style-span" style="color: rgb(51, 51, 51); line-height: 24px; font-size: 12px;">
+</span></span></p><p>ACCESS语句：</p>
+<p>select * from&nbsp;数据表 where (DateDiff('d',日期字段,Date())=0) &nbsp;</p>
+<p>语法</p>
+<p>DateDiff(interval, date1, date2 [, firstdayofweek] [, firstweekofyear] )</p>
+<p>DateDiff 函数的语法包含以下参数<span class="AsstInlineDefText"><span class="ACICollapsed" id="divInlineDef_870250506_1"><span class="Apple-converted-space">&nbsp;</span>（参数:为操作、事件、方法、属性、函数或过程提供信息的值。）</span></span>：</p>
+<div class="cntIndent0" id="tableoverflow" style="line-height: 24px; margin-left: auto;">
+<div class="table-box"><table class="collapse" border="0"><tbody><tr class="trbgeven"><th><strong class="bterm">参数</strong></th><th><strong class="bterm">说明</strong></th>
+</tr><tr class="trbgodd"><td>interval</td>
+<td>必选。该表达式为用于计算 date1 和 date2 之间的差的时间间隔。</td>
+</tr><tr class="trbgeven"><td>date1, date2</td>
+<td>必选。变量型（日期型）。表示两个要用于计算的日期。</td>
+</tr><tr class="trbgodd"><td>firstdayofweek</td>
+<td>可选。常量<span class="AsstInlineDefText"><span class="ACICollapsed" id="divInlineDef_53825377_3"><span class="Apple-converted-space">&nbsp;</span></span></span>，指定一周的第一天。如果不指定，则默认为星期日。</td>
+</tr><tr class="trbgeven"><td>firstweekofyear</td>
+<td>可选。常量，指定一年的第一周。如果不指定，则第一周默认为 1 月 1 日所在的周。</td>
+</tr></tbody></table></div></div>
+<p>设置</p>
+<p>interval 包含以下设置：</p>
+<div class="cntIndent0" style="line-height: 24px; margin-left: auto;">
+<div class="table-box"><table class="collapse" border="0"><tbody><tr class="trbgeven"><th><strong class="bterm">设置</strong></th><th><strong class="bterm">说明</strong></th>
+</tr><tr class="trbgodd"><td>yyyy</td>
+<td>年</td>
+</tr><tr class="trbgeven"><td>q</td>
+<td>季度</td>
+</tr><tr class="trbgodd"><td>m</td>
+<td>月</td>
+</tr><tr class="trbgeven"><td>y</td>
+<td>某年的某一天</td>
+</tr><tr class="trbgodd"><td>d</td>
+<td>天</td>
+</tr><tr class="trbgeven"><td>w</td>
+<td>工作日</td>
+</tr><tr class="trbgodd"><td>ww</td>
+<td>周</td>
+</tr><tr class="trbgeven"><td>h</td>
+<td>时</td>
+</tr><tr class="trbgodd"><td>n</td>
+<td>分</td>
+</tr><tr class="trbgeven"><td>s</td>
+<td>秒</td>
+</tr></tbody></table></div></div>
+<p>firstdayofweek 参数包含以下设置：</p>
+<div class="cntIndent0" style="line-height: 24px; margin-left: auto;">
+<div class="table-box"><table class="collapse" border="0"><tbody><tr class="trbgeven"><th><strong class="bterm">常量</strong></th><th><strong class="bterm">值</strong></th><th><strong class="bterm">说明</strong></th>
+</tr><tr class="trbgodd"><td>vbUseSystem</td>
+<td>0</td>
+<td>使用 NLS API 设置。</td>
+</tr><tr class="trbgeven"><td>vbSunday</td>
+<td>1</td>
+<td>星期日（默认）</td>
+</tr><tr class="trbgodd"><td>vbMonday</td>
+<td>2</td>
+<td>星期一</td>
+</tr><tr class="trbgeven"><td>vbTuesday</td>
+<td>3</td>
+<td>星期二</td>
+</tr><tr class="trbgodd"><td>vbWednesday</td>
+<td>4</td>
+<td>星期三</td>
+</tr><tr class="trbgeven"><td>vbThursday</td>
+<td>5</td>
+<td>星期四</td>
+</tr><tr class="trbgodd"><td>vbFriday</td>
+<td>6</td>
+<td>星期五</td>
+</tr><tr class="trbgeven"><td>vbSaturday</td>
+<td>7</td>
+<td>星期六</td>
+</tr></tbody></table></div></div>
+<div class="cntIndent0" style="line-height: 24px; margin-left: auto;">
+<div class="table-box"><table class="collapse" border="0"><tbody><tr class="trbgeven"><th><strong class="bterm">常量</strong></th><th><strong class="bterm">值</strong></th><th><strong class="bterm">说明</strong></th>
+</tr><tr class="trbgodd"><td>vbUseSystem</td>
+<td>0</td>
+<td>使用 NLS API 设置。</td>
+</tr><tr class="trbgeven"><td>vbFirstJan1</td>
+<td>1</td>
+<td>从 1 月 1 日所在的周开始（默认）。</td>
+</tr><tr class="trbgodd"><td>vbFirstFourDays</td>
+<td>2</td>
+<td>从至少包含新年中四天的第一周开始。</td>
+</tr><tr class="trbgeven"><td>vbFirstFullWeek</td>
+<td>3</td>
+<td>从一年的第一个全周开始。</td>
+</tr></tbody></table></div></div>
+<p>注解</p>
+<p>可以使用 DateDiff 函数确定在两个日期之间存在多少指定的时间间隔。例如，可以使用 DateDiff 计算两个日期之间的天数或今天到年末之间的周数。</p>
+<p>若要计算 date1 和 date2 之间的天数，可以使用“某年的某一天”(“y”) 或“天”(“d”)。当 interval 为“工作日”(“w”) 时，DateDiff 返回两个日期之间的周数。如果 date1 为星期一，则 DateDiff 会计算 date2 之前的星期一的个数。它会将 date2 计算在内，但不会将 date1 计算在内。但是，如果 interval 为“周”(“ww”)，DateDiff 函数将返回两个日期之间的日历周数。它会计算 date1 和 date2 之间的星期日的个数。如果 date2 为星期日，则 DateDiff 会将其计算在内；但即使 date1 为星期日，也不会将其计算在内。</p>
+<p>如果 date1 引用了比 date2 晚的时间点，则 DateDiff 函数返回一个负数。</p>
+<p>firstdayofweek 参数会影响使用“w”和“ww”间隔符号的计算。</p>
+<p>如果 date1 或 date2 为日期文本<span class="AsstInlineDefText"><span class="ACICollapsed" id="divInlineDef_400165243_5"><span class="Apple-converted-space">&nbsp;</span>（日期文本:具有有效格式的任意字符序列，两边由编号符号 (#) 括起。有效格式包括由代码的区域设置指定的日期格式或通用的日期格式。）</span></span>，则指定的年会成为日期的永久部分。但是，如果 date1 或 date2 括在双引号 (" ") 中，并且省略了年份，则每次计算 date1 或 date2 表达式时，当前年份都会插入代码中。这样即可编写用于不同年份的代码。</p>
+<p>将 12 月 31 日与来年的 1 月 1 日相比较时，对于“年”("yyyy")，即使仅过去一天，DateDiff 也返回 1。</p>
+<p><span>&nbsp;注释&nbsp;</span>&nbsp;&nbsp; 对于 date1 和 date2，如果 Calendar 属性设置为公历，则提供的日期必须为公历。如果日历为回历，则提供的日期必须为回历。</p>
+                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>

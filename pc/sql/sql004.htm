@@ -1,0 +1,79 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Access时间日期比较查询的方法总结 - qhzhen的博客 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            <p style="margin-left: 3pt;"><span style="color: rgb(35, 35, 35);">Access日期时间比较查询语句困扰过很多网友，种豆网整理了一下Access日期比较查询的几种方法，假定数据表明为TblName，日期/时间字段名为FDate(这里不能讲FDate设置为字符串，否则比较查询结果不正确）。</span></p>
+
+<h2 style="margin-left: 4.5pt;"><a name="t0"></a><strong><strong><span style="color: rgb(35, 35, 35);"><strong>1.Access数据表日期字段同日期字符串直接比较</strong></span></strong></strong></h2>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(35, 35, 35);">以下是查询2012年12月12日以后的数据的SQL语句。</span></p>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(0, 0, 0);">select&nbsp;*&nbsp;from TblName&nbsp;</span><span style="color: rgb(0, 0, 255);">where</span><span style="color: rgb(0, 0, 0);">&nbsp;DFDate&gt;#</span><span style="color: rgb(128, 0, 128);">2012</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">12</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">12</span><span style="color: rgb(0, 0, 0);">#</span></p>
+
+<p style="margin-left: 0pt;"><strong><span style="color: rgb(35, 35, 35);"><strong>注意：</strong></span></strong><span style="color: rgb(35, 35, 35);">Access日期查询时，表示日期的字符串前后要加#</span></p>
+
+<h2 style="margin-left: 4.5pt;"><a name="t1"></a><strong><strong><span style="color: rgb(35, 35, 35);"><strong>2.Access数据表日期字段同日期类型变量直接比较</strong></span></strong></strong></h2>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(35, 35, 35);">这种方法其实等同于方法一，以下是查询比当前日期（如2012-12-12）早10天的数据的SQL语句。</span></p>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(0, 0, 0);">DateTime queryDate=DateTime.Now.AddDays(-</span><span style="color: rgb(128, 0, 128);">10</span><span style="color: rgb(0, 0, 0);">);</span><br><span style="color: rgb(0, 0, 255);">string</span><span style="color: rgb(0, 0, 0);">&nbsp;sql&nbsp;=&nbsp;</span><span style="color: rgb(128, 0, 0);">"select * from TblName where DFDate&gt;#"</span><span style="color: rgb(0, 0, 0);">+queryDate+</span><span style="color: rgb(128, 0, 0);">"#"</span><span style="color: rgb(0, 0, 0);">;</span></p>
+
+<h2 style="margin-left: 4.5pt;"><a name="t2"></a><strong><strong><span style="color: rgb(35, 35, 35);"><strong>3.使用DateDiff函数对Access日期字段比较查询</strong></span></strong></strong></h2>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(35, 35, 35);">DateDiff，语法如下：</span></p>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(35, 35, 35);">DateDiff( 间隔字符, 日期1, 日期2 [,firstdayofweek[, firstweekofyear]])</span></p>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(35, 35, 35);">通常只需要使用以下方式</span></p>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(35, 35, 35);">DateDiff( 间隔字符, 日期1, 日期2)</span></p>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(35, 35, 35);">这个函数比较的结果是“日期2-日期1”，如果日期1晚于日期2，就会返回负数，其中间隔字符有以下几种表示方式：</span></p>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(128, 0, 0);">"yyyy"</span><span style="color: rgb(0, 0, 0);">&nbsp;比较年份</span><br><span style="color: rgb(128, 0, 0);">"d"</span><span style="color: rgb(0, 0, 0);">&nbsp; &nbsp; 比较日期</span><br><span style="color: rgb(128, 0, 0);">"m"</span><span style="color: rgb(0, 0, 0);">&nbsp; &nbsp; 比较月份</span></p>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(35, 35, 35);">示例如下：</span></p>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(0, 0, 0);">select DateDiff(&nbsp;</span><span style="color: rgb(128, 0, 0);">"d"</span><span style="color: rgb(0, 0, 0);">, #</span><span style="color: rgb(128, 0, 128);">2012</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">12</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">12</span><span style="color: rgb(0, 0, 0);">#, #</span><span style="color: rgb(128, 0, 128);">2012</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">12</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">2</span><span style="color: rgb(0, 0, 0);">#)</span><br><span style="color: rgb(0, 0, 0);">SQL查询结果是：-</span><span style="color: rgb(128, 0, 128);">10</span><span style="color: rgb(0, 0, 0);">，表示前面的日期比后面的日期晚10天</span><br><br><span style="color: rgb(0, 0, 0);">select DateDiff(&nbsp;</span><span style="color: rgb(128, 0, 0);">"m"</span><span style="color: rgb(0, 0, 0);">, #</span><span style="color: rgb(128, 0, 128);">2012</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">10</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">12</span><span style="color: rgb(0, 0, 0);">#, #</span><span style="color: rgb(128, 0, 128);">2012</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">12</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">2</span><span style="color: rgb(0, 0, 0);">#)</span><br><span style="color: rgb(0, 0, 0);">SQL查询结果是：</span><span style="color: rgb(128, 0, 128);">2</span><span style="color: rgb(0, 0, 0);">，表示前面的日期比后面的日期早两个月</span><br><br><span style="color: rgb(0, 0, 0);">select DateDiff(&nbsp;</span><span style="color: rgb(128, 0, 0);">"yyyy"</span><span style="color: rgb(0, 0, 0);">, #</span><span style="color: rgb(128, 0, 128);">2012</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">10</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">12</span><span style="color: rgb(0, 0, 0);">#, #</span><span style="color: rgb(128, 0, 128);">2010</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">12</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">2</span><span style="color: rgb(0, 0, 0);">#)</span><br><span style="color: rgb(0, 0, 0);">SQL查询结果是：-</span><span style="color: rgb(128, 0, 128);">2</span><span style="color: rgb(0, 0, 0);">，表示前面的日期比后面的日期晚两年</span></p>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(35, 35, 35);">以下是Access使用DateDiff函数查询2012年12月12日以后的数据的SQL语句。</span></p>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(0, 0, 0);">select&nbsp;*&nbsp;from TblName&nbsp;</span><span style="color: rgb(0, 0, 255);">where</span><span style="color: rgb(0, 0, 0);">&nbsp;DateDiff(&nbsp;</span><span style="color: rgb(128, 0, 0);">"d"</span><span style="color: rgb(0, 0, 0);">, DFDate, #</span><span style="color: rgb(128, 0, 128);">2012</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">12</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">12</span><span style="color: rgb(0, 0, 0);">#)&lt;</span><span style="color: rgb(128, 0, 128);">0</span></p>
+
+<h2 style="margin-left: 4.5pt;"><a name="t3"></a><strong><strong><span style="color: rgb(35, 35, 35);"><strong>4.使用DateDiff函数查询Access日期字段等于某个日期的SQL语句</strong></span></strong></strong></h2>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(35, 35, 35);">假定数据库中某条记录的FDate=2012-12-12 12:12:12</span></p>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(35, 35, 35);">以下语句的查询结果为0条记录，因为数据库中还包含时间信息，而查询条件中无时间信息。</span></p>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(0, 0, 0);">select&nbsp;*&nbsp;from TblName&nbsp;</span><span style="color: rgb(0, 0, 255);">where</span><span style="color: rgb(0, 0, 0);">&nbsp;FDate=#</span><span style="color: rgb(128, 0, 128);">2012</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">12</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">12</span><span style="color: rgb(0, 0, 0);">#</span></p>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(35, 35, 35);">如果想得到正确的查询结果（1条记录），则需要使用以下SQL语句查询（查询日期为2012年12月12日的数据记录）。</span></p>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(0, 0, 0);">select&nbsp;*&nbsp;from TblName&nbsp;</span><span style="color: rgb(0, 0, 255);">where</span><span style="color: rgb(0, 0, 0);">&nbsp;DateDiff(&nbsp;</span><span style="color: rgb(128, 0, 0);">"d"</span><span style="color: rgb(0, 0, 0);">, FDate, #</span><span style="color: rgb(128, 0, 128);">2012</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">12</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">12</span><span style="color: rgb(0, 0, 0);">#)&nbsp;&lt;=</span><span style="color: rgb(128, 0, 128);">0</span><span style="color: rgb(0, 0, 0);">&nbsp;AND DateDiff(&nbsp;</span><span style="color: rgb(128, 0, 0);">"d"</span><span style="color: rgb(0, 0, 0);">, FDate, #</span><span style="color: rgb(128, 0, 128);">2012</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">12</span><span style="color: rgb(0, 0, 0);">-</span><span style="color: rgb(128, 0, 128);">12</span><span style="color: rgb(0, 0, 0);">#)&gt;=</span><span style="color: rgb(128, 0, 128);">0</span></p>
+
+<h2 style="margin-left: 4.5pt;"><a name="t4"></a><strong><strong><span style="color: rgb(35, 35, 35);"><strong>5.要查询出签收时间在处理时间的第二天的14:00:00以前的数据</strong></span></strong></strong></h2>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(0, 0, 0);">Select 签收时间,CDate(Format(DateAdd(</span><span style="color: rgb(128, 0, 0);">"d"</span><span style="color: rgb(0, 0, 0);">,&nbsp;</span><span style="color: rgb(128, 0, 128);">1</span><span style="color: rgb(0, 0, 0);">,处理时间),</span><span style="color: rgb(128, 0, 0);">"yyyy-mm-dd"</span><span style="color: rgb(0, 0, 0);">)+</span><span style="color: rgb(128, 0, 0);">"&nbsp;14:00:00"</span><span style="color: rgb(0, 0, 0);">) from 表&nbsp;</span><span style="color: rgb(0, 0, 255);">where</span><span style="color: rgb(0, 0, 0);">&nbsp;签收时间&nbsp;&lt;&nbsp;CDate(Format(DateAdd(</span><span style="color: rgb(128, 0, 0);">"d"</span><span style="color: rgb(0, 0, 0);">,&nbsp;</span><span style="color: rgb(128, 0, 128);">1</span><span style="color: rgb(0, 0, 0);">, 处理时间),</span><span style="color: rgb(128, 0, 0);">"yyyy-mm-dd"</span><span style="color: rgb(0, 0, 0);">)+</span><span style="color: rgb(128, 0, 0);">"&nbsp;14:00:00"</span><span style="color: rgb(0, 0, 0);">)</span></p>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(35, 35, 35);">下面的语句查询出签收时间在当天或是在第二天的14:00:00之前的所有数据</span></p>
+
+<p style="margin-left: 0pt;"><span style="color: rgb(0, 0, 0);">select&nbsp;*&nbsp;from table&nbsp;</span><span style="color: rgb(0, 0, 255);">where</span><span style="color: rgb(0, 0, 0);">&nbsp;DATEDIFF(D,CONVERT(datetime,[处理时间],</span><span style="color: rgb(128, 0, 128);">120</span><span style="color: rgb(0, 0, 0);">),CONVERT(datetime,[签收时间],</span><span style="color: rgb(128, 0, 128);">120</span><span style="color: rgb(0, 0, 0);">))&lt;</span><span style="color: rgb(128, 0, 128);">1</span><span style="color: rgb(0, 0, 0);">&nbsp;or （ DATEDIFF(D,CONVERT(datetime,[处理时间],</span><span style="color: rgb(128, 0, 128);">120</span><span style="color: rgb(0, 0, 0);">),CONVERT(datetime,[签收时间],</span><span style="color: rgb(128, 0, 128);">120</span><span style="color: rgb(0, 0, 0);">))=</span><span style="color: rgb(128, 0, 128);">1</span><span style="color: rgb(0, 0, 0);">&nbsp;and DATEPART(HOUR,CONVERT(datetime,[签收时间],</span><span style="color: rgb(128, 0, 128);">120</span><span style="color: rgb(0, 0, 0);">))&lt;</span><span style="color: rgb(128, 0, 128);">14</span><span style="color: rgb(0, 0, 0);">&nbsp;）</span></p>
+
+<p style="margin-left: 0pt;">&nbsp;</p>                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>

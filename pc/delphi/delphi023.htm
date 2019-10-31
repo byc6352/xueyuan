@@ -1,0 +1,267 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delphi 编译指令与说明 - rznice的专栏 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            
+<div class="bct fc05 fc11 nbw-blog ztag js-fs2">
+<p><span style="color: rgb(0, 128, 128);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>{$IFDEF WIN32}</strong></span> </p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 对于Delphi来说﹐左右大括号之间的内容是批注﹐然而 <strong><span style="color: rgb(0, 128, 128);">{$</span></strong> (左括号后紧接着货币符号)对于Compiler(编译器)而言并不是批注﹐而是写给Compiler看的特别指示。</p>
+<p><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: rgb(0, 0, 255);"><strong>应用时机与场合</strong><br></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Delphi中有许许多多的<span style="color: rgb(255, 0, 0);"><strong>Compiler Directives</strong></span>(编译器指令)﹐这些编译指令对于我们的程序发展有何影响呢? 它们又能帮我们什么忙呢?<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong><span style="color: rgb(255, 0, 0);">Compiler Directive</span></strong> 对程序开发的影响与助益, 可以从以下几个方向来讨论:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img alt="" src="images/delphi02301.gif">&nbsp;
+<strong>协助除错</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img alt="" src="images/delphi02302.gif">&nbsp;
+<strong>版本分类<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img alt="" src="images/delphi02303.gif">&nbsp;
+<strong>程序的重用与管理</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img alt="" src="images/delphi02304.gif">&nbsp;
+<strong>设定统一的执行环境</strong></p>
+<p><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong><span style="color: rgb(0, 0, 0);">协助除错<br></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 稳健熟练的程序设计师经常会在开发应用系统的过程中﹐特别加入一些除错程序或者回馈验算的程序﹐这些除错程序对于软件品质的提升有极其正面的功能。然而开发完成的正式版本中如果不需要这些额外的程序的话﹐要想在一堆程序中找出哪些是除错用的程序并加以删除或设定为批注﹐不仅累人﹐而且容易出错﹐况且日后维护时这些除错程序还用得着。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 此时如果能够应用像是<strong><span style="color: rgb(0, 128, 128);">{</span><span style="color: rgb(0, 128, 128);">$IFDEF}</span></strong>的<strong><span style="color: rgb(255, 0, 0);">Compiler Directives</span></strong> ﹐就可以轻易的指示Delphi要/不要将某一段程序编进执行文件中。同时﹐Compiler本身也提供了一些错误检查的开关﹐可以预先对程序中可能的问题提醒程序设计师注意﹐同样有助于撰写正确的程序。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>版本分类<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 除了上述的除错版本/正式版本的分类之外﹐对于像是「试用版」「普及版」「专业版」的版本分类﹐也可以经由<span style="color: rgb(255, 0, 0);"><strong>Compiler Directive</strong></span>的使用﹐为最后的产品设定不同的使用权限。其它诸如「中文版」「日文版」「国际标准版」等全球版本管理方面﹐同样也可以视需要指示Delphi特别连结哪些资源档或者是采用哪些适当的程序。以上的两则例子中﹐各版本间只需共享同一份程序代码即可。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 组件资源文件(.DCR)即是其中一例﹐两者的档案格式并不兼容﹐在您读过本文之后﹐相信可以写出这样的程序﹐指示Delphi在不同的版本采用适当的资源文件以利于组件的安装。<br><strong><span style="color: rgb(0, 128, 128);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$IFDEF WIN32} <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$R XXX32.DCR} <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$ELSE} <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$R XXXX16.DCR} <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$EDNIF}</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 程序的重用与管理<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 经过前文的讨论后﹐相信你已经不难看出<strong><span style="color: rgb(255, 0, 0);">Compiler Directives</span></strong>在程序管理上的应用价值。对于原始程序的重用与管理﹐也是<strong><span style="color: rgb(255, 0, 0);">Compiler Directives</span></strong> 使得上力的地方. 举例来说:
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Pascal-Style字符串之间的明显差异﹐除了原先的短字符串之外﹐之后还多了更为方便使用的长字符串﹐同时﹐系统也额外提供了像是 Trim() 这样的字符串处理函式。假如您有一个字符串处理单元必须要同时应用于Delphi不同的项目时﹐编译指示器可以帮你的忙。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;此外﹐透过像是<strong><span style="color: rgb(0, 128, 128);">{$I xxxx}</span></strong> 这样的 <span style="color: rgb(255, 0, 0);">
+<strong>Compiler Directives</strong></span>﹐我们也可以适当的含入某些程序, 同样有助于切割组合我们的程序或编译设定。<br><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设定一致的执行环境<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 项目小组的成员间﹐必须有共同的环境设定﹐我很难预料一个小组成员间彼此有不同的<strong><span style="color: rgb(0, 128, 128);">{$B}{$H}{$X}</span></strong>设定﹐最后子系统在并入主程序时会发生什么事。此外, 当您写好一个组件或单元需要交予第三者使用时, 使用编译指示器也可以保证元件使用者与您有相同的编译环境。<br></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong><span style="color: rgb(0, 0, 255);">使用Compiler Directives</span></strong></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>指令语法</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: rgb(255, 0, 0);"><strong>Compiler Directives</strong></span>从外表看起来与批注颇为类似, 与批注不同的是,<span style="color: rgb(255, 0, 0);"><strong>Compiler Directives</strong></span>的语法格式都是以
+<strong><span style="color: rgb(0, 128, 128);">{$ </span></strong>开始, 不空格紧接一个名称(或一个字母)表明给Compiler的特别指示, 再加上其它的开关或参数内容, 最后以右大括号作为指令的结束, 例如:<br><strong><span style="color: rgb(0, 128, 128);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$B+}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$R-}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$R MyCursor.res}</span></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 同时, 就如同Pascal的变量名称与保留字一样, <strong><span style="color: rgb(255, 0, 0);">Compiler Directives</span></strong>也是不区分大小写的。从指令的语法格式来说<strong><span style="color: rgb(255, 0, 0);">Compiler Directives</span></strong>﹐可以进一步分类成以下三种格式:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1,&nbsp; <strong>开关指令(Switch directives)</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 这类指令都是单一字母以不空格的方式连接「+」或「-」符号; 或者是开关名称以一个空格后连接「ON」或「OFF」来表示作用/关闭某一个编译指示开关。例如:<br><strong><span style="color: rgb(0, 128, 128);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$A+}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$ALIGN ON}</span></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 开关型的编译指令不一定要分行写, 它们可以组合在同一个编译指示的批注符号之间,但必须以逗号连接, 而且中间不可以有空格, 例如:<br><strong><span style="color: rgb(0, 128, 128);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$B+,H+,T-,J+}<br></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 光标停留在程序编辑器的任一位置时按下Ctrl+O O, 完整的<span style="color: rgb(255, 0, 0);"><strong>Compiler Directives</strong></span>将会全部列于Unit的最上方。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2, <strong>参数指令(Parameter directives)</strong> <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 有些Compiler Directives需要在编译名称后面连接自定的参数(文件名称或指定的记忆体大小), 例如:&nbsp;<strong><span style="color: rgb(0, 128, 128);">{$R MyCursor.res}</span></strong>, 即在指示Delphi在编译连结时, 含入「MyCursor.res」这个资源档。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3, &nbsp;<strong>条件指令(Conditional directives)</strong> <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 指示Compiler在编译的过程中, 按我们设定的条件, 选择性的采用/排除不同区域的程序代码。以下是一个条件编译的例子, 第一与第三列是写给Compiler看的,指示 Compiler在 __DEBUG这个条件名称完成定义的情况才编译ShowMessage()这列程序;反之, 如果 __DEBUG 当时没有定义的话, 这段程序几乎与批注无异, Compiler对它将视而不见。
+<br><strong><span style="color: rgb(0, 128, 128);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$IFDEF __DEBUG}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ShowMessage(IntToStr(i));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$ENDIF}<br></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img alt="" src="images/delphi02305.gif">&nbsp;<strong>如何从IDE改变Compiler directives设定</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 从Delphi的IDE程序整合发展环境, 我们很方便的就可以修改各个compiler directives的设定, 方法是:从Delphi IDE主选单: Project/Options/Compiler, 直接核选/取消各个CheckBox。值得注意的是, 改变一个项目的Compiler directives并不会影响其它的项目, 换言之,各个项目都保有自己一套编译指示。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 假如您希望其它的项目也采用相同一套的Compiler directives, 在上述Project Options对话盒的左下方有一个「Default」选项, 选取这个CheckBox之后, 虽然对于既有的项目没有作用, 但未来新的项目都将可以采用这组设定作为默认值。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img alt="" src="images/delphi02306.gif"><strong>将Compiler directives写入程序<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 透过Delphi的整合环境设定Compiler directives的确十分简便, 但是许多情况下我们仍然需要将Compiler directive直接加到程序中。至少有两个原因支持我们这么作:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong> 局部控制编译条件<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 在Project/Options/Compiler中所作的设定, 影响所及是整个项目, 如果某一段程序要特别使用不同的编译设定, 就必须直接将编译指示加到程序中。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 下列这段取自Online Help的程序范例, 即应用了{$I}编译指令局部控制在发生I/O错误时不要举发例外讯息, 这样, 我们就可以编译出一支在这段程序区域中不会产生I/O例外讯息的档案侦测函数。<br><strong>function</strong> FileExists(FileName: string): Boolean;<br><strong>var</strong><br>
+&nbsp; F: file;<br><strong>begin<br></strong>&nbsp; <span style="color: rgb(0, 128, 128);">{$I-}<br></span>&nbsp; AssignFile(F, FileName);<br>
+&nbsp; FileMode := 0;&nbsp; ( Set file access to read only }<br>
+&nbsp; Reset(F);<br>
+&nbsp; CloseFile(F);<br>
+&nbsp; <span style="color: rgb(0, 128, 128);">{$I+}<br></span>&nbsp; FileExists := (IOResult = 0) and (FileName &lt;&gt; '');<br><strong>end</strong>;&nbsp; { FileExists }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>程序的可移植性</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 我们都可能会用到其它公司或个人创作的unit或component, 也可能分享程序给其它人, 换句话说, 单元或程序可能会在不同的机器上编译, 直接将Compiler directives加入程序, 不仅可以免去程序使用前需要特别更改IDE的麻烦, 更重要的是解决了各个单元间要求不同编译环境的歧异。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: rgb(255, 0, 0);">注意事项<br></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Compiler directives的作用与影响范围如同变量的可见范围与生命周期, 在我们使用 Compiler Directives 时也必须注意各个Compiler Directives 的作用范围.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Compiler Directives的作用范围可分为以下两种:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1,全域的<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 全域的Compiler Directives, 影响所及是整个项目; 我们稍早前提到经由Delphi IDE改变Compiler directives的方式就属于全域的设定。<br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; 2,区域的<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 而区域的Compiler Directives 影响所及只从Compiler Directives 改变的那一行开始,&nbsp;直到该程序单元(Unit)的结束或另一个相同的Compiler Directives 为止, 对其他的程序单元并没有影响。也就是说, 如果在unit中特别加入Compiler directives, Compiler会优先采用区域的设定, 然后才是属于项目层级的全域设定。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 值得一提的是, 在程序中直接加入Compiler directives的最大作用范围也只限于当时那个单元而已, 对其他单元并没有任何影响, 即使是以uses参考也是一样。也就是说, 我们可以透过uses参考其它unit公开的变量与函式, 但是各个unit的编译指令并不会互相参考。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 这项独立的性质, 使得unit之间编译环境的设定与关系变得十分简洁, 例如Delphi 2.0的VCL都是在<strong><span style="color: rgb(0, 128, 128);">{$H+}</span></strong>的情况下编译的, 因此, VCL中的字符串都是以长字符串的型态编译而成的, 有了这项编译指令独立的特性, 不论我们Prject中的设定为何, 这些在VCL中定义过的字符串都是长字符串。我们的Project也不会因为uses了VCL中的unit而改变了自己的设定。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 因此, 在我们移交程序到网络上时, 大可以放心的在程序中加入必要的Compiler directives, 别担心, 即使别的unit以uses参考了我们的程序, 也不影响它自己原来的设定。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 如果我们自行以<span style="color: rgb(0, 128, 128);"><strong>{$DEFINE _DEBUGVERSION} </strong>
+</span><span style="color: rgb(0, 0, 0);">(</span>$DEFINE在稍后的个别指令介绍中将有说明)定义了一个条件符号, 这个新的条件符号也是区域的, 换句话说, 它只从定义的那一个单元的那一列之后才成立, 当然, 也只对目前这个单元有效.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 由于自订的条件符号只有区域的作用, 如果有好几个程序单元都需要参考到某一个条件符号, 怎么办呢? 嗯! 在每一个程序单元开头处中都加上编译指示是最直接的方式, 可是略嫌麻烦, 特别是编译指示有变时, 要一一修正各个单元的设定内容, 很容易因为疏忽而出错。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 比较简易可行的作法是从Delphi IDE整合发展环境的主选单-Project / Options / Directories/Conditional 的 Conditionals 中填入条件名称。这样, 相对于项目的各个unit而言, 就有了一个全域的条件符号。 或者, 您也可以参考本文对于{$I}这个Compiler Directive的说明。 我在那里指出了另一个弹性的解决方式。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 修改过编译指令后, 建议Build All过一次程序.&nbsp;&nbsp; 请试一试这个程序:<br><strong>procedure</strong> TForm1.Button1Click(Sender: TObject);<br><strong>begin</strong><br>
+// ifopt是用来侦测某一个编译开关的作用状态<br><span style="color: rgb(0, 128, 128);">{$ifopt H+}<br></span>&nbsp; ShowMessage('H+');<br><span style="color: rgb(0, 128, 128);">{$else}<br></span>&nbsp; ShowMessage('H-');<br><span style="color: rgb(0, 128, 128);">{$endif}<br></span><strong>end;</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 在我们执行上述程序时, 在Delphi预设的是$H+时, ShowMessage()会在画面上会显示「H+」, 执行过后, 让程序与form的内容与位置保留不变, 单纯的从主选单:&nbsp;Project/Options/Compiler, 将Huge Strings的核对方块清除($H-),
+<br>
+然后按下F9执行, 咦! 怎么还是看到「H+」?! 那是因为Delphi只会在unit内容经过异动后才会重新将.PAS编译成.DCU, 在我们的例子中, 程序并没有变动, .DCU当然也没有重新产生, 最后.EXE的这个部分自然也是没什么变化。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 所以, 要解决这个问题, 只要以Delphi IDE主选单Project/Build All指示Delphi重新编译全部的程序即可。因此, 如果您从Delphi IDE修改过Compiler Directives后, 记得要Build All喔!<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>不应该用来作为程序执行流程控制</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 在程序中, 我们可以使用if叙述, 根据执行当时的情况控制程序执行时的流程, 但我们不可以用{$IFDEF}来作同样的事, 为什么? 从上述的说明, 相信您不难发现, Compiler directives会对最后.EXE的内容发生直接的影响, 应用像是{$IFDEF}指示Compiler的结果, 几乎可以视同授权Compiler在编译的那个时候自动选用/舍弃程序到.DCU, .EXE中, 换句话说, 在程序编译完成时, 会执行到那一段程序已成定局了, 我们自然不能用它来作程序流程的控制。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>条件编译的嵌套最多可以16层<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 在使用{$IFDEF}…{$ENDIF}条件编译我们的程序时, 一个{$IFDEF}中可以再包含另一个{$IFDEF}, 但深度最多只能16层, 虽然是个限制, 但以正常的情形来说, 这应该已经足够了。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>有些Compiler directives不应写在Unit中<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 对于像是{$MINSTACKSIZE}{$MAXSTACKSIZE}管理堆栈大小, 或者像是{$APPTYE}指示程序编译成图形/文字模式的Compiler directives, 只能写在.DPR中, 写在Unit中是没有效果的。<br><span style="color: rgb(255, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 建议事项</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1,确定您了解指令的影响<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 由于编译指令的影响是如此直接与深远, 在修改与应用某一个Compiler directive时, 请确定您已经了解其含意与影响。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2,打开全部的侦错开关<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Delphi有关侦错的Compiler directives如下:<br><strong><span style="color: rgb(0, 128, 128);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; $HINTS ON<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; $D+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;$L+<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$Q+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $R+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$WARNINGS ON<br></span></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 各指令的用法您可以参阅本章稍后对个别指令的说明, 全部打开这些开关吧! 这样不仅让您可以使用Delphi IDE的除错器, 对于程序编译与执行过程中的问题,&nbsp;Delphi也会适时的反应, 有助于写作正确的程序。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 此处有一个迷惑有待澄清-「加入Dubug信息会不会让执行文件变大变慢啊?」, 不一定。对于们像是$D+, $L+, $HINTS ON这些开关, 打开后, Delphi在编译时的确会额外加入一些除错信息, 使得.DCU的档案变大, 对于.EXE的档案大小并没有影响; 同时, 程序的执行速度也没有改变, 还可以应用IDE的除错器trace我们的程序, 值得应用。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 对于像是$Q, $R等Compiler directive, 的确会影响执行文件的大小与速度, 然而这并不动摇我们在研发期间使用它们的决定, 请想想看, 值得为这一点点的速度放弃程序的正确性吗? 当然, 程序开发完成后, 正式出货的版本, 可以关闭这两个开关。<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 如果您写好了一个组件, 而且只预备提供.DCU, 由于没有.PAS可供Delphi IDE的Debugger追踪程序, 除错开关反而应该在组件脱手前关闭并重新编译.DCU, 否则会引起使用者那边找不到档案的例外讯息。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>善用{$I}<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$I FileName}是一个非常有用的Compiler directive.应用这个指令, 我们可以弹性的管理Compiler directive的设定。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>条件名称请加入前导符</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 不知道您有没有这个疑问 -- 如果用{$DEFINE}定义的条件名称与变量名称相同时会发生什么事? <br><strong>procedure</strong> TForm1.Button1Click(Sender: TObject);<br><strong>var</strong><br>
+&nbsp; TEST: integer;<br><strong>begin</strong><br>
+{$DEFINE TEST}<br>
+{$IFDEF TEST}<br>
+&nbsp;&nbsp; ShowMessage('Test');<br>
+{$ENDIF}<br><strong>end;<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 以上的程序编译与执行都没有问题, 但条件名称与变量名称重复毕意容易让人混淆, 因此,假如能适当的为编译条件名称之前加上诸如底线(_TEST), 程序会比较容易阅读。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>设定一致的编译环境<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 在您了解了Compiler Directives之后, 请立即开始着手修改您IDE中有关编译指示的各个开关并且设为Default, 这样, 日后您的项目乃至整个研发小组都将拥有共同一致的编译环境, 对于写出来的程序会以何种方式编译连结都了然于胸, 直接有助于子系统顺利并入主系统中。</p>
+<p><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>个别指令说明</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 有了之前对于Compiler directives的观念之后, 接下来的这一节我将一一介绍几个常用的Compiler Directive的用法与注意事项, 您可以从这一节中学到更多有关Compiler directives的知识与使用细节。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$A+} 字段对齐<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 在{$A+}(默认值)的情形下, 如果没有使用 packed 修饰词宣告的 record 型态, 其字段会以CPU可以有效存取的方式向 1. 2. 4 等边界对齐, 以获取最佳的存取速度。以下列的程序示例来说:<br><span style="color: rgb(0, 128, 128);">{$A+}</span><br><strong>type</strong><br>
+&nbsp; MyRecord = record<br>
+&nbsp;&nbsp;&nbsp; ByteField: byte;<br>
+&nbsp;&nbsp;&nbsp; IntegerField: integer;<br>
+&nbsp; <strong>end;<br></strong>…<br><strong>procedure</strong> TForm1.Button1Click(Sender: TObject);<br>
+begin<br>
+&nbsp; ShowMessage(IntToStr(SizeOf(MyRecord)));<br><strong>end;</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ShowMessage在{$A+}时显示的结果是:「8」; 倘若是{$A-}, 那所得的结果是「5」, </p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 按理说, Byte应该只要一个byte就足够了, 但是考虑到硬件的执行特性, 经过对齐后的record会有比较好的执行速度。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 有关这个Compiler Directive要注意的事项是: 不管{$A}的开关是ON或OFF, 使用packed修饰过的记录宣告, 是一定不会对齐的. 例如:
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MyRecord = packed record // 不会对齐的记录宣告方式<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>{$APPTYPE GDI} 应用程序型态<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 一般的情形下, Delphi会以{$APPTYPE GUI}的方式产生一个图形的使用者接口程序, 如果您需要产生一个文字屏幕模式的程序, 那可以经由:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 在.DPR中加入{$APPTYPE CONSOLE}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 从主选单: Project/Options/Linker/EXE and DLL Options, 核取 「Generate Console Application」Check Box。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>其它有关这个Compiler Directive的注意事项有:<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;$APPTYPE不能应用在DLL的项目或单一的程序单元(Unit), 它只对.EXE有意义。而且只有写在.DPR中才有作用。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;我们可以应用System程序单元中的IsConsole函数在程序执行时侦测应用程序的类型。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 参阅Object Pascal手册第十三章可以知道更多有关Console Mode Application的信息。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>{$B-} 布尔评估</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 请看以下的程序:<br>
+&nbsp;<strong> if</strong> (Length(sCheckedDateString) &lt;&gt; 8)<br>
+&nbsp;&nbsp;&nbsp; <strong>or</strong> EmptyStr(sCheckedDateString)<br>
+&nbsp;&nbsp;&nbsp; <strong>or</strong> (sCheckedDateString = '&nbsp; .&nbsp; .&nbsp; ')<br>
+&nbsp;&nbsp;&nbsp; <strong>or</strong> (sCheckedDateString = '&nbsp; /&nbsp; /&nbsp; ') <strong>then<br>
+&nbsp; begin<br></strong>&nbsp;&nbsp;&nbsp; Result := True;<br>
+&nbsp;&nbsp;&nbsp; Exit;<br>
+&nbsp; <strong>end;<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 假如sCheckedDateString的字符串内容是「85/12/241」(长度9)的话, 以上的if述句, 其实在第一个逻辑判断时就已经知道结果了, 即使不看后来的逻辑运算结果也知道整个式子会是真值。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 假如您希望对整个逻辑表达式进行完整的评估 -- 尽管结果已知, 后来的逻辑运算也不影响整个的结果时仍要全部评估过, 请将这个Compiler directives设为{$B+}, 反之, 请设为{$B-}, 系统的默认值是{$B-}。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>{$D+} 除错信息</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 当程序以{$D+}(默认值)编译时, 我们可以用Delphi整合发展境境的Debugger设定断点, 也可以使用Trace Into或Trace Info追踪程序的执行过程, 值得注意的是, 以{$D+}编译的程序, 执行的速度并不会受到影响, 只不过编译过的DCU的档案长度会加大, 但EXE档的大小不变。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>&nbsp;&nbsp; {$DEFINE条件名称} 定义条件名称<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 随着您对Compiler Directives的了解与应用程度的加深, 您会发现这是一个非常实用的编译指示。经常, 我们会因为除错需要﹑区别不同版本等缘故, 希望选择性的采用或排除某一段程序, 这个时候, 我们就可以先以$DEFINE定义好一个条件名称(Conditional name),&nbsp;然后配合{$IFDEF条件名称}…{$ELSE}…{$ENDIF}指示编译器按指定的条件名称之有无来选择需要编译的程序。以下列的程序片断来说:<br><span style="color: rgb(0, 128, 128);">{$DEFINE _ProVersion}</span><br>
+…<br><strong>procedure</strong> TForm1.Button1Click(Sender: TObject);<br><strong>begin<br></strong><span style="color: rgb(0, 128, 128);">{$IFDEF _Proversion}<br></span>&nbsp;&nbsp; frmPrint.ShowModal;&nbsp; // A<br><span style="color: rgb(0, 128, 128);">{$ELSE}<br></span>&nbsp;&nbsp; ShowMessage('很抱歉, 试用版不提供打印功能');<br><span style="color: rgb(0, 128, 128);">{$ENDIF}</span><br><strong>end;<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 编译器将会选择编译上述A的那列程序, 日后, 如果我们需要编译「简易版」的程序版本时, 只要: 将{$DEFINE _ProVersion}那列整个删掉。 或者, 将{$DEFINE _ProVersion}改成{-$DEFINE _ProVersion}, 让它变成普通的批注 或者, 在{$DEFINE _ProVersion}的下一列加上{$UNDEF _ProVersion}, 解除_ProVersion这个条件名称的定义。<br>
+这样, 由于_ProVersion这个条件名称未定义的缘故, Compiler就只会选择{$ELSE}下的那段程序, 重新编译一次, 不需费太多力气, 很容易的就可以制作出「简易版」了, 省去了要同时维护两份程序的麻烦。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: rgb(255, 0, 0);">使用$DEFINE时的其它注意事项如下:<br></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 以{$DEFINE}定义的条件名称都是区域的。换句话说, 它的作用范围只在当时所在的单元才有效, 即使定义在unit的interface, 由其它的unit以uses参考也没有效, 仍然只有在目前的unit有作用。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;此外, 它的作用范围是从定义起, 到unit结尾或者以{$UNDEF}解除为止。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 如果程序单元中已经用{$DEFINE}定义了一个条件名称, 而且也没有用{$UNDEF}解除定义, 重新{$DEFINE}一个同样名称并没有作用, 换句话说, 它们是同一个.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;假如需要一个全域的条件名称, 您可以:主选单: Project / Options / Directories/Conditional 的 Conditionals 中填入条件名称。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;以下的标准条件名称, 是Delphi 已经预先预备好的, 我们可以直接引用, 同时, 它们都是全域的, 任何Unit都可以参照得到。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VER90: Delphi Object Pascal的版本编号。90表示9.0版, 日后若出现9.5版时, 也会有VER95的定义。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WIN32: 指出目前是在Win32(95, NT)作业环境<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;CUP386: 采用386(含)以上的CPU时, 系统会提供本条件名称。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CONSOLE: 此符号会于应用程序是在屏幕模式下编译时才定义。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>{$DESCRIPTION&nbsp; 描述内容}</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 应用{$DESCRIPTION}可以指定加入一段文字到.EXE或.DLL表头的模块描述进入点(module description entry)中﹐通常我们会用这个Compiler Directive加入应用程序的名称与版本编号到.EXE中。例如:<br><strong><span style="color: rgb(0, 128, 128);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$DESCRIPTION Dchat Version 1.0}<br></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$X+}&nbsp; 扩充语法</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 这是为了与之前的Pascal版本前向兼容的编译指令, 虽然设定这个开关型的指令仍有作用, 但笔者建议您大可保留系统的默认值{$X+}, 在{$X+}下:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;不需要非得准备一个变量接受函数的传回值, 换句话说, 函数的传回值可以舍弃, 此时, 就可以像是呼叫程序一样, 很方便的呼叫函数。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;支持Pchar型态与零基的字符数组作为C语言以Null结尾的字符串。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>{$HINTS OFF}&nbsp; 提示讯息</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 打关{$HINTS}开关后, Compiler会提示程序设计师注意以下的情况:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;变量定义了却没有使用<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 程序流程中不会执行的for或while循环<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;只有存入没有取用的指定叙述。意思是说, 指定数据到某一个变量之后,&nbsp;却没有任何的程序参考取用这个变量值。<br><span style="color: rgb(0, 128, 128);">{$HINTS ON}<br></span><strong>procedure</strong> MyTest;<br><strong>const</strong> _False = False;<br><strong>var<br></strong>&nbsp; I, J: integer;<br><strong>begin<br>
+&nbsp; if</strong> _False <strong>then<br>
+&nbsp;&nbsp;&nbsp; for</strong> I := 1 <strong>to</strong> 3 <strong>do</strong> ;<br>
+&nbsp; J := 3;<br><strong>end;<br></strong><span style="color: rgb(0, 128, 128);">{$HINTS OFF}</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 由于程序简单, 在两个$HINTS中间的程序, 我们不难看出:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;for循环不会执行到, I 变量也因此不曾用过<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;J := 3写了等于白写<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 但在程序越写越长而日趋复杂时, 藉由{$HINTS ON}的协助, 比较容易察觉出程序的毛病。<br><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$IFDEF} {$IFNDEF}</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 请参阅{$DEFINE}的说明, 在此补充说明{$IFNDEF}, 以下列程序来说, 即在指示Compiler在_Test未定义时, 条件编译ShowMessage()那列程序:<br>
+{$IFNDEF _TEST}<br>
+&nbsp; ShowMessage('_TEST not define');<br>
+{$ENDIF}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 换言之, {$IFNDEF}相当于{$IFDEF}的{$ELSE}部分。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>{$IFOPT 开关}</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 到底{$B}是开着或关着呢? 如果我们想要指示Compiler按照某一个编译开关当时的状态作我们指定的事, 应该该怎么做呢? 这时, {$IFOPT}就派得上用场了。例如:<br><span style="color: rgb(0, 128, 128);"><strong>{$R+}<br>
+{$Q-}</strong>&nbsp; // 特别指定为Q-<br><strong>{$IFOPT R+}</strong> // 如果 Range Check 是开启的话<br>
+&nbsp; ShowMessage('程序是在 Range Check 开启状态下编译的');<br>
+&nbsp; // 这个 Q+ 也会在 IFOPT R+ 成立时才通知 Compiler<br>
+&nbsp;<strong> {$Q+}<br>
+{$ENDIF}<br>
+{$IFOPT Q+}</strong><br>
+&nbsp; ShowMessage('Q 也变成开启状态了');<br><strong>{$ENDIF}</strong></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ShowMessage() 与 {$Q+}会在$R+ 的情形下才编译, 因此, 虽然我们事前特别指示为{$Q-}, 第二个的ShowMessage()在程序执行时也可以看到「Q 也变成开启状态了」。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>{$IMAGEBASE档案基础地址}</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 这个Compiler directive用来指示.EXE或.DLL加载时的预设地址。例如: {$IMAGEBASE $00400000}。如果指定加载的地址空间之前已经有其它模块占用了, Windows会为.EXE重新配置一个新的加载地址。对于.DLL来说, 如果可以成功配置到我们写在{$IMAGEBASE}的地址, 由于不需要重新配置内存地址, 不仅加载的速度较快, 如果有其它程序也参照到这个DLL的话, 也可以减少加载时间与内存的消耗。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: rgb(255, 0, 0);">使用这个Compiler directive时需要注意的事项有:<br></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;指定的叙述必须是一个大于$00010000的32位整数数值, 同时, 较低位置的16个位必须是零。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;DLL的建议地址范围从$40000000到$7FFFFFFF, 该范围的地址可以同时适用于Windows 95与Windows NT。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>{$I文件名称} 含入档案</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 以Delphi IDE修改Compiler directives的确相当方便, 但往往我们仍然需要将Compiler directives直接加入程序中, 可是当我们这样作之后不用多久, 就会发现要一一重新修改各个单元中的这些Compiler directives时, 实在是既无聊而又容易出错的工作。这时候, 假如您一开始就采用{$I文件名称}, 整件事就会变得很简单。怎么做呢?
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 让我用一个例子告诉您&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;先用一般的文书编辑器建好一个MySet.inc的普通文本文件, 内容为:<br><span style="color: rgb(0, 128, 128);">{$H+}<br>
+{$DEFINE _Proversion}</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 在我们的程序中, 加入一列{$I MySet.inc}, 例如:<br><strong>unit</strong> Unit1;<br><span style="color: rgb(0, 128, 128);">{$I MySet.inc}</span></p>
+<p><strong>interface<br></strong>…<br><strong>implementation</strong></p>
+<p><span style="color: rgb(0, 128, 128);">{$R *.DFM}</span></p>
+<p><strong>procedure</strong> TForm1.Button1Click(Sender: TObject);<br><strong>begin<br></strong><span style="color: rgb(0, 128, 128);">{$IFDEF _ProVersion}<br></span>&nbsp; ShowMessage('专业版');<br><span style="color: rgb(0, 128, 128);">{$Else}</span><br>
+&nbsp; ShowMessage('只有专业版才有此功能');<br><span style="color: rgb(0, 128, 128);">{$ENDIF}</span><br><strong>end;</strong><br>
+…<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 这是子程序的观念嘛! 没错, 就是这么简单而已, 以后如果有任何变化, 修改MySet.INC,&nbsp;然后Project/Buile All即可, 实在是够简单的了。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 基本动作会了之后, 让我告诉你多一点有关{$I文件名称}的事。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;一旦应用了{$I文件名称}, 几乎等于Compiler在编译时, 让Compiler将这个档案的内容贴进我们的程序中的那个位置。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;如果没有注明扩展名, Delphi预设这个档案是.PAS。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;如果在项目的目录中找不到这个档案的话, Delphi会陆续搜寻Tools/Options/Library中的Library Path中的目录。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 另外, 当您写作了一个DLL, 使用者在使用其中的函数前必须宣告过, 如果能够一并提供这些函数的宣告文件, 使用者只要一行{$I xxx}即可, 是不是很方便呢?<br><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$I+}&nbsp; EInOutError检查<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 在{$I+}(系统默认值)状态编译的程序, 一旦发生I/O错误时, 将会举发一个EInOutError的例外, 假如我们在特定的情况下不希望出现这个例外的讯息时(例如前文提到的侦测档案是否存在函数), 可以将这个Compiler directive设为{$I-}, 此时, 程序执行时是否发生过错误,程序设定师必须自行检查IOResult这个公用变量的值, 如果是零, 表示没有错误, 非零的错误代码含意请详查Online help。<br><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$L文件名称} 连结目标文件<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 如果您有一个.OBJ文件要并入Delphi的程序时, 可以在程序中加入:{$L OTHER.OBJ} .这样, 就可以使用OTHER.OBJ中的程序了, 值得注意的是, 函数或程序在呼叫前, 仍然必须用external宣告过, 表明这些模块是来自「外部」的函式。举例来说, 笔者有一份由Keypro厂商提供的.OBJ檔, 在使用时, 相关的程序如下:<br>
+…<br><span style="color: rgb(0, 128, 128);">{$L hasptpw.obj}</span><br><span style="color: rgb(0, 128, 128);">{$F+}</span><br><strong>procedure</strong> hasp (Service, SeedCode, LptNum, Pass1, Pass2 : word;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; var p1,p2,p3,p4 : word); <strong>external</strong>;<br><span style="color: rgb(0, 128, 128);">{$F-}<br></span>…<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 经过{$L hasptpw.obj}宣告之后, 程序的其它部分就可以直接呼叫原先位于 hasptpw.obj中的hsap这个程序了。<br><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$L+} 区域符号信息</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 在{$L+}时, Delphi会额外加入一些区域符号信息, 这使得我们可以应用Delphi IDE中的View/Call Stack, View/Watch在程序执行时检视变量内容与函式呼叫的关系。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 应用这个Compiler directive的注意事项有:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;{$D-}时, {$L+}不会有作用。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;使用{$L+}, 只会加大.DCU的档案大小, 对.EXE的大小与执行速度并没有影响。<br><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$H+} 长字符串宣告</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 好用的长字符串, 不仅没有资料长度255的限制, 与C语言惯用的Null-terminated string兼容性也大为提高。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 使用{$H}时的注意事项有:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;{$H+}的编译情形下, 以string定义的字符串变量都是长字符串, 请注意, 字符串是否为长字符串是在字符串定义时决定的, 例如:<br><strong>procedure</strong> TForm1.Button1Click(Sender: TObject); <br><span style="color: rgb(0, 128, 128);">{$H-}<br></span><strong>var</strong><br>
+&nbsp; s: string;<br><strong>begin</strong><br><span style="color: rgb(0, 128, 128);">{$H+}</span><br>
+&nbsp; s := '测试一下长字符串';<br>
+&nbsp; Windows.MessageBox(0, pchar(s), '讯息', 64);<br><strong>end;<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 由于var前{$H-}的缘故, 虽然在begin后我们立即设定为{$H+}, 但s仍然是一个短字符串, 所以, 自然不能像是长字符串一样, 以pchar强制型别转换后当作Null-terminated字符串使用。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;承上, 不管程序是{$H+}或{$H-}, 只要字符串是以长字符串方式定义的, 即使begin..end;中改成{$H-}, 该字符串的操作仍然具有长字符串的特性。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 因此, 由于VCL中的字符串都是长字符串, 即使我们的程序是{$H-}, 仍然可以拿它们当长字符串来使用。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;不论{$H}的状态如何, 以AnsiString定义的一定是长字符串; 以string[n]或ShortString定义的一定是短字符串。<br><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$M 16386, 1048576} 内存配置大小<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 要改变唯叠(Stack)内存配置大小时, 我们可以有以下两种选择:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;使用{$MINSTACKSIZE数字}, {$MAXSTACKSIZE数字}, 分别指定最小.最大的Stack大小.&nbsp;或者使用{$M min, max}, 同时指定最小与最大的值。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 使用这些Compiler directive时的注意事项有:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1,写在.DPR中才有效果。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2,&nbsp;堆栈的最小数字必须介于1024至21474835647之间。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3,&nbsp;堆栈的最大数字必须介于$MINSTACKSIZE至21474835647之间。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4,&nbsp;当内存不足而无法满足最小的堆栈大小时, Windows会在激活这程序时提出错误报告。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5,&nbsp;当程序要求的内存超过$MINSTACKSIZE的大小时, 将举发EStackOverflow例外。<br><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$Z1} 最小列举大小</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 这个Compiler directive将影响储存列举型态时最小所需的byte数值。如果宣告列举型态时, 数值不大于256, 而且也在系统预设的{$Z1}时, 这个列举型态只占用一个byte储存的。{$Z2}时, 以两个byte储存, {$Z4}时, 以四个byte储存。因为C语言通常以WORD或DWORD储存列举型态, 如果您的程序需要与C、C++沟通时,{$Z2}{$Z4}就很管用了<br>
+{$Z+}, 与{$Z-}分别对应到{$Z1}和{$Z4}。<br><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$P+} 开放字符串参数</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 在程序与函数宣告时, 其中的字符串自变量, 在{$P+}时表示是Open string; {$P-}时,只是一般的字符串变量而已。这个Compiler directive只在{$H-}时有作用。<br><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$O+} 最佳化开关<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 建议您维持{$O+}的系统默认值。开启这个Compiler directive, Delphi会自动进行最佳化处理, 程序可以因此跑得快一些, 您可以放心的打开这个编译开关, Delphi不会进行不安全的最佳化而使您的程序执行时发生错误。<br><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$Q-} 满溢检查, {$R-} 范围检查<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$Q}与{$R}是一组搭配使用的Compiler directive, 它们将检查数值或数组的操作是否在安全的边界中, {$Q}会检查整数运算(如+, -, Abs, Sqr, Pred, Succ等), 而{$R}则检查字符串与数组的存取是否超出合理边界范围等问题。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 使用这两个Compiler directives会因为这些检查动作而降低程序执行的速度, 通常我们会在除错时开启这两个编译开关。<br><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$U-} Pentium CPU浮点运算安全检查</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 还记得早期Pentium CPU浮点运算不正确的事吧? 这批CPU应该回收得差不多了, 但如果您仍然不确定程序会不会意外的遇到漏网之鱼或黑心牌经销商的话, 请将这个Compiler directives设为{$U+}。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 根据Borland手册的说明, 如果CPU是没有暇疵的, 设定{$U+}对于执行速度只有轻微的影响; 但如果是问题CPU, 浮点的除法速度会因此慢上三倍, 是否要打开这个开关, 您心中应该已有取舍。<br><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$R文件名称} 资源档<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 在您还没有开始学习Compiler directives之前, 这个指令就已经出现在您的程序中了,每次开出一个新的form时, Delphi自动在Implement开头部分中加入{$R *.DFM}, 在Project/Source中看到的.DPR程序中也有{$R *.RES}, 这些是什么意思呢? 意思是说, 在编译连结时, 含入与项目主档名同名的.RES, 以及与form unit档案同名的.DFM等资源档。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 如果您需要在程序中使用额外的资源(例如: 自订鼠标指针), 请注意不要自行以Resouse WorkShop或Image Editor等资源编辑器更改这些与Project或Form同名的资源档, 改变这些同名的档案不仅无效, 可能还有不可预期的错误。因些, 您应该在另外一个资源档中存放这些资源, 并于{$R}中写明档案的名称将其连结进来, 例如:<span style="color: rgb(0, 128, 128);">{$R MyCursor.res}</span><br><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$T-} @指针型态检查</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 应用@操作数可以取得变量的地址, 在{$T-}时, 以@取得是一个无型别的指针(Pointer)。反过来说, 在{$T+}时, 是有型别的指针, 假定I是一个integer的变量, @I所得到的即是相当于^Integer(Pointer of Integer)的指针。<br><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {$WARNINGS ON} 编译器警告<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 这个Compiler directive与{$HINTS}的作用类似, 同样会对程序的可能问题提出警告。不同的是, 在{$WARNINGS ON}时, Compiler会对未初始化的变量、没有传回值的函数、建构抽象对象等情况提出警告。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>{$J-} 型态常数只读<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 从前笔者曾经对以下的程序产生过疑惑:<br><span style="color: rgb(0, 128, 128);">{$J+}</span><br><strong>procedure</strong> TForm1.Button1Click(Sender: TObject);<br><strong>const</strong><br>
+&nbsp; VarConst: integer = 4;<br><strong>begin</strong><br>
+&nbsp; VarConst := 5;<br>
+&nbsp; ShowMessage(IntToStr(VarConst));<br><strong>end;<br></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const不是常数吗? 为什么可以改呢? 在先前的Pascal版本中, 以const VarName: DataType = const value;<br>
+定义的具型态常数的确是可以改的, 假如您希望常数就是常数, 它不应该允许修改, 请将这个Compiler directive设为{$J-}不论是{$J+}或{$J-}, 以const VarName = const value; 定义的常数(没有加上型别宣告), 是一个真正的常数, 其它的程序不可以改变其内容。其实{$J+}时还有一个妙用, 那就是宣告出类似C语言static的变量, 换句话说, 产生了一个与Application相同生命周期的变量。在这种情形下, 变量只在第一次使用时才会建立, 函数或程序结束时,
+ 该变量也不会消灭, 下一次再呼叫到这个函数或程序时, 我们仍然可以参考到上次执行结束时的值。让我们试一下这个例子:<br><span style="color: rgb(0, 128, 128);">{$J+}<br></span><strong>procedure</strong> TForm1.Button1Click(Sender: TObject);<br><strong>const</strong><br>
+&nbsp; i: integer = 0;<br><strong>begin</strong><br>
+&nbsp; ShowMessage(IntToStr(i));<br>
+&nbsp; Inc(i);<br>
+&nbsp; ShowMessage(IntToStr(i));<br><strong>end;</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 第一次执行时, 我们分别会看到「0」「1」, 再点一次这个按钮时, 看到的将是「1」「2」。</p>
+</div>
+<br>                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>
