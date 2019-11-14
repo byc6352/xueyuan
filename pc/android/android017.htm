@@ -1,0 +1,224 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PCM数据的采集和播放 - cyq7on的博客 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                                <div class="article-copyright">
+                <span class="creativecommons">
+                <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                    </a>
+            <span>
+                版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。            </span>
+               <div class="article-source-link2222">
+                    本文链接：<a href="https://blog.csdn.net/cyq7on/article/details/79691769">https://blog.csdn.net/cyq7on/article/details/79691769</a>
+                </div>
+            </span>
+                    </div>
+                                                    <!--一个博主专栏付费入口-->
+             
+             <!--一个博主专栏付费入口结束-->
+            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-d284373521.css" rel="stylesheet">
+                                        <div class="markdown_views" id="content_views">
+                    <!-- flowchart 箭头图标 勿删 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-linecap="round" d="M 5 0 L 0 2.5 L 5 5 Z" />
+                    </svg>
+                                            <h1 id="一初识pcm"><a name="t0"></a>一、初识PCM</h1>
+
+<p>以下介绍来自<a href="https://baike.baidu.com/item/PCM%E7%BC%96%E7%A0%81/10865033" rel="nofollow" data-token="4a659e7baeed1c5579665bebd87d4e86">百度百科</a></p>
+
+<blockquote>
+  <p>PCM 脉冲编码调制是Pulse Code Modulation的缩写。脉冲编码调制是数字通信的编码方式之一。主要过程是将话音、图像等模拟信号每隔一定时间进行取样，使其离散化，同时将抽样值按分层单位四舍五入取整量化，同时将抽样值按一组二进制码来表示抽样脉冲的幅值。</p>
+</blockquote>
+
+<p>简而言之，语音、图像经过采样、量化之后进行二进制编码，最后得到的二进制码即为PCM数据。</p>
+
+
+
+<h1 id="二android平台上的实现"><a name="t1"></a>二、Android平台上的实现</h1>
+
+
+
+<h2 id="1采集"><a name="t2"></a>1、采集</h2>
+
+<p>对于音频的采集使用AudioRecord：</p>
+
+<blockquote>
+  <p>The AudioRecord class manages the audio resources for Java applications <br>
+   to record audio from the audio input hardware of the platform</p>
+</blockquote>
+
+<p>AudioRecord用于管理音频源，从音频输入硬件记录音频。 <br>
+下面开始一步步来实现：</p>
+
+
+
+<h3 id="权限"><a name="t3"></a>权限</h3>
+
+
+
+<div class="top-box hide"><div class="alert-info"></div></div><div class="top-box hide"><div class="alert-info"></div></div><div class="top-box hide"><div class="alert-info"></div></div><pre class="prettyprint prettyprinted" name="code" data-original-code='<uses-permission android:name="android.permission.RECORD_AUDIO" />&#10;<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />' data-snippet-id="ext.e2286a9daad682bda3b2080c56e3f889" data-snippet-saved="false" data-codota-status="done"><code class="hljs xml has-numbering"><span class="hljs-tag">&lt;<span class="hljs-title">uses-permission</span> <span class="hljs-attribute">android:name</span>=<span class="hljs-value">"android.permission.RECORD_AUDIO"</span> /&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">uses-permission</span> <span class="hljs-attribute">android:name</span>=<span class="hljs-value">"android.permission.WRITE_EXTERNAL_STORAGE"</span> /&gt;</span></code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li></ul></pre>
+
+
+
+<h3 id="创建文件"><a name="t4"></a>创建文件</h3>
+
+
+
+<div class="top-box hide"><div class="alert-info"></div></div><div class="top-box hide"><div class="alert-info"></div></div><div class="top-box hide"><div class="alert-info"></div></div><pre class="prettyprint prettyprinted" name="code" data-original-code='audioFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +&#10;                "/test.pcm");&#10;if (audioFile.exists()) {&#10;    audioFile.delete();&#10;}&#10;audioFile.createNewFile();&#10;OutputStream os = new FileOutputStream(audioFile);' data-snippet-id="ext.81c604ac5dfe1d7d89546ada48cc7a71" data-snippet-saved="false" data-codota-status="done"><code class="hljs avrasm has-numbering">audioFile = new File(Environment<span class="hljs-preprocessor">.getExternalStorageDirectory</span>()<span class="hljs-preprocessor">.getAbsolutePath</span>() +
+                <span class="hljs-string">"/test.pcm"</span>)<span class="hljs-comment">;</span>
+if (audioFile<span class="hljs-preprocessor">.exists</span>()) {
+    audioFile<span class="hljs-preprocessor">.delete</span>()<span class="hljs-comment">;</span>
+}
+audioFile<span class="hljs-preprocessor">.createNewFile</span>()<span class="hljs-comment">;</span>
+OutputStream os = new FileOutputStream(audioFile)<span class="hljs-comment">;</span></code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li></ul></pre>
+
+<p>创建的PCM文件用于存储采集的音频，输出流用于将音频数据写入到文件。</p>
+
+
+
+<h3 id="创建audiorecord对象"><a name="t5"></a>创建AudioRecord对象</h3>
+
+<p>AudioRecord有两个构造方法，其中一个被<strong>@SystemApi</strong>标记，故一般使用另外一个：</p>
+
+
+
+<div class="top-box hide"><div class="alert-info"></div></div><div class="top-box hide"><div class="alert-info"></div></div><div class="top-box hide"><div class="alert-info"></div></div><pre class="prettyprint prettyprinted" name="code" data-original-code="public AudioRecord(int audioSource, int sampleRateInHz, &#10;    int channelConfig, int audioFormat,int bufferSizeInBytes)" data-snippet-id="ext.08dd68426dc0b5a68b5ba6ac8d7dfc60" data-snippet-saved="false" data-codota-status="done"><code class="hljs cs has-numbering"><span class="hljs-keyword">public</span> <span class="hljs-title">AudioRecord</span>(<span class="hljs-keyword">int</span> audioSource, <span class="hljs-keyword">int</span> sampleRateInHz, 
+    <span class="hljs-keyword">int</span> channelConfig, <span class="hljs-keyword">int</span> audioFormat,<span class="hljs-keyword">int</span> bufferSizeInBytes)</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li></ul></pre>
+
+<ul>
+<li>audioSource <br>
+记录源，在 MediaRecorder.AudioSource中可看到所有类型，此处传入MediaRecorder.AudioSource.MIC。</li>
+<li>sampleRateInHz <br>
+采样频率，单位Hz，常见的有44100，22050、16000,、和11025 ，其中44100可以保证在所有设备上正常工作，此处取该值。</li>
+<li>channelConfig <br>
+音频通道设置，有AudioFormat.CHANNEL_IN_MONOAudioFormat.CHANNEL_IN_STEREO，前者可以保证在所有设备上正常工作，此处取该值。</li>
+<li>audioFormat <br>
+音频格式，有AudioFormat.ENCODING_PCM_8BIT、AudioFormat.ENCODING_PCM_16BIT和AudioFormat.ENCODING_PCM_FLOAT，精度依次递增，此处取16bit。</li>
+<li>bufferSizeInBytes <br>
+缓冲区大小，单位是byte，可调用以下方法获取：</li>
+</ul>
+
+
+
+<div class="top-box hide"><div class="alert-info"></div></div><div class="top-box hide"><div class="alert-info"></div></div><div class="top-box hide"><div class="alert-info"></div></div><pre class="prettyprint prettyprinted" name="code" data-original-code="getMinBufferSize(int sampleRateInHz, int channelConfig, int audioFormat)" data-snippet-id="ext.e22e2cddb068811616aa8a99e980f761" data-snippet-saved="false" data-codota-status="done"><code class="hljs cs has-numbering">getMinBufferSize(<span class="hljs-keyword">int</span> sampleRateInHz, <span class="hljs-keyword">int</span> channelConfig, <span class="hljs-keyword">int</span> audioFormat)</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+
+<p>###开始记录</p>
+
+
+
+<div class="top-box hide"><div class="alert-info"></div></div><div class="top-box hide"><div class="alert-info"></div></div><div class="top-box hide"><div class="alert-info"></div></div><pre class="prettyprint prettyprinted" name="code" data-original-code="audioRecord.startRecording();&#10;byte bytes[] = new byte[minBufferSize];&#10;while (isRecord) {&#10;    int length = audioRecord.read(bytes, 0, minBufferSize);&#10;    if (length > 0) {&#10;         os.write(bytes);&#10;    }&#10;}" data-snippet-id="ext.01edaac5c3160a61e4d6d253c5497931" data-snippet-saved="false" data-codota-status="done"><code class="hljs perl has-numbering">audioRecord.startRecording();
+byte bytes[] = new byte[minBufferSize];
+<span class="hljs-keyword">while</span> (isRecord) {
+    <span class="hljs-keyword">int</span> <span class="hljs-keyword">length</span> = audioRecord.<span class="hljs-keyword">read</span>(bytes, <span class="hljs-number">0</span>, minBufferSize);
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">length</span> &gt; <span class="hljs-number">0</span>) {
+         os.<span class="hljs-keyword">write</span>(bytes);
+    }
+}</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li></ul></pre>
+
+
+
+<h3 id="停止记录"><a name="t6"></a>停止记录</h3>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs avrasm has-numbering">audioRecord<span class="hljs-preprocessor">.stop</span>()<span class="hljs-comment">;</span>
+audioRecord<span class="hljs-preprocessor">.release</span>()<span class="hljs-comment">;</span></code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li></ul></pre>
+
+
+
+<h2 id="2播放"><a name="t7"></a>2、播放</h2>
+
+
+
+<h3 id="创建播放器"><a name="t8"></a>创建播放器</h3>
+
+<p>使用AudioTrack播放PCM，在SDK23前后，创建的方法不一样：</p>
+
+
+
+<div class="top-box hide"><div class="alert-info"></div></div><div class="top-box hide"><div class="alert-info"></div></div><div class="top-box hide"><div class="alert-info"></div></div><pre class="prettyprint prettyprinted" name="code" data-original-code="int sampleRateInHz = 44100;&#10;int channelConfig = AudioFormat.CHANNEL_OUT_MONO;&#10;int audioFormat = AudioFormat.ENCODING_PCM_16BIT;&#10;int minBufferSize = AudioTrack.getMinBufferSize(sampleRateInHz , channelConfig , audioFormat);&#10;int length = minBufferSize + 1024;&#10;if (Build.VERSION.SDK_INT >= 23) {&#10;    player = new AudioTrack.Builder()&#10;    .setAudioFormat(new AudioFormat.Builder()&#10;    .setEncoding(audioFormat)&#10;    .setSampleRate(sampleRateInHz)&#10;    .setChannelMask(channelConfig)&#10;    .build())&#10;    .setBufferSizeInBytes(length)&#10;    .build();&#10;} else {&#10;    player = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRateInHz,&#10;                            channelConfig, audioFormat,&#10;                            length, MODE_STREAM);&#10;}" data-snippet-id="ext.d6c63f155eb4579325f86a05cfa4fa5c" data-snippet-saved="false" data-codota-status="done"><code class="hljs avrasm has-numbering">int sampleRateInHz = <span class="hljs-number">44100</span><span class="hljs-comment">;</span>
+int channelConfig = AudioFormat<span class="hljs-preprocessor">.CHANNEL</span>_OUT_MONO<span class="hljs-comment">;</span>
+int audioFormat = AudioFormat<span class="hljs-preprocessor">.ENCODING</span>_PCM_16BIT<span class="hljs-comment">;</span>
+int minBufferSize = AudioTrack<span class="hljs-preprocessor">.getMinBufferSize</span>(sampleRateInHz , channelConfig , audioFormat)<span class="hljs-comment">;</span>
+int length = minBufferSize + <span class="hljs-number">1024</span><span class="hljs-comment">;</span>
+if (Build<span class="hljs-preprocessor">.VERSION</span><span class="hljs-preprocessor">.SDK</span>_INT &gt;= <span class="hljs-number">23</span>) {
+    player = new AudioTrack<span class="hljs-preprocessor">.Builder</span>()
+    <span class="hljs-preprocessor">.setAudioFormat</span>(new AudioFormat<span class="hljs-preprocessor">.Builder</span>()
+    <span class="hljs-preprocessor">.setEncoding</span>(audioFormat)
+    <span class="hljs-preprocessor">.setSampleRate</span>(sampleRateInHz)
+    <span class="hljs-preprocessor">.setChannelMask</span>(channelConfig)
+    <span class="hljs-preprocessor">.build</span>())
+    <span class="hljs-preprocessor">.setBufferSizeInBytes</span>(length)
+    <span class="hljs-preprocessor">.build</span>()<span class="hljs-comment">;</span>
+} else {
+    player = new AudioTrack(AudioManager<span class="hljs-preprocessor">.STREAM</span>_MUSIC, sampleRateInHz,
+                            channelConfig, audioFormat,
+                            length, MODE_STREAM)<span class="hljs-comment">;</span>
+}</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li></ul></pre>
+
+<p>上面的几个参数与创建AudioRecord时是相似且对应的，但是注意channelConfig有in和out的区别。 <br>
+关于length这个参数，最初使用的如下方式：</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs glsl has-numbering"><span class="hljs-keyword">int</span> <span class="hljs-built_in">length</span> = (<span class="hljs-keyword">int</span>) audioFile.<span class="hljs-built_in">length</span>();</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+
+<p>实测发现过大或者过小都有可能引发“play() called on uninitialized AudioTrack”的异常，现在的写法是借鉴了stackoverflow的解决方法。</p>
+
+
+
+<h3 id="给播放器写入数据"><a name="t9"></a>给播放器写入数据</h3>
+
+
+
+<div class="top-box hide"><div class="alert-info"></div></div><div class="top-box hide"><div class="alert-info"></div></div><div class="top-box hide"><div class="alert-info"></div></div><pre class="prettyprint prettyprinted" name="code" data-original-code="InputStream is = new FileInputStream(audioFile);&#10;int read;&#10;while ((read = is.read(bytes)) > 0) {&#10;     player.write(bytes, 0, read);&#10;}&#10;" data-snippet-id="ext.5b8b8a38e67c79cbf24baf95b23923f1" data-snippet-saved="false" data-codota-status="done"><code class="hljs applescript has-numbering">InputStream <span class="hljs-keyword">is</span> = new FileInputStream(audioFile);
+int <span class="hljs-command">read</span>;
+<span class="hljs-keyword">while</span> ((<span class="hljs-command">read</span> = <span class="hljs-keyword">is</span>.<span class="hljs-command">read</span>(bytes)) &gt; <span class="hljs-number">0</span>) {
+     player.<span class="hljs-command">write</span>(bytes, <span class="hljs-number">0</span>, <span class="hljs-command">read</span>);
+}
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li></ul></pre>
+
+<p>很眼熟吧，其实就是Java输入流的基本用法。</p>
+
+
+
+<h3 id="播放"><a name="t10"></a>播放</h3>
+
+<p>调用player.play();</p>
+
+
+
+<h3 id="停止播放"><a name="t11"></a>停止播放</h3>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs avrasm has-numbering">if (player != null &amp;&amp; player<span class="hljs-preprocessor">.getPlayState</span>() == AudioTrack<span class="hljs-preprocessor">.PLAYSTATE</span>_PLAYING) {
+    player<span class="hljs-preprocessor">.stop</span>()<span class="hljs-comment">;</span>
+    player<span class="hljs-preprocessor">.release</span>()<span class="hljs-comment">;</span>
+}</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li></ul></pre>
+
+<p>把与停止无关的判断也一并写在这里了，因为实际开发时是很有必要进行这样的判断的。</p>
+
+<h1 id="后记"><a name="t12"></a>后记</h1>
+
+<p>一直以来都对音视频领域比较感兴趣，奈何工作上一直没有机会基础，无意间看见Jhuster大神的Android 音视频开发入门指南，决定利用闲暇时间入坑，在此表示感谢。</p>
+
+<p><a href="https://github.com/cyq7on/AndroidAVPractice" rel="nofollow" data-token="459f6520ae79c4cc07b9bbe479320c8c">源码</a> <br>
+Thanks <br>
+<a href="http://blog.51cto.com/ticktick/1956269" rel="nofollow" data-token="1e34569a802048ee380143f077611ebd">Android 音视频开发入门指南</a> <br>
+<a href="https://blog.csdn.net/qq_26787115/article/details/53078951" rel="nofollow" data-token="1663d3b6fac5a80606e912e823d6f90a">Android音频处理</a></p>                                    </div>
+                <link href="https://csdnimg.cn/release/phoenix/mdeditor/markdown_views-526ced5128.css" rel="stylesheet">
+                    </div>
+
+
+</div>
+
+
+</body></html>

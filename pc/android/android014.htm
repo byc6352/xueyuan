@@ -1,0 +1,579 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apk解析之 —— resource.arsc - Knowledge worth spreading - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                                <div class="article-copyright">
+                <span class="creativecommons">
+                <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                    </a>
+            <span>
+                版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。            </span>
+               <div class="article-source-link2222">
+                    本文链接：<a href="https://blog.csdn.net/dutlxq2014/article/details/78078734">https://blog.csdn.net/dutlxq2014/article/details/78078734</a>
+                </div>
+            </span>
+                    </div>
+                                                    <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-3019150162.css" rel="stylesheet">
+                                        <div class="markdown_views prism-atom-one-dark" id="content_views">
+                    <!-- flowchart 箭头图标 勿删 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-linecap="round" d="M 5 0 L 0 2.5 L 5 5 Z" />
+                    </svg>
+                                            <blockquote>
+  <p>本篇解析resource.arsc文件，参考文章：<a href="http://www.wjdiankong.cn/android%E9%80%86%E5%90%91%E4%B9%8B%E6%97%85-%E8%A7%A3%E6%9E%90%E7%BC%96%E8%AF%91%E4%B9%8B%E5%90%8E%E7%9A%84androidmanifest%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F/" rel="nofollow" data-token="5fa04d745644c6193f3a2d80d74ee128">Reference</a> <br>
+  项目源码：<strong><a href="https://github.com/dutlxq2014/ApkParser" rel="nofollow" data-token="e69735697349613530d951c9ac26a2c4">ApkParser</a></strong></p>
+</blockquote>
+
+<h3 id="arsc文件结构"><a name="t0"></a>arsc文件结构</h3>
+
+<p>arsc文件的结构图，所有的resource资源类型都定义在AOSP的<code>frameworks\base\include\androidfw\ResourceTypes.h</code>头文件中。</p>
+
+<p><img src="images/android01401.jpg"></p>
+
+
+
+<h3 id="一头部信息"><a name="t1"></a>一、头部信息</h3>
+
+<p>Resources.arsc文件格式是由一系列的chunk构成，每一个chunk均包含如下结构的ResChunk_header，用来描述这个chunk的基本信息：</p>
+
+<div class="table-box"><table>
+<thead>
+<tr>
+  <th>字段名</th>
+  <th>含义</th>
+  <th>长度</th>
+</tr>
+</thead>
+<tbody><tr>
+  <td>type</td>
+  <td>当前这个chunk的类型</td>
+  <td>2字节</td>
+</tr>
+<tr>
+  <td>headerSize</td>
+  <td>当前这个chunk的头部大小</td>
+  <td>2字节</td>
+</tr>
+<tr>
+  <td>size</td>
+  <td>当前这个chunk的大小</td>
+  <td>4字节</td>
+</tr>
+</tbody></table></div>
+
+
+
+
+<h3 id="二资源索引表的头部信息"><a name="t2"></a>二、资源索引表的头部信息</h3>
+
+<div class="table-box"><table>
+<thead>
+<tr>
+  <th>字段名</th>
+  <th>含义</th>
+  <th>长度</th>
+</tr>
+</thead>
+<tbody><tr>
+  <td>header</td>
+  <td>标准的Chunk头部信息格式</td>
+  <td>8字节：0x0002</td>
+</tr>
+<tr>
+  <td>packageCount</td>
+  <td>被编译的资源包的个数，Apk中可以包含多个资源包，默认就1个</td>
+  <td>4字节</td>
+</tr>
+</tbody></table></div>
+
+
+
+
+<h3 id="三资源项的值字符串资源池"><a name="t3"></a>三、资源项的值字符串资源池</h3>
+
+<p>紧跟着资源索引表头部的是资源项的值字符串资源池,这个字符串资源池包含了所有的在资源包里面所定义的资源项的值字符串,字符串资源池头部的结构如下：</p>
+
+<div class="table-box"><table>
+<thead>
+<tr>
+  <th>字段名</th>
+  <th>含义</th>
+  <th>长度</th>
+</tr>
+</thead>
+<tbody><tr>
+  <td>header</td>
+  <td>标准的Chunk头部信息格式</td>
+  <td>8字节：0x0001</td>
+</tr>
+<tr>
+  <td>stringCount</td>
+  <td>字符串的个数</td>
+  <td>4字节</td>
+</tr>
+<tr>
+  <td>styleCount</td>
+  <td>字符串样式的个数</td>
+  <td>4字节</td>
+</tr>
+<tr>
+  <td>flags</td>
+  <td>字符串的属性,可取值包括0x000(UTF-16),0x001(字符串经过排序)、0X100(UTF-8)和他们的组合值</td>
+  <td>4字节</td>
+</tr>
+<tr>
+  <td>stringsStart</td>
+  <td>字符串内容块相对于当前Chunk头部的距离</td>
+  <td>4字节*stringCount</td>
+</tr>
+<tr>
+  <td>stylesStart</td>
+  <td>字符串样式块相对于当前Chunk头部的距离</td>
+  <td>4字节*styleCount</td>
+</tr>
+<tr>
+  <td>stringOffsetArray</td>
+  <td>每个字符串相对于stringsStart位置的偏移</td>
+  <td>4字节*stringCount</td>
+</tr>
+<tr>
+  <td>styleOffsetArray</td>
+  <td>每个style串相对于stylesStart位置的偏移</td>
+  <td>4字节*stylesCount</td>
+</tr>
+<tr>
+  <td>strings</td>
+  <td>字符串内容池</td>
+  <td>每个串的前2个字节标识字符串长度，utf8的字符串以0x00结尾，长度不包含结束符</td>
+</tr>
+<tr>
+  <td>styles</td>
+  <td>样式串内容池</td>
+  <td></td>
+</tr>
+</tbody></table></div>
+
+
+<p>字符串的长度计算比较特殊：<code>length = byte[1] &amp; 0x7f</code>，并且长只包含有效字符的长度，不包含结束符0x00。</p>
+
+
+
+<h3 id="四package数据块"><a name="t4"></a>四、Package数据块</h3>
+
+<p>接着资源项的值字符串资源池后面的部分就是Package数据块,这个数据块记录编译包的元数据,头部结构如下：</p>
+
+<div class="table-box"><table>
+<thead>
+<tr>
+  <th>字段名</th>
+  <th>含义</th>
+  <th>长度</th>
+</tr>
+</thead>
+<tbody><tr>
+  <td>header</td>
+  <td>标准的Chunk头部信息格式</td>
+  <td>8字节：0x0200</td>
+</tr>
+<tr>
+  <td>pkgId</td>
+  <td>用户包的值Package Id为0X7F,系统资源包的Package Id为0X01</td>
+  <td>4字节</td>
+</tr>
+<tr>
+  <td>packageName</td>
+  <td>包名</td>
+  <td>128*2字节</td>
+</tr>
+<tr>
+  <td>typeString</td>
+  <td>类型字符串资源池 相对头部的偏移</td>
+  <td>4字节</td>
+</tr>
+<tr>
+  <td>lastPublicType</td>
+  <td>最后一个导出的Public类型字符串在类型字符串资源池中的索引，目前这个值设置为类型字符串资源池的元素个数</td>
+  <td>4字节</td>
+</tr>
+<tr>
+  <td>keyStrings</td>
+  <td>资源项名称字符串相对头部的偏移</td>
+  <td>4字节</td>
+</tr>
+<tr>
+  <td>lastPublicKey</td>
+  <td>最后一个导出的Public资源项名称字符串在资源项名称字符串资源池中的索引，资源项名称字符串资源池的元素个数</td>
+  <td>4字节</td>
+</tr>
+</tbody></table></div>
+
+
+<p>PackageChunk数据块头部0x0120字节 (8+4+128*2+16+4 = 0120 最后4字节无用)，数据块部分包含：</p>
+
+<div class="table-box"><table>
+<thead>
+<tr>
+  <th>DataBlock</th>
+  <th>含义</th>
+  <th></th>
+</tr>
+</thead>
+<tbody><tr>
+  <td>TypeStringPool</td>
+  <td>类型字符串 资源池</td>
+  <td>attr、drawable、mipmap、layout、anim string、dimen、style、bool、color、id、interger</td>
+</tr>
+<tr>
+  <td>KeyStringPool</td>
+  <td>资源项名称字符串 资源池</td>
+  <td></td>
+</tr>
+<tr>
+  <td>ResTableTypeSpec</td>
+  <td>类型规范数据块</td>
+  <td>RES_TABLE_TYPE_SPEC_TYPE</td>
+</tr>
+<tr>
+  <td>ResTableTypeInfo</td>
+  <td>类型资源项数据块</td>
+  <td>RES_TABLE_TYPE_TYPE</td>
+</tr>
+</tbody></table></div>
+
+
+
+
+<h3 id="五类型规范数据块-restabletypespectype"><a name="t5"></a>五、类型规范数据块 RES_TABLE_TYPE_SPEC_TYPE</h3>
+
+<p>类型规范数据块用来描述资源项的配置差异性。通过这个差异性描述，我们就可以知道每一个资源项的配置状况。知道了一个资源项的配置状况之后，Android资源管理框架在检测到设备的配置信息发生变化之后，就可以知道是否需要重新加载该资源项。类型规范数据块是按照类型来组织的，也就是说，<code>每一种类型都对应有一个类型规范数据块</code>。其数据块头部结构如下。</p>
+
+<div class="table-box"><table>
+<thead>
+<tr>
+  <th>DataBlock</th>
+  <th>含义</th>
+  <th></th>
+</tr>
+</thead>
+<tbody><tr>
+  <td>header</td>
+  <td>标准的Chunk头部信息格式</td>
+  <td>8字节：0x0202</td>
+</tr>
+<tr>
+  <td>typeId</td>
+  <td>标识资源的Type ID,Type ID是指资源的类型ID，资源的类型有animator、anim、color、drawable、layout、menu、raw、string和xml等等若干种，每一种都会被赋予一个ID</td>
+  <td>1字节</td>
+</tr>
+<tr>
+  <td>res0</td>
+  <td>保留,始终为0</td>
+  <td>1字节</td>
+</tr>
+<tr>
+  <td>res1</td>
+  <td>保留,始终为0</td>
+  <td>2字节</td>
+</tr>
+<tr>
+  <td>entryCount</td>
+  <td>等于本类型的资源项个数,指名称相同的资源项的个数。</td>
+  <td>4字节</td>
+</tr>
+<tr>
+  <td>entryConfigs</td>
+  <td>配置项数组</td>
+  <td>entryConfigs * 4字节</td>
+</tr>
+</tbody></table></div>
+
+
+
+
+<h3 id="六资源类型项数据块-restabletypeinfotype"><a name="t6"></a>六、资源类型项数据块 RES_TABLE_TYPE_INFO_TYPE</h3>
+
+<p>类型资源项数据块用来描述资源项的具体信息, 这样我们就可以知道每一个资源项的<code>名称</code>、<code>值</code>和<code>配置</code>等信息。类型资源项数据同样是按照类型和配置来组织的,也就是说,一个具有n个配置的类型一共对应有n个类型资源项数据块。其数据块头部结构如下</p>
+
+<div class="table-box"><table>
+<thead>
+<tr>
+  <th>DataBlock</th>
+  <th>含义</th>
+  <th></th>
+</tr>
+</thead>
+<tbody><tr>
+  <td>header</td>
+  <td>标准的Chunk头部信息格式</td>
+  <td>8字节：0x0201</td>
+</tr>
+<tr>
+  <td>typeId</td>
+  <td>标识资源的Type ID</td>
+  <td>1字节</td>
+</tr>
+<tr>
+  <td>res0</td>
+  <td>保留,始终为0</td>
+  <td>1字节</td>
+</tr>
+<tr>
+  <td>res1</td>
+  <td>保留,始终为0</td>
+  <td>2字节</td>
+</tr>
+<tr>
+  <td>entryCount</td>
+  <td>等于本类型的资源项个数,指名称相同的资源项的个数</td>
+  <td>4字节</td>
+</tr>
+<tr>
+  <td>entriesStart</td>
+  <td>等于资源项数据块相对头部的偏移值</td>
+  <td>4字节</td>
+</tr>
+<tr>
+  <td>resConfig</td>
+  <td>指向一个ResTable_config,用来描述配置信息,地区,语言,分辨率等，是union类型</td>
+  <td>大小由ResTableConfig#size字段指定，正常是56个字节</td>
+</tr>
+<tr>
+  <td>entryOffsets</td>
+  <td>属于当前InfoChunk的Entry偏移数组</td>
+  <td>entryCount * 4字节</td>
+</tr>
+<tr>
+  <td>tableEntries</td>
+  <td>具体的Entry定义，根据ResTableEntry#flags区分类型：=FLAG_COMPLEX表示ResTableMapEntry，否则为ResTableValueEntry</td>
+  <td>根据实际的类型确定</td>
+</tr>
+</tbody></table></div>
+
+
+<p>如果检查到 <code>entryOffsets[i] == 0xffffffffL</code> 表示这个位置没有entry，应该跳过继续读取下一个。这个地方还要明确一下 <code>RES_TABLE_TYPE_SPEC_TYPE</code> 和 <code>RES_TABLE_TYPE_INFO_TYPE</code> 这两种TypeChunk的关系，下面的表格是按文件流的顺序解析得到结果，可以清楚地说明问题：</p>
+
+<div class="table-box"><table>
+<thead>
+<tr>
+  <th>SequenceId</th>
+  <th>ChunkType</th>
+  <th>TypeID</th>
+  <th>TypeName</th>
+  <th>EntryCount</th>
+</tr>
+</thead>
+<tbody><tr>
+  <td>0</td>
+  <td><code>RES_TABLE_TYPE_SPEC_TYPE</code></td>
+  <td>0x01</td>
+  <td>attr</td>
+  <td>228</td>
+</tr>
+<tr>
+  <td>1</td>
+  <td>RES_TABLE_TYPE_INFO_TYPE</td>
+  <td>0x01</td>
+  <td>attr</td>
+  <td>228</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>RES_TABLE_TYPE_SPEC_TYPE</code></td>
+  <td>0x02</td>
+  <td>drawable</td>
+  <td>95</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td>RES_TABLE_TYPE_INFO_TYPE</td>
+  <td>0x02</td>
+  <td>drawable</td>
+  <td>95</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td>RES_TABLE_TYPE_SPEC_TYPE</td>
+  <td>0x02</td>
+  <td>drawable</td>
+  <td>95</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td>RES_TABLE_TYPE_INFO_TYPE</td>
+  <td>0x02</td>
+  <td>drawable</td>
+  <td>95</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td>RES_TABLE_TYPE_SPEC_TYPE</td>
+  <td>0x02</td>
+  <td>drawable</td>
+  <td>95</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td>RES_TABLE_TYPE_INFO_TYPE</td>
+  <td>0x02</td>
+  <td>drawable</td>
+  <td>95</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>RES_TABLE_TYPE_SPEC_TYPE</code></td>
+  <td>0x03</td>
+  <td>mipmap</td>
+  <td>1</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td>RES_TABLE_TYPE_INFO_TYPE</td>
+  <td>0x03</td>
+  <td>mipmap</td>
+  <td>1</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td>RES_TABLE_TYPE_SPEC_TYPE</td>
+  <td>0x03</td>
+  <td>mipmap</td>
+  <td>1</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td>RES_TABLE_TYPE_INFO_TYPE</td>
+  <td>0x03</td>
+  <td>mipmap</td>
+  <td>1</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td>RES_TABLE_TYPE_SPEC_TYPE</td>
+  <td>0x03</td>
+  <td>mipmap</td>
+  <td>1</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td>RES_TABLE_TYPE_INFO_TYPE</td>
+  <td>0x03</td>
+  <td>mipmap</td>
+  <td>1</td>
+</tr>
+<tr>
+  <td>…</td>
+  <td>…</td>
+  <td>0x04<br>0x05<br>0x06<br>0x07<br>0x08<br>0x09<br>0x0a<br>0x0b<br>0x0c</td>
+  <td>layout<br>anim<br>string<br>dimen<br>style<br>bool<br>color<br>id<br>interger</td>
+  <td>…</td>
+</tr>
+</tbody></table></div>
+
+
+<p><code>RES_TABLE_TYPE_SPEC_TYPE</code> 的数量和当前APP使用到的资源类型数相同（attr、drawable、mipmap、layout、anim、string、dimen、style、bool、color、id、interger、xml、raw、array、menu），每个<code>RES_TABLE_TYPE_SPEC_TYPE</code>块之后都会跟着若干个<code>RES_TABLE_TYPE_INFO_TYPE</code>块，而具体的数量实际上对应的就是这种类型的资源有几种配置。</p>
+
+<p>最后再看一下最后一列的<code>EntryCount</code>，如果把每种RES_TABLE_TYPE_SPEC_TYPE的EntryCount加起来，总数正好就是public.xml中<code>&lt;public .../&gt;</code>的条目数量。</p>
+
+<p>我们写代码的时候不能保证每个资源都正好提供N种类型，比如说mipmap类型的图片资源，a图片提供了全部配置hdpi/mdpi/xhdpi/xxhdpi/xxxhdpi，b图片只提供了mdpi/xxhdpi，那这种差异就由entryOffsets[i]数组的具体位置来标识了，如果 entryOffsets[i]==0xffffffffL 就意味着这种类型的资源在当前这种配置下没有提供，读取时应该忽略。因为具体的资源Entry在文件中都是紧密排列的，所以同一个资源在不同配置之间的偏移下标不一定相同，完全取决于其他资源配置缺失的情况。</p>
+
+<div class="table-box"><table>
+<thead>
+<tr>
+  <th>配置</th>
+  <th>Offset[] for A</th>
+  <th>Offset[] for B</th>
+</tr>
+</thead>
+<tbody><tr>
+  <td>hdpi</td>
+  <td>0x111111</td>
+  <td>0xffffffffL 缺失</td>
+</tr>
+<tr>
+  <td>mhdpi</td>
+  <td>0x111111</td>
+  <td>0x111222</td>
+</tr>
+<tr>
+  <td>xhdpi</td>
+  <td>0x120000</td>
+  <td>0x111333</td>
+</tr>
+<tr>
+  <td>xxmhdpi</td>
+  <td>0x110000</td>
+  <td>0xffffffffL 缺失</td>
+</tr>
+<tr>
+  <td>xxxmhdpi</td>
+  <td>0x120000</td>
+  <td>0xffffffffL 缺失</td>
+</tr>
+</tbody></table></div>
+
+
+<p>这个具体运行一下Demo代码就知道了，RES_TABLE_TYPE_SPEC_TYPE 和 RES_TABLE_TYPE_INFO_TYPE 这两个Chunk应该算是最复杂的了，搞清楚后下一步生成public.xml就方便了。</p>
+
+<h3 id="七生成publicxml"><a name="t7"></a>七、生成public.xml</h3>
+
+<p>构造public.xml要提供下面几个Entry属性：</p>
+
+<div class="table-box"><table>
+<thead>
+<tr>
+  <th>属性</th>
+  <th>含义</th>
+  <th>保存字段</th>
+</tr>
+</thead>
+<tbody><tr>
+  <td>属性类型名称</td>
+  <td>在ResTableTypeInfoChunk中根据typeId索引从typeStringPool获取：atrr/drawble/mipmap…</td>
+  <td></td>
+</tr>
+<tr>
+  <td>属性名称</td>
+  <td>在ResTableEntry中根据key.index索引从keyStringPool获取，具体在子类实现</td>
+  <td>ResTableEntry#key#index</td>
+</tr>
+<tr>
+  <td>资源包ID</td>
+  <td>0x01系统资源，0x7f用户资源，由PackageChunk保存</td>
+  <td>ResTablePackageChunk#pkgId</td>
+</tr>
+<tr>
+  <td>资源类型ID</td>
+  <td>[0x01, 0x10]下标从1开始，共16种，保存在对应的TypeChunk中</td>
+  <td>ResTableTypeInfoChunk#typeId</td>
+</tr>
+<tr>
+  <td>资源ID</td>
+  <td>Entry所在的数组下标，顺序从文件读取Entry的时候记录在具体的ResTableEntry中</td>
+  <td>ResTableEntry#entryId</td>
+</tr>
+</tbody></table></div>
+
+
+<p>上面提到同一种类型的资源对应的 RES_TABLE_TYPE_INFO_TYPE_CHUNK 会有多个，个数等于配置最多的资源类型数，同一种资源的ID是相同的，所以要避免产生重复的Entry，同时对于配置缺失的情况，要使用其他有配置的Chunk来补充。所以格式化输出时对于同一种资源，需要从多个同类别的 RES_TABLE_TYPE_INFO_TYPE_CHUNK 中找到一个非空的，顺序构造publix.xml。</p>
+
+<p>public.xml文件中的id是4字节的16进制数，由pkgId, typeId, entryId合成：<code>id = pkgId &lt;&lt; 24 | typeIdId &lt;&lt; 16 | (entryId &amp; 0xffff)</code>，最后就是构造类似<code>&lt;public type="attr" name="drawerArrowStyle" id="0x7f010000" /&gt;</code>这样的Entry项了，可以和apktool反编译出来的对比，应该是完全相同的。</p>
+
+
+
+<h3 id="八由publicxml的key找到value值"><a name="t8"></a>八、由public.xml的key找到value值</h3>
+
+<p>.</p>                                    </div>
+                <link href="https://csdnimg.cn/release/phoenix/mdeditor/markdown_views-e9f16cbbc2.css" rel="stylesheet">
+                    </div>
+
+
+</div>
+
+
+</body></html>

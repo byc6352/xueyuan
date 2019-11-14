@@ -1,0 +1,220 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<table cellspacing="0" cellpadding="0"><tbody><tr><td class="t_f" id="postmessage_5404261">
+<div align="left">Android 下 APK 捆绑器的实现</div><div align="left"><font face="宋体">&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 作者：</font> 海东青</div><div align="left">利用捆绑器向正常程序捆绑病毒、木马等恶意程序，以达到隐蔽安装、运行的目的，这</div><div align="left">在 Windows 平台下是一种很常规的攻击手段。那么，在智能终端十分流行的今天，如何实</div><div align="left">现针对手机应用的捆绑器呢？对此，本文针对 Android 平台的应用程序 APK 文件，给出了</div><div align="left">类似 Windows 下捆绑器的实现方案。</div><div align="left"> </div><div align="left"> </div><div align="left">原理与基础</div><div align="left">对任意的两个 APK 应用程序 A 和 B 进行捆绑，并且在手机上安装、运行捆绑生成的</div><div align="left">APK 程序 C 后，仍然具备和 A 一样的运行效果，要实现这一目的，捆绑过程可以从两个思</div><div align="left">路去实现。</div><div align="left">1）对 Android 应用程序 A 进行反编译，通过修改反编译生成的 smali 代码，控制执行</div><div align="left">流程，使其具备安装和执行应用程序 B 的功能，最后再打包生成捆绑后的应用 C。此方法</div><div align="left">和早期的 Windows 环境下的 PE 病毒类似，插入额外的功能代码，修改入口点改变程序执行</div><div align="left">流程，最后再回到原有流程执行 A 的功能。</div><div align="left">2）考虑到 A、B 的任意性，以及生成程序 C 的稳定性，在这里重点介绍另外一种通过</div><div align="left">宿主程序实现释放、安装、运行 A 和 B 的方法。其思路亦来自 Windows 下的捆绑器，即专</div><div align="left">门写一个 host 程序作为宿主，其中应用程序 A、B 作为 host 的资源文件，运行 host 时可以</div><div align="left">释放、安装和运行 A 和 B 的功能。此外，若考虑到安全性、免杀性，可对 A 和 B 进行加密、</div><div align="left">编码。</div><font color="black"><font face="宋体"><font style="font-size: 10pt;">&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;因此，根据方法</font></font></font><font color="black"><font face="&amp;quot"><font style="font-size: 10pt;"> 2</font></font></font><font color="black"><font face="宋体"><font style="font-size: 10pt;">，可得出</font></font></font><font color="black"><font face="&amp;quot"><font style="font-size: 10pt;"> PC</font></font></font><font color="black"><font face="宋?"><font style="font-size: 10pt;"> </font></font></font><font color="black"><font face="宋体"><font style="font-size: 10pt;">端和</font></font></font><font color="black"><font face="&amp;quot"><font style="font-size: 10pt;">Android</font></font></font><font color="black"><font face="宋?"><font style="font-size: 10pt;"> </font></font></font><font color="black"><font face="宋体"><font style="font-size: 10pt;">手机端的软件工作流程如图</font></font></font><font color="black"><font face="&amp;quot"><font style="font-size: 10pt;"> 1</font></font></font><font color="black"><font face="宋?"><font style="font-size: 10pt;"> </font></font></font><font color="black"><font face="宋体"><font style="font-size: 10pt;">和图</font></font></font><font color="black"><font face="&amp;quot"><font style="font-size: 10pt;"> 2</font></font></font><font color="black"><font face="宋?"><font style="font-size: 10pt;"> </font></font></font><font color="black"><font face="宋体"><font style="font-size: 10pt;">所示</font></font></font><br>
+<div align="left"> 
+<ignore_js_op>
+
+<img width="475" height="348" class="zoom" id="aimg_265952" onmouseover="showMenu({'ctrlid':this.id,'pos':'12'})" onclick="zoom(this, this.src, 0, 0, 0)" src="images/android01601.jpg" initialized="true" lazyloaded="true" inpost="1" file="https://attach.52pojie.cn/forum/201404/04/150225u8ti4558iooor08o.jpg" zoomfile="https://attach.52pojie.cn/forum/201404/04/150225u8ti4558iooor08o.jpg" aid="265952">
+
+<div class="tip tip_4 aimg_tip" id="aimg_265952_menu" style="left: 200.62px; top: 753px; display: none; position: absolute; z-index: 301;" initialized="true" disautofocus="true">
+<div class="xs0">
+<p><strong>QQ图片20140404144049.jpg</strong> <em class="xg1">(50.11 KB, 下载次数: 22)</em></p>
+<p>
+<a href="forum.php?mod=attachment&amp;aid=MjY1OTUyfDQ5YjBhZjM2fDE1NzM1MzcwNjJ8MHwyNDk1Njk%3D&amp;nothumb=yes" target="_blank">下载附件</a>
+
+&nbsp;<a id="savephoto_265952" onclick="showWindow(this.id, this.getAttribute('url'), 'get', 0);" href="javascript:;" rel="nofollow noopener" url="home.php?mod=spacecp&amp;ac=album&amp;op=saveforumphoto&amp;aid=265952&amp;handlekey=savephoto_265952">保存到相册</a>
+
+</p>
+
+<p class="xg1 y">2014-4-4 15:02 上传</p>
+
+</div>
+<div class="tip_horn"></div>
+</div>
+
+</ignore_js_op>
+</div><div align="left">&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;
+<ignore_js_op>
+
+<img width="421" class="zoom" id="aimg_265954" onmouseover="showMenu({'ctrlid':this.id,'pos':'12'})" onclick="zoom(this, this.src, 0, 0, 0)" src="images/android01602.jpg" initialized="true" lazyloaded="true" inpost="1" file="https://attach.52pojie.cn/forum/201404/04/150410uo2gbqkbzd7h21om.jpg" zoomfile="https://attach.52pojie.cn/forum/201404/04/150410uo2gbqkbzd7h21om.jpg" aid="265954" _load="1">
+
+<div class="tip tip_4 aimg_tip" id="aimg_265954_menu" style="left: 264.62px; top: 1101px; display: none; position: absolute; z-index: 301;" initialized="true" disautofocus="true">
+<div class="xs0">
+<p><strong>QQ图片20140404150245.jpg</strong> <em class="xg1">(30.84 KB, 下载次数: 16)</em></p>
+<p>
+<a href="forum.php?mod=attachment&amp;aid=MjY1OTU0fDM0NWY3NGM2fDE1NzM1MzcwNjJ8MHwyNDk1Njk%3D&amp;nothumb=yes" target="_blank">下载附件</a>
+
+&nbsp;<a id="savephoto_265954" onclick="showWindow(this.id, this.getAttribute('url'), 'get', 0);" href="javascript:;" rel="nofollow noopener" url="home.php?mod=spacecp&amp;ac=album&amp;op=saveforumphoto&amp;aid=265954&amp;handlekey=savephoto_265954">保存到相册</a>
+
+</p>
+
+<p class="xg1 y">2014-4-4 15:04 上传</p>
+
+</div>
+<div class="tip_horn"></div>
+</div>
+
+</ignore_js_op>
+</div><div align="left"> </div><br>
+<div align="left">功能实现</div><div align="left">通过上面的介绍，可以知道总共需要实现两个程序，即作为宿主程序的 Android 应用</div><div align="left">host.apk，以及作为捆绑器的 Windows 应用程序“捆绑器”，下面将详细介绍这两个程序内</div><div align="left">部原理和实现方法。</div><div align="left"> </div><div align="left"> </div><div align="left">1.宿主应用程序</div><div align="left"><strong>1</strong>）工作流程</div><div align="left">对于宿主程序 host.apk，要实现上文所定义的功能需求，则其内部的工作流程可设计如</div><div align="left">成如图 3 所示的结构。在宿主程序初始化时，会调用MainActity 的 onCreate 函数。在 onCreate</div><div align="left">函数中，通常用来初始化 MainActivity，但是考虑到最终呈现给用户的界面（即 Activity）</div><div align="left">为 A 的界面，所以宿主程序的 onCreate 函数中无需处理自身界面，只需想办法启动 A 的</div><div align="left">Activity 即可。</div><div align="left"><br>
+</div><div align="left"> </div><div align="left">&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 
+<ignore_js_op>
+
+<img width="547" class="zoom" id="aimg_265953" onmouseover="showMenu({'ctrlid':this.id,'pos':'12'})" onclick="zoom(this, this.src, 0, 0, 0)" src="images/android01603.jpg" initialized="true" lazyloaded="true" inpost="1" file="https://attach.52pojie.cn/forum/201404/04/150310d8hniag7j6iaiuez.jpg" zoomfile="https://attach.52pojie.cn/forum/201404/04/150310d8hniag7j6iaiuez.jpg" aid="265953" _load="1">
+
+<div class="tip tip_4 aimg_tip" id="aimg_265953_menu" style="left: 408.62px; top: 1632px; display: none; position: absolute; z-index: 301;" initialized="true" disautofocus="true">
+<div class="xs0">
+<p><strong>QQ图片20140404144738.jpg</strong> <em class="xg1">(81.05 KB, 下载次数: 11)</em></p>
+<p>
+<a href="forum.php?mod=attachment&amp;aid=MjY1OTUzfDJlYzQ1NzQzfDE1NzM1MzcwNjJ8MHwyNDk1Njk%3D&amp;nothumb=yes" target="_blank">下载附件</a>
+
+&nbsp;<a id="savephoto_265953" onclick="showWindow(this.id, this.getAttribute('url'), 'get', 0);" href="javascript:;" rel="nofollow noopener" url="home.php?mod=spacecp&amp;ac=album&amp;op=saveforumphoto&amp;aid=265953&amp;handlekey=savephoto_265953">保存到相册</a>
+
+</p>
+
+<p class="xg1 y">2014-4-4 15:03 上传</p>
+
+</div>
+<div class="tip_horn"></div>
+</div>
+
+</ignore_js_op>
+</div><div align="left"> </div><div align="left"> </div><div align="left">&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;释放和安装指定的应用程序通常需要较长时间（与应用程序的大小相关），若所有流程</div><div align="left">均在 onCreate 函数流程中实现，则会导致宿主程序界面卡顿或假死，故可通过在 onCreate</div><div align="left">函数中创建子线程的方式避免该问题，在子线程中实现相关功能，其中主要有释放和安装应</div><div align="left">用程序，以及启动主应用程序这两部分。</div><div align="left"><strong>2</strong>）释放和安装应用程序</div><div align="left">①释放指定文件</div><div align="left">对于 Android 应用程序，需要捆绑的资源文件可以直接放置到 assets 目录下。在宿主程</div><div align="left">序中，共计需要释放三个文件，即配置文件 config、主程序 update.res 和捆绑进去的程序</div><div align="left">data.res，释放方式如下。当程序安装后，需要释放时可通过如下方式实现。</div><div align="left"> </div><div align="left"> </div><div align="left">//dstFilePath 为释放出来的文件路径，resFileName 为需要释放的文件路径</div><div align="left">private void dropFile(String dstFilePath, StringresFilename){</div><div align="left">if(isFileExist(dstFilePath)) return;</div><div align="left">InputStream inputFS;</div><div align="left">try { inputFS = this.getResources().getAssets().open(resFilename);</div><div align="left">} catch (IOException e1) {return; }</div><div align="left">File outFile = new File(dstFilePath);</div><br>
+<div align="left"><br>
+</div><div align="left">byte buf[] = new byte[1024];&nbsp; &nbsp;int len;</div><br>
+<div align="left"><br>
+</div><div align="left">try {</div><div align="left">OutputStream outputFS = new FileOutputStream(outFile);</div><br>
+<div align="left"><br>
+</div><div align="left">while((len = inputFS.read(buf))&gt;0) {&nbsp;&nbsp;outputFS.write(buf,0,len);}</div><br>
+<div align="left"><br>
+</div><div align="left">outputFS.close();&nbsp;&nbsp;inputFS.close();</div><br>
+<div align="left"><br>
+</div><div align="left">} catch (IOException e) { return ; }</div><br>
+<div align="left"><br>
+</div><div align="left">return;</div><div align="left">}</div><div align="left"> </div><div align="left"> </div><div align="left">②安装应用程序</div><div align="left">文件释放后，接下来就要根据需要进行安装程序。对用户而言，已经安装程序了，故接</div><div align="left">下来安装程序需要在后台完成，即不引起用户察觉，这就需要使用 shell 下的 pm 命令（Package</div><div align="left">Manage），而 pm 命令需要 system 权限，故执行此操作时需要确保可以获取 root 权限。安装</div><div align="left">一个指定程序可通过“pm installtarget_apk”实现。而执行 shell 命令利用 runtime.exec 即可</div><div align="left">实现，可将其简单封装为 runCommand(String str)。</div><div align="left"> </div><div align="left"> </div><div align="left">private void runCommand(String strCommand){</div><div align="left">Runtime runtime = Runtime.getRuntime();</div><div align="left">try { runtime.exec(strCommand);</div><br>
+<div align="left"><br>
+</div><div align="left">} catch (IOException e) {e.printStackTrace(); }</div><br>
+<div align="left"><br>
+</div><div align="left">}</div><div align="left"> </div><div align="left"> </div><br>
+<div align="left">综上，释放、安装的功能实现代码如下。</div><div align="left"> //Install the specified apk</div><div align="left">public String installAPK(String apkFileName)</div><br>
+<font color="black"><font face="&amp;quot"><font style="font-size: 10pt;"><br>
+</font></font></font><div align="left">{</div><font face="黑?"><font style="font-size: 12pt;"><br>
+</font></font><div align="left">//获取 assets 中文件安装后的实际路径</div><br>
+<font color="black"><font face="宋?"><font style="font-size: 10pt;"><br>
+</font></font></font><div align="left">String tmpDir =this.getApplicationContext().getFilesDir()+"/";</div><div align="left">String apk_path = tmpDir+apkFileName;</div><div align="left">//释放文件</div><div align="left">dropFile(apk_path, apkFileName);</div><div align="left">//安装的 apk 文件需要读写权限，故赋予读写权限</div><div align="left">runCommand("su -c chmod 666 "+apk_path);</div><div align="left">//使用 pm 安装文件</div><div align="left">runCommand("su -c pm install -t "+apk_path);</div><div align="left">return apk_path;</div><div align="left">}</div><div align="left"> </div><div align="left"> </div><div align="left"><strong>3</strong>）启动应用程序</div><div align="left">启动应用程序可通过切换 Activity 实现，即调用主程序 A 的 MainActivity 就可实现启动</div><div align="left">A 程序并切换界面为 A，该过程可通过如下几步实现。</div><div align="left">①获取需要启动的 apk 的信息</div><div align="left">具体包括 apk 的packagename 和MainActivity 名。对于宿主程序而言，由于捆绑器已成</div><div align="left">功获取并将此信息写入了 config 文件，故只需要从 config 中分别读取这两个字符串即可。</div><div align="left">②新建 intent</div><div align="left">Intent intent = new Intent(Intent.ACTION_MAIN);</div><div align="left">intent.addCategory(Intent.CATEGORY_LAUNCHER);</div><div align="left">③切换 Activity，启动程序</div><div align="left">ComponentName cn = new ComponentName(main_app,main_app_Acitivty);</div><div align="left">intent.setComponent(cn);</div><div align="left">startActivity(intent);</div><div align="left"> </div><div align="left">2.捆绑器程序</div><div align="left">运行在 Windows 下的捆绑器程序主要是为宿主程序做准备：获取主程序 A 的</div><div align="left">packagename 和MainActivity 信息，获取捆绑进去的程序 B 的 packagename；修改宿主程序</div><div align="left">的图标，使其和程序 A 的一致；将准备好的宿主程序打包、签名等。下面将详述每个部分。</div><div align="left">1）提取信息</div><div align="left">需要提取的信息为应用程序的 Packagename 和 MainActivity 名，这些信息可以从 manifest</div><div align="left">中解析，但更简单的办法就是使用现有工具 apktool。该工具可以对 apk 程序进行解包、打</div><div align="left">包、提取信息等。具体的，提取信息仅需命令“aapt.exedump badging apk_name”即可。为</div><div align="left">了方便应用，我们可以写一个专门提取信息的批处理脚本 aapt_apkinfo.bat，具体如下：</div><div align="left">set PATH=%CD%;%PATH%;</div><div align="left">"%~dp0\aapt.exe" dump badging %1 &gt; %2</div><div align="left">&nbsp;&nbsp;</div><div align="left">该批处理以“aapt_apkinfo.bata.apk info.txt”的方式调用，其中第一个参数为 apk 路径，</div><div align="left">第二个参数为信息存储文件。在程序中则可以如下调用。</div><div align="left"> </div><div align="left"> </div><div align="left">ShellExecute(NULL, TEXT("open"),szAaptCommand,szParameter, NULL, SW_HIDE);</div><div align="left"> </div><div align="left"> </div><div align="left">其中，szAaptCommand 指向aapt_apkinfo.bat，szParameter 为参数 1 和参数 2 构成的字</div><div align="left">符串，如“a.apkinfo.txt”。</div><div align="left">由于此时获取到的信息如图 4 所示，内容太过冗余，我们需要从中解析出packagename</div><div align="left">和 MainActivity。易知，此时得到的信息是按行存储的，即 info.txt 中的每行为一类或一条信</div><div align="left">息 ， 故 解 析 时 逐 行 判 断 即 可 。 其 中packagename 通 常 以 此 种 格 式 出 现 “ package:</div><div align="left">name='com.tencent.mobileqq' ”， 可 以 认 为 package: name 之 后 的 单 引 号 内 的 内 容 为</div><div align="left">packagename。mainactivity 的信息如图 5 所示，故同样易得其信息。相关文本搜索、字符串</div><div align="left">判断等相关代码不再罗列。</div><div align="left">&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+<ignore_js_op>
+
+<img width="657" class="zoom" id="aimg_265978" onmouseover="showMenu({'ctrlid':this.id,'pos':'12'})" onclick="zoom(this, this.src, 0, 0, 0)" src="images/android01604.jpg" initialized="true" lazyloaded="true" inpost="1" file="https://attach.52pojie.cn/forum/201404/04/160701foemafxnc6z6zhma.jpg" zoomfile="https://attach.52pojie.cn/forum/201404/04/160701foemafxnc6z6zhma.jpg" aid="265978" _load="1">
+
+<div class="tip tip_4 aimg_tip" id="aimg_265978_menu" style="left: 404.62px; top: 4272px; display: none; position: absolute; z-index: 301;" initialized="true" disautofocus="true">
+<div class="xs0">
+<p><strong>QQ图片20140404160507.jpg</strong> <em class="xg1">(219.29 KB, 下载次数: 11)</em></p>
+<p>
+<a href="forum.php?mod=attachment&amp;aid=MjY1OTc4fDQ5YmE2Mjc4fDE1NzM1MzcwNjJ8MHwyNDk1Njk%3D&amp;nothumb=yes" target="_blank">下载附件</a>
+
+&nbsp;<a id="savephoto_265978" onclick="showWindow(this.id, this.getAttribute('url'), 'get', 0);" href="javascript:;" rel="nofollow noopener" url="home.php?mod=spacecp&amp;ac=album&amp;op=saveforumphoto&amp;aid=265978&amp;handlekey=savephoto_265978">保存到相册</a>
+
+</p>
+
+<p class="xg1 y">2014-4-4 16:07 上传</p>
+
+</div>
+<div class="tip_horn"></div>
+</div>
+
+</ignore_js_op>
+ </div><div align="left"> </div><div align="left"> </div><div align="left">图 4 利用 apt 从 apk 中提取的原始信息</div><div align="left"> </div><div align="left">&nbsp; &nbsp;</div><div align="left">&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+<ignore_js_op>
+
+<img width="698" class="zoom" id="aimg_265979" onmouseover="showMenu({'ctrlid':this.id,'pos':'12'})" onclick="zoom(this, this.src, 0, 0, 0)" src="images/android01605.jpg" initialized="true" lazyloaded="true" inpost="1" file="https://attach.52pojie.cn/forum/201404/04/160714cfeqs3u04ylgpjzx.jpg" zoomfile="https://attach.52pojie.cn/forum/201404/04/160714cfeqs3u04ylgpjzx.jpg" aid="265979" _load="1">
+
+<div class="tip tip_4 aimg_tip" id="aimg_265979_menu" style="left: 440.62px; top: 4786px; display: none; position: absolute; z-index: 301;" initialized="true" disautofocus="true">
+<div class="xs0">
+<p><strong>QQ图片20140404160522.jpg</strong> <em class="xg1">(98.85 KB, 下载次数: 12)</em></p>
+<p>
+<a href="forum.php?mod=attachment&amp;aid=MjY1OTc5fGNiNGZjMGM1fDE1NzM1MzcwNjJ8MHwyNDk1Njk%3D&amp;nothumb=yes" target="_blank">下载附件</a>
+
+&nbsp;<a id="savephoto_265979" onclick="showWindow(this.id, this.getAttribute('url'), 'get', 0);" href="javascript:;" rel="nofollow noopener" url="home.php?mod=spacecp&amp;ac=album&amp;op=saveforumphoto&amp;aid=265979&amp;handlekey=savephoto_265979">保存到相册</a>
+
+</p>
+
+<p class="xg1 y">2014-4-4 16:07 上传</p>
+
+</div>
+<div class="tip_horn"></div>
+</div>
+
+</ignore_js_op>
+</div><div align="left"> </div><div align="left"> </div><div align="left">&nbsp;&nbsp;</div><div align="left">图 5 info.txt 中 mainactivity 的格式</div><div align="left">最后，通过上述方法将提取到的信息存入 assets 目录下的 config 文件中，供宿主程序使</div><div align="left">用。</div><div align="left">2）替换图标和标签</div><div align="left">①获取图标和标签信息</div><div align="left">考虑到安全性，需要对 host 程序进行必要的伪装，即重新打包后的 host 程序，安装后</div><div align="left"> </div><div align="left">在应用列表看上去要和 A 程序的一致，故还需要替换图标和标签。同理，通过上述方法，</div><div align="left">可从 info.txt 中获得 label 和 icon 的信息，如图 6 所示。</div><div align="left">
+<ignore_js_op>
+
+<img width="698" class="zoom" id="aimg_265981" onmouseover="showMenu({'ctrlid':this.id,'pos':'12'})" onclick="zoom(this, this.src, 0, 0, 0)" src="images/android01606.jpg" lazyloaded="true" inpost="1" file="https://attach.52pojie.cn/forum/201404/04/161048kiuihw6ibswihta8.jpg" zoomfile="https://attach.52pojie.cn/forum/201404/04/161048kiuihw6ibswihta8.jpg" aid="265981" _load="1">
+
+<div class="tip tip_4 aimg_tip" id="aimg_265981_menu" style="display: none; position: absolute;" disautofocus="true">
+<div class="xs0">
+<p><strong>QQ图片20140404160866666666666666666.jpg</strong> <em class="xg1">(70.56 KB, 下载次数: 10)</em></p>
+<p>
+<a href="forum.php?mod=attachment&amp;aid=MjY1OTgxfGU1OGY0NjlkfDE1NzM1MzcwNjJ8MHwyNDk1Njk%3D&amp;nothumb=yes" target="_blank">下载附件</a>
+
+&nbsp;<a id="savephoto_265981" onclick="showWindow(this.id, this.getAttribute('url'), 'get', 0);" href="javascript:;" rel="nofollow noopener" url="home.php?mod=spacecp&amp;ac=album&amp;op=saveforumphoto&amp;aid=265981&amp;handlekey=savephoto_265981">保存到相册</a>
+
+</p>
+
+<p class="xg1 y">2014-4-4 16:10 上传</p>
+
+</div>
+<div class="tip_horn"></div>
+</div>
+
+</ignore_js_op>
+</div><div align="left"> </div><div align="left">&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;图 6 info.txt 中的 label 和 icon 信息</div><div align="left">②替换图标和标签信息</div><div align="left">在获得 icon 路径和 label 之后，接下来需要替换 host.apk 中的这些信息。</div><div align="left">首先需要对主程序 A.apk 进行解包，以获得图标文件。Apk 解包同样使用 apktool。直</div><div align="left">接使用 apktool 解包的命令为“java –jar apktool.jar –d apkpathunpackeddir”，其中 apktool 支</div><div align="left">持很多参数，实现其他功能，方便起见将其封装为 bat 文件 unpack_apk.bat，内容如下。</div><div align="left"> </div><div align="left"> </div><div align="left">set PATH=%CD%;%PATH%;</div><div align="left">java -jar "%~dp0\apktool.jar" d %1 %2</div><div align="left"> </div><div align="left"> </div><div align="left">该批处理的第一个参数为 apk 路径，第二个参数为解包后的目录路径。在捆绑器程序中，</div><div align="left">可通过如下命令调用该批处理，实现相应的解包功能。</div><div align="left"> </div><div align="left"> </div><div align="left">ShellExecute(NULL, TEXT("open"), szBatfilePath,szParameters, NULL, SW_HIDE);</div><div align="left"> </div><div align="left"> </div><div align="left">其中，szParameters 即为批处理文件对应的两个参数。</div><div align="left">在成功解包之后，替换图标就很简单了，只需要用上述 icon 路径对应的文件替换宿主</div><div align="left">程序 host.apk 中的“\res\drawable-mdpi\ic_launcher.png”、 \res\drawable-hdpi\ic_launcher.png”、</div><div align="left">“\res\drawable-ldpi\ic_launcher.png”和“\res\drawable-xhdpi\ic_launcher.png”文件。</div><div align="left">宿主程序的标签信息位于“\res\values\strings.xml”中，具体如图 7 所示。</div><div align="left">只需将其中的app_name 对应的值替换为前面获取到的 label 的值即可。</div><div align="left">
+<ignore_js_op>
+
+<img width="507" class="zoom" id="aimg_265982" onmouseover="showMenu({'ctrlid':this.id,'pos':'12'})" onclick="zoom(this, this.src, 0, 0, 0)" src="images/android01607.jpg" initialized="true" lazyloaded="true" inpost="1" file="https://attach.52pojie.cn/forum/201404/04/161136kowmj2pvn0000j2j.jpg" zoomfile="https://attach.52pojie.cn/forum/201404/04/161136kowmj2pvn0000j2j.jpg" aid="265982" _load="1">
+
+<div class="tip tip_4 aimg_tip" id="aimg_265982_menu" style="left: 200.62px; top: 5627px; display: none; position: absolute; z-index: 301;" initialized="true" disautofocus="true">
+<div class="xs0">
+<p><strong>QQ图片20140404160910777777777777777.jpg</strong> <em class="xg1">(44.96 KB, 下载次数: 13)</em></p>
+<p>
+<a href="forum.php?mod=attachment&amp;aid=MjY1OTgyfDkzOWU2ZWFkfDE1NzM1MzcwNjJ8MHwyNDk1Njk%3D&amp;nothumb=yes" target="_blank">下载附件</a>
+
+&nbsp;<a id="savephoto_265982" onclick="showWindow(this.id, this.getAttribute('url'), 'get', 0);" href="javascript:;" rel="nofollow noopener" url="home.php?mod=spacecp&amp;ac=album&amp;op=saveforumphoto&amp;aid=265982&amp;handlekey=savephoto_265982">保存到相册</a>
+
+</p>
+
+<p class="xg1 y">2014-4-4 16:11 上传</p>
+
+</div>
+<div class="tip_horn"></div>
+</div>
+
+</ignore_js_op>
+</div><div align="left"> </div><div align="left"> </div><div align="left">&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; 图 7 宿主程序的 strings 文件内容</div><div align="left"> </div><div align="left"> </div><div align="left"><strong>3</strong>）打包、签名</div><div align="left">通过前面的步骤，我们已经成功修改好了宿主程序 host.apk，接下来需要对其进行打包、</div><div align="left">签名。</div><div align="left">①打包</div><div align="left">对 APK 的打包，仍旧采用 apktool，将其封装成apk_apk.bat，内容如下。</div><div align="left"><br>
+</div><div align="left">&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;set PATH=%CD%;%PATH%;</div><div align="left">java -jar "%~dp0\apktool.jar" b %1</div><div align="left"> 
+<ignore_js_op>
+
+<img width="700" class="zoom" id="aimg_265983" onmouseover="showMenu({'ctrlid':this.id,'pos':'12'})" onclick="zoom(this, this.src, 0, 0, 0)" src="images/android01608.jpg" initialized="true" lazyloaded="true" inpost="1" file="https://attach.52pojie.cn/forum/201404/04/161443errmevrabrzfaabe.jpg" zoomfile="https://attach.52pojie.cn/forum/201404/04/161443errmevrabrzfaabe.jpg" aid="265983" _load="1">
+
+<div class="tip tip_4 aimg_tip" id="aimg_265983_menu" style="left: 200.62px; top: 6032px; display: none; position: absolute; z-index: 301;" initialized="true" disautofocus="true">
+<div class="xs0">
+<p><strong>QQ图片2014040416131288888888888888.jpg</strong> <em class="xg1">(90.95 KB, 下载次数: 11)</em></p>
+<p>
+<a href="forum.php?mod=attachment&amp;aid=MjY1OTgzfGNkMGIxYmI1fDE1NzM1MzcwNjJ8MHwyNDk1Njk%3D&amp;nothumb=yes" target="_blank">下载附件</a>
+
+&nbsp;<a id="savephoto_265983" onclick="showWindow(this.id, this.getAttribute('url'), 'get', 0);" href="javascript:;" rel="nofollow noopener" url="home.php?mod=spacecp&amp;ac=album&amp;op=saveforumphoto&amp;aid=265983&amp;handlekey=savephoto_265983">保存到相册</a>
+
+</p>
+
+<p class="xg1 y">2014-4-4 16:14 上传</p>
+
+</div>
+<div class="tip_horn"></div>
+</div>
+
+</ignore_js_op>
+</div><div align="left"> </div><div align="left">其所需的唯一一个参数即为需要打包成 apk 的目录。类似的，程序中的调用方法依旧使</div><div align="left">用“ShellExecute(NULL,TEXT("open"), szPackBatfile, m_szFinalApkDir, m_pctApkToolDir,</div><div align="left">SW_HIDE);”。</div><div align="left">②签名</div><div align="left">对 apk 的签名，可通过使用工具 autosign 实现。其调用方式为“java -jar signapk.jar</div><div align="left">testkey.x509.pem testkey.pk8 unsigined.apk signed.apk”，需要的两个参数为签名的文件路径和</div><div align="left">成功签名后的文件路径。将其写为 sign.bat，内容为：“java -jar signapk.jar testkey.x509.pem</div><div align="left">testkey.pk8 %1 %2”。在捆绑器程序中相应的调用方式为“ShellExecute(NULL, TEXT("open"),</div><div align="left">szSignBatfile, szParameters, m_pctAutoSignDir, SW_HIDE);”，最终即可获得捆绑后的 apk 程</div><div align="left">序。</div><div align="left"> </div><div align="left"> </div><div align="left">总结</div><div align="left">通过前面的步骤，最终生成了一套由“apktool”、“auto-sign”、“host.apk”和“捆绑器”</div><div align="left">组成的 apk 捆绑器工具，如图 8 所示。</div><div align="left">&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;</div><div align="left"> </div><div align="left">图 8 捆绑器工具组成（左）和捆绑器运行界面（右）</div><div align="left">最终捆绑之后的 apk 应用程序具备和正常安装的 apk 一样的运行效果，但却能隐蔽的安</div><div align="left">装所指定的任意 apk 文件，达到预期的目的和功能效果。</div><div align="left">同时，在上述实现过程中仍存在一定的不足，如在安装捆绑之后的 apk 应用时，所显示</div><div align="left">的权限和非正常安装的程序（主程序 A.apk）的权限不一致。一种更完美的方法则可以考虑</div><div align="left">在修改 host.apk 文件时，同时将主程序 A.apk 的 manifest 中的权限也复制到 host.apk 的</div><div align="left">manifest 中，有兴趣的读者可以自行尝试。</div><div align="left"> </div><br>
+<div align="left"> </div><div align="left"> </div><div align="left"> </div><div align="left"> </div><div align="left"> </div><div align="left"> </div><div align="left"> </div><div align="left"> </div><div align="left"> </div><div align="left"> </div><div align="left"> </div><div align="left"> </div><div align="left"> </div><div align="left"> </div><div align="left"> </div><br>
+</td></tr></tbody></table>
+
+</div>
+
+
+</body></html>
