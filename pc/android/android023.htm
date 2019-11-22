@@ -1,0 +1,126 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AccessibilityService新增gesturedescription使用详解，7.0模拟手势抢红包核心代码分析 - qq_24641847的专栏 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                                <div class="article-copyright">
+                <span class="creativecommons">
+                <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                    </a>
+            <span>
+                版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。            </span>
+               <div class="article-source-link2222">
+                    本文链接：<a href="https://blog.csdn.net/qq_24641847/article/details/77683826">https://blog.csdn.net/qq_24641847/article/details/77683826</a>
+                </div>
+            </span>
+                    </div>
+                                                    <!--一个博主专栏付费入口-->
+             
+             <!--一个博主专栏付费入口结束-->
+            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-d284373521.css" rel="stylesheet">
+                                        <div class="markdown_views" id="content_views">
+                    <!-- flowchart 箭头图标 勿删 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-linecap="round" d="M 5 0 L 0 2.5 L 5 5 Z" />
+                    </svg>
+                                            <p>目前市面上大部分抢微信抢红包外挂的都失效了，最关键的原因就是在7.0我们再通过findAccessibilityNodeInfosByText或者findAccessibilityNodeInfosByViewId来拿View已经不行了，主要是系统已经换了新的方式实现，这就是本次要分享的内容，虽然我们拿不到View，但是我们可以通过模拟手势，一样可以实现点击拆红包 <br>
+下边就开始一步一步解析 <br>
+首先是<strong>dispatchGesture</strong>方法的解释</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="language-ruby hljs  has-numbering">boolean dispatchGesture (<span class="hljs-constant">GestureDescription</span> gesture, 
+                <span class="hljs-constant">AccessibilityService</span>.<span class="hljs-constant">GestureResultCallback</span> callback, 
+                <span class="hljs-constant">Handler</span> handler)</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li></ul></pre>
+
+<p>这个就是我们要实现模拟手势需要调用的方法 <br>
+这个方法有三个参数：</p>
+
+<ol>
+<li>参数GestureDescription：翻译过来就是手势的描述，如果要实现模拟，首先要描述你的腰模拟的手势嘛</li>
+<li>参数GestureResultCallback：翻译过来就是手势的回调，手势模拟执行以后回调结果</li>
+<li>参数handler：大部分情况我们不用的话传空就可以了 <br>
+一般我们关注GestureDescription这个参数就够了，下边就重点介绍一下这个参数</li>
+</ol>
+
+<p>GestureDescription官网描述：</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="language-rubly hljs livecodeserver has-numbering">Accessibility services <span class="hljs-operator">with</span> <span class="hljs-operator">the</span> AccessibilityService_canPerformGestures property can <span class="hljs-built_in">dispatch</span> gestures. This class describes those gestures. Gestures are made up <span class="hljs-operator">of</span> <span class="hljs-constant">one</span> <span class="hljs-operator">or</span> more strokes. Gestures are immutable once built. 
+Spatial dimensions throughout are <span class="hljs-operator">in</span> screen pixels. Time is measured <span class="hljs-operator">in</span> <span class="hljs-built_in">milliseconds</span>.</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li></ul></pre>
+
+<p>翻译过来大概意思：</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="language-ruby hljs  has-numbering">辅助功能服务，其具有<span class="hljs-constant">AccessibilityService_canPerformGestures</span>属性，可发送手势。此类描述手势。手势由一个或多个笔划组成。一旦生成, 手势是不可改变的。
+整个空间尺寸都以屏幕像素为单位。时间以毫秒为单位。</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li></ul></pre>
+
+<p>构建一个手势描述的关键代码：</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="language-ruby hljs  has-numbering"><span class="hljs-constant">GestureDescription</span>.<span class="hljs-constant">StrokeDescription</span>(<span class="hljs-constant">Path</span> path, long startTime, long duration)</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+
+<p>例如：</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="language-ruby hljs  has-numbering">val builder = <span class="hljs-constant">GestureDescription</span>.<span class="hljs-constant">Builder</span>()
+val gestureDescription = builder
+                    .addStroke(<span class="hljs-constant">GestureDescription</span>.<span class="hljs-constant">StrokeDescription</span>(path, <span class="hljs-number">100</span>, <span class="hljs-number">50</span>))
+                    .build()</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li></ul></pre>
+
+<p>参数介绍如下：</p>
+
+<ul>
+<li>参数path：笔画路径</li>
+<li>参数startTime：时间 (以毫秒为单位)，从手势开始到开始笔划的时间，非负数</li>
+<li>参数duration：笔划经过路径的持续时间(以毫秒为单位)，非负数</li>
+</ul>
+
+<p>这里重点介绍path，官网描述：</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="language-ruby hljs  has-numbering"><span class="hljs-symbol">ath:</span> <span class="hljs-constant">The</span> path to follow. <span class="hljs-constant">Must</span> have exactly one contour. <span class="hljs-constant">The</span> bounds of the path must <span class="hljs-keyword">not</span> be negative. <span class="hljs-constant">The</span> path must <span class="hljs-keyword">not</span> be empty. <span class="hljs-constant">If</span> the path has zero length (<span class="hljs-keyword">for</span> example, a single moveTo()), the stroke is a touch that doesn<span class="hljs-string">'t move.
+This value must never be null.</span></code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li></ul></pre>
+
+<p>翻译过来大概意思就是：</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="language-ruby hljs  has-numbering"><span class="hljs-constant">Path</span><span class="hljs-symbol">:</span> 要跟随的路径。必须有正好一个轮廓。路径的边界不得为负数。路径不得为空。如果路径的长度为零 (例如, 单个moveTo()), 则笔划是一个没有移动的点击</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+
+<p>那就很清晰了，如果要模拟单机事件，直接像这样就好：</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="language-ruby hljs  has-numbering">val path = <span class="hljs-constant">Path</span>()
+path.moveTo(x, y)</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li></ul></pre>
+
+<p><em>注意：其中x和y表示要点击的按钮坐标相对于屏幕左上角的坐标</em> <br>
+那如果要模拟滚动手势就可以像这样：</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="language-ruby hljs  has-numbering">val path = <span class="hljs-constant">Path</span>()
+path.moveTo(x1, y1)
+path.lineTo(x2, y2)</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li></ul></pre>
+
+<p>表示模拟从第一个点滚动到第二个点，其他更复杂的手势都可以通过path模拟 <br>
+至此关于模拟手势问题介绍完毕，如有疑问可留言</p>                                    </div>
+                <link href="https://csdnimg.cn/release/phoenix/mdeditor/markdown_views-b6c3c6d139.css" rel="stylesheet">
+                    </div>
+
+
+</div>
+
+
+</body></html>

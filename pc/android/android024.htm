@@ -1,0 +1,293 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android项目之JSON解析（3种解析技术详解） - ChessLuo - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content">
+                                            <div class="article-copyright">
+                <span class="creativecommons">
+                    <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                    </a>
+                    <span>
+                        版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。                    </span>
+                    <div class="article-source-link2222">
+                        本文链接：<a href="https://blog.csdn.net/qq_29269233/article/details/53352668">https://blog.csdn.net/qq_29269233/article/details/53352668</a>
+                    </div>
+                </span>
+                    
+                </div>
+                                                    <!--一个博主专栏付费入口-->
+             
+             <!--一个博主专栏付费入口结束-->
+            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-4a3473df85.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-4a3473df85.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            <p><strong>前言：</strong></p>
+
+<p>在我写博客前再声明一下，我希望转载我文章的某某某记得注明：（<span style="color: rgb(255, 0, 0);">本文来自<a href="http://blog.csdn.net/qq_29269233" rel="nofollow">http://blog.csdn.net/qq_29269233</a></span>），要尊重我的劳动成果，这样才能给我更多的支持和鼓励！差不多有3天没有写博客了，要想的、要做的事情太多了，额....原归正传，今天接着上一篇博客：<a href="http://blog.csdn.net/qq_29269233/article/details/53300249" rel="nofollow">Android项目之JSON解析（扯淡）</a><strong>，</strong>继续分享我对JSON解析的了解。</p>
+
+<p>&nbsp;</p>
+
+<p><strong>一、用Android原生技术解析JSON：</strong></p>
+
+<p>特点：很麻烦，对于复杂的json数据解析很容易出错！（不推荐使用）</p>
+
+<p>1、解析JSON对象的API：JsonObject</p>
+
+<p>JSONObject(String&nbsp;json)；将Json字符串解析成Json对象；</p>
+
+<p>XxxgetXxx(String name) ；根据name在json对象中得到相应的value。</p>
+
+<p>示例代码：</p>
+
+<p>（1）获取或创建JSON数据（为了方便，这里就直接创建了）：</p>
+
+<p>&nbsp;</p>
+
+<pre class="has" name="code"><code class="language-java hljs"><ol class="hljs-ln" style="width: 836px;"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> String json = <span class="hljs-string">"{\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"\t\"id\":2, \"name\":\"金鱼\", \n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"\t\"price\":12.3, \n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"\t\"imagePath\":\"http://blog.csdn.net/qq_29269233/L05_Server/images/f1.jpg\"\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"}\n"</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        ShopInfo shopInfo = <span class="hljs-keyword">null</span>;</div></div></li></ol></code></pre>
+
+<p>&nbsp;</p>
+
+<p>（2）解析Json对象：</p>
+
+<p>&nbsp;</p>
+
+<pre class="has" name="code"><code class="language-java hljs"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> <span class="hljs-keyword">try</span> {</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">            JSONObject jsonObject = <span class="hljs-keyword">new</span> JSONObject(json);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">//            int id = jsonObject.getInt("id");</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">            <span class="hljs-keyword">int</span> id1 = jsonObject.optInt(<span class="hljs-string">"id"</span>);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">            String name = jsonObject.optString(<span class="hljs-string">"name"</span>);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">            <span class="hljs-keyword">double</span> price = jsonObject.optDouble(<span class="hljs-string">"price"</span>);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">            String imagePath = jsonObject.optString(<span class="hljs-string">"imagePath"</span>);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">            <span class="hljs-comment">// 封装Java对象</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">            shopInfo = <span class="hljs-keyword">new</span> ShopInfo(id1, name, price, imagePath);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="15"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        } <span class="hljs-keyword">catch</span> (JSONException e) {</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="16"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">            e.printStackTrace();</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="17"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        }</div></div></li></ol></code></pre>
+
+<p>注意：这里记得要加try_catch异常处理。<br>
+&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>（3）创建JavaBean类，并显示解析后的数据：</p>
+
+<p>&nbsp;</p>
+
+<pre class="has" name="code"><code class="language-java hljs">        tv_native_last.setText(shopInfo.toString());</code></pre>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>2、解析Json数组的API：JSONArray</p>
+
+<p>JSONArray(String&nbsp;json)；将json字符串解析成json数组；</p>
+
+<p>int length()；得到json数组中元素的个数；</p>
+
+<p>XxxgetXxx(int s) ；根据下标得到json数组中对应的元素数据。</p>
+
+<p>示例代码：</p>
+
+<p>（1）获取或创建JSON数据：</p>
+
+<p>&nbsp;</p>
+
+<pre class="has" name="code"><code class="language-java hljs"><ol class="hljs-ln" style="width: 759px;"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> String json = <span class="hljs-string">"[\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"    {\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"id\": 1,\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"imagePath\": \"http://blog.csdn.net/qq_29269233/f1.jpg\",\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"name\": \"金鱼1\",\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"price\": 12.3\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"    },\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"    {\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"id\": 2,\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"imagePath\": \"http://blog.csdn.net/qq_29269233/f2.jpg\",\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"name\": \"金鱼2\",\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"price\": 12.5\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"    }\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"]"</span>;</div></div></li></ol></code></pre>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>（2）解析json数组：</p>
+
+<p>&nbsp;</p>
+
+<pre class="has" name="code"><code class="language-java hljs"><ol class="hljs-ln" style="width: 698px;"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">try</span> {</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">            JSONArray jsonArray = <span class="hljs-keyword">new</span> JSONArray(json);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; jsonArray.length(); i++) {</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                JSONObject jsonObject = jsonArray.getJSONObject(i);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-keyword">if</span> (jsonObject != <span class="hljs-keyword">null</span>) {</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                    <span class="hljs-keyword">int</span> id = jsonObject.optInt(<span class="hljs-string">"id"</span>);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                    String name = jsonObject.optString(<span class="hljs-string">"name"</span>);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                    <span class="hljs-keyword">double</span> price = jsonObject.optDouble(<span class="hljs-string">"price"</span>);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                    String imagePath = jsonObject.optString(<span class="hljs-string">"imagePath"</span>);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="15"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="16"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                    <span class="hljs-comment">// 封装Java对象</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="17"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                    ShopInfo shopInfo = <span class="hljs-keyword">new</span> ShopInfo(id, name, price, imagePath);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="18"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="19"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                    shops.add(shopInfo);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="20"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                }</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="21"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">            }</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="22"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        } <span class="hljs-keyword">catch</span> (JSONException e) {</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="23"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">            e.printStackTrace();</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="24"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        }</div></div></li></ol></code></pre>
+
+<p><br>
+（3）显示解析后的数据：</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<pre class="has" name="code"><code class="language-java hljs">   tv_native_last.setText(shops.toString());
+</code></pre>
+
+<p><br><strong><em>到此为止，这就是用原生的技术去解析json了，至于复杂特殊的json数据怎样去解析，也是大同小异了，一层一层解析就对了！</em></strong></p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p><strong>二、用Gson框架技术解析JSON：</strong></p>
+
+<p>特点：解析没那么麻烦，代码量简洁，可以很方便地解析复杂的Json数据，而且谷歌官方也推荐使用。</p>
+
+<p>先放出jar包的下载地址：<a href="https://mvnrepository.com/artifact/com.google.code.gson/gson" rel="nofollow">https://mvnrepository.com/artifact/com.google.code.gson/gson</a></p>
+
+<p><img class="has" alt="" src="images/android02401.jpg"></p>
+
+<p>如过用Android Studio做开发的话，可以通过Gradle，直接添加依赖，不用下载jar包，很方便,如下：</p>
+
+<p><img class="has" alt="" src="images/android02402.jpg"></p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>1、用Gson解析JSON对象：</p>
+
+<p>（1）将gson的jar包导入到项目libs目录下，或者直接通过Gradle添加依赖：</p>
+
+<p>&nbsp;</p>
+
+<pre class="has" name="code"><code class="language-java hljs">compile group: <span class="hljs-string">'com.google.code.gson'</span>, name: <span class="hljs-string">'gson'</span>, version: <span class="hljs-string">'2.8.0'</span></code></pre>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>（2）创建Gson对象：</p>
+
+<p>&nbsp;</p>
+
+<pre class="has" name="code"><code class="language-java hljs"> Gson gson = <span class="hljs-keyword">new</span> Gson();</code></pre>
+
+<p><br>
+（3）通过创建的Gson对象调用fromJson()方法，返回该json数据对象的Java对象；</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<pre class="has" name="code"><code class="language-java hljs">ShopInfo shopInfo = gson.fromJson(json, ShopInfo.class);</code></pre>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p><strong>注意要记得创建对象的JavaBean类；要求json对象中的key的名称与Java对象的JavaBean类中的属性名要相同，否则解析不成功！</strong></p>
+
+<p><br>
+示例代码如下：</p>
+
+<p>&nbsp;</p>
+
+<pre class="has" name="code"><code class="language-java hljs"><ol class="hljs-ln" style="width: 836px;"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> <span class="hljs-comment">// 1 获取或创建JSON数据</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        String json = <span class="hljs-string">"{\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"\t\"id\":2, \"name\":\"金鱼\", \n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"\t\"price\":12.3, \n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"\t\"imagePath\":\"http://blog.csdn.net/qq_29269233/L05_Server/images/f1.jpg\"\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"}\n"</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        <span class="hljs-comment">// 2 解析JSON数据</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        Gson gson = <span class="hljs-keyword">new</span> Gson();</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        ShopInfo shopInfo = gson.fromJson(json, ShopInfo.class);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        <span class="hljs-comment">// 3 展示数据</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        tv_gson_last.setText(shopInfo.toString());</div></div></li></ol></code></pre>
+
+<p><br>
+2、用Gson解析JSON数组：</p>
+
+<p>&nbsp;</p>
+
+<p>（1）（2）与上面相同，要用Gson就要先添加依赖，然后创建Gson对象；</p>
+
+<p>（3）通过创建的Gson对象调用fromJson()方法，返回该json数据对应的Java集合。</p>
+
+<p><strong>这里但强调一下：要记得创建对象的JavaBean类；要求json对象中的key的名称与Java对象的JavaBean类中的属性名要相同，否则解析不成功！</strong></p>
+
+<p>&nbsp;</p>
+
+<p>示例代码如下：</p>
+
+<p>&nbsp;</p>
+
+<pre class="has" name="code"><code class="language-java hljs"><ol class="hljs-ln" style="width: 759px;"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> <span class="hljs-comment">// 1 获取或创建JSON数据</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        String json = <span class="hljs-string">"[\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"    {\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"id\": 1,\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"imagePath\": \"http://blog.csdn.net/qq_29269233/f1.jpg\",\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"name\": \"金鱼1\",\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"price\": 12.3\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"    },\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"    {\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"id\": 2,\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"imagePath\": \"http://blog.csdn.net/qq_29269233/f2.jpg\",\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"name\": \"金鱼2\",\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"price\": 12.5\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"    }\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="15"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"]"</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="16"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="17"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        <span class="hljs-comment">// 2 解析JSON数据</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="18"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        Gson gson = <span class="hljs-keyword">new</span> Gson();</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="19"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="20"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        List&lt;ShopInfo&gt; shops = gson.fromJson(json, <span class="hljs-keyword">new</span> TypeToken&lt;List&lt;ShopInfo&gt;&gt;() {</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="21"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        }.getType());</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="22"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="23"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        <span class="hljs-comment">// 3 展示数据</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="24"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        tv_gson_last.setText(shops.toString());</div></div></li></ol></code></pre>
+
+<p><br><strong><em>还是那句话，复杂特殊的都是大同小异，理解了方法就没问题了！</em></strong></p>
+
+<p>&nbsp;</p>
+
+<p>3、Gson还可以将Java对象、Java对象的List&nbsp;转换为json字符串{}；有兴趣的就去研究一下哈。</p>
+
+<p>&nbsp;</p>
+
+<p><strong>三、用Fastjson框架技术解析JSON：</strong></p>
+
+<p>特点：Fastjson是用Java语言编写的高性能功能完善的JSON库。它采用了一种“假定有序、快速匹配”的算法，</p>
+
+<p>把JSON Parse的性能提升到极致，是目前Java语言中最快的JSON库。</p>
+
+<p>Fastjson是阿里巴巴开源框架，已经开源到github上了,地址为：<a href="https://github.com/alibaba/fastjson" rel="nofollow">https://github.com/alibaba/fastjson</a></p>
+
+<p><img class="has" alt="" src="images/android02403.jpg"><img class="has" alt="" src="images/android02404.jpg"></p>
+
+<p>&nbsp;</p>
+
+<p>在github上，我还专门留意了这个，哈哈，gson和fastjson比起来，gson就是“乌龟”</p>
+
+<p><img class="has" alt="" src="images/android02405.jpg"></p>
+
+<p>要使用Fastjson，也是想Gson一样，先导入jar包，或者在Gradle中添加依赖：</p>
+
+<p>&nbsp;</p>
+
+<pre class="has" name="code"><code class="language-java hljs"> compile <span class="hljs-string">'com.alibaba:fastjson:1.1.55.android'</span></code></pre>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>添加好依赖后就可以使用Fastjson了！</p>
+
+<p>1、用Fastjson解析JSON对象：</p>
+
+<p>利用Fastjson的JSON调用parseObject()方法，获取转换后的Java对象。</p>
+
+<p><strong>注意要记得创建对象的JavaBean类；要求json对象中的key的名称与Java对象的JavaBean类中的属性名要相同，否则解析不成功！</strong></p>
+
+<p>示例代码：</p>
+
+<p>&nbsp;</p>
+
+<pre class="has" name="code"><code class="language-java hljs"><ol class="hljs-ln" style="width: 836px;"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> <span class="hljs-comment">// 1 获取或创建json数据</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        String json = <span class="hljs-string">"{\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"\t\"id\":2, \"name\":\"金鱼\", \n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"\t\"price\":12.3, \n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"\t\"imagePath\":\"http://blog.csdn.net/qq_29269233/L05_Server/images/f1.jpg\"\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"}\n"</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        <span class="hljs-comment">// 2 解析JSON数据</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        ShopInfo shopInfo = JSON.parseObject(json, ShopInfo.class);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        <span class="hljs-comment">// 3 显示数据</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        tv_fastjson_last.setText(shopInfo.toString());</div></div></li></ol></code></pre>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>2.用Fastjson解析JSON数组：</p>
+
+<p>利用Fastjson的JSON调用parseArray()方法，获取转换后的Java集合。</p>
+
+<p><strong>这里但强调一下：要记得创建对象的JavaBean类；要求json对象中的key的名称与Java对象的JavaBean类中的属性名要相同，否则解析不成功！</strong></p>
+
+<p>示例代码：</p>
+
+<p>&nbsp;</p>
+
+<pre class="has" name="code"><code class="language-java hljs"><ol class="hljs-ln" style="width: 759px;"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> <span class="hljs-comment">// 1 获取或创建json数据</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        String json = <span class="hljs-string">"[\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"    {\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"id\": 1,\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"imagePath\": \"http://blog.csdn.net/qq_29269233/f1.jpg\",\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"name\": \"金鱼1\",\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"price\": 12.3\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"    },\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"    {\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"id\": 2,\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"imagePath\": \"http://blog.csdn.net/qq_29269233/f2.jpg\",\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"name\": \"金鱼2\",\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"        \"price\": 12.5\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"    }\n"</span> +</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="15"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">                <span class="hljs-string">"]"</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="16"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="17"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">       <span class="hljs-comment">// 2 解析JSON数据</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="18"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        List&lt;ShopInfo&gt; shopInfos = JSON.parseArray(json, ShopInfo.class);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="19"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="20"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        <span class="hljs-comment">// 3 显示数据</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="21"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        tv_fastjson_last.setText(shopInfos.toString());</div></div></li></ol></code></pre>
+
+<p><br>
+3、同样Fastjson也可以将Java对象、Java对象的List&nbsp;转换为json字符串{}；有兴趣的就去研究一下哈。</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>到此为止，已经完美对接了上一篇博客：<a href="http://blog.csdn.net/qq_29269233/article/details/53300249" rel="nofollow">Android项目之JSON解析（扯淡）</a> ，算是比较详细地介绍了json解析了。</p>
+
+<p>&nbsp;</p>
+
+<p>支持我的话可以关注下我的公众号，也欢迎大家投稿~</p>
+
+<blockquote>
+<p>扫一扫关注我的微信公众号：程序猿在广东</p>
+
+<p><img width="100" height="100" class="has" alt="" src="images/android02406.jpg"></p>
+</blockquote>
+
+<p>&nbsp;</p>
+
+<p><span style="color: rgb(255, 255, 255);"><strong>，</strong></span></p>                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>

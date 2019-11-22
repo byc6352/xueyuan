@@ -1,0 +1,149 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PCM数据格式 - cyq129445的博客 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="post">
+            <h1 class="postTitle">
+                
+<a class="postTitle2" id="cb_post_title_url" href="https://www.cnblogs.com/sthu/p/9098720.html">Android APK反编译就这么简单 详解</a>
+
+            </h1>
+            <div class="clear"></div>
+            <div class="postBody">
+                
+<div class="blogpost-body " id="cnblogs_post_body">
+    <p>在学习Android开发的过程你，你往往会去借鉴别人的应用是怎么开发的，那些漂亮的动画和精致的布局可能会让你爱不释手，作为一个开发者，你可能会很想知道这些效果界面是怎么去实现的，这时，你便可以对改应用的APK进行反编译查看。下面是我参考了一些文章后简单的教程详解。</p>
+<p>（注：反编译不是让各位开发者去对一个应用破解搞重装什么的，主要目的是为了促进开发者学习，借鉴好的代码，提升自我开发水平。）</p>
+<p>&nbsp;</p>
+<p>测试环境：</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;win 7&nbsp;</p>
+<p>&nbsp;</p>
+<p>使用工具：</p>
+<p>&nbsp; &nbsp; &nbsp;CSDN上下载地址：</p>
+<p>&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;apktool&nbsp;（资源文件获取）&nbsp;&nbsp;<a href="http://download.csdn.net/detail/vipzjyno1/7025111" target="_blank">下载</a>&nbsp;&nbsp;</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;dex2jar（源码文件获取）&nbsp;<a href="http://download.csdn.net/detail/vipzjyno1/7025127" target="_blank">下载</a></p>
+<p>&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;jd-gui&nbsp;&nbsp;（源码查看）&nbsp;<a href="http://download.csdn.net/detail/vipzjyno1/7025145" target="_blank">下载</a></p>
+<p>&nbsp;</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;Android反编译整合工具包（最新）&nbsp;<a href="http://download.csdn.net/detail/vipzjyno1/7025729" target="_blank">下载</a></p>
+<p>&nbsp;</p>
+<p>&nbsp; &nbsp; &nbsp;官方最新版本下载地址：</p>
+<p>&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;<a href="https://code.google.com/p/android-apktool/downloads/list" target="_blank">apktool</a>（google code）</p>
+<p><a href="https://code.google.com/p/android-apktool/downloads/list" target="_blank">&nbsp;</a>&nbsp;<a href="http://code.google.com/p/dex2jar/downloads/list" target="_blank">dex2jar</a>（google code）&nbsp;&nbsp;</p>
+<p><a href="https://code.google.com/p/android-apktool/downloads/list" target="_blank">&nbsp;&nbsp;</a>&nbsp;<a href="http://code.google.com/p/innlab/downloads/list" target="_blank">jd-gui</a>（google code）最新版请见<a href="http://java.decompiler.free.fr/?q=jdgui" target="_blank">官方</a></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>工具介绍：</p>
+<p>apktool&nbsp;&nbsp;</p>
+<p>&nbsp; &nbsp; &nbsp;作用：资源文件获取，可以提取出图片文件和布局文件进行使用查看</p>
+<p>dex2jar</p>
+<p>&nbsp; &nbsp; &nbsp;作用：将apk反编译成java源码（classes.dex转化成jar文件）</p>
+<p>jd-gui</p>
+<p>&nbsp; &nbsp; &nbsp;作用：查看APK中classes.dex转化成出的jar文件，即源码文件</p>
+<p>&nbsp;</p>
+<p>反编译流程：</p>
+<p>一、apk反编译得到程序的源代码、图片、XML配置、语言资源等文件</p>
+<p>下载上述工具中的apktool，解压得到3个文件：aapt.exe，apktool.bat，apktool.jar ，将需要反编译的APK文件放到该目录下，</p>
+<p>打开命令行界面（运行-CMD）&nbsp;，定位到apktool文件夹，输入以下命令：apktool.bat d -f &nbsp;test.apk &nbsp;test &nbsp; &nbsp;</p>
+<p><img alt="" src="images/smali00101.jpg"></p>
+<p>（命令中test.apk指的是要反编译的APK文件全名，test为反编译后资源文件存放的目录名称，即为：apktool.bat &nbsp; d &nbsp;-f &nbsp; &nbsp;[apk文件 ]&nbsp;&nbsp; [输出文件夹]）</p>
+<p><img alt="" src="images/smali00102.jpg"></p>
+<p>说明获取成功，之后发现在文件夹下多了个test文件，点击便可以查看该应用的所有资源文件了。</p>
+<p>如果你想将反编译完的文件重新打包成apk，那你可以：输入apktool.bat &nbsp; b &nbsp; &nbsp;test（你编译出来文件夹）便可，效果如下：</p>
+<p><img alt="" src="images/smali00103.jpg"></p>
+<p>之后在之前的test文件下便可以发现多了2个文件夹:</p>
+<p>build</p>
+<p>dist(里面存放着打包出来的APK文件)</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>二、Apk反编译得到Java源代码</p>
+<p>下载上述工具中的dex2jar和jd-gui&nbsp;，解压</p>
+<p>将要反编译的APK后缀名改为.rar或则 .zip，并解压，得到其中的额classes.dex文件（它就是java文件编译再通过dx工具打包而成的），将获取到的classes.dex放到之前解压出来的工具dex2jar-0.0.9.15&nbsp;文件夹内，</p>
+<p>在命令行下定位到dex2jar.bat所在目录，输入dex2jar.bat&nbsp;&nbsp;&nbsp;classes.dex，效果如下：</p>
+<p><img alt="" src="images/smali00104.jpg"></p>
+<p>在改目录下会生成一个classes_dex2jar.jar的文件，然后打开工具jd-gui文件夹里的jd-gui.exe，之后用该工具打开之前生成的classes_dex2jar.jar文件，便可以看到源码了，效果如下：</p>
+<p><img alt="" src="images/smali00105.jpg"></p>
+<p>被混淆过的效果图（类文件名称以及里面的方法名称都会以a,b,c....之类的样式命名）：</p>
+<p><img alt="" src="images/smali00106.jpg"></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>三、 图形化反编译apk（本人未使用过）</p>
+<p>上述步骤一、二讲述了命令行反编译apk，现在提供一种图形化反编译工具：Androidfby</p>
+<p>首先，下载上述反编译工具包，打开Androidfby目录，双击Android反编译工具.exe，就可以浏览打开要反编译的apk</p>
+<p><img alt="" src="images/smali00107.jpg"></p>
+<p>&nbsp;</p>
+<p>通过反编译，你可以获知该应用用到了什么第3方的库文件，它的代码是如何编写的等等。</p>
+<p>然而，如果该APK进行了混淆处理，那么你看到的类文件名称以及里面的方法名称都会以a,b,c....之类的样式命名，所以你可以想找到你所想得知的界面代码可能会十分费劲，找到了代码可能看起来也会很费劲，可是一个大体的思路会获得，有了这个思路，你就可以自己去尝试了。</p>
+<p>本人曾经想写一个类似唱吧的名人界面布局，可是当初第一次接触不知道如何去写，进进行了反编译，即使他的那个代码是混淆过的，我也看出来他是通过LISTVIEW的TYPE设定不同的ITEM布局实现了。可能好多引用都是采用重写VIEW来实现效果，你可以得到他的大体思路对你的开发有益无害。</p>
+<p>&nbsp;</p>
+<p>还有处于一个开发者辛辛苦苦将自己的应用开发出来被别人一反编译便成为了他自己的东西，所以要进行混淆处理：</p>
+<p>以下是我转载的混淆的教程：<a href="http://blog.csdn.net/vipzjyno1/article/details/21042823" target="_blank">http://blog.csdn.net/vipzjyno1/article/details/21042823</a></p>
+<p>&nbsp;</p>
+</div>
+<div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block">
+
+
+    <div id="blog_post_info">
+<div id="green_channel">
+        <a id="green_channel_digg" onclick="DiggIt(9098720,cb_blogId,1);green_channel_success(this,'谢谢推荐！');" href="javascript:void(0);">好文要顶</a>
+        <a id="green_channel_follow" onclick="follow('7d2092a0-465e-48cf-f1ff-08d4ef52ecb5');" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a title="分享至新浪微博" id="green_channel_weibo" onclick="ShareToTsina()" href="javascript:void(0);"><img alt="" src="images/smali00108.png"></a>
+    <a title="分享至微信" id="green_channel_wechat" onclick="shareOnWechat()" href="javascript:void(0);"><img alt="" src="images/smali00109.png"></a>
+</div>
+<div id="author_profile">
+    <div class="author_profile_info" id="author_profile_info">
+            <a href="https://home.cnblogs.com/u/sthu/" target="_blank"><img class="author_avatar" alt="" src="images/smali00110.png"></a>
+        <div class="author_profile_info" id="author_profile_detail">
+            <a href="https://home.cnblogs.com/u/sthu/">sthu</a><br>
+            <a href="https://home.cnblogs.com/u/sthu/followees/">关注 - 1</a><br>
+            <a href="https://home.cnblogs.com/u/sthu/followers/">粉丝 - 13</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow">
+                <a onclick="follow('7d2092a0-465e-48cf-f1ff-08d4ef52ecb5');return false;" href="javascript:void(0);">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(9098720,'Digg')">
+        <span class="diggnum" id="digg_count">0</span>
+    </div>
+    <div class="buryit" onclick="votePost(9098720,'Bury')">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+    <div class="clear"></div>
+    <div id="post_next_prev">
+
+    <a class="p_n_p_prefix" href="https://www.cnblogs.com/sthu/p/9066142.html">« </a> 上一篇：    <a title="发布于 2018-05-21 10:55" href="https://www.cnblogs.com/sthu/p/9066142.html">大话CNN</a>
+    <br>
+    <a class="p_n_p_prefix" href="https://www.cnblogs.com/sthu/p/9131760.html">» </a> 下一篇：    <a title="发布于 2018-06-04 09:25" href="https://www.cnblogs.com/sthu/p/9131760.html">基于python的图片修复程序-可用于水印去除</a>
+
+</div>
+</div>
+            </div>
+            <div class="postDesc">posted @ 
+<span id="post-date">2018-05-28 10:12</span>&nbsp;<a href="https://www.cnblogs.com/sthu/">sthu</a> 阅读(<span id="post_view_count">11225</span>) 评论(<span id="post_comment_count">0</span>) <a href="https://i.cnblogs.com/EditPosts.aspx?postid=9098720" rel="nofollow"> 编辑</a> <a onclick="AddToWz(9098720); return false;" href="javascript:void(0)">收藏</a>
+</div>
+        </div>
+
+</div>
+
+
+</body></html>

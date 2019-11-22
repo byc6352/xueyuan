@@ -1,0 +1,265 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android动态更换APP图标及名称 - Fu - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                                <div class="article-copyright">
+                <span class="creativecommons">
+                <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                    </a>
+            <span>
+                版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。            </span>
+               <div class="article-source-link2222">
+                    本文链接：<a href="https://blog.csdn.net/fu908323236/article/details/78813136">https://blog.csdn.net/fu908323236/article/details/78813136</a>
+                </div>
+            </span>
+                    </div>
+                                                    <!--一个博主专栏付费入口-->
+             
+             <!--一个博主专栏付费入口结束-->
+            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-d284373521.css" rel="stylesheet">
+                                        <div class="markdown_views" id="content_views">
+                    <!-- flowchart 箭头图标 勿删 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-linecap="round" d="M 5 0 L 0 2.5 L 5 5 Z" />
+                    </svg>
+                                            <h3 id="前言"><a name="t0"></a>前言</h3>
+
+<p>本来想研究一加手机上的天气APP，会随着每天的天气、温度不同动态的改变APP的图标是如何实现的，但始终没有想出和查阅到相关方法，毕竟是人家自己的系统APP。但是也找到了一种能动态改变图标的方法，这里做一下简单的记录。</p>
+
+
+
+<h3 id="效果图"><a name="t1"></a>效果图</h3>
+
+<p><img title="" alt="这里写图片描述" src="images/android01801.jpg"></p>
+
+<p>这里点击完“改变图标”后，桌面上的APP图标不会立即改变，会有一定的延迟，需要等待Launcher刷新。</p>
+
+
+
+<h3 id="基础原理"><a name="t2"></a>基础原理</h3>
+
+<p><strong>多入口配置：activity-alias</strong> <br>
+alias是别名的意思，顾名思义，就是可以给Activity配置别名。在AndroidManifest.xml中，与基本的Activity的配置大体相似,如：</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs xml has-numbering">        <span class="hljs-tag">&lt;<span class="hljs-title">activity
+</span>            <span class="hljs-attribute">android:name</span>=<span class="hljs-value">".MainActivity"</span>
+            <span class="hljs-attribute">android:label</span>=<span class="hljs-value">"改变前的"</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-title">intent-filter</span>&gt;</span>
+                <span class="hljs-tag">&lt;<span class="hljs-title">action</span> <span class="hljs-attribute">android:name</span>=<span class="hljs-value">"android.intent.action.MAIN"</span> /&gt;</span>
+
+                <span class="hljs-tag">&lt;<span class="hljs-title">category</span> <span class="hljs-attribute">android:name</span>=<span class="hljs-value">"android.intent.category.LAUNCHER"</span> /&gt;</span>
+            <span class="hljs-tag">&lt;/<span class="hljs-title">intent-filter</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-title">activity</span>&gt;</span>
+
+        <span class="hljs-tag">&lt;<span class="hljs-title">activity-alias
+</span>            <span class="hljs-attribute">android:name</span>=<span class="hljs-value">".test"</span>
+            <span class="hljs-attribute">android:enabled</span>=<span class="hljs-value">"false"</span>
+            <span class="hljs-attribute">android:icon</span>=<span class="hljs-value">"@mipmap/icon_test"</span>
+            <span class="hljs-attribute">android:label</span>=<span class="hljs-value">"改变后的"</span>
+            <span class="hljs-attribute">android:targetActivity</span>=<span class="hljs-value">".MainActivity"</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-title">intent-filter</span>&gt;</span>
+                <span class="hljs-tag">&lt;<span class="hljs-title">action</span> <span class="hljs-attribute">android:name</span>=<span class="hljs-value">"android.intent.action.MAIN"</span> /&gt;</span>
+
+                <span class="hljs-tag">&lt;<span class="hljs-title">category</span> <span class="hljs-attribute">android:name</span>=<span class="hljs-value">"android.intent.category.LAUNCHER"</span> /&gt;</span>
+            <span class="hljs-tag">&lt;/<span class="hljs-title">intent-filter</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-title">activity-alias</span>&gt;</span></code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li></ul></pre>
+
+<p>上面的默认的，下面的是配置的别名，也就是另一个入口。 <br>
+android:name：就是注册这个组件的名字，不需要去创建test.java这个类，就是个名字，我这里的这个名称是，com.fu.changeicondemo.test <br>
+android:enabled：是否启用这个组件，也就是是否显示这个入口。 <br>
+android:icon：图标 <br>
+android:label：名称 <br>
+android:targetActivity：这个需要注意，默认的activity没有这个属性，这个属性就是指定目标activity，与默认的activity中的name属性是一样的，需要有相应的java类文件。 <br>
+然后intent-filter是一样的。</p>
+
+<p>我们把别名activity的android:enabled设为true,就是开启它，桌面上就有两个入口了。 <br>
+如图： <br>
+<img title="" alt="这里写图片描述" src="images/android01802.jpg"> <br>
+点击这两个图标效果是一样的，都是进入MainActivity。</p>
+
+<p>讲到这里，相信读者应该已经明白了，如何动态改变图标了，其实就启用不同的入口就行，然后每次就只有一个入口被启用就行了，在默认情况下，我们就让启动的默认组件，其他入口组件全部禁用，需要用哪个就启用哪个，并且把其他的关闭了，避免出现多个入口，那么如何通过代码动态的设置启动或禁用呢？</p>
+
+<p><strong>如何动态设置是否启用？</strong> <br>
+那就需要packageManager，有一个这个方法：</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs avrasm has-numbering">        packageManager<span class="hljs-preprocessor">.setComponentEnabledSetting</span>(componentName,
+                PackageManager<span class="hljs-preprocessor">.COMPONENT</span>_ENABLED_STATE_ENABLED,
+                PackageManager<span class="hljs-preprocessor">.DONT</span>_KILL_APP)<span class="hljs-comment">;</span></code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li></ul></pre>
+
+<p>第一个参数是组件，第二个参数就是是否启用，第三个参数一般就填不杀死APP。 <br>
+然后组件通过自己定义的组件名字来获取到，如</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs cs has-numbering">        <span class="hljs-comment">//拿到我们注册的MainActivity组件</span>
+        defaultComponent = <span class="hljs-keyword">new</span> ComponentName(getBaseContext(), <span class="hljs-string">"com.fu.changeicondemo.MainActivity"</span>);  <span class="hljs-comment">//拿到默认的组件</span>
+        <span class="hljs-comment">//拿到我注册的别名test组件</span>
+        testComponent = <span class="hljs-keyword">new</span> ComponentName(getBaseContext(), <span class="hljs-string">"com.fu.changeicondemo.test"</span>);</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li></ul></pre>
+
+<p>到了这里，相信大家已经很清楚了如何实现了，下面附上代码。</p>
+
+
+
+<h3 id="代码"><a name="t3"></a>代码</h3>
+
+<p><strong>MainActivity.java</strong></p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs java has-numbering"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MainActivity</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">AppCompatActivity</span> {</span>
+
+    <span class="hljs-keyword">private</span> ComponentName defaultComponent;
+    <span class="hljs-keyword">private</span> ComponentName testComponent;
+    <span class="hljs-keyword">private</span> PackageManager packageManager;
+
+    <span class="hljs-annotation">@Override</span>
+    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title">onCreate</span>(Bundle savedInstanceState) {
+        <span class="hljs-keyword">super</span>.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        <span class="hljs-comment">//拿到当前activity注册的组件名称</span>
+        ComponentName componentName = getComponentName();
+
+        <span class="hljs-comment">//拿到我们注册的MainActivity组件</span>
+        defaultComponent = <span class="hljs-keyword">new</span> ComponentName(getBaseContext(), <span class="hljs-string">"com.fu.changeicondemo.MainActivity"</span>);  <span class="hljs-comment">//拿到默认的组件</span>
+        <span class="hljs-comment">//拿到我注册的别名test组件</span>
+        testComponent = <span class="hljs-keyword">new</span> ComponentName(getBaseContext(), <span class="hljs-string">"com.fu.changeicondemo.test"</span>);
+
+        packageManager = getApplicationContext().getPackageManager();
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">changeIcon</span>(View view) {
+        disableComponent(defaultComponent);
+        enableComponent(testComponent);
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">changeDefaultIcon</span>(View view) {
+        enableComponent(defaultComponent);
+        disableComponent(testComponent);
+    }
+
+    <span class="hljs-javadoc">/**
+     * 启用组件
+     *
+     *<span class="hljs-javadoctag"> @param</span> componentName
+     */</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">enableComponent</span>(ComponentName componentName) {
+        <span class="hljs-keyword">int</span> state = packageManager.getComponentEnabledSetting(componentName);
+        <span class="hljs-keyword">if</span> (state == PackageManager.COMPONENT_ENABLED_STATE_ENABLED) {
+            <span class="hljs-comment">//已经启用</span>
+            <span class="hljs-keyword">return</span>;
+        }
+        packageManager.setComponentEnabledSetting(componentName,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
+    }
+
+    <span class="hljs-javadoc">/**
+     * 禁用组件
+     *
+     *<span class="hljs-javadoctag"> @param</span> componentName
+     */</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">disableComponent</span>(ComponentName componentName) {
+        <span class="hljs-keyword">int</span> state = packageManager.getComponentEnabledSetting(componentName);
+        <span class="hljs-keyword">if</span> (state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
+            <span class="hljs-comment">//已经禁用</span>
+            <span class="hljs-keyword">return</span>;
+        }
+        packageManager.setComponentEnabledSetting(componentName,
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP);
+    }
+}</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li><li style="color: rgb(153, 153, 153);">28</li><li style="color: rgb(153, 153, 153);">29</li><li style="color: rgb(153, 153, 153);">30</li><li style="color: rgb(153, 153, 153);">31</li><li style="color: rgb(153, 153, 153);">32</li><li style="color: rgb(153, 153, 153);">33</li><li style="color: rgb(153, 153, 153);">34</li><li style="color: rgb(153, 153, 153);">35</li><li style="color: rgb(153, 153, 153);">36</li><li style="color: rgb(153, 153, 153);">37</li><li style="color: rgb(153, 153, 153);">38</li><li style="color: rgb(153, 153, 153);">39</li><li style="color: rgb(153, 153, 153);">40</li><li style="color: rgb(153, 153, 153);">41</li><li style="color: rgb(153, 153, 153);">42</li><li style="color: rgb(153, 153, 153);">43</li><li style="color: rgb(153, 153, 153);">44</li><li style="color: rgb(153, 153, 153);">45</li><li style="color: rgb(153, 153, 153);">46</li><li style="color: rgb(153, 153, 153);">47</li><li style="color: rgb(153, 153, 153);">48</li><li style="color: rgb(153, 153, 153);">49</li><li style="color: rgb(153, 153, 153);">50</li><li style="color: rgb(153, 153, 153);">51</li><li style="color: rgb(153, 153, 153);">52</li><li style="color: rgb(153, 153, 153);">53</li><li style="color: rgb(153, 153, 153);">54</li><li style="color: rgb(153, 153, 153);">55</li><li style="color: rgb(153, 153, 153);">56</li><li style="color: rgb(153, 153, 153);">57</li><li style="color: rgb(153, 153, 153);">58</li><li style="color: rgb(153, 153, 153);">59</li><li style="color: rgb(153, 153, 153);">60</li><li style="color: rgb(153, 153, 153);">61</li><li style="color: rgb(153, 153, 153);">62</li><li style="color: rgb(153, 153, 153);">63</li></ul></pre>
+
+<p><strong>activity_main.xml</strong></p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs xml has-numbering"><span class="hljs-pi">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">LinearLayout</span> <span class="hljs-attribute">xmlns:android</span>=<span class="hljs-value">"http://schemas.android.com/apk/res/android"</span>
+    <span class="hljs-attribute">xmlns:tools</span>=<span class="hljs-value">"http://schemas.android.com/tools"</span>
+    <span class="hljs-attribute">android:layout_width</span>=<span class="hljs-value">"match_parent"</span>
+    <span class="hljs-attribute">android:layout_height</span>=<span class="hljs-value">"match_parent"</span>
+    <span class="hljs-attribute">android:orientation</span>=<span class="hljs-value">"vertical"</span>
+    <span class="hljs-attribute">tools:context</span>=<span class="hljs-value">"com.fu.changeicondemo.MainActivity"</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-title">Button
+</span>        <span class="hljs-attribute">android:layout_width</span>=<span class="hljs-value">"wrap_content"</span>
+        <span class="hljs-attribute">android:layout_height</span>=<span class="hljs-value">"wrap_content"</span>
+        <span class="hljs-attribute">android:text</span>=<span class="hljs-value">"改变图标"</span>
+        <span class="hljs-attribute">android:onClick</span>=<span class="hljs-value">"changeIcon"</span>/&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-title">Button
+</span>        <span class="hljs-attribute">android:layout_width</span>=<span class="hljs-value">"wrap_content"</span>
+        <span class="hljs-attribute">android:layout_height</span>=<span class="hljs-value">"wrap_content"</span>
+        <span class="hljs-attribute">android:text</span>=<span class="hljs-value">"改回默认图标"</span>
+        <span class="hljs-attribute">android:onClick</span>=<span class="hljs-value">"changeDefaultIcon"</span> /&gt;</span>
+
+<span class="hljs-tag">&lt;/<span class="hljs-title">LinearLayout</span>&gt;</span></code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li></ul></pre>
+
+<p><strong>AndroidManifest.xml</strong></p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs xml has-numbering"><span class="hljs-pi">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">manifest</span> <span class="hljs-attribute">xmlns:android</span>=<span class="hljs-value">"http://schemas.android.com/apk/res/android"</span>
+    <span class="hljs-attribute">package</span>=<span class="hljs-value">"com.fu.changeicondemo"</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-title">application
+</span>        <span class="hljs-attribute">android:allowBackup</span>=<span class="hljs-value">"true"</span>
+        <span class="hljs-attribute">android:icon</span>=<span class="hljs-value">"@mipmap/ic_launcher"</span>
+        <span class="hljs-attribute">android:label</span>=<span class="hljs-value">"@string/app_name"</span>
+        <span class="hljs-attribute">android:roundIcon</span>=<span class="hljs-value">"@mipmap/ic_launcher_round"</span>
+        <span class="hljs-attribute">android:supportsRtl</span>=<span class="hljs-value">"true"</span>
+        <span class="hljs-attribute">android:theme</span>=<span class="hljs-value">"@style/AppTheme"</span>&gt;</span>
+
+        <span class="hljs-tag">&lt;<span class="hljs-title">activity
+</span>            <span class="hljs-attribute">android:name</span>=<span class="hljs-value">".MainActivity"</span>
+            <span class="hljs-attribute">android:label</span>=<span class="hljs-value">"改变前的"</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-title">intent-filter</span>&gt;</span>
+                <span class="hljs-tag">&lt;<span class="hljs-title">action</span> <span class="hljs-attribute">android:name</span>=<span class="hljs-value">"android.intent.action.MAIN"</span> /&gt;</span>
+
+                <span class="hljs-tag">&lt;<span class="hljs-title">category</span> <span class="hljs-attribute">android:name</span>=<span class="hljs-value">"android.intent.category.LAUNCHER"</span> /&gt;</span>
+            <span class="hljs-tag">&lt;/<span class="hljs-title">intent-filter</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-title">activity</span>&gt;</span>
+
+        <span class="hljs-tag">&lt;<span class="hljs-title">activity-alias
+</span>            <span class="hljs-attribute">android:name</span>=<span class="hljs-value">".test"</span>
+            <span class="hljs-attribute">android:enabled</span>=<span class="hljs-value">"false"</span>
+            <span class="hljs-attribute">android:icon</span>=<span class="hljs-value">"@mipmap/icon_test"</span>
+            <span class="hljs-attribute">android:label</span>=<span class="hljs-value">"改变后的"</span>
+            <span class="hljs-attribute">android:targetActivity</span>=<span class="hljs-value">".MainActivity"</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-title">intent-filter</span>&gt;</span>
+                <span class="hljs-tag">&lt;<span class="hljs-title">action</span> <span class="hljs-attribute">android:name</span>=<span class="hljs-value">"android.intent.action.MAIN"</span> /&gt;</span>
+
+                <span class="hljs-tag">&lt;<span class="hljs-title">category</span> <span class="hljs-attribute">android:name</span>=<span class="hljs-value">"android.intent.category.LAUNCHER"</span> /&gt;</span>
+            <span class="hljs-tag">&lt;/<span class="hljs-title">intent-filter</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-title">activity-alias</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;/<span class="hljs-title">application</span>&gt;</span>
+
+<span class="hljs-tag">&lt;/<span class="hljs-title">manifest</span>&gt;</span></code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li><li style="color: rgb(153, 153, 153);">28</li><li style="color: rgb(153, 153, 153);">29</li><li style="color: rgb(153, 153, 153);">30</li><li style="color: rgb(153, 153, 153);">31</li><li style="color: rgb(153, 153, 153);">32</li><li style="color: rgb(153, 153, 153);">33</li><li style="color: rgb(153, 153, 153);">34</li><li style="color: rgb(153, 153, 153);">35</li><li style="color: rgb(153, 153, 153);">36</li><li style="color: rgb(153, 153, 153);">37</li><li style="color: rgb(153, 153, 153);">38</li></ul></pre>
+
+
+
+<h3 id="总结"><a name="t4"></a>总结</h3>
+
+<p>这个方法能动态改变图标和名称、但是需要提前把“坑位”站住，需要用哪个就用哪个。还有一个问题就是，在调用完相应的改变图标的方法时候需要等待Launcher刷新，而在这个时间里，在去点击图标就会提示“未安装该应用”。如图： <br>
+<img title="" alt="这里写图片描述" src="images/android01803.jpg"></p>                                    </div>
+                <link href="https://csdnimg.cn/release/phoenix/mdeditor/markdown_views-b6c3c6d139.css" rel="stylesheet">
+                    </div>
+
+
+</div>
+
+
+</body></html>

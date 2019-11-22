@@ -1,0 +1,669 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android之辅助服务上篇————AccessibilityService使用 - 冰炭不投day的博客 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                                <div class="article-copyright">
+                <span class="creativecommons">
+                <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                    </a>
+            <span>
+                版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。            </span>
+               <div class="article-source-link2222">
+                    本文链接：<a href="https://blog.csdn.net/qq_38499859/article/details/90523283">https://blog.csdn.net/qq_38499859/article/details/90523283</a>
+                </div>
+            </span>
+                    </div>
+                                                    <!--一个博主专栏付费入口-->
+             
+             <!--一个博主专栏付费入口结束-->
+            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-d284373521.css" rel="stylesheet">
+                                        <div class="markdown_views prism-atom-one-dark" id="content_views">
+                    <!-- flowchart 箭头图标 勿删 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-linecap="round" d="M 5 0 L 0 2.5 L 5 5 Z" />
+                    </svg>
+                                            <h1><a name="t0"></a><a id="AndroidAccessibilityService_0"></a>Android之辅助服务上篇————AccessibilityService使用</h1>
+<p></p><div class="toc"><h3><a name="t1"></a>文章目录</h3><ul><li><a href="#AndroidAccessibilityService_0" target="_self" rel="nofollow">Android之辅助服务上篇————AccessibilityService使用</a></li><ul><ul><li><a href="#_2" target="_self" rel="nofollow">一.前言</a></li><li><a href="#_6" target="_self" rel="nofollow">二.概述</a></li><ul><li><a href="#1_7" target="_self" rel="nofollow">1.辅助服务是什么</a></li><li><a href="#2_16" target="_self" rel="nofollow">2.辅助服务生命周期</a></li></ul><li><a href="#_23" target="_self" rel="nofollow">三.配置</a></li><ul><li><a href="#1AccessbilityService_24" target="_self" rel="nofollow">1.继承AccessbilityService类</a></li><li><a href="#2AndroidManifest_65" target="_self" rel="nofollow">2.在AndroidManifest中注册该服务</a></li><li><a href="#3AccessbilityService_82" target="_self" rel="nofollow">3.配置AccessbilityService</a></li></ul><li><a href="#_160" target="_self" rel="nofollow">四.使用</a></li><ul><li><a href="#1_161" target="_self" rel="nofollow">1.启动服务</a></li><li><a href="#2_169" target="_self" rel="nofollow">2.获取事件信息</a></li><li><a href="#3_210" target="_self" rel="nofollow">3.处理事件--寻找控件</a></li><li><a href="#4_256" target="_self" rel="nofollow">4.处理事件--操作控件</a></li></ul><li><a href="#_279" target="_self" rel="nofollow">五.综合应用</a></li><ul><li><a href="#1Viewid_280" target="_self" rel="nofollow">1.获得View对应的id</a></li><li><a href="#2AccessibilityService_289" target="_self" rel="nofollow">2.AccessibilityService的手势控制</a></li><li><a href="#3AccessibilityService_341" target="_self" rel="nofollow">3.AccessibilityService的基础类</a></li><li><a href="#4_572" target="_self" rel="nofollow">4.实际应用</a></li></ul><li><a href="#_581" target="_self" rel="nofollow">六.参考资料</a></li></ul></ul></ul></div><p></p>
+<h3><a name="t2"></a><a id="_2"></a>一.前言</h3>
+<p>最近好久没写博客了，特别是Android系统启动这一个系列，虽然过程已经理了很多遍了，但是由于实习期间是在抽不出时间，没办法输出文章。最近接触了Android辅助服务，即AccessibilityService的相关内容，也算是解决了我一直一来的困惑——微信抢红包插件是怎么实现的。这两天，抽空总结一下这一部分相关的内容，上篇介绍使用，下篇分析原理。</p>
+<h3><a name="t3"></a><a id="_6"></a>二.概述</h3>
+<h4><a id="1_7"></a>1.辅助服务是什么</h4>
+<p>下面两个链接是Google官方对于辅助服务的介绍：<br>
+<a href="https://developer.android.com/guide/topics/ui/accessibility/service#manifest" rel="nofollow">辅助服务使用官方介绍</a><br>
+<a href="https://developer.android.com/reference/android/accessibilityservice/AccessibilityService#developer-guides" rel="nofollow">辅助服务类官方api文档</a></p>
+<p>辅助服务的设计初衷提供给无法和界面进行交互的残疾用户。来协助帮助他们进行一些用户操作，比如点击，返回，长按，获取屏幕信息等能力。后来被开发者另辟蹊径，用于一些插件开发，做一些监听第三方应用的插件。</p>
+<p>下面是辅助服务的继承关系：<br>
+<img alt="在这里插入图片描述" src="images/android01901.png"></p>
+<h4><a id="2_16"></a>2.辅助服务生命周期</h4>
+<p>辅助服务的生命周期由系统专门管理，并遵循Server的生命周期。服务的启动只能用户在设备设置中明确启动服务来触发。当系统绑定到服务后，它会调用AccessibilityService#onServiceConnected()方法。当用户在设置设置中关闭时，辅助服务功能将停止，或者调用AccessibilityService#disableSelf()方法。giant服务会被关闭销毁</p>
+<p>设备设置无障碍选择：<br>
+<img alt="在这里插入图片描述" src="images/android01902.jpg"></p>
+<p>下面是关于AccessibilityService的使用</p>
+<h3><a name="t4"></a><a id="_23"></a>三.配置</h3>
+<h4><a id="1AccessbilityService_24"></a>1.继承AccessbilityService类</h4>
+<p>要使用辅助服务，首先先继承AccessbilityService类，并且重写其方法。</p>
+<pre class="prettyprint"><code class="prism language-java has-numbering"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">StatusAccessibilityService</span> <span class="token keyword">extends</span> <span class="token class-name">AccessibilityService</span> <span class="token punctuation">{</span>
+
+
+    <span class="token comment">/**
+     * 发生用户界面事件回调此事件
+     * @param event
+     */</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onAccessibilityEvent</span><span class="token punctuation">(</span>AccessibilityEvent event<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 中断可访问性反馈
+     */</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onInterrupt</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li></ul></pre>
+<p>除了上面的两个必须要重写的方法外，AccessbilityService还提供了下面的一些方法：</p>
+<ul>
+<li>disableSelf()，禁用当前服务，也就是说关闭当服务</li>
+<li>dispatchGesture(GestureDescription gesture, AccessibilityService.GestureResultCallback callback, Handler handler)，将手势发送到触摸屏</li>
+<li>findFocus(int focus)：寻找到具有指定焦点类型的视图。</li>
+<li>getRootInActiveWindow()：获取当前活动窗口中的根节点。</li>
+<li>getServiceInfo()：获取当前服务的配置信息</li>
+<li>getSystemService(String name)：获取系统服务</li>
+<li>getWindows():获取屏幕上的窗口。</li>
+<li>performGlobalAction(int action)：执行全局操作：比如返回，回到主页，打开最近等操作</li>
+<li>setServiceInfo(AccessibilityServiceInfo info):设置当前服务的配置信息 (下面的配置AccessbilityService会介绍)</li>
+</ul>
+<p>不太常用的：</p>
+<ul>
+<li>getAccessibilityButtonController()：返回系统导航区域内辅助功能按钮的控制器。</li>
+<li>getFingerprintGestureController()：获取指纹手势的控制器。</li>
+<li>getMagnificationController():返回放大器控制器，可用于查询和修改显示放大率的状态。</li>
+<li>getSoftKeyboardController():返回软键盘控制器，可用于查询和修改软键盘显示模式。</li>
+</ul>
+<h4><a id="2AndroidManifest_65"></a>2.在AndroidManifest中注册该服务</h4>
+<p>AccessbilityService是一个服务，所以同样，他也要在AndroidManifest中注册：</p>
+<pre class="prettyprint"><code class="prism language-java has-numbering">        <span class="token operator">&lt;</span>service
+            android<span class="token operator">:</span>name<span class="token operator">=</span><span class="token string">"com.hahak.walle.accessibilitydame.StatusAccessibilityService"</span>
+            android<span class="token operator">:</span>label<span class="token operator">=</span><span class="token string">"辅助服务测试"</span>
+            android<span class="token operator">:</span>permission<span class="token operator">=</span><span class="token string">"android.permission.BIND_ACCESSIBILITY_SERVICE"</span><span class="token operator">&gt;</span>
+            <span class="token operator">&lt;</span>intent<span class="token operator">-</span>filter<span class="token operator">&gt;</span>
+                <span class="token operator">&lt;</span>action android<span class="token operator">:</span>name<span class="token operator">=</span><span class="token string">"android.accessibilityservice.AccessibilityService"</span><span class="token operator">/</span><span class="token operator">&gt;</span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>intent<span class="token operator">-</span>filter<span class="token operator">&gt;</span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span>service<span class="token operator">&gt;</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li></ul></pre>
+<ul>
+<li>android:permission：需要指定BIND_ACCESSIBILITY_SERVICE权限，这是4.0以上的系统要求的</li>
+<li>intent-filter：这个name是固定不变的</li>
+</ul>
+<h4><a id="3AccessbilityService_82"></a>3.配置AccessbilityService</h4>
+<p>接下来，就是配置服务参数，即设定AccessbilityService所能干的事。<br>
+配置方法有两种，一种是在代码中动态设置，一种是写配置文件。</p>
+<p><strong>方法1.写配置文件</strong><br>
+首先在AndroidManifest中生命配置文件的位置</p>
+<pre class="prettyprint"><code class="prism language-xml has-numbering">       <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>service</span>
+            <span class="token attr-name"><span class="token namespace">android:</span>name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>com.hahack.walle.AutoCheckStatusAccessibilityService<span class="token punctuation">"</span></span>
+            <span class="token attr-name"><span class="token namespace">android:</span>label</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>运营助手：自动艾特用户<span class="token punctuation">"</span></span>
+            <span class="token attr-name"><span class="token namespace">android:</span>permission</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>android.permission.BIND_ACCESSIBILITY_SERVICE<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>intent-filter</span><span class="token punctuation">&gt;</span></span>
+                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>action</span> <span class="token attr-name"><span class="token namespace">android:</span>name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>android.accessibilityservice.AccessibilityService<span class="token punctuation">"</span></span><span class="token punctuation">/&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>intent-filter</span><span class="token punctuation">&gt;</span></span>
+
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta-data</span>
+                <span class="token attr-name"><span class="token namespace">android:</span>name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>android.accessibilityservice<span class="token punctuation">"</span></span>
+                <span class="token attr-name"><span class="token namespace">android:</span>resource</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>@xml/allocation<span class="token punctuation">"</span></span><span class="token punctuation">/&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>service</span><span class="token punctuation">&gt;</span></span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li></ul></pre>
+<p>其次，在@xml/allocation文件中，声明下面的内容</p>
+<pre class="prettyprint"><code class="prism language-xml has-numbering"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>accessibility-service</span> <span class="token attr-name"><span class="token namespace">xmlns:</span>android</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>http://schemas.android.com/apk/res/android<span class="token punctuation">"</span></span>
+    <span class="token attr-name"><span class="token namespace">android:</span>accessibilityEventTypes</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>typeAllMask<span class="token punctuation">"</span></span>
+    <span class="token attr-name"><span class="token namespace">android:</span>description</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>demo<span class="token punctuation">"</span></span>
+    <span class="token attr-name"><span class="token namespace">android:</span>accessibilityFeedbackType</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>feedbackSpoken<span class="token punctuation">"</span></span>
+    <span class="token attr-name"><span class="token namespace">android:</span>canRetrieveWindowContent</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>true<span class="token punctuation">"</span></span>
+    <span class="token attr-name"><span class="token namespace">android:</span>notificationTimeout</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>1000<span class="token punctuation">"</span></span><span class="token punctuation">/&gt;</span></span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li></ul></pre>
+<p><strong>方法2:.在代码中动态添加</strong><br>
+在自定义的AccessibilityService类中，可以通过在AccessibilityServiceInfo类重写onServiceConnected()，并通过 this.setServiceInfo来添加配置</p>
+<pre class="prettyprint"><code class="prism language-java has-numbering"><span class="token annotation punctuation">@Override</span>
+<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onServiceConnected</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+    info<span class="token punctuation">.</span>eventTypes <span class="token operator">=</span> AccessibilityEvent<span class="token punctuation">.</span>TYPE_VIEW_CLICKED <span class="token operator">|</span>
+            AccessibilityEvent<span class="token punctuation">.</span>TYPE_VIEW_FOCUSED<span class="token punctuation">;</span>
+
+    info<span class="token punctuation">.</span>packageNames <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span>
+            <span class="token punctuation">{</span><span class="token string">"com.example.android.myFirstApp"</span><span class="token punctuation">,</span> <span class="token string">"com.example.android.mySecondApp"</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+    info<span class="token punctuation">.</span>feedbackType <span class="token operator">=</span> AccessibilityServiceInfo<span class="token punctuation">.</span>FEEDBACK_SPOKEN
+
+    info<span class="token punctuation">.</span>notificationTimeout <span class="token operator">=</span> <span class="token number">100</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">setServiceInfo</span><span class="token punctuation">(</span>info<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token punctuation">}</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li></ul></pre>
+<p>下面说说配置内容的具体含义：</p>
+<ul>
+<li>accessibilityEventTypes：此服务希望按照指定接收的事件类型(AccessibilityEvent)</li>
+</ul>
+
+<div class="table-box"><table>
+<thead>
+<tr>
+<th>常量</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>typeViewClicked</td>
+<td>点击事件</td>
+</tr>
+<tr>
+<td>typeViewSelected</td>
+<td>view被选择</td>
+</tr>
+<tr>
+<td>typeViewScrolled</td>
+<td>滑动事件</td>
+</tr>
+<tr>
+<td>typeWindowContentChanged</td>
+<td>窗口内容该表</td>
+</tr>
+<tr>
+<td>typeAllMask</td>
+<td>所有事件</td>
+</tr>
+</tbody>
+</table></div><ul>
+<li>accessibilityFeedbackType：此服务提供的反馈类型，比如说是语音播报还是真的震动</li>
+</ul>
+
+<div class="table-box"><table>
+<thead>
+<tr>
+<th>常量</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>feedbackSpoken</td>
+<td>语音反馈</td>
+</tr>
+<tr>
+<td>feedbackHaptic</td>
+<td>触觉（震动）反馈</td>
+</tr>
+<tr>
+<td>feedbackAudible</td>
+<td>音频反馈</td>
+</tr>
+<tr>
+<td>feedbackVisual</td>
+<td>视频反馈</td>
+</tr>
+<tr>
+<td>feedbackGeneric</td>
+<td>通用反馈</td>
+</tr>
+<tr>
+<td>feedbackAllMask</td>
+<td>以上都具有</td>
+</tr>
+</tbody>
+</table></div><ul>
+<li>canRetrieveWindowContent：表示该服务能否访问活动窗口中的内容。也就是如果你希望在服务中获取窗体内容，则需要设置其值为true</li>
+<li>description：对该无障碍功能的描述。</li>
+<li>notificationTimeout：接受事件的时间间隔，通常将其设置为100即可</li>
+<li>packageNames：表示对该服务是用来监听哪个包的产生的事件，上面以微信的包名为例</li>
+<li>canPerformGestures:表示是否允许进行手势分发</li>
+<li>canRequestFilterKeyEvents：辅助服务希望能够请求过滤关键事件。</li>
+<li>nonInteractiveUiTimeout：超时设置，未不包含交互式空间返回合适的值</li>
+</ul>
+<h3><a name="t5"></a><a id="_160"></a>四.使用</h3>
+<h4><a id="1_161"></a>1.启动服务</h4>
+<p>辅助服务的启动必须通过用户设置来开启，所以我们要先提醒用户进行无障碍功能列表</p>
+<pre class="prettyprint"><code class="prism language-java has-numbering">Intent intent <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Intent</span><span class="token punctuation">(</span>Settings<span class="token punctuation">.</span>ACTION_ACCESSIBILITY_SETTINGS<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">startActivity</span><span class="token punctuation">(</span>intent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li></ul></pre>
+<p>通过上面的代码就可以打开系统的无障碍功能列表</p>
+<h4><a id="2_169"></a>2.获取事件信息</h4>
+<p>当我们监听的目标应用界面或者界面等信息，会通过onAccessibilityEvent回调我们的事件，接着进行事件的处理。</p>
+<pre class="prettyprint"><code class="prism language-java has-numbering"><span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onAccessibilityEvent</span><span class="token punctuation">(</span><span class="token keyword">final</span> AccessibilityEvent event<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        String packageName <span class="token operator">=</span> event<span class="token punctuation">.</span><span class="token function">getPackageName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>packageName<span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span><span class="token string">"com.tencent.mm"</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">int</span> eventType <span class="token operator">=</span> event<span class="token punctuation">.</span><span class="token function">getEventType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">switch</span> <span class="token punctuation">(</span>eventType<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">case</span> AccessibilityEvent<span class="token punctuation">.</span>TYPE_WINDOW_STATE_CHANGED<span class="token operator">:</span>
+            处理
+            <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        <span class="token punctuation">}</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li></ul></pre>
+<p>可以看出，当发生变化时，回调onAccessibilityEvent方法，并传入AccessibilityEvent类型。下面让我们看看AccessibilityEvent的含义。</p>
+<p>先看看AccessibilityEvent提供的方法(源是指触发此方法的ui/时间)：</p>
+<ul>
+<li>getAction()：获取触发此世界的已执行操作</li>
+<li>getEventTime()：获取发送此事件的时间</li>
+<li>getEventType()：获取事件类型。</li>
+<li>getPackageName()：获取源的包名称<br>
+从AccessibilityRecord基础的方法</li>
+<li>getMaxScrollY()：获取源上边缘的最大滚动偏移（以像素为单位）</li>
+<li>getMaxScrollX()：获取源左边缘的最大滚动偏移量（以像素为单位）。</li>
+<li>getClassName()：获取源的类名。</li>
+<li>getText()：获取事件的文本，比如事件是有TextView发出的,此时获取的就是TextView的text属性。如果该事件源是树结构，那么此时获取的是这个树上所有具有text属性的值的集合</li>
+<li>getToIndex()： 获取滚动时文本选择结束的索引或最后一个可见项的索引。</li>
+<li>getItemCount()：如果事件源是树结构，将返回该树根节点下子节点的数量<br>
+更详细的可以参考官方文档：<br>
+<a href="https://developer.android.com/reference/android/view/accessibility/AccessibilityEvent.html" rel="nofollow">AccessibilityEvent官方api介绍</a></li>
+</ul>
+<p>关于事件类型getEventType()返回值：</p>
+<ul>
+<li>TYPE_VIEW_LONG_CLICKED 长按事件</li>
+<li>TYPE_VIEW_CONTEXT_CLICKED点击事件</li>
+<li>TYPE_WINDOW_STATE_CHANGED 表示用户界面被更改。</li>
+<li>TYPE_NOTIFICATION_STATE_CHANGED：通知栏的改变</li>
+<li>TYPE_WINDOWS_CHANGED：表示系统窗口的时间变更</li>
+<li>…还有很多，详情可以看看官方文档</li>
+</ul>
+<h4><a id="3_210"></a>3.处理事件–寻找控件</h4>
+<p>当我们接受到事件后，根据事件就可以处理对应的时间，比如说检测到弹窗，就可以转换为动作：点击弹窗。<br>
+处理事件总的来说，分为两个步骤。第一步，寻找该控件。第二部，模拟人的操作对各个控件进行操作(点击，长按，输入，读取)</p>
+<p><strong>寻找控件</strong><br>
+寻找控件首先要找的它对象窗口内容对应的树，即AccessibilityWindowInfo(代表)和AccessibilityNodeInfo(代表具体的View)。注意，这个功能需要在xml资源配置中声明SERVICE_META_DATA。<br>
+针对寻找AccessibilityWindowInfo和AccessibilityNodeInfo，谷歌官方提供了下面的api</p>
+<ul>
+<li>AccessibilityEvent#getSource(),返回值为发起当前事件的控件的AccessibilityNodeInfo</li>
+<li>AccessibilityService#findFocus(int)，参数表示输入焦点，返回值为指定焦点对应的AccessibilityNodeInfo</li>
+<li>AccessibilityService#getWindows()，返回值为当前所有可交互窗户的 AccessibilityWindowInfo列表（List）</li>
+<li>AccessibilityService#getRootInActiveWindow()，返回值为当前活动的AccessibilityWindowInfo，如果用户没有触摸任何窗口，则活动窗口是具有输入焦点的窗口。</li>
+</ul>
+<p><strong>AccessibilityWindowInfo</strong>：<br>
+AccessibilityWindowInfo表示可访问窗口的状态快照。屏幕内容包含一个或者多个窗口，其中一些窗口可以是其他窗口的后代，窗口是次序排序的。<br>
+AccessibilityWindowInfor提供的api简介：</p>
+<ul>
+<li>getChild(int index) ，返回给定索引处的子窗口的AccessibilityWindowInfo</li>
+<li>getChildCount()，返回代表子窗口的数量的int值</li>
+<li>getId(),返回代表唯一的窗口id的int值</li>
+<li>getParent()，返回代表父窗口的AccessibilityWindowInfo</li>
+<li>getLayer()，返回代表窗口在z轴的图层的int值</li>
+<li><strong>getRoot()</strong>，返回代表窗口层次中根节点的AccessibilityNodeInfo</li>
+<li>…其余详见官网文档</li>
+</ul>
+<p><strong>AccessibilityNodeInfo</strong>：<br>
+AccessibilityNodeInfo表示窗口内容的节点以及可以进行的操作。<br>
+AccessibilityNodeInfo内部类介绍：</p>
+<ul>
+<li>AccessibilityAction，表示可以对AccessibilityNodeInfo提供的操作</li>
+<li>CollectionInfo，表示当节点是集合时，包含集合信息的类。</li>
+<li>CollectionItemInfo，表示当节点是集合子项，包含集合子项信息的类。</li>
+<li>RangeInfo，表示当节点是范围，包含该范围包含信息的类。</li>
+</ul>
+<p>AccessibilityNodeInfo提供的api简述</p>
+<ul>
+<li>addAction(action: AccessibilityNodeInfo.AccessibilityAction)/(action: Int)，添加可在节点上执行的操作,有两个同名方法，参数不同</li>
+<li>performAction(action: Int)，在节点上执行操作</li>
+<li>addChild(child: View!)添加一个子项</li>
+<li>findAccessibilityNodeInfosByText(text: String!)，按文字寻找对应的控件，并返回其 AccessibilityNodeInfo</li>
+<li>findAccessibilityNodeInfosByViewId(viewId: String!)，根据View的id资源名称查找对应的View，返回AccessibilityNodeInfo</li>
+<li>findFocus(focus: Int)，找到具有指定焦点类型的视图。返回AccessibilityNodeInfo</li>
+<li>focusSearch(direction: Int)，搜索指定方向上可以获取输入焦点的最近视图。返回AccessibilityNodeInfo</li>
+<li>getActionList()，获取可以在节点上执行的操作。</li>
+<li>getHintText()，获取此节点的提示文本</li>
+<li>getText()，获取此节点的文本</li>
+<li>isClickable()，获取此节点是否可单击，还有其他对于的方法，判断节点是否可操作</li>
+<li>…其余详见官网文档</li>
+</ul>
+<h4><a id="4_256"></a>4.处理事件–操作控件</h4>
+<p>在上面一小节里，我们通过addAction，可以给AccessibilityNodeInfo添加对于的动作，其参数是 AccessibilityNodeInfo的内部类AccessibilityAction。</p>
+<p><strong>AccessibilityAction</strong><br>
+AccessibilityAction表示可以对AccessibilityNodeInfo。每个操作都有一个唯一的ID，这是必需的和可选的数据。<br>
+其有三类动作</p>
+<ul>
+<li>标准操作 - 这些操作由平台中的标准UI小部件报告和处理。对于每个标准动作，在该类中定义了一个静态常量，例如ACTION_FOCUS。这些操作将有null标签。</li>
+<li>自定义操作操作 - 这些是由自定义窗口小部件报告和处理的操作。即不属于UI工具包的那些。例如，应用程序可以定义用于清除用户历史的自定义操作。</li>
+<li>覆盖标准操作 - 这些操作会覆盖标准操作以自定义它们。例如，应用可以向标准ACTION_CLICK操作添加标签，以向用户指示此操作清除浏览历史记录。</li>
+</ul>
+<p>可提供的操作</p>
+<ul>
+<li>ACTION_ACCESSIBILITY_FOCUS，为可访问性提供焦点的操作。</li>
+<li>ACTION_CLEAR_ACCESSIBILITY_FOCUS，清除节点可访问性焦点的操作。</li>
+<li>ACTION_CLICK，单击节点信息的操作。</li>
+<li>ACTION_LONG_CLICK,长按</li>
+<li>ACTION_FOCUS，为输入焦点提供节点</li>
+<li>ACTION_COPY，将当前选择复制到剪贴板的操作。</li>
+<li>ACTION_CUT，剪切</li>
+<li>ACTION_PAGE_DOWN，移动到下一页，以及移动到下，左，右页面</li>
+<li>ACTION_PASTE，粘贴剪切板内容</li>
+<li>ACTION_SCROLL_BACKWARD/ACTION_SCROLL_FORWARD ,下滑/上滑</li>
+<li>ACTION_SET_TEXT，设置节点文本</li>
+<li>…其余详见官网文档</li>
+</ul>
+<h3><a name="t6"></a><a id="_279"></a>五.综合应用</h3>
+<h4><a id="1Viewid_280"></a>1.获得View对应的id</h4>
+<ul>
+<li>
+<p>打开tools–&gt;Android–&gt;Android Device Monitor<br>
+<img alt="在这里插入图片描述" src="images/android01903.png"></p>
+</li>
+<li>
+<p>选择设备，并点击图中坐标<br>
+<img alt="在这里插入图片描述" src="images/android01904.jpg"></p>
+</li>
+<li>
+<p>选择对应的控件进行点击查看<br>
+<img alt="在这里插入图片描述" src="images/android01905.jpg"></p>
+</li>
+</ul>
+<h4><a id="2AccessibilityService_289"></a>2.AccessibilityService的手势控制</h4>
+<p>在Android7.0之后，AccessibilityService又增加了一个新的方法dispatchGesture。可以将手势发送到触摸屏上。但是要使用这个功能必须在配置文件中声明，canPerformGestures = “true”</p>
+<p>api接口:</p>
+<pre class="prettyprint"><code class="prism language-java has-numbering"><span class="token keyword">public</span> <span class="token keyword">final</span> <span class="token keyword">boolean</span> dispatchGesture <span class="token punctuation">(</span>GestureDescription gesture<span class="token punctuation">,</span> 
+                AccessibilityService<span class="token punctuation">.</span>GestureResultCallback callback<span class="token punctuation">,</span> 
+                Handler handler<span class="token punctuation">)</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li></ul></pre>
+<p>参数:</p>
+<ul>
+<li>GestureDescription：要分派的手势</li>
+<li>AccessibilityService.GestureResultCallback:完成后的回调</li>
+<li>Handler；处理回调程序的线程，如果传入null,则为主线程</li>
+</ul>
+<p>使用示例</p>
+<pre class="prettyprint"><code class="prism language-java has-numbering">        Path path <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Path</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        path<span class="token punctuation">.</span><span class="token function">moveTo</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">400</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        path<span class="token punctuation">.</span><span class="token function">lineTo</span><span class="token punctuation">(</span><span class="token number">400</span><span class="token punctuation">,</span> <span class="token number">400</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> GestureDescription<span class="token punctuation">.</span>StrokeDescription sd<span class="token punctuation">;</span>
+
+        sd <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">GestureDescription<span class="token punctuation">.</span>StrokeDescription</span><span class="token punctuation">(</span>path<span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">,</span> <span class="token number">50</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">//先横滑</span>
+        <span class="token keyword">boolean</span> flag <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">dispatchGesture</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">GestureDescription<span class="token punctuation">.</span>Builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">addStroke</span><span class="token punctuation">(</span>sd<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">AccessibilityService<span class="token punctuation">.</span>GestureResultCallback</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onCompleted</span><span class="token punctuation">(</span>GestureDescription gestureDescription<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">onCompleted</span><span class="token punctuation">(</span>gestureDescription<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                Log<span class="token punctuation">.</span><span class="token function">d</span><span class="token punctuation">(</span><span class="token string">"22222"</span><span class="token punctuation">,</span> <span class="token string">"onCompleted:横滑 "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                Path path2 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Path</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                path2<span class="token punctuation">.</span><span class="token function">moveTo</span><span class="token punctuation">(</span><span class="token number">600</span><span class="token punctuation">,</span> <span class="token number">600</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                path2<span class="token punctuation">.</span><span class="token function">lineTo</span><span class="token punctuation">(</span><span class="token number">600</span><span class="token punctuation">,</span> <span class="token number">800</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">final</span> GestureDescription<span class="token punctuation">.</span>StrokeDescription sd2 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">GestureDescription<span class="token punctuation">.</span>StrokeDescription</span><span class="token punctuation">(</span>path2<span class="token punctuation">,</span> <span class="token number">1000</span><span class="token punctuation">,</span> <span class="token number">500</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token comment">//滑完后再过1秒竖滑</span>
+                BaseAccessibilityService<span class="token punctuation">.</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">dispatchGesture</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">GestureDescription<span class="token punctuation">.</span>Builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">addStroke</span><span class="token punctuation">(</span>sd2<span class="token punctuation">)</span><span class="token comment">/*.addStroke(sd2)*/</span><span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> null<span class="token punctuation">,</span> null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onCancelled</span><span class="token punctuation">(</span>GestureDescription gestureDescription<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                Log<span class="token punctuation">.</span><span class="token function">d</span><span class="token punctuation">(</span><span class="token string">"22222"</span><span class="token punctuation">,</span> <span class="token string">"onCancelled"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">onCancelled</span><span class="token punctuation">(</span>gestureDescription<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span> null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li><li style="color: rgb(153, 153, 153);">28</li></ul></pre>
+<p>上图的示例为左滑和下滑，如果要实现点击事件，则可以只传入一个点Path。即</p>
+<pre class="prettyprint"><code class="prism language-java has-numbering">Path path <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Path</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+path<span class="token punctuation">.</span><span class="token function">moveTo</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">400</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+sd <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">GestureDescription<span class="token punctuation">.</span>StrokeDescription</span><span class="token punctuation">(</span>path<span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">,</span> <span class="token number">50</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li></ul></pre>
+<h4><a id="3AccessibilityService_341"></a>3.AccessibilityService的基础类</h4>
+<p>下面是对AccessibilityService提供的各种方法的封装</p>
+<pre class="prettyprint"><code class="prism language-java has-numbering"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">BaseAccessibilityService</span> <span class="token keyword">extends</span> <span class="token class-name">AccessibilityService</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">private</span> AccessibilityManager mAccessibilityManager<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> Context mContext<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token keyword">static</span> BaseAccessibilityService mInstance<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">init</span><span class="token punctuation">(</span>Context context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        mContext <span class="token operator">=</span> context<span class="token punctuation">.</span><span class="token function">getApplicationContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        mAccessibilityManager <span class="token operator">=</span> <span class="token punctuation">(</span>AccessibilityManager<span class="token punctuation">)</span> mContext<span class="token punctuation">.</span><span class="token function">getSystemService</span><span class="token punctuation">(</span>Context<span class="token punctuation">.</span>ACCESSIBILITY_SERVICE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">static</span> BaseAccessibilityService <span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>mInstance <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            mInstance <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">BaseAccessibilityService</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> mInstance<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * Check当前辅助服务是否启用
+     *
+     * @param serviceName serviceName
+     * @return 是否启用
+     */</span>
+    <span class="token keyword">private</span> <span class="token keyword">boolean</span> <span class="token function">checkAccessibilityEnabled</span><span class="token punctuation">(</span>String serviceName<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        List<span class="token generics function"><span class="token punctuation">&lt;</span>AccessibilityServiceInfo<span class="token punctuation">&gt;</span></span> accessibilityServices <span class="token operator">=</span>
+                mAccessibilityManager<span class="token punctuation">.</span><span class="token function">getEnabledAccessibilityServiceList</span><span class="token punctuation">(</span>AccessibilityServiceInfo<span class="token punctuation">.</span>FEEDBACK_GENERIC<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span>AccessibilityServiceInfo info <span class="token operator">:</span> accessibilityServices<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>info<span class="token punctuation">.</span><span class="token function">getId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span>serviceName<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 前往开启辅助服务界面
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">goAccess</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Intent intent <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Intent</span><span class="token punctuation">(</span>Settings<span class="token punctuation">.</span>ACTION_ACCESSIBILITY_SETTINGS<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        intent<span class="token punctuation">.</span><span class="token function">setFlags</span><span class="token punctuation">(</span>Intent<span class="token punctuation">.</span>FLAG_ACTIVITY_NEW_TASK<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        mContext<span class="token punctuation">.</span><span class="token function">startActivity</span><span class="token punctuation">(</span>intent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 模拟点击事件
+     *
+     * @param nodeInfo nodeInfo
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">performViewClick</span><span class="token punctuation">(</span>AccessibilityNodeInfo nodeInfo<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>nodeInfo <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span>nodeInfo <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>nodeInfo<span class="token punctuation">.</span><span class="token function">isClickable</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                nodeInfo<span class="token punctuation">.</span><span class="token function">performAction</span><span class="token punctuation">(</span>AccessibilityNodeInfo<span class="token punctuation">.</span>ACTION_CLICK<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">break</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            nodeInfo <span class="token operator">=</span> nodeInfo<span class="token punctuation">.</span><span class="token function">getParent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 模拟返回操作
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">performBackClick</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            Thread<span class="token punctuation">.</span><span class="token function">sleep</span><span class="token punctuation">(</span><span class="token number">500</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">InterruptedException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token function">performGlobalAction</span><span class="token punctuation">(</span>GLOBAL_ACTION_BACK<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 模拟下滑操作
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">performScrollBackward</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            Thread<span class="token punctuation">.</span><span class="token function">sleep</span><span class="token punctuation">(</span><span class="token number">500</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">InterruptedException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token function">performGlobalAction</span><span class="token punctuation">(</span>AccessibilityNodeInfo<span class="token punctuation">.</span>ACTION_SCROLL_BACKWARD<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 模拟上滑操作
+     */</span>
+    <span class="token annotation punctuation">@RequiresApi</span><span class="token punctuation">(</span>api <span class="token operator">=</span> Build<span class="token punctuation">.</span>VERSION_CODES<span class="token punctuation">.</span>N<span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">performScrollForward</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            Thread<span class="token punctuation">.</span><span class="token function">sleep</span><span class="token punctuation">(</span><span class="token number">500</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">InterruptedException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token function">performGlobalAction</span><span class="token punctuation">(</span>AccessibilityNodeInfo<span class="token punctuation">.</span>ACTION_SCROLL_FORWARD<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 查找对应文本的View
+     *
+     * @param text text
+     * @return View
+     */</span>
+    <span class="token keyword">public</span> AccessibilityNodeInfo <span class="token function">findViewByText</span><span class="token punctuation">(</span>String text<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token function">findViewByText</span><span class="token punctuation">(</span>text<span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 查找对应文本的View
+     *
+     * @param text      text
+     * @param clickable 该View是否可以点击
+     * @return View
+     */</span>
+    <span class="token keyword">public</span> AccessibilityNodeInfo <span class="token function">findViewByText</span><span class="token punctuation">(</span>String text<span class="token punctuation">,</span> <span class="token keyword">boolean</span> clickable<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        AccessibilityNodeInfo accessibilityNodeInfo <span class="token operator">=</span> <span class="token function">getRootInActiveWindow</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>accessibilityNodeInfo <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        List<span class="token generics function"><span class="token punctuation">&lt;</span>AccessibilityNodeInfo<span class="token punctuation">&gt;</span></span> nodeInfoList <span class="token operator">=</span> accessibilityNodeInfo<span class="token punctuation">.</span><span class="token function">findAccessibilityNodeInfosByText</span><span class="token punctuation">(</span>text<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>nodeInfoList <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>nodeInfoList<span class="token punctuation">.</span><span class="token function">isEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">for</span> <span class="token punctuation">(</span>AccessibilityNodeInfo nodeInfo <span class="token operator">:</span> nodeInfoList<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>nodeInfo <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>nodeInfo<span class="token punctuation">.</span><span class="token function">isClickable</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> clickable<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">return</span> nodeInfo<span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 查找对应ID的View
+     *
+     * @param id id
+     * @return View
+     */</span>
+    <span class="token annotation punctuation">@TargetApi</span><span class="token punctuation">(</span>Build<span class="token punctuation">.</span>VERSION_CODES<span class="token punctuation">.</span>JELLY_BEAN_MR2<span class="token punctuation">)</span>
+    <span class="token keyword">public</span> AccessibilityNodeInfo <span class="token function">findViewByID</span><span class="token punctuation">(</span>String id<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        AccessibilityNodeInfo accessibilityNodeInfo <span class="token operator">=</span> <span class="token function">getRootInActiveWindow</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>accessibilityNodeInfo <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        List<span class="token generics function"><span class="token punctuation">&lt;</span>AccessibilityNodeInfo<span class="token punctuation">&gt;</span></span> nodeInfoList <span class="token operator">=</span> accessibilityNodeInfo<span class="token punctuation">.</span><span class="token function">findAccessibilityNodeInfosByViewId</span><span class="token punctuation">(</span>id<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>nodeInfoList <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>nodeInfoList<span class="token punctuation">.</span><span class="token function">isEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            Log<span class="token punctuation">.</span><span class="token function">d</span><span class="token punctuation">(</span><span class="token string">"dd"</span><span class="token punctuation">,</span> <span class="token string">"findViewByID: "</span> <span class="token operator">+</span> nodeInfoList<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">for</span> <span class="token punctuation">(</span>AccessibilityNodeInfo nodeInfo <span class="token operator">:</span> nodeInfoList<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                Log<span class="token punctuation">.</span><span class="token function">d</span><span class="token punctuation">(</span><span class="token string">"dd"</span><span class="token punctuation">,</span> <span class="token string">"findViewByID: "</span> <span class="token operator">+</span> nodeInfo<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>nodeInfo <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">return</span> nodeInfo<span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">clickTextViewByText</span><span class="token punctuation">(</span>String text<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        AccessibilityNodeInfo accessibilityNodeInfo <span class="token operator">=</span> <span class="token function">getRootInActiveWindow</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>accessibilityNodeInfo <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        List<span class="token generics function"><span class="token punctuation">&lt;</span>AccessibilityNodeInfo<span class="token punctuation">&gt;</span></span> nodeInfoList <span class="token operator">=</span> accessibilityNodeInfo<span class="token punctuation">.</span><span class="token function">findAccessibilityNodeInfosByText</span><span class="token punctuation">(</span>text<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>nodeInfoList <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>nodeInfoList<span class="token punctuation">.</span><span class="token function">isEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">for</span> <span class="token punctuation">(</span>AccessibilityNodeInfo nodeInfo <span class="token operator">:</span> nodeInfoList<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>nodeInfo <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token function">performViewClick</span><span class="token punctuation">(</span>nodeInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token keyword">break</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@TargetApi</span><span class="token punctuation">(</span>Build<span class="token punctuation">.</span>VERSION_CODES<span class="token punctuation">.</span>JELLY_BEAN_MR2<span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">clickTextViewByID</span><span class="token punctuation">(</span>String id<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        AccessibilityNodeInfo accessibilityNodeInfo <span class="token operator">=</span> <span class="token function">getRootInActiveWindow</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>accessibilityNodeInfo <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        List<span class="token generics function"><span class="token punctuation">&lt;</span>AccessibilityNodeInfo<span class="token punctuation">&gt;</span></span> nodeInfoList <span class="token operator">=</span> accessibilityNodeInfo<span class="token punctuation">.</span><span class="token function">findAccessibilityNodeInfosByViewId</span><span class="token punctuation">(</span>id<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>nodeInfoList <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>nodeInfoList<span class="token punctuation">.</span><span class="token function">isEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">for</span> <span class="token punctuation">(</span>AccessibilityNodeInfo nodeInfo <span class="token operator">:</span> nodeInfoList<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>nodeInfo <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token function">performViewClick</span><span class="token punctuation">(</span>nodeInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token keyword">break</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 模拟输入
+     *
+     * @param nodeInfo nodeInfo
+     * @param text     text
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">inputText</span><span class="token punctuation">(</span>AccessibilityNodeInfo nodeInfo<span class="token punctuation">,</span> String text<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>Build<span class="token punctuation">.</span>VERSION<span class="token punctuation">.</span>SDK_INT <span class="token operator">&gt;=</span> Build<span class="token punctuation">.</span>VERSION_CODES<span class="token punctuation">.</span>LOLLIPOP<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            Bundle arguments <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Bundle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            arguments<span class="token punctuation">.</span><span class="token function">putCharSequence</span><span class="token punctuation">(</span>AccessibilityNodeInfo<span class="token punctuation">.</span>ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE<span class="token punctuation">,</span> text<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            nodeInfo<span class="token punctuation">.</span><span class="token function">performAction</span><span class="token punctuation">(</span>AccessibilityNodeInfo<span class="token punctuation">.</span>ACTION_SET_TEXT<span class="token punctuation">,</span> arguments<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>Build<span class="token punctuation">.</span>VERSION<span class="token punctuation">.</span>SDK_INT <span class="token operator">&gt;=</span> Build<span class="token punctuation">.</span>VERSION_CODES<span class="token punctuation">.</span>JELLY_BEAN_MR2<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            ClipboardManager clipboard <span class="token operator">=</span> <span class="token punctuation">(</span>ClipboardManager<span class="token punctuation">)</span> <span class="token function">getSystemService</span><span class="token punctuation">(</span>Context<span class="token punctuation">.</span>CLIPBOARD_SERVICE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            ClipData clip <span class="token operator">=</span> ClipData<span class="token punctuation">.</span><span class="token function">newPlainText</span><span class="token punctuation">(</span><span class="token string">"label"</span><span class="token punctuation">,</span> text<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            clipboard<span class="token punctuation">.</span><span class="token function">setPrimaryClip</span><span class="token punctuation">(</span>clip<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            nodeInfo<span class="token punctuation">.</span><span class="token function">performAction</span><span class="token punctuation">(</span>AccessibilityNodeInfo<span class="token punctuation">.</span>ACTION_FOCUS<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            nodeInfo<span class="token punctuation">.</span><span class="token function">performAction</span><span class="token punctuation">(</span>AccessibilityNodeInfo<span class="token punctuation">.</span>ACTION_PASTE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onAccessibilityEvent</span><span class="token punctuation">(</span>AccessibilityEvent event<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Log<span class="token punctuation">.</span><span class="token function">d</span><span class="token punctuation">(</span><span class="token string">"dd"</span><span class="token punctuation">,</span> <span class="token string">"onAccessibilityEvent: "</span> <span class="token operator">+</span> event<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onInterrupt</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">onServiceConnected</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">onServiceConnected</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Log<span class="token punctuation">.</span><span class="token function">d</span><span class="token punctuation">(</span><span class="token string">"llll"</span><span class="token punctuation">,</span> <span class="token string">"onServiceConnected: "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li><li style="color: rgb(153, 153, 153);">28</li><li style="color: rgb(153, 153, 153);">29</li><li style="color: rgb(153, 153, 153);">30</li><li style="color: rgb(153, 153, 153);">31</li><li style="color: rgb(153, 153, 153);">32</li><li style="color: rgb(153, 153, 153);">33</li><li style="color: rgb(153, 153, 153);">34</li><li style="color: rgb(153, 153, 153);">35</li><li style="color: rgb(153, 153, 153);">36</li><li style="color: rgb(153, 153, 153);">37</li><li style="color: rgb(153, 153, 153);">38</li><li style="color: rgb(153, 153, 153);">39</li><li style="color: rgb(153, 153, 153);">40</li><li style="color: rgb(153, 153, 153);">41</li><li style="color: rgb(153, 153, 153);">42</li><li style="color: rgb(153, 153, 153);">43</li><li style="color: rgb(153, 153, 153);">44</li><li style="color: rgb(153, 153, 153);">45</li><li style="color: rgb(153, 153, 153);">46</li><li style="color: rgb(153, 153, 153);">47</li><li style="color: rgb(153, 153, 153);">48</li><li style="color: rgb(153, 153, 153);">49</li><li style="color: rgb(153, 153, 153);">50</li><li style="color: rgb(153, 153, 153);">51</li><li style="color: rgb(153, 153, 153);">52</li><li style="color: rgb(153, 153, 153);">53</li><li style="color: rgb(153, 153, 153);">54</li><li style="color: rgb(153, 153, 153);">55</li><li style="color: rgb(153, 153, 153);">56</li><li style="color: rgb(153, 153, 153);">57</li><li style="color: rgb(153, 153, 153);">58</li><li style="color: rgb(153, 153, 153);">59</li><li style="color: rgb(153, 153, 153);">60</li><li style="color: rgb(153, 153, 153);">61</li><li style="color: rgb(153, 153, 153);">62</li><li style="color: rgb(153, 153, 153);">63</li><li style="color: rgb(153, 153, 153);">64</li><li style="color: rgb(153, 153, 153);">65</li><li style="color: rgb(153, 153, 153);">66</li><li style="color: rgb(153, 153, 153);">67</li><li style="color: rgb(153, 153, 153);">68</li><li style="color: rgb(153, 153, 153);">69</li><li style="color: rgb(153, 153, 153);">70</li><li style="color: rgb(153, 153, 153);">71</li><li style="color: rgb(153, 153, 153);">72</li><li style="color: rgb(153, 153, 153);">73</li><li style="color: rgb(153, 153, 153);">74</li><li style="color: rgb(153, 153, 153);">75</li><li style="color: rgb(153, 153, 153);">76</li><li style="color: rgb(153, 153, 153);">77</li><li style="color: rgb(153, 153, 153);">78</li><li style="color: rgb(153, 153, 153);">79</li><li style="color: rgb(153, 153, 153);">80</li><li style="color: rgb(153, 153, 153);">81</li><li style="color: rgb(153, 153, 153);">82</li><li style="color: rgb(153, 153, 153);">83</li><li style="color: rgb(153, 153, 153);">84</li><li style="color: rgb(153, 153, 153);">85</li><li style="color: rgb(153, 153, 153);">86</li><li style="color: rgb(153, 153, 153);">87</li><li style="color: rgb(153, 153, 153);">88</li><li style="color: rgb(153, 153, 153);">89</li><li style="color: rgb(153, 153, 153);">90</li><li style="color: rgb(153, 153, 153);">91</li><li style="color: rgb(153, 153, 153);">92</li><li style="color: rgb(153, 153, 153);">93</li><li style="color: rgb(153, 153, 153);">94</li><li style="color: rgb(153, 153, 153);">95</li><li style="color: rgb(153, 153, 153);">96</li><li style="color: rgb(153, 153, 153);">97</li><li style="color: rgb(153, 153, 153);">98</li><li style="color: rgb(153, 153, 153);">99</li><li style="color: rgb(153, 153, 153);">100</li><li style="color: rgb(153, 153, 153);">101</li><li style="color: rgb(153, 153, 153);">102</li><li style="color: rgb(153, 153, 153);">103</li><li style="color: rgb(153, 153, 153);">104</li><li style="color: rgb(153, 153, 153);">105</li><li style="color: rgb(153, 153, 153);">106</li><li style="color: rgb(153, 153, 153);">107</li><li style="color: rgb(153, 153, 153);">108</li><li style="color: rgb(153, 153, 153);">109</li><li style="color: rgb(153, 153, 153);">110</li><li style="color: rgb(153, 153, 153);">111</li><li style="color: rgb(153, 153, 153);">112</li><li style="color: rgb(153, 153, 153);">113</li><li style="color: rgb(153, 153, 153);">114</li><li style="color: rgb(153, 153, 153);">115</li><li style="color: rgb(153, 153, 153);">116</li><li style="color: rgb(153, 153, 153);">117</li><li style="color: rgb(153, 153, 153);">118</li><li style="color: rgb(153, 153, 153);">119</li><li style="color: rgb(153, 153, 153);">120</li><li style="color: rgb(153, 153, 153);">121</li><li style="color: rgb(153, 153, 153);">122</li><li style="color: rgb(153, 153, 153);">123</li><li style="color: rgb(153, 153, 153);">124</li><li style="color: rgb(153, 153, 153);">125</li><li style="color: rgb(153, 153, 153);">126</li><li style="color: rgb(153, 153, 153);">127</li><li style="color: rgb(153, 153, 153);">128</li><li style="color: rgb(153, 153, 153);">129</li><li style="color: rgb(153, 153, 153);">130</li><li style="color: rgb(153, 153, 153);">131</li><li style="color: rgb(153, 153, 153);">132</li><li style="color: rgb(153, 153, 153);">133</li><li style="color: rgb(153, 153, 153);">134</li><li style="color: rgb(153, 153, 153);">135</li><li style="color: rgb(153, 153, 153);">136</li><li style="color: rgb(153, 153, 153);">137</li><li style="color: rgb(153, 153, 153);">138</li><li style="color: rgb(153, 153, 153);">139</li><li style="color: rgb(153, 153, 153);">140</li><li style="color: rgb(153, 153, 153);">141</li><li style="color: rgb(153, 153, 153);">142</li><li style="color: rgb(153, 153, 153);">143</li><li style="color: rgb(153, 153, 153);">144</li><li style="color: rgb(153, 153, 153);">145</li><li style="color: rgb(153, 153, 153);">146</li><li style="color: rgb(153, 153, 153);">147</li><li style="color: rgb(153, 153, 153);">148</li><li style="color: rgb(153, 153, 153);">149</li><li style="color: rgb(153, 153, 153);">150</li><li style="color: rgb(153, 153, 153);">151</li><li style="color: rgb(153, 153, 153);">152</li><li style="color: rgb(153, 153, 153);">153</li><li style="color: rgb(153, 153, 153);">154</li><li style="color: rgb(153, 153, 153);">155</li><li style="color: rgb(153, 153, 153);">156</li><li style="color: rgb(153, 153, 153);">157</li><li style="color: rgb(153, 153, 153);">158</li><li style="color: rgb(153, 153, 153);">159</li><li style="color: rgb(153, 153, 153);">160</li><li style="color: rgb(153, 153, 153);">161</li><li style="color: rgb(153, 153, 153);">162</li><li style="color: rgb(153, 153, 153);">163</li><li style="color: rgb(153, 153, 153);">164</li><li style="color: rgb(153, 153, 153);">165</li><li style="color: rgb(153, 153, 153);">166</li><li style="color: rgb(153, 153, 153);">167</li><li style="color: rgb(153, 153, 153);">168</li><li style="color: rgb(153, 153, 153);">169</li><li style="color: rgb(153, 153, 153);">170</li><li style="color: rgb(153, 153, 153);">171</li><li style="color: rgb(153, 153, 153);">172</li><li style="color: rgb(153, 153, 153);">173</li><li style="color: rgb(153, 153, 153);">174</li><li style="color: rgb(153, 153, 153);">175</li><li style="color: rgb(153, 153, 153);">176</li><li style="color: rgb(153, 153, 153);">177</li><li style="color: rgb(153, 153, 153);">178</li><li style="color: rgb(153, 153, 153);">179</li><li style="color: rgb(153, 153, 153);">180</li><li style="color: rgb(153, 153, 153);">181</li><li style="color: rgb(153, 153, 153);">182</li><li style="color: rgb(153, 153, 153);">183</li><li style="color: rgb(153, 153, 153);">184</li><li style="color: rgb(153, 153, 153);">185</li><li style="color: rgb(153, 153, 153);">186</li><li style="color: rgb(153, 153, 153);">187</li><li style="color: rgb(153, 153, 153);">188</li><li style="color: rgb(153, 153, 153);">189</li><li style="color: rgb(153, 153, 153);">190</li><li style="color: rgb(153, 153, 153);">191</li><li style="color: rgb(153, 153, 153);">192</li><li style="color: rgb(153, 153, 153);">193</li><li style="color: rgb(153, 153, 153);">194</li><li style="color: rgb(153, 153, 153);">195</li><li style="color: rgb(153, 153, 153);">196</li><li style="color: rgb(153, 153, 153);">197</li><li style="color: rgb(153, 153, 153);">198</li><li style="color: rgb(153, 153, 153);">199</li><li style="color: rgb(153, 153, 153);">200</li><li style="color: rgb(153, 153, 153);">201</li><li style="color: rgb(153, 153, 153);">202</li><li style="color: rgb(153, 153, 153);">203</li><li style="color: rgb(153, 153, 153);">204</li><li style="color: rgb(153, 153, 153);">205</li><li style="color: rgb(153, 153, 153);">206</li><li style="color: rgb(153, 153, 153);">207</li><li style="color: rgb(153, 153, 153);">208</li><li style="color: rgb(153, 153, 153);">209</li><li style="color: rgb(153, 153, 153);">210</li><li style="color: rgb(153, 153, 153);">211</li><li style="color: rgb(153, 153, 153);">212</li><li style="color: rgb(153, 153, 153);">213</li><li style="color: rgb(153, 153, 153);">214</li><li style="color: rgb(153, 153, 153);">215</li><li style="color: rgb(153, 153, 153);">216</li><li style="color: rgb(153, 153, 153);">217</li><li style="color: rgb(153, 153, 153);">218</li><li style="color: rgb(153, 153, 153);">219</li><li style="color: rgb(153, 153, 153);">220</li><li style="color: rgb(153, 153, 153);">221</li><li style="color: rgb(153, 153, 153);">222</li><li style="color: rgb(153, 153, 153);">223</li><li style="color: rgb(153, 153, 153);">224</li><li style="color: rgb(153, 153, 153);">225</li><li style="color: rgb(153, 153, 153);">226</li><li style="color: rgb(153, 153, 153);">227</li></ul></pre>
+<h4><a id="4_572"></a>4.实际应用</h4>
+<p>学习了大部分的AccessibilityService相关知识。就可以灵活运用这些内容进行组装。<br>
+比如说：</p>
+<ul>
+<li>微信红包外挂</li>
+<li>支付宝自动收能量</li>
+<li>微信自动发消息</li>
+<li>朋友圈自动点赞</li>
+<li>…</li>
+</ul>
+<h3><a name="t7"></a><a id="_581"></a>六.参考资料</h3>
+<p><a href="https://developer.android.google.cn/reference/android/accessibilityservice/AccessibilityService.html#lifecycle" rel="nofollow">官方api文档 </a><br>
+<a href="https://developer.android.google.cn/guide/topics/ui/accessibility/index.html" rel="nofollow">官网辅助服务介绍</a><br>
+<a href="https://juejin.im/post/5acb49126fb9a028cc6186f1" rel="nofollow">妙用AccessibilityService黑科技实现微信自动加好友拉人进群聊</a></p>
+
+                                    </div>
+                <link href="https://csdnimg.cn/release/phoenix/mdeditor/markdown_views-b6c3c6d139.css" rel="stylesheet">
+                    </div>
+
+
+</div>
+
+
+</body></html>

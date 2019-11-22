@@ -1,0 +1,285 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android动态更换APP图标及名称 - Fu - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="post">
+		<h1 class="postTitle">
+			
+<a class="postTitle2" id="cb_post_title_url" href="https://www.cnblogs.com/zq-boke/p/8523710.html">java复制文件的4种方式</a>
+
+		</h1>
+		<div class="clear"></div>
+		<div class="postBody">
+			
+<div class="blogpost-body " id="cnblogs_post_body">
+    <h1>一、使用FileStreams复制</h1>
+<p>这是最经典的方式将一个文件的内容复制到另一个文件中。 使用FileInputStream读取文件A的字节，使用FileOutputStream写入到文件B。 这是第一个方法的代码:</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a title="复制代码" onclick="copyCnblogsCode(this)" href="javascript:void(0);"><img alt="复制代码" src="images/java01601.gif"></a></span></div>
+<pre><span style="color: rgb(0, 128, 128);"> 1</span> <span style="color: rgb(0, 0, 255);">private</span> <span style="color: rgb(0, 0, 255);">static</span> <span style="color: rgb(0, 0, 255);">void</span><span style="color: rgb(0, 0, 0);"> copyFileUsingFileStreams(File source, File dest)
+</span><span style="color: rgb(0, 128, 128);"> 2</span>         <span style="color: rgb(0, 0, 255);">throws</span><span style="color: rgb(0, 0, 0);"> IOException {    
+</span><span style="color: rgb(0, 128, 128);"> 3</span>     InputStream input = <span style="color: rgb(0, 0, 255);">null</span><span style="color: rgb(0, 0, 0);">;    
+</span><span style="color: rgb(0, 128, 128);"> 4</span>     OutputStream output = <span style="color: rgb(0, 0, 255);">null</span><span style="color: rgb(0, 0, 0);">;    
+</span><span style="color: rgb(0, 128, 128);"> 5</span>     <span style="color: rgb(0, 0, 255);">try</span><span style="color: rgb(0, 0, 0);"> {
+</span><span style="color: rgb(0, 128, 128);"> 6</span>            input = <span style="color: rgb(0, 0, 255);">new</span><span style="color: rgb(0, 0, 0);"> FileInputStream(source);
+</span><span style="color: rgb(0, 128, 128);"> 7</span>            output = <span style="color: rgb(0, 0, 255);">new</span><span style="color: rgb(0, 0, 0);"> FileOutputStream(dest);        
+</span><span style="color: rgb(0, 128, 128);"> 8</span>            <span style="color: rgb(0, 0, 255);">byte</span>[] buf = <span style="color: rgb(0, 0, 255);">new</span> <span style="color: rgb(0, 0, 255);">byte</span>[1024<span style="color: rgb(0, 0, 0);">];        
+</span><span style="color: rgb(0, 128, 128);"> 9</span>            <span style="color: rgb(0, 0, 255);">int</span><span style="color: rgb(0, 0, 0);"> bytesRead;        
+</span><span style="color: rgb(0, 128, 128);">10</span>            <span style="color: rgb(0, 0, 255);">while</span> ((bytesRead = input.read(buf)) ！= -1<span style="color: rgb(0, 0, 0);">) {
+</span><span style="color: rgb(0, 128, 128);">11</span>                output.write(buf, 0<span style="color: rgb(0, 0, 0);">, bytesRead);
+</span><span style="color: rgb(0, 128, 128);">12</span> <span style="color: rgb(0, 0, 0);">           }
+</span><span style="color: rgb(0, 128, 128);">13</span>     } <span style="color: rgb(0, 0, 255);">finally</span><span style="color: rgb(0, 0, 0);"> {
+</span><span style="color: rgb(0, 128, 128);">14</span> <span style="color: rgb(0, 0, 0);">        input.close();
+</span><span style="color: rgb(0, 128, 128);">15</span> <span style="color: rgb(0, 0, 0);">        output.close();
+</span><span style="color: rgb(0, 128, 128);">16</span> <span style="color: rgb(0, 0, 0);">    }
+</span><span style="color: rgb(0, 128, 128);">17</span> }</pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a title="复制代码" onclick="copyCnblogsCode(this)" href="javascript:void(0);"><img alt="复制代码" src="images/java01602.gif"></a></span></div></div>
+<p>正如你所看到的我们执行几个读和写操作try的数据,所以这应该是一个低效率的,下一个方法我们将看到新的方式。</p>
+<h1>二、使用FileChannel复制</h1>
+<p>Java NIO包括transferFrom方法,根据文档应该比文件流复制的速度更快。 这是第二种方法的代码:</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a title="复制代码" onclick="copyCnblogsCode(this)" href="javascript:void(0);"><img alt="复制代码" src="images/java01603.gif"></a></span></div>
+<pre><span style="color: rgb(0, 128, 128);"> 1</span> <span style="color: rgb(0, 0, 255);">private</span> <span style="color: rgb(0, 0, 255);">static</span> <span style="color: rgb(0, 0, 255);">void</span> copyFileUsingFileChannels(File source, File dest) <span style="color: rgb(0, 0, 255);">throws</span><span style="color: rgb(0, 0, 0);"> IOException {    
+</span><span style="color: rgb(0, 128, 128);"> 2</span>         FileChannel inputChannel = <span style="color: rgb(0, 0, 255);">null</span><span style="color: rgb(0, 0, 0);">;    
+</span><span style="color: rgb(0, 128, 128);"> 3</span>         FileChannel outputChannel = <span style="color: rgb(0, 0, 255);">null</span><span style="color: rgb(0, 0, 0);">;    
+</span><span style="color: rgb(0, 128, 128);"> 4</span>     <span style="color: rgb(0, 0, 255);">try</span><span style="color: rgb(0, 0, 0);"> {
+</span><span style="color: rgb(0, 128, 128);"> 5</span>         inputChannel = <span style="color: rgb(0, 0, 255);">new</span><span style="color: rgb(0, 0, 0);"> FileInputStream(source).getChannel();
+</span><span style="color: rgb(0, 128, 128);"> 6</span>         outputChannel = <span style="color: rgb(0, 0, 255);">new</span><span style="color: rgb(0, 0, 0);"> FileOutputStream(dest).getChannel();
+</span><span style="color: rgb(0, 128, 128);"> 7</span>         outputChannel.transferFrom(inputChannel, 0<span style="color: rgb(0, 0, 0);">, inputChannel.size());
+</span><span style="color: rgb(0, 128, 128);"> 8</span>     } <span style="color: rgb(0, 0, 255);">finally</span><span style="color: rgb(0, 0, 0);"> {
+</span><span style="color: rgb(0, 128, 128);"> 9</span> <span style="color: rgb(0, 0, 0);">        inputChannel.close();
+</span><span style="color: rgb(0, 128, 128);">10</span> <span style="color: rgb(0, 0, 0);">        outputChannel.close();
+</span><span style="color: rgb(0, 128, 128);">11</span> <span style="color: rgb(0, 0, 0);">    }
+</span><span style="color: rgb(0, 128, 128);">12</span> }</pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a title="复制代码" onclick="copyCnblogsCode(this)" href="javascript:void(0);"><img alt="复制代码" src="images/java01604.gif"></a></span></div></div>
+<h1><span>三、使用Commons IO复制</span></h1>
+<p>Apache Commons IO提供拷贝文件方法在其FileUtils类,可用于复制一个文件到另一个地方。它非常方便使用Apache Commons FileUtils类时,您已经使用您的项目。基本上,这个类使用Java NIO FileChannel内部。 这是第三种方法的代码:</p>
+<div class="cnblogs_code">
+<pre><span style="color: rgb(0, 128, 128);">1</span> <span style="color: rgb(0, 0, 255);">private</span> <span style="color: rgb(0, 0, 255);">static</span> <span style="color: rgb(0, 0, 255);">void</span><span style="color: rgb(0, 0, 0);"> copyFileUsingApacheCommonsIO(File source, File dest)
+</span><span style="color: rgb(0, 128, 128);">2</span>         <span style="color: rgb(0, 0, 255);">throws</span><span style="color: rgb(0, 0, 0);"> IOException {
+</span><span style="color: rgb(0, 128, 128);">3</span> <span style="color: rgb(0, 0, 0);">    FileUtils.copyFile(source, dest);
+</span><span style="color: rgb(0, 128, 128);">4</span> }</pre>
+</div>
+<p><span style="font-family: 宋体; font-size: 18px;"><span style="color: rgb(255, 0, 0);">该方法的核心代码</span>如下：</span></p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a title="复制代码" onclick="copyCnblogsCode(this)" href="javascript:void(0);"><img alt="复制代码" src="images/java01605.gif"></a></span></div>
+<pre><span style="color: rgb(0, 128, 128);"> 1</span> <span style="color: rgb(0, 0, 255);">private</span> <span style="color: rgb(0, 0, 255);">static</span> <span style="color: rgb(0, 0, 255);">void</span> doCopyFile(File srcFile, File destFile, <span style="color: rgb(0, 0, 255);">boolean</span> preserveFileDate) <span style="color: rgb(0, 0, 255);">throws</span><span style="color: rgb(0, 0, 0);"> IOException {
+</span><span style="color: rgb(0, 128, 128);"> 2</span>         <span style="color: rgb(0, 0, 255);">if</span> (destFile.exists() &amp;&amp;<span style="color: rgb(0, 0, 0);"> destFile.isDirectory()) {
+</span><span style="color: rgb(0, 128, 128);"> 3</span>             <span style="color: rgb(0, 0, 255);">throw</span> <span style="color: rgb(0, 0, 255);">new</span> IOException("Destination '" + destFile + "' exists but is a directory"<span style="color: rgb(0, 0, 0);">);
+</span><span style="color: rgb(0, 128, 128);"> 4</span> <span style="color: rgb(0, 0, 0);">        }
+</span><span style="color: rgb(0, 128, 128);"> 5</span> 
+<span style="color: rgb(0, 128, 128);"> 6</span>         FileInputStream fis = <span style="color: rgb(0, 0, 255);">null</span><span style="color: rgb(0, 0, 0);">;
+</span><span style="color: rgb(0, 128, 128);"> 7</span>         FileOutputStream fos = <span style="color: rgb(0, 0, 255);">null</span><span style="color: rgb(0, 0, 0);">;
+</span><span style="color: rgb(0, 128, 128);"> 8</span>         FileChannel input = <span style="color: rgb(0, 0, 255);">null</span><span style="color: rgb(0, 0, 0);">;
+</span><span style="color: rgb(0, 128, 128);"> 9</span>         FileChannel output = <span style="color: rgb(0, 0, 255);">null</span><span style="color: rgb(0, 0, 0);">;
+</span><span style="color: rgb(0, 128, 128);">10</span>         <span style="color: rgb(0, 0, 255);">try</span><span style="color: rgb(0, 0, 0);"> {
+</span><span style="color: rgb(0, 128, 128);">11</span>             fis = <span style="color: rgb(0, 0, 255);">new</span><span style="color: rgb(0, 0, 0);"> FileInputStream(srcFile);
+</span><span style="color: rgb(0, 128, 128);">12</span>             fos = <span style="color: rgb(0, 0, 255);">new</span><span style="color: rgb(0, 0, 0);"> FileOutputStream(destFile);
+</span><span style="color: rgb(0, 128, 128);">13</span>             input  =<span style="color: rgb(0, 0, 0);"> fis.getChannel();
+</span><span style="color: rgb(0, 128, 128);">14</span>             output =<span style="color: rgb(0, 0, 0);"> fos.getChannel();
+</span><span style="color: rgb(0, 128, 128);">15</span>             <span style="color: rgb(0, 0, 255);">long</span> size =<span style="color: rgb(0, 0, 0);"> input.size();
+</span><span style="color: rgb(0, 128, 128);">16</span>             <span style="color: rgb(0, 0, 255);">long</span> pos = 0<span style="color: rgb(0, 0, 0);">;
+</span><span style="color: rgb(0, 128, 128);">17</span>             <span style="color: rgb(0, 0, 255);">long</span> count = 0<span style="color: rgb(0, 0, 0);">;
+</span><span style="color: rgb(0, 128, 128);">18</span>             <span style="color: rgb(0, 0, 255);">while</span> (pos &lt;<span style="color: rgb(0, 0, 0);"> size) {
+</span><span style="color: rgb(0, 128, 128);">19</span>                 count = size - pos &gt; FILE_COPY_BUFFER_SIZE ? FILE_COPY_BUFFER_SIZE : size -<span style="color: rgb(0, 0, 0);"> pos;
+</span><span style="color: rgb(0, 128, 128);">20</span>                 pos +=<span style="color: rgb(0, 0, 0);"> output.transferFrom(input, pos, count);
+</span><span style="color: rgb(0, 128, 128);">21</span> <span style="color: rgb(0, 0, 0);">            }
+</span><span style="color: rgb(0, 128, 128);">22</span>         } <span style="color: rgb(0, 0, 255);">finally</span><span style="color: rgb(0, 0, 0);"> {
+</span><span style="color: rgb(0, 128, 128);">23</span> <span style="color: rgb(0, 0, 0);">            IOUtils.closeQuietly(output);
+</span><span style="color: rgb(0, 128, 128);">24</span> <span style="color: rgb(0, 0, 0);">            IOUtils.closeQuietly(fos);
+</span><span style="color: rgb(0, 128, 128);">25</span> <span style="color: rgb(0, 0, 0);">            IOUtils.closeQuietly(input);
+</span><span style="color: rgb(0, 128, 128);">26</span> <span style="color: rgb(0, 0, 0);">            IOUtils.closeQuietly(fis);
+</span><span style="color: rgb(0, 128, 128);">27</span> <span style="color: rgb(0, 0, 0);">        }
+</span><span style="color: rgb(0, 128, 128);">28</span> 
+<span style="color: rgb(0, 128, 128);">29</span>         <span style="color: rgb(0, 0, 255);">if</span> (srcFile.length() !=<span style="color: rgb(0, 0, 0);"> destFile.length()) {
+</span><span style="color: rgb(0, 128, 128);">30</span>             <span style="color: rgb(0, 0, 255);">throw</span> <span style="color: rgb(0, 0, 255);">new</span> IOException("Failed to copy full contents from '" +
+<span style="color: rgb(0, 128, 128);">31</span>                     srcFile + "' to '" + destFile + "'"<span style="color: rgb(0, 0, 0);">);
+</span><span style="color: rgb(0, 128, 128);">32</span> <span style="color: rgb(0, 0, 0);">        }
+</span><span style="color: rgb(0, 128, 128);">33</span>         <span style="color: rgb(0, 0, 255);">if</span><span style="color: rgb(0, 0, 0);"> (preserveFileDate) {
+</span><span style="color: rgb(0, 128, 128);">34</span> <span style="color: rgb(0, 0, 0);">            destFile.setLastModified(srcFile.lastModified());
+</span><span style="color: rgb(0, 128, 128);">35</span> <span style="color: rgb(0, 0, 0);">        }
+</span><span style="color: rgb(0, 128, 128);">36</span>     }</pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a title="复制代码" onclick="copyCnblogsCode(this)" href="javascript:void(0);"><img alt="复制代码" src="images/java01606.gif"></a></span></div></div>
+<p>由此可见，使用<span style="color: rgb(255, 0, 0);">Apache Commons IO复制文件的原理就是上述第二种方法：使用FileChannel复制</span></p>
+<p>&nbsp;</p>
+<h1>四、使用Java7的Files类复制</h1>
+<p>如果你有一些经验在Java 7中你可能会知道,可以使用复制方法的Files类文件,从一个文件复制到另一个文件。 这是第四个方法的代码:</p>
+<div class="cnblogs_code">
+<pre><span style="color: rgb(0, 128, 128);">1</span> <span style="color: rgb(0, 0, 255);">private</span> <span style="color: rgb(0, 0, 255);">static</span> <span style="color: rgb(0, 0, 255);">void</span><span style="color: rgb(0, 0, 0);"> copyFileUsingJava7Files(File source, File dest)
+</span><span style="color: rgb(0, 128, 128);">2</span>         <span style="color: rgb(0, 0, 255);">throws</span><span style="color: rgb(0, 0, 0);"> IOException {    
+</span><span style="color: rgb(0, 128, 128);">3</span> <span style="color: rgb(0, 0, 0);">        Files.copy(source.toPath(), dest.toPath());
+</span><span style="color: rgb(0, 128, 128);">4</span> }</pre>
+</div>
+<p>&nbsp;</p>
+<h1>五、测试</h1>
+<p>现在看到这些方法中的哪一个是更高效的,我们会复制一个大文件使用每一个在一个简单的程序。 从缓存来避免任何性能明显我们将使用四个不同的源文件和四种不同的目标文件。 让我们看一下代码:</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a title="复制代码" onclick="copyCnblogsCode(this)" href="javascript:void(0);"><img alt="复制代码" src="images/java01607.gif"></a></span></div>
+<pre><span style="color: rgb(0, 128, 128);"> 1</span> <span style="color: rgb(0, 0, 255);">import</span><span style="color: rgb(0, 0, 0);"> java.io.File;
+</span><span style="color: rgb(0, 128, 128);"> 2</span> <span style="color: rgb(0, 0, 255);">import</span><span style="color: rgb(0, 0, 0);"> java.io.FileInputStream;
+</span><span style="color: rgb(0, 128, 128);"> 3</span> <span style="color: rgb(0, 0, 255);">import</span><span style="color: rgb(0, 0, 0);"> java.io.FileOutputStream;
+</span><span style="color: rgb(0, 128, 128);"> 4</span> <span style="color: rgb(0, 0, 255);">import</span><span style="color: rgb(0, 0, 0);"> java.io.IOException;
+</span><span style="color: rgb(0, 128, 128);"> 5</span> <span style="color: rgb(0, 0, 255);">import</span><span style="color: rgb(0, 0, 0);"> java.io.InputStream;
+</span><span style="color: rgb(0, 128, 128);"> 6</span> <span style="color: rgb(0, 0, 255);">import</span><span style="color: rgb(0, 0, 0);"> java.io.OutputStream;
+</span><span style="color: rgb(0, 128, 128);"> 7</span> <span style="color: rgb(0, 0, 255);">import</span><span style="color: rgb(0, 0, 0);"> java.nio.channels.FileChannel;
+</span><span style="color: rgb(0, 128, 128);"> 8</span> <span style="color: rgb(0, 0, 255);">import</span><span style="color: rgb(0, 0, 0);"> java.nio.file.Files;
+</span><span style="color: rgb(0, 128, 128);"> 9</span> <span style="color: rgb(0, 0, 255);">import</span><span style="color: rgb(0, 0, 0);"> org.apache.commons.io.FileUtils;
+</span><span style="color: rgb(0, 128, 128);">10</span> 
+<span style="color: rgb(0, 128, 128);">11</span> <span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">class</span><span style="color: rgb(0, 0, 0);"> CopyFilesExample {
+</span><span style="color: rgb(0, 128, 128);">12</span> 
+<span style="color: rgb(0, 128, 128);">13</span>     <span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">static</span> <span style="color: rgb(0, 0, 255);">void</span> main(String[] args) <span style="color: rgb(0, 0, 255);">throws</span><span style="color: rgb(0, 0, 0);"> InterruptedException,
+</span><span style="color: rgb(0, 128, 128);">14</span> <span style="color: rgb(0, 0, 0);">            IOException {
+</span><span style="color: rgb(0, 128, 128);">15</span> 
+<span style="color: rgb(0, 128, 128);">16</span>         File source = <span style="color: rgb(0, 0, 255);">new</span> File("C:\\Users\\nikos7\\Desktop\\files\\sourcefile1.txt"<span style="color: rgb(0, 0, 0);">);
+</span><span style="color: rgb(0, 128, 128);">17</span>         File dest = <span style="color: rgb(0, 0, 255);">new</span> File("C:\\Users\\nikos7\\Desktop\\files\\destfile1.txt"<span style="color: rgb(0, 0, 0);">);
+</span><span style="color: rgb(0, 128, 128);">18</span> 
+<span style="color: rgb(0, 128, 128);">19</span>         <span style="color: rgb(0, 128, 0);">//</span><span style="color: rgb(0, 128, 0);"> copy file using FileStreamslong start = System.nanoTime();</span>
+<span style="color: rgb(0, 128, 128);">20</span>         <span style="color: rgb(0, 0, 255);">long</span><span style="color: rgb(0, 0, 0);"> end;
+</span><span style="color: rgb(0, 128, 128);">21</span> <span style="color: rgb(0, 0, 0);">        copyFileUsingFileStreams(source, dest);
+</span><span style="color: rgb(0, 128, 128);">22</span>         System.out.println("Time taken by FileStreams Copy = "
+<span style="color: rgb(0, 128, 128);">23</span>                 + (System.nanoTime() -<span style="color: rgb(0, 0, 0);"> start));
+</span><span style="color: rgb(0, 128, 128);">24</span> 
+<span style="color: rgb(0, 128, 128);">25</span>         <span style="color: rgb(0, 128, 0);">//</span><span style="color: rgb(0, 128, 0);"> copy files using java.nio.FileChannelsource = new File("C:\\Users\\nikos7\\Desktop\\files\\sourcefile2.txt");</span>
+<span style="color: rgb(0, 128, 128);">26</span>         dest = <span style="color: rgb(0, 0, 255);">new</span> File("C:\\Users\\nikos7\\Desktop\\files\\destfile2.txt"<span style="color: rgb(0, 0, 0);">);
+</span><span style="color: rgb(0, 128, 128);">27</span>         start =<span style="color: rgb(0, 0, 0);"> System.nanoTime();
+</span><span style="color: rgb(0, 128, 128);">28</span> <span style="color: rgb(0, 0, 0);">        copyFileUsingFileChannels(source, dest);
+</span><span style="color: rgb(0, 128, 128);">29</span>         end =<span style="color: rgb(0, 0, 0);"> System.nanoTime();
+</span><span style="color: rgb(0, 128, 128);">30</span>         System.out.println("Time taken by FileChannels Copy = " + (end -<span style="color: rgb(0, 0, 0);"> start));
+</span><span style="color: rgb(0, 128, 128);">31</span> 
+<span style="color: rgb(0, 128, 128);">32</span>         <span style="color: rgb(0, 128, 0);">//</span><span style="color: rgb(0, 128, 0);"> copy file using Java 7 Files classsource = new File("C:\\Users\\nikos7\\Desktop\\files\\sourcefile3.txt");</span>
+<span style="color: rgb(0, 128, 128);">33</span>         dest = <span style="color: rgb(0, 0, 255);">new</span> File("C:\\Users\\nikos7\\Desktop\\files\\destfile3.txt"<span style="color: rgb(0, 0, 0);">);
+</span><span style="color: rgb(0, 128, 128);">34</span>         start =<span style="color: rgb(0, 0, 0);"> System.nanoTime();
+</span><span style="color: rgb(0, 128, 128);">35</span> <span style="color: rgb(0, 0, 0);">        copyFileUsingJava7Files(source, dest);
+</span><span style="color: rgb(0, 128, 128);">36</span>         end =<span style="color: rgb(0, 0, 0);"> System.nanoTime();
+</span><span style="color: rgb(0, 128, 128);">37</span>         System.out.println("Time taken by Java7 Files Copy = " + (end -<span style="color: rgb(0, 0, 0);"> start));
+</span><span style="color: rgb(0, 128, 128);">38</span> 
+<span style="color: rgb(0, 128, 128);">39</span>         <span style="color: rgb(0, 128, 0);">//</span><span style="color: rgb(0, 128, 0);"> copy files using apache commons iosource = new File("C:\\Users\\nikos7\\Desktop\\files\\sourcefile4.txt");</span>
+<span style="color: rgb(0, 128, 128);">40</span>         dest = <span style="color: rgb(0, 0, 255);">new</span> File("C:\\Users\\nikos7\\Desktop\\files\\destfile4.txt"<span style="color: rgb(0, 0, 0);">);
+</span><span style="color: rgb(0, 128, 128);">41</span>         start =<span style="color: rgb(0, 0, 0);"> System.nanoTime();
+</span><span style="color: rgb(0, 128, 128);">42</span> <span style="color: rgb(0, 0, 0);">        copyFileUsingApacheCommonsIO(source, dest);
+</span><span style="color: rgb(0, 128, 128);">43</span>         end =<span style="color: rgb(0, 0, 0);"> System.nanoTime();
+</span><span style="color: rgb(0, 128, 128);">44</span>         System.out.println("Time taken by Apache Commons IO Copy = "
+<span style="color: rgb(0, 128, 128);">45</span>                 + (end -<span style="color: rgb(0, 0, 0);"> start));
+</span><span style="color: rgb(0, 128, 128);">46</span> 
+<span style="color: rgb(0, 128, 128);">47</span> <span style="color: rgb(0, 0, 0);">    }
+</span><span style="color: rgb(0, 128, 128);">48</span> 
+<span style="color: rgb(0, 128, 128);">49</span>     <span style="color: rgb(0, 0, 255);">private</span> <span style="color: rgb(0, 0, 255);">static</span> <span style="color: rgb(0, 0, 255);">void</span><span style="color: rgb(0, 0, 0);"> copyFileUsingFileStreams(File source, File dest)
+</span><span style="color: rgb(0, 128, 128);">50</span>             <span style="color: rgb(0, 0, 255);">throws</span><span style="color: rgb(0, 0, 0);"> IOException {
+</span><span style="color: rgb(0, 128, 128);">51</span>         InputStream input = <span style="color: rgb(0, 0, 255);">null</span><span style="color: rgb(0, 0, 0);">;
+</span><span style="color: rgb(0, 128, 128);">52</span>         OutputStream output = <span style="color: rgb(0, 0, 255);">null</span><span style="color: rgb(0, 0, 0);">;
+</span><span style="color: rgb(0, 128, 128);">53</span>         <span style="color: rgb(0, 0, 255);">try</span><span style="color: rgb(0, 0, 0);"> {
+</span><span style="color: rgb(0, 128, 128);">54</span>             input = <span style="color: rgb(0, 0, 255);">new</span><span style="color: rgb(0, 0, 0);"> FileInputStream(source);
+</span><span style="color: rgb(0, 128, 128);">55</span>             output = <span style="color: rgb(0, 0, 255);">new</span><span style="color: rgb(0, 0, 0);"> FileOutputStream(dest);
+</span><span style="color: rgb(0, 128, 128);">56</span>             <span style="color: rgb(0, 0, 255);">byte</span>[] buf = <span style="color: rgb(0, 0, 255);">new</span> <span style="color: rgb(0, 0, 255);">byte</span>[1024<span style="color: rgb(0, 0, 0);">];
+</span><span style="color: rgb(0, 128, 128);">57</span>             <span style="color: rgb(0, 0, 255);">int</span><span style="color: rgb(0, 0, 0);"> bytesRead;
+</span><span style="color: rgb(0, 128, 128);">58</span>             <span style="color: rgb(0, 0, 255);">while</span> ((bytesRead = input.read(buf)) &gt; 0<span style="color: rgb(0, 0, 0);">) {
+</span><span style="color: rgb(0, 128, 128);">59</span>                 output.write(buf, 0<span style="color: rgb(0, 0, 0);">, bytesRead);
+</span><span style="color: rgb(0, 128, 128);">60</span> <span style="color: rgb(0, 0, 0);">            }
+</span><span style="color: rgb(0, 128, 128);">61</span>         } <span style="color: rgb(0, 0, 255);">finally</span><span style="color: rgb(0, 0, 0);"> {
+</span><span style="color: rgb(0, 128, 128);">62</span> <span style="color: rgb(0, 0, 0);">            input.close();
+</span><span style="color: rgb(0, 128, 128);">63</span> <span style="color: rgb(0, 0, 0);">            output.close();
+</span><span style="color: rgb(0, 128, 128);">64</span> <span style="color: rgb(0, 0, 0);">        }
+</span><span style="color: rgb(0, 128, 128);">65</span> <span style="color: rgb(0, 0, 0);">    }
+</span><span style="color: rgb(0, 128, 128);">66</span> 
+<span style="color: rgb(0, 128, 128);">67</span>     <span style="color: rgb(0, 0, 255);">private</span> <span style="color: rgb(0, 0, 255);">static</span> <span style="color: rgb(0, 0, 255);">void</span><span style="color: rgb(0, 0, 0);"> copyFileUsingFileChannels(File source, File dest)
+</span><span style="color: rgb(0, 128, 128);">68</span>             <span style="color: rgb(0, 0, 255);">throws</span><span style="color: rgb(0, 0, 0);"> IOException {
+</span><span style="color: rgb(0, 128, 128);">69</span>         FileChannel inputChannel = <span style="color: rgb(0, 0, 255);">null</span><span style="color: rgb(0, 0, 0);">;
+</span><span style="color: rgb(0, 128, 128);">70</span>         FileChannel outputChannel = <span style="color: rgb(0, 0, 255);">null</span><span style="color: rgb(0, 0, 0);">;
+</span><span style="color: rgb(0, 128, 128);">71</span>         <span style="color: rgb(0, 0, 255);">try</span><span style="color: rgb(0, 0, 0);"> {
+</span><span style="color: rgb(0, 128, 128);">72</span>             inputChannel = <span style="color: rgb(0, 0, 255);">new</span><span style="color: rgb(0, 0, 0);"> FileInputStream(source).getChannel();
+</span><span style="color: rgb(0, 128, 128);">73</span>             outputChannel = <span style="color: rgb(0, 0, 255);">new</span><span style="color: rgb(0, 0, 0);"> FileOutputStream(dest).getChannel();
+</span><span style="color: rgb(0, 128, 128);">74</span>             outputChannel.transferFrom(inputChannel, 0<span style="color: rgb(0, 0, 0);">, inputChannel.size());
+</span><span style="color: rgb(0, 128, 128);">75</span>         } <span style="color: rgb(0, 0, 255);">finally</span><span style="color: rgb(0, 0, 0);"> {
+</span><span style="color: rgb(0, 128, 128);">76</span> <span style="color: rgb(0, 0, 0);">            inputChannel.close();
+</span><span style="color: rgb(0, 128, 128);">77</span> <span style="color: rgb(0, 0, 0);">            outputChannel.close();
+</span><span style="color: rgb(0, 128, 128);">78</span> <span style="color: rgb(0, 0, 0);">        }
+</span><span style="color: rgb(0, 128, 128);">79</span> <span style="color: rgb(0, 0, 0);">    }
+</span><span style="color: rgb(0, 128, 128);">80</span> 
+<span style="color: rgb(0, 128, 128);">81</span>     <span style="color: rgb(0, 0, 255);">private</span> <span style="color: rgb(0, 0, 255);">static</span> <span style="color: rgb(0, 0, 255);">void</span><span style="color: rgb(0, 0, 0);"> copyFileUsingJava7Files(File source, File dest)
+</span><span style="color: rgb(0, 128, 128);">82</span>             <span style="color: rgb(0, 0, 255);">throws</span><span style="color: rgb(0, 0, 0);"> IOException {
+</span><span style="color: rgb(0, 128, 128);">83</span> <span style="color: rgb(0, 0, 0);">        Files.copy(source.toPath(), dest.toPath());
+</span><span style="color: rgb(0, 128, 128);">84</span> <span style="color: rgb(0, 0, 0);">    }
+</span><span style="color: rgb(0, 128, 128);">85</span> 
+<span style="color: rgb(0, 128, 128);">86</span>     <span style="color: rgb(0, 0, 255);">private</span> <span style="color: rgb(0, 0, 255);">static</span> <span style="color: rgb(0, 0, 255);">void</span><span style="color: rgb(0, 0, 0);"> copyFileUsingApacheCommonsIO(File source, File dest)
+</span><span style="color: rgb(0, 128, 128);">87</span>             <span style="color: rgb(0, 0, 255);">throws</span><span style="color: rgb(0, 0, 0);"> IOException {
+</span><span style="color: rgb(0, 128, 128);">88</span> <span style="color: rgb(0, 0, 0);">        FileUtils.copyFile(source, dest);
+</span><span style="color: rgb(0, 128, 128);">89</span> <span style="color: rgb(0, 0, 0);">    }
+</span><span style="color: rgb(0, 128, 128);">90</span> 
+<span style="color: rgb(0, 128, 128);">91</span> }</pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a title="复制代码" onclick="copyCnblogsCode(this)" href="javascript:void(0);"><img alt="复制代码" src="images/java01608.gif"></a></span></div></div>
+<p><span style="background-color: inherit;">输出：</span></p>
+<div class="cnblogs_code">
+<pre>Time taken by FileStreams Copy = 127572360<span style="color: rgb(0, 0, 0);">
+Time taken by FileChannels Copy </span>= 10449963<span style="color: rgb(0, 0, 0);">
+Time taken by Java7 Files Copy </span>= 10808333<span style="color: rgb(0, 0, 0);">
+Time taken by Apache Commons IO Copy </span>= 17971677</pre>
+</div>
+<p>&nbsp;</p>
+<p><span style="font-size: 14px; background-color: inherit;"><span style="font-size: 16px; background-color: inherit;">正如您可以看到的FileChannels拷贝大文件是最好的方法。如果你处理更大的文件,你会注意到一个更大的速度差。 这是一个示例,该示例演示了Java中四种不同的方法可以复制一个文件。</span></span></p>
+<p>&nbsp;</p>
+</div>
+<div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block"><div id="BlogPostCategory">
+    分类: 
+            <a href="https://www.cnblogs.com/zq-boke/category/844650.html" target="_blank">Java</a></div>
+
+
+    <div id="blog_post_info">
+<div id="green_channel">
+        <a id="green_channel_digg" onclick="DiggIt(8523710,cb_blogId,1);green_channel_success(this,'谢谢推荐！');" href="javascript:void(0);">好文要顶</a>
+        <a id="green_channel_follow" onclick="follow('f77035fd-f138-e611-9fc1-ac853d9f53cc');" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a title="分享至新浪微博" id="green_channel_weibo" onclick="ShareToTsina()" href="javascript:void(0);"><img alt="" src="images/java01609.png"></a>
+    <a title="分享至微信" id="green_channel_wechat" onclick="shareOnWechat()" href="javascript:void(0);"><img alt="" src="images/java01610.png"></a>
+</div>
+<div id="author_profile">
+    <div class="author_profile_info" id="author_profile_info">
+            <a href="https://home.cnblogs.com/u/zq-boke/" target="_blank"><img class="author_avatar" alt="" src="images/java01611.png"></a>
+        <div class="author_profile_info" id="author_profile_detail">
+            <a href="https://home.cnblogs.com/u/zq-boke/">夏嘻嘻嘻嘻嘻</a><br>
+            <a href="https://home.cnblogs.com/u/zq-boke/followees/">关注 - 0</a><br>
+            <a href="https://home.cnblogs.com/u/zq-boke/followers/">粉丝 - 18</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow">
+                <a onclick="follow('f77035fd-f138-e611-9fc1-ac853d9f53cc');return false;" href="javascript:void(0);">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(8523710,'Digg')">
+        <span class="diggnum" id="digg_count">2</span>
+    </div>
+    <div class="buryit" onclick="votePost(8523710,'Bury')">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+    <div class="clear"></div>
+    <div id="post_next_prev">
+
+    <a class="p_n_p_prefix" href="https://www.cnblogs.com/zq-boke/p/8522824.html">« </a> 上一篇：    <a title="发布于 2018-03-07 15:43" href="https://www.cnblogs.com/zq-boke/p/8522824.html">Java并发编程之CountDownLatch的用法</a>
+    <br>
+    <a class="p_n_p_prefix" href="https://www.cnblogs.com/zq-boke/p/8524497.html">» </a> 下一篇：    <a title="发布于 2018-03-07 18:15" href="https://www.cnblogs.com/zq-boke/p/8524497.html">json转List、Map</a>
+
+</div>
+</div>
+		</div>
+		<div class="postDesc">posted @ 
+<span id="post-date">2018-03-07 17:21</span>&nbsp;<a href="https://www.cnblogs.com/zq-boke/">夏嘻嘻嘻嘻嘻</a> 阅读(<span id="post_view_count">26896</span>) 评论(<span id="post_comment_count">0</span>) <a href="https://i.cnblogs.com/EditPosts.aspx?postid=8523710" rel="nofollow"> 编辑</a> <a onclick="AddToWz(8523710); return false;" href="javascript:void(0)">收藏</a>
+</div>
+	</div>
+
+</div>
+
+
+</body></html>
