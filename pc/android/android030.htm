@@ -1,0 +1,321 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android 中几种优雅的退出APP方式介绍 - YZJ_0722的博客 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                    <!--一个博主专栏付费入口-->
+             
+             <!--一个博主专栏付费入口结束-->
+            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-4a3473df85.css" rel="stylesheet">
+                                        <div class="markdown_views" id="content_views">
+                    <!-- flowchart 箭头图标 勿删 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-linecap="round" d="M 5 0 L 0 2.5 L 5 5 Z" />
+                    </svg>
+                                            <div class="article_content clearfix csdn-tracking-statistics" id="article_content" style="height: 1392px; overflow: hidden;">
+                    <div class="markdown_views">
+                <blockquote>
+  <p>我们的态度是：每天进步一点点，理想终会被实现。</p>
+</blockquote>
+
+
+
+<h2 id="前言"><a name="t0"></a><a></a>前言</h2>
+
+<hr>
+
+<p>最近由于项目的修改，项目由MainActivity按返回键一次退出修改为MainActivity中连续按两次返回键退出，顺便优化一下推出这里的代码。因此还是在网上搜索了一番，总结比较之后得出了有以下集中方式，优缺点都会提出来，有需要的老铁按需选择。</p>
+
+
+
+<h2 id="目录"><a name="t1"></a><a></a>目录</h2>
+
+<hr>
+
+<p>常见的有5中方式：</p>
+
+
+
+<ul>
+<li>容器式 </li>
+<li>便捷式 </li>
+<li>广播式 </li>
+<li>SingleTask式</li>
+<li>进程式 </li>
+</ul>
+
+
+
+
+
+<h2 id="实现方法"><a name="t2"></a><a></a>实现方法</h2>
+
+<hr>
+
+<p><strong>1.容器式</strong> <br>
+容器式可能是我们最常见的方式之一了，主要通过创建一个全局的容器，把所有的Activity都保存下来，退出的时候循环遍历所有activity，然后finish()掉。</p>
+
+<p>BaseActivity添加代码：</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs java has-numbering hljs"><span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-keyword"><span class="hljs-keyword">abstract</span></span> <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">BaseActivity</span></span></span><span class="hljs-class"> </span><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">extends</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">AppCompatActivity</span></span></span><span class="hljs-class">{</span></span>
+ <span class="hljs-annotation"><span class="hljs-annotation">@Override</span></span>
+ <span class="hljs-keyword"><span class="hljs-keyword">protected</span></span> <span class="hljs-keyword"><span class="hljs-keyword">void</span></span> <span class="hljs-title"><span class="hljs-title">onCreate</span></span>(Bundle savedInstanceState) {
+     <span class="hljs-keyword"><span class="hljs-keyword">super</span></span>.onCreate(savedInstanceState);
+     <span class="hljs-comment"><span class="hljs-comment">// 添加Activity到堆栈</span></span>
+     ActivityUtils.getInstance().addActivity(<span class="hljs-keyword"><span class="hljs-keyword">this</span></span>);
+ }
+
+ <span class="hljs-annotation"><span class="hljs-annotation">@Override</span></span>
+ <span class="hljs-keyword"><span class="hljs-keyword">protected</span></span> <span class="hljs-keyword"><span class="hljs-keyword">void</span></span> <span class="hljs-title"><span class="hljs-title">onDestroy</span></span>() {
+     <span class="hljs-keyword"><span class="hljs-keyword">super</span></span>.onDestroy();
+     <span class="hljs-comment"><span class="hljs-comment">// 结束Activity&amp;从栈中移除该Activity</span></span>
+     ActivityUtils.getInstance().removeActivity(<span class="hljs-keyword"><span class="hljs-keyword">this</span></span>);
+ }
+
+}</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li></ul><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li></ul></pre>
+
+<p>创建一个全局工具类：</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs java has-numbering hljs"><span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">ActivityUtils</span></span></span><span class="hljs-class">{</span></span>
+
+   <span class="hljs-keyword"><span class="hljs-keyword">private</span></span> <span class="hljs-title"><span class="hljs-title">ActivityUtils</span></span>() {
+   }
+
+   <span class="hljs-keyword"><span class="hljs-keyword">private</span></span> <span class="hljs-keyword"><span class="hljs-keyword">static</span></span> AtyContainer instance = <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> AtyContainer();
+   <span class="hljs-keyword"><span class="hljs-keyword">private</span></span> <span class="hljs-keyword"><span class="hljs-keyword">static</span></span> List&lt;Activity&gt; activitys = <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> ArrayList&lt;Activity&gt;();
+
+   <span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-keyword"><span class="hljs-keyword">static</span></span> ActivityUtils <span class="hljs-title"><span class="hljs-title">getInstance</span></span>() {
+       <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> instance;
+   }
+
+   <span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-keyword"><span class="hljs-keyword">void</span></span> <span class="hljs-title"><span class="hljs-title">addActivity</span></span>(Activity activity) {
+       activityStack.add(activity);
+   }
+
+   <span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-keyword"><span class="hljs-keyword">void</span></span> <span class="hljs-title"><span class="hljs-title">removeActivity</span></span>(Activity activity) {
+       activityStack.remove(activity);
+   }
+
+   <span class="hljs-javadoc"><span class="hljs-javadoc">/**
+    * 结束所有Activity
+    */</span></span>
+   <span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-keyword"><span class="hljs-keyword">void</span></span> <span class="hljs-title"><span class="hljs-title">finishAllActivity</span></span>() {
+       <span class="hljs-keyword"><span class="hljs-keyword">for</span></span> (<span class="hljs-keyword"><span class="hljs-keyword">int</span></span> i = <span class="hljs-number"><span class="hljs-number">0</span></span>, size = activityStack.size(); i &lt; size; i++) {
+           <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (<span class="hljs-keyword"></span> != activityStack.get(i)) {
+               activityStack.get(i).finish();
+           }
+       }
+       activityStack.clear();
+   }
+
+}</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li><li style="color: rgb(153, 153, 153);">28</li><li style="color: rgb(153, 153, 153);">29</li><li style="color: rgb(153, 153, 153);">30</li><li style="color: rgb(153, 153, 153);">31</li><li style="color: rgb(153, 153, 153);">32</li><li style="color: rgb(153, 153, 153);">33</li></ul><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li><li style="color: rgb(153, 153, 153);">28</li><li style="color: rgb(153, 153, 153);">29</li><li style="color: rgb(153, 153, 153);">30</li><li style="color: rgb(153, 153, 153);">31</li><li style="color: rgb(153, 153, 153);">32</li><li style="color: rgb(153, 153, 153);">33</li></ul></pre>
+
+<p>这种方式是有一定的缺点的，我们的工具类ActivityUtils持有Activity的引用，当我们的应用发生异常，ActivityUtils持有的引用没有被销毁会导致部分内存问题，而且代码量多，不够优雅，诸多不便。</p>
+
+<p>但是容器式这种方式还是有解决办法的，我们可以采用弱引用的方式，就不存在前面所说的问题了，习惯于容器式的可以采用弱引用这种方式的。</p>
+
+<p><strong>2.便捷式</strong></p>
+
+<p>在之前，先讲一下Activity的启动模式：SingleTask</p>
+
+
+
+<blockquote>
+  <p>我们知道Activity有四种加载模式，而singleTask就是其中的一种，使用这个模式之后，当startActivity时，它先会在当前栈中查询是否存在Activity的实例，如果存在，则将其至于栈顶，并将其之上的所有Activity移除栈。我们打开一个app，首先是一个splash页面，然后会finish掉splash页面。跳转到主页。然后会在主页进行N次的跳转，期间会产生数量不定的Activity，有的被销毁，有的驻留在栈中，但是栈底永远是我们的HomeActivity。这样就让问题变得简单很多了。我们只需两步操作即可优雅的实现app的退出。</p>
+</blockquote>
+
+
+
+<p>有了这么一个启动模式，就好办了，我们将退出的出口放在MainActivity中所有事都解决了。</p>
+
+<p>那么这种方法为什么叫便捷式呢？这种方式代码量很少而且很好理解、优雅，而且市面上很多APP都是基于此实现的。我们在MainActivity中实现如下代码：</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs java has-numbering hljs"><span class="hljs-keyword"><span class="hljs-keyword">private</span></span> <span class="hljs-keyword"><span class="hljs-keyword">boolean</span></span> isExit;
+
+  <span class="hljs-javadoc"><span class="hljs-javadoc">/**
+   * 双击返回键退出
+   */</span></span>
+  <span class="hljs-annotation"><span class="hljs-annotation">@Override</span></span>
+  <span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-keyword"><span class="hljs-keyword">boolean</span></span> <span class="hljs-title"><span class="hljs-title">onKeyDown</span></span>(<span class="hljs-keyword"><span class="hljs-keyword">int</span></span> keyCode, KeyEvent event) {
+
+      <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (keyCode == KeyEvent.KEYCODE_BACK) {
+          <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (isExit) {
+              <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.finish();
+
+          } <span class="hljs-keyword"><span class="hljs-keyword">else</span></span> {
+              Toast.makeText(<span class="hljs-keyword"><span class="hljs-keyword">this</span></span>, <span class="hljs-string"><span class="hljs-string">"再按一次退出"</span></span>, Toast.LENGTH_SHORT).show();
+              mIsExit = <span class="hljs-keyword"><span class="hljs-keyword">true</span></span>;
+              <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> Handler().postDelayed(<span class="hljs-keyword"><span class="hljs-keyword">new</span></span> Runnable() {
+                  <span class="hljs-annotation"><span class="hljs-annotation">@Override</span></span>
+                  <span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-keyword"><span class="hljs-keyword">void</span></span> <span class="hljs-title"><span class="hljs-title">run</span></span>() {
+                      isExit= <span class="hljs-keyword"><span class="hljs-keyword">false</span></span>;
+                  }
+              }, <span class="hljs-number"><span class="hljs-number">2000</span></span>);
+          }
+          <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> <span class="hljs-keyword"><span class="hljs-keyword">true</span></span>;
+      }
+
+      <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> <span class="hljs-keyword"><span class="hljs-keyword">super</span></span>.onKeyDown(keyCode, event);
+  }</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li></ul><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li></ul></pre>
+
+<p>不要着急，不要以为就完了，还有很重要的一步：将MainActivity设置为singleTask。</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs xml has-numbering hljs"><span class="hljs-tag"><span class="hljs-tag">&lt;</span><span class="hljs-title"><span class="hljs-tag"><span class="hljs-title">activity</span></span></span><span class="hljs-tag"> </span><span class="hljs-attribute"><span class="hljs-tag"><span class="hljs-attribute">android:name</span></span></span><span class="hljs-tag">=</span><span class="hljs-value"><span class="hljs-tag"><span class="hljs-value">".MainActivity"</span></span></span><span class="hljs-tag">
+           </span><span class="hljs-attribute"><span class="hljs-tag"><span class="hljs-attribute">android:launchMode</span></span></span><span class="hljs-tag">=</span><span class="hljs-value"><span class="hljs-tag"><span class="hljs-value">"singleTask"</span></span></span><span class="hljs-tag">&gt;</span></span>
+           <span class="hljs-tag"><span class="hljs-tag">&lt;</span><span class="hljs-title"><span class="hljs-tag"><span class="hljs-title">intent-filter</span></span></span><span class="hljs-tag">&gt;</span></span>
+               <span class="hljs-tag"><span class="hljs-tag">&lt;</span><span class="hljs-title"><span class="hljs-tag"><span class="hljs-title">action</span></span></span><span class="hljs-tag"> </span><span class="hljs-attribute"><span class="hljs-tag"><span class="hljs-attribute">android:name</span></span></span><span class="hljs-tag">=</span><span class="hljs-value"><span class="hljs-tag"><span class="hljs-value">"android.intent.action.MAIN"</span></span></span><span class="hljs-tag">/&gt;</span></span>
+
+               <span class="hljs-tag"><span class="hljs-tag">&lt;</span><span class="hljs-title"><span class="hljs-tag"><span class="hljs-title">category</span></span></span><span class="hljs-tag"> </span><span class="hljs-attribute"><span class="hljs-tag"><span class="hljs-attribute">android:name</span></span></span><span class="hljs-tag">=</span><span class="hljs-value"><span class="hljs-tag"><span class="hljs-value">"android.intent.category.LAUNCHER"</span></span></span><span class="hljs-tag">/&gt;</span></span>
+           <span class="hljs-tag"><span class="hljs-tag">&lt;/</span><span class="hljs-title"><span class="hljs-tag"><span class="hljs-title">intent-filter</span></span></span><span class="hljs-tag">&gt;</span></span>
+       <span class="hljs-tag"><span class="hljs-tag">&lt;/</span><span class="hljs-title"><span class="hljs-tag"><span class="hljs-title">activity</span></span></span><span class="hljs-tag">&gt;</span></span></code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li></ul><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li></ul></pre>
+
+<p>上面这种方法就是我个人认为最简便的方式了，这也符合有些要求按2次退出。</p>
+
+<p><strong>3.广播式</strong></p>
+
+<p>我相信很多的老铁是使用的广播式，毕竟很方便，先上代码，再说利弊。</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs axapta has-numbering hljs"><span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-keyword"><span class="hljs-keyword">abstract</span></span> <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">BaseActivity</span></span></span><span class="hljs-class"> </span><span class="hljs-inheritance"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-inheritance"><span class="hljs-keyword">extends</span></span></span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">Activity</span></span></span><span class="hljs-class"> {</span></span>
+
+   <span class="hljs-keyword"><span class="hljs-keyword">private</span></span> <span class="hljs-keyword"><span class="hljs-keyword">static</span></span> <span class="hljs-keyword"><span class="hljs-keyword">final</span></span> String ACTION = <span class="hljs-string"><span class="hljs-string">"action.exit"</span></span>;
+
+   <span class="hljs-keyword"><span class="hljs-keyword">private</span></span> ExitReceiver exitReceiver = <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> ExitReceiver();
+
+   @Override
+   <span class="hljs-keyword"><span class="hljs-keyword">protected</span></span> <span class="hljs-keyword"><span class="hljs-keyword">void</span></span> onCreate(Bundle savedInstanceState) {
+       <span class="hljs-keyword"><span class="hljs-keyword">super</span></span>.onCreate(savedInstanceState);
+       IntentFilter filter = <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> IntentFilter();
+       filter.addAction(ACTION);
+       registerReceiver(exitReceiver, filter);
+   }
+
+   @Override
+   <span class="hljs-keyword"><span class="hljs-keyword">protected</span></span> <span class="hljs-keyword"><span class="hljs-keyword">void</span></span> onDestroy() {
+       <span class="hljs-keyword"><span class="hljs-keyword">super</span></span>.onDestroy();
+       unregisterReceiver(exitReceiver);
+   }
+
+   <span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">ExitReceiver</span></span></span><span class="hljs-class"> </span><span class="hljs-inheritance"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-inheritance"><span class="hljs-keyword">extends</span></span></span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">BroadcastReceiver</span></span></span><span class="hljs-class"> {</span></span>
+
+       @Override
+       <span class="hljs-keyword"><span class="hljs-keyword">public</span></span> <span class="hljs-keyword"><span class="hljs-keyword">void</span></span> onReceive(Context context, Intent intent) {
+           BaseActivity.<span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.finish();
+       }
+
+   }
+
+}</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li><li style="color: rgb(153, 153, 153);">28</li><li style="color: rgb(153, 153, 153);">29</li><li style="color: rgb(153, 153, 153);">30</li></ul><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li><li style="color: rgb(153, 153, 153);">28</li><li style="color: rgb(153, 153, 153);">29</li><li style="color: rgb(153, 153, 153);">30</li></ul></pre>
+
+<p>最后再需要退出的地方，发送一个广播就可以了，注意Action和注册的相同就可以了。</p>
+
+<p>但是个人觉得这种方式还是太耗性能，毕竟广播是进程间通信，我们一个退出APP功能不是特别的有必要。</p>
+
+<p><strong>4.SingleTask式</strong></p>
+
+<p>简单解释一下SingleTask这种启动模式的两个特点： <br>
+清除堆栈中处于当前Activity上方的Activity <br>
+堆栈中含有你要启动的Activity时，不会重新创建。</p>
+
+<p>假设我们的MainActivity是使用的SingleTask的启动模式，假设我跳转到了其他的页面，然后使用startActivity(this,MainActivity.class)的方式再次启动MainActivity，这时MainActivity走到onNewIntent()方法，然后按照生命周期onRestart()——&gt;onStart()——&gt;onResume()，MainActivity不会重新创建。</p>
+
+<p>既然有这么一个特点我们就可以分三步来退出APP：</p>
+
+<p>第一步：MainActivity设置为SingleTask。</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs avrasm has-numbering hljs"><span class="hljs-label"><span class="hljs-label">android:</span></span>launchMode=<span class="hljs-string"><span class="hljs-string">"singleTask"</span></span></code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+
+<p>第二步：重写MainActivity中的onNewIntent方法</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs java has-numbering hljs"><span class="hljs-keyword"><span class="hljs-keyword">private</span></span> <span class="hljs-keyword"><span class="hljs-keyword">static</span></span> <span class="hljs-keyword"><span class="hljs-keyword">final</span></span> String TAG_EXIT = <span class="hljs-string"><span class="hljs-string">"exit"</span></span>;
+
+   <span class="hljs-annotation"><span class="hljs-annotation">@Override</span></span>
+   <span class="hljs-keyword"><span class="hljs-keyword">protected</span></span> <span class="hljs-keyword"><span class="hljs-keyword">void</span></span> <span class="hljs-title"><span class="hljs-title">onNewIntent</span></span>(Intent intent) {
+       <span class="hljs-keyword"><span class="hljs-keyword">super</span></span>.onNewIntent(intent);
+       <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (intent != <span class="hljs-keyword"></span>) {
+           <span class="hljs-keyword"><span class="hljs-keyword">boolean</span></span> isExit = intent.getBooleanExtra(TAG_EXIT, <span class="hljs-keyword"><span class="hljs-keyword">false</span></span>);
+           <span class="hljs-keyword"><span class="hljs-keyword">if</span></span> (isExit) {
+               <span class="hljs-keyword"><span class="hljs-keyword">this</span></span>.finish();
+           }
+       }
+   }</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li></ul><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li></ul></pre>
+
+<p>第三步：需要退出时在Intent中添加退出的tag</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs actionscript has-numbering hljs">Intent intent = <span class="hljs-keyword"><span class="hljs-keyword">new</span></span> Intent(<span class="hljs-keyword"><span class="hljs-keyword">this</span></span>,MainActivity.<span class="hljs-keyword"><span class="hljs-keyword">class</span></span>);
+       intent.putExtra(MainActivity.TAG_EXIT, <span class="hljs-literal"><span class="hljs-literal">true</span></span>);
+       startActivity(intent);</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li></ul><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li></ul></pre>
+
+<p>虽然这种方式简单、便捷，但还有弊端：当我们需要退出的时候，假如是在其他的Activity中退出，这时MainActivity要走一段生命周期的方法，有点浪费。</p>
+
+<p><strong>5.进程式</strong></p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs avrasm has-numbering hljs"><span class="hljs-number"><span class="hljs-number">1.</span></span>android<span class="hljs-preprocessor"><span class="hljs-preprocessor">.os</span></span><span class="hljs-preprocessor"><span class="hljs-preprocessor">.Process</span></span><span class="hljs-preprocessor"><span class="hljs-preprocessor">.killProcess</span></span>(android<span class="hljs-preprocessor"><span class="hljs-preprocessor">.os</span></span><span class="hljs-preprocessor"><span class="hljs-preprocessor">.Process</span></span><span class="hljs-preprocessor"><span class="hljs-preprocessor">.myPid</span></span>())<span class="hljs-comment"><span class="hljs-comment">;</span></span>
+
+<span class="hljs-number"><span class="hljs-number">2.</span></span>System<span class="hljs-preprocessor"><span class="hljs-preprocessor">.exit</span></span>(<span class="hljs-number"><span class="hljs-number">0</span></span>)<span class="hljs-comment"><span class="hljs-comment">;</span></span>
+
+<span class="hljs-number"><span class="hljs-number">3.</span></span>ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE)<span class="hljs-comment"><span class="hljs-comment">;</span></span>
+   manager<span class="hljs-preprocessor"><span class="hljs-preprocessor">.killBackgroundProcesses</span></span>(getPackageName())<span class="hljs-comment"><span class="hljs-comment">;</span></span></code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li></ul><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li></ul></pre>
+
+<p>这三种方式都能够达到杀死进程的效果，直接退出APP，但是这种太暴力了不推荐使用，而且使用体验不好。不知道是不是华为手机问题，我用华为P10 Plus使用这种方式退出的时候要白屏、闪屏一下，反正就是不建议使用这种方式。</p>
+
+<h2 id="总结"><a name="t3"></a><a></a>总结</h2>
+
+<hr>
+
+<p>其实严格来说，还有一种方式就是抛异常让APP强制退出，因为感觉用的人不多就没有细说。 <br>
+上面的几种方式中，最不推荐的就是最后第五种方式，暴力而且用户体验不好。大家在项目中看着需求、以及自己习惯的方式来选择就好，今天就到这里了。</p>
+
+<hr>
+
+<p><strong>温馨提示：</strong> <br>
+我创建了一个技术交流群，群里有各个行业的大佬都有，大家可以在群里畅聊技术方面内容，以及文章推荐；如果有想加入的伙伴加我微信号【luotaosc】备注一下“加群” <br>
+另外关注公众号，还有一些个人收藏的视频： <br>
+回复“Android” ，获取Android视频链接。 <br>
+回复“Java” ，获取Java视频链接。 <br>
+回复“C++” ，获取C++视频链接。 <br>
+回复“C” ，获取C视频链接。 <br>
+回复“Python” ，获取Python视频链接等等。</p>
+
+<p>原创文章不易，如果觉得写得好，扫码关注一下点个赞，是我最大的动力。</p>
+
+<p>关注我，一定会有意想不到的东西等你： <br>
+每天专注分享Android、JAVA干货</p>
+
+<p><img title="" alt="这里写图片描述" src="images/android03001.jpg"></p>
+
+<p>备注：程序圈LT</p>            </div>
+
+<pre class="prettyprint"><code class="has-numbering">        &lt;link rel="stylesheet" href="https://csdnimg.cn/release/phoenix/template/css/markdown_views-ea0013b516.css"&gt;
+            &lt;/div&gt;
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li></ul></pre></div>                                    </div>
+                <link href="https://csdnimg.cn/release/phoenix/mdeditor/markdown_views-b6c3c6d139.css" rel="stylesheet">
+                    </div>
+
+
+</div>
+
+
+</body></html>

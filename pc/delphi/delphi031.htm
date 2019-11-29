@@ -1,0 +1,247 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>一个比较完整的Inno Setup 安装脚本 - Augusdi的专栏 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                    <!--一个博主专栏付费入口-->
+             
+             <!--一个博主专栏付费入口结束-->
+            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-4a3473df85.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-4a3473df85.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            <p>一个比较完整的Inno Setup 安装脚本，增加了对ini文件设置的功能，一个安装包常用的功能都具备了。</p><pre><code class="language-cs">[<span class="hljs-meta">Setup</span>]
+; 注: AppId的值为单独标识该应用程序。
+; 不要为其他安装程序使用相同的AppId值。
+; (生成新的GUID，点击 工具|在IDE中生成GUID。)
+AppId={{A9861883<span class="hljs-number">-31</span>C5<span class="hljs-number">-4324</span>-BD9A-DC3271EEB675}
+;程序名
+AppName=ISsample
+;版本号
+AppVerName=ISsample <span class="hljs-number">1.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span>
+;发布者名
+AppPublisher=Hkiss
+;相关连接
+AppPublisherURL=http:<span class="hljs-comment">//zwkufo.blog.163.com</span>
+AppSupportURL=http:<span class="hljs-comment">//zwkufo.blog.163.com</span>
+AppUpdatesURL=http:<span class="hljs-comment">//zwkufo.blog.163.com</span>
+;默认安装目录
+DefaultDirName={pf}\ISsample
+;默认开始菜单名
+DefaultGroupName=ISsample
+;是否打开-&gt;可选安装开始菜单项
+;AllowNoIcons=yes
+;安装协议
+;LicenseFile=C:\Example\原始文件\agreement.txt
+;安装前查看的文本文件
+;InfoBeforeFile=C:\Example\原始文件\Setup_New.txt
+;安装后查看文本文件
+;InfoAfterFile=C:\Example\原始文件\Setup_Old.txt
+;输出文件夹
+OutputDir=C:\Example\InnoSetup\<span class="hljs-keyword">out</span>
+;输出文件名
+OutputBaseFilename=setup
+;安装图标
+SetupIconFile=C:\Example\原始文件\title.ico
+;安装需要输入密码
+;Password=<span class="hljs-number">123</span>
+;Encryption=yes
+
+;压缩相关
+Compression=lzma
+SolidCompression=yes
+
+;可以让用户忽略选择语言相关
+ShowLanguageDialog = yes
+;备注版本信息
+VersionInfoCompany=HTTP:<span class="hljs-comment">//www.Hkiss.COM</span>
+VersionInfoDescription=ISsample 汉化增强版
+VersionInfoVersion=<span class="hljs-number">1.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span>
+VersionInfoCopyright=Copyright (C) <span class="hljs-number">2007</span><span class="hljs-number">-2008</span> Hkiss
+
+;制作选择语言
+[<span class="hljs-meta">Languages</span>]
+Name: <span class="hljs-string">"chs"</span>; MessagesFile: <span class="hljs-string">"compiler:Default.isl"</span> ;LicenSeFile :<span class="hljs-string">"C:\Example\原始文件\chs\agreement.txt"</span>
+Name: <span class="hljs-string">"en"</span>; MessagesFile: <span class="hljs-string">"compiler:Languages\English.isl"</span>;LicenSeFile :<span class="hljs-string">"C:\Example\原始文件\en\agreement.txt"</span>
+
+;用户定制任务
+[<span class="hljs-meta">Tasks</span>]
+Name: <span class="hljs-string">"desktopicon"</span>; Description: <span class="hljs-string">"{cm:CreateDesktopIcon}"</span>; GroupDescription: <span class="hljs-string">"{cm:AdditionalIcons}"</span>; Flags: <span class="hljs-keyword">unchecked</span>
+Name: <span class="hljs-string">"quicklaunchicon"</span>; Description: <span class="hljs-string">"{cm:CreateQuickLaunchIcon}"</span>; GroupDescription: <span class="hljs-string">"{cm:AdditionalIcons}"</span>; Flags: <span class="hljs-keyword">unchecked</span>
+Name: <span class="hljs-string">"Tasks_1"</span> ; Description:<span class="hljs-string">"用户自定义任务1"</span>; Flags: <span class="hljs-keyword">unchecked</span>
+Name: <span class="hljs-string">"Tasks_2"</span> ; Description:<span class="hljs-string">"用户自定义任务2"</span>; Flags: <span class="hljs-keyword">unchecked</span>
+;选择了组件才会出现的定制任务
+Name: <span class="hljs-string">"Tasks_3"</span> ; Description:<span class="hljs-string">"用户自定义任务3"</span>;Components: c1 ; Flags: <span class="hljs-keyword">unchecked</span>
+
+;文件安装
+[<span class="hljs-meta">Files</span>]
+;多语言安装环境设置    公共参数Languages 来设置
+Source: <span class="hljs-string">"C:\Example\原始文件\enfile.txt"</span>; DestDir: <span class="hljs-string">"{app}"</span>; Languages: en ; Flags: ignoreversion
+Source: <span class="hljs-string">"C:\Example\原始文件\chsfile.txt"</span>; DestDir: <span class="hljs-string">"{app}"</span>; Languages: chs ; Flags: ignoreversion
+;用户自定义任务 Tasks
+Source: <span class="hljs-string">"C:\Example\原始文件\Tasks\tasks_1.txt"</span>; DestDir: <span class="hljs-string">"{app}\Tasks"</span>; Flags: ignoreversion ;Tasks : Tasks_1
+Source: <span class="hljs-string">"C:\Example\原始文件\Tasks\tasks_2.txt"</span>; DestDir: <span class="hljs-string">"{app}\Tasks"</span>; Flags: ignoreversion ;Tasks :Tasks_2
+Source: <span class="hljs-string">"C:\Example\原始文件\Tasks\tasks_Components.txt"</span>; DestDir: <span class="hljs-string">"{app}\Tasks"</span>; Flags: ignoreversion ;Tasks :Tasks_2
+;用户定义组件安装
+Source: <span class="hljs-string">"C:\Example\原始文件\Components\Components_1.txt"</span>; DestDir: <span class="hljs-string">"{app}\Components"</span>; Flags: ignoreversion ; Components: a1;
+Source: <span class="hljs-string">"C:\Example\原始文件\Components\Components_2.txt"</span>; DestDir: <span class="hljs-string">"{app}\Components"</span>; Flags: ignoreversion ; Components: a2;
+Source: <span class="hljs-string">"C:\Example\原始文件\Components\Components_3.txt"</span>; DestDir: <span class="hljs-string">"{app}\Components"</span>; Flags: ignoreversion ; Components: a3;
+Source: <span class="hljs-string">"C:\Example\原始文件\Components\Components_4.txt"</span>; DestDir: <span class="hljs-string">"{app}\Components"</span>; Flags: ignoreversion ; Components: a1 a2 a3;
+
+;用户注册自定义Dll文件      regserver 注册 noregerror 不显示错误信息
+Source: <span class="hljs-string">"C:\Example\原始文件\jmail.dll"</span>; DestDir: <span class="hljs-string">"{app}"</span>; Flags: ignoreversion regserver
+;添加自述文件
+Source: <span class="hljs-string">"C:\Example\原始文件\ISsample.txt"</span>; DestDir: <span class="hljs-string">"{app}"</span>; Flags: ignoreversion
+;添加一个文件到缓存文件夹{Tmp} deleteafterinstall 安装后删除
+Source: <span class="hljs-string">"C:\Example\原始文件\test.exe"</span>; DestDir: <span class="hljs-string">"{tmp}"</span>; Flags: ignoreversion deleteafterinstall
+
+Source: <span class="hljs-string">"C:\Example\原始文件\ISsample.chm"</span>; DestDir: <span class="hljs-string">"{app}"</span>; Flags: ignoreversion
+Source: <span class="hljs-string">"C:\Example\原始文件\ISsample.exe"</span>; DestDir: <span class="hljs-string">"{app}"</span>; Flags: ignoreversion
+Source: <span class="hljs-string">"C:\Example\原始文件\ISsample.dll"</span>; DestDir: <span class="hljs-string">"{app}"</span>; Flags: ignoreversion
+Source: <span class="hljs-string">"C:\Example\原始文件\ISsample.ini"</span>; DestDir: <span class="hljs-string">"{app}"</span>; Flags: ignoreversion
+Source: <span class="hljs-string">"C:\Example\原始文件\ISsample.rar"</span>; DestDir: <span class="hljs-string">"{app}"</span>; Flags: ignoreversion
+Source: <span class="hljs-string">"C:\Example\原始文件\ISsample_sys.dll"</span>; DestDir: <span class="hljs-string">"{win}\System32"</span>; Flags: ignoreversion
+Source: <span class="hljs-string">"C:\Example\原始文件\log\*"</span>; DestDir: <span class="hljs-string">"{app}\log"</span>; Flags: ignoreversion recursesubdirs createallsubdirs
+; 注意: 不要在任何共享系统文件上使用“Flags: ignoreversion”
+;安装类型设置
+[<span class="hljs-meta">Types</span>]
+Name: Full ;Description:<span class="hljs-string">"完全安装"</span>; Flags: iscustom
+Name: Compact ;Description:<span class="hljs-string">"简洁安装"</span>;
+Name: Custom; Description:<span class="hljs-string">"自定义安装"</span>;
+;组件安装
+[<span class="hljs-meta">Components</span>]
+Name: c1; Description: <span class="hljs-string">"自定义任务3"</span> ; Types: Full
+Name: a1; Description: <span class="hljs-string">"安装Components_1"</span>; Types: Full Compact Custom ;
+Name: a2; Description: <span class="hljs-string">"安装Components_2"</span>; Types : Full   Compact
+Name: a3; Description: <span class="hljs-string">"安装Components_3"</span>; Types : Full
+
+;开始菜单，桌面快捷方式
+[<span class="hljs-meta">Icons</span>]
+Name: <span class="hljs-string">"{group}\ISsample"</span>; Filename: <span class="hljs-string">"{app}\ISsample.exe"</span>
+Name: <span class="hljs-string">"{group}\{cm:ProgramOnTheWeb,ISsample}"</span>; Filename: <span class="hljs-string">"http://zwkufo.blog.163.com"</span>
+Name: <span class="hljs-string">"{group}\{cm:UninstallProgram,ISsample}"</span>; Filename: <span class="hljs-string">"{uninstallexe}"</span>
+Name: <span class="hljs-string">"{commondesktop}\ISsample"</span>; Filename: <span class="hljs-string">"{app}\ISsample.exe"</span>; Tasks: desktopicon
+Name: <span class="hljs-string">"{userappdata}\Microsoft\Internet Explorer\Quick Launch\ISsample"</span>; Filename: <span class="hljs-string">"{app}\ISsample.exe"</span>; Tasks: quicklaunchicon
+;添加一个帮助文挡
+Name: {<span class="hljs-keyword">group</span>}\ISsample <span class="hljs-number">1.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span> 帮助文档;Filename: {app}\ISsample.chm
+
+;用来在程序安装完成后 在安装程序显示最终对话框之前执行程序 常用与运行主程序 显示自述文件 删除临时文件
+[<span class="hljs-meta">Run</span>]
+Filename: <span class="hljs-string">"{app}\ISsample.exe"</span>; Description: <span class="hljs-string">"{cm:LaunchProgram,ISsample}"</span>; Flags: nowait postinstall skipifsilent
+Filename: <span class="hljs-string">"{app}\ISsample.txt"</span>; Description: <span class="hljs-string">"查看显示自述文件"</span>; Flags: postinstall skipifsilent shellexec
+
+;更改显示在程序中显示的消息文本
+[<span class="hljs-meta">Messages</span>]
+BeveledLabel=HKiss科技
+;卸载对话框说明
+ConfirmUninstall=您真的想要从电脑中卸载ISsample吗?%n%n按 [是] 则完全删除 %<span class="hljs-number">1</span> 以及它的所有组件;%n按 [否]则让软件继续留在您的电脑上.
+;定义解压说明
+;StatusExtractFiles=解压并复制主程序文件及相关库文件...
+
+;用于在用户系统中创建，修改或删除ini文件健值
+[<span class="hljs-meta">INI</span>]
+Filename: <span class="hljs-string">"{app}\cfg.ini"</span>; Section: <span class="hljs-string">"Startup Options"</span>; Flags: uninsdeletesection
+Filename: <span class="hljs-string">"{app}\cfg.ini"</span>; Section: <span class="hljs-string">"Startup Options"</span>; Key: <span class="hljs-string">"server ip"</span>; String: <span class="hljs-string">"127.0.0.1"</span>
+Filename: <span class="hljs-string">"{app}\cfg.ini"</span>; Section: <span class="hljs-string">"Startup Options"</span>; Key: <span class="hljs-string">"server port"</span>; String: <span class="hljs-string">"8080"</span>
+
+;用于在用户系统中创建，修改或删除注册表健值
+[<span class="hljs-meta">Registry</span>]
+Root: HKLM ;SubKey:<span class="hljs-string">"Software\ISsample"</span>;ValueType:dword;ValueName:config;ValueData:<span class="hljs-number">10</span> ;Flags:uninsdeletevalue
+;在执行脚本
+[<span class="hljs-meta">code</span>]
+<span class="hljs-comment">//全局变量</span>
+<span class="hljs-keyword">var</span> MyProgChecked: Boolean;
+
+<span class="hljs-comment">//判断程序是否存在</span>
+<span class="hljs-comment">//初始华程序事件</span>
+<span class="hljs-function">function <span class="hljs-title">InitializeSetup</span>(<span class="hljs-params"></span>): boolean</span>;
+<span class="hljs-keyword">var</span> Isbl: boolean;         <span class="hljs-comment">//声明变量</span>
+<span class="hljs-keyword">var</span> Isstr: <span class="hljs-keyword">string</span>;
+begin       <span class="hljs-comment">//开始</span>
+Isbl := <span class="hljs-literal">true</span>;             <span class="hljs-comment">//变量赋值</span>
+Isstr := <span class="hljs-string">'欢迎'</span>;
+<span class="hljs-function"><span class="hljs-keyword">if</span> <span class="hljs-title">RegValueExists</span>(<span class="hljs-params">HKEY_LOCAL_MACHINE, <span class="hljs-string">'SOFTWARE\ISsample'</span>, <span class="hljs-string">'config'</span></span>) then
+begin
+    <span class="hljs-title">MsgBox</span>(<span class="hljs-params"><span class="hljs-string">'已安装过，请先卸载在安装'</span>,mbConfirmation, MB_OK</span>)</span>;
+    isbl := <span class="hljs-literal">false</span>;
+end <span class="hljs-keyword">else</span>
+begin
+   <span class="hljs-comment">//MsgBox('无值',mbConfirmation, MB_OK);</span>
+     isbl := <span class="hljs-literal">true</span>;
+end;
+
+<span class="hljs-comment">//下面是个麻烦的 条件语句 end else 注意</span>
+<span class="hljs-comment">//if MsgBox(Isstr, mbConfirmation, MB_OKCANCEL) = IDOK then</span>
+<span class="hljs-comment">//begin</span>
+<span class="hljs-comment">// isbl := true;</span>
+<span class="hljs-comment">// MsgBox('执行了', mbConfirmation, MB_OK);</span>
+<span class="hljs-comment">//end else</span>
+<span class="hljs-comment">//begin</span>
+<span class="hljs-comment">// isbl := false;</span>
+<span class="hljs-comment">//MsgBox('执行了', mbConfirmation, MB_OK);</span>
+<span class="hljs-comment">//end;</span>
+
+Result := Isbl;
+end;       <span class="hljs-comment">//结束</span>
+
+<span class="hljs-function">procedure <span class="hljs-title">CurStepChanged</span>(<span class="hljs-params">CurStep: TSetupStep</span>)</span>;
+<span class="hljs-keyword">var</span> Isstr :<span class="hljs-keyword">string</span>;
+begin
+<span class="hljs-keyword">if</span> CurStep=ssInstall then       <span class="hljs-comment">//实际安装前调用</span>
+begin
+    <span class="hljs-comment">//MsgBox('CurStepChanged:实际安装前调用', mbConfirmation, MB_OKCANCEL);           //安装完成后调用</span>
+end;
+<span class="hljs-keyword">if</span> CurStep=ssPostInstall then
+begin
+    Isstr := ExpandConstant(<span class="hljs-string">'{tmp}\tmp.rar'</span>);
+<span class="hljs-comment">//    if FileExists(Isstr) then</span>
+<span class="hljs-comment">//    begin</span>
+<span class="hljs-comment">//      MsgBox('文件存在',mbConfirmation, MB_OK);</span>
+<span class="hljs-comment">//    end else</span>
+<span class="hljs-comment">//    begin</span>
+<span class="hljs-comment">//      MsgBox('文件不存在',mbConfirmation, MB_OK);</span>
+<span class="hljs-comment">//    end;</span>
+   <span class="hljs-comment">// MsgBox('CurStepChanged:实际安装后调用', mbConfirmation, MB_OKCANCEL);</span>
+end;
+end;
+
+<span class="hljs-comment">//下一步 按钮按钮 事件</span>
+<span class="hljs-function">function <span class="hljs-title">NextButtonClick</span>(<span class="hljs-params">CurPageID: Integer</span>): Boolean</span>;
+<span class="hljs-keyword">var</span> ResultCode: Integer;
+<span class="hljs-keyword">var</span> IsSetup : Boolean;
+begin
+IsSetup := <span class="hljs-literal">true</span> ;
+<span class="hljs-keyword">case</span> CurPageID of
+    wpSelectDir:
+       MsgBox(<span class="hljs-string">'NextButtonClick:'</span> <span class="hljs-meta">#13#13 'You selected: ''' + WizardDirValue + '''.', mbInformation, MB_OK);   //WizardDirValue路径</span>
+    wpSelectProgramGroup:
+       MsgBox(<span class="hljs-string">'NextButtonClick:'</span> <span class="hljs-meta">#13#13 'You selected: ''' + WizardGroupValue + '''.', mbInformation, MB_OK); //开始菜单名</span>
+    wpReady:
+      <span class="hljs-function">begin
+       <span class="hljs-keyword">if</span> not <span class="hljs-title">RegValueExists</span>(<span class="hljs-params">HKEY_LOCAL_MACHINE, <span class="hljs-string">'SOFTWARE\Test'</span>, <span class="hljs-string">'config'</span></span>) then   begin
+          <span class="hljs-keyword">if</span> <span class="hljs-title">MsgBox</span>(<span class="hljs-params"><span class="hljs-string">'程序执行需要Test.ext,是否安装!'</span>, mbConfirmation, MB_YESNO</span>) </span>= <span class="hljs-function">idYes then begin
+           <span class="hljs-title">ExtractTemporaryFile</span>(<span class="hljs-params"><span class="hljs-string">'test.exe'</span></span>)</span>;
+            <span class="hljs-function"><span class="hljs-keyword">if</span> not <span class="hljs-title">Exec</span>(<span class="hljs-params">ExpandConstant(<span class="hljs-string">'{tmp}\test.exe'</span></span>), '', '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then
+              <span class="hljs-title">MsgBox</span>(<span class="hljs-params"><span class="hljs-string">'Test.exe出错:'</span> #<span class="hljs-number">13</span>#<span class="hljs-number">13</span> <span class="hljs-string">' '</span> + SysErrorMessage(ResultCode</span>) + '.', mbError, MB_OK)</span>;
+          end <span class="hljs-keyword">else</span> begin
+                IsSetup := <span class="hljs-literal">false</span> ;
+          end ;
+          BringToFrontAndRestore();
+        end;
+      end;
+end;
+Result := IsSetup;
+end;
+
+</code></pre><p><br>&nbsp;</p>                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>

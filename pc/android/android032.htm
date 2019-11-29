@@ -1,0 +1,599 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android 混淆：proguard实践 - 程序员闲谈 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+<link href="https://adservice.google.com/adsid/integrator.js?domain=" rel="preload"><script src="https://adservice.google.com/adsid/integrator.js?domain=" type="text/javascript"></script><script src="https://securepubads.g.doubleclick.net/gpt/pubads_impl_2019111801.js?21065176" async=""></script></head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div id="post_detail">
+<!--done-->
+<div id="topics">
+	<div class="post">
+		<h1 class="postTitle">
+			
+<a class="postTitle2" id="cb_post_title_url" href="https://www.cnblogs.com/cr330326/p/5534915.html">ProGuard代码混淆技术详解</a>
+
+		</h1>
+		<div class="clear"></div>
+		<div class="postBody">
+			
+<div class="blogpost-body " id="cnblogs_post_body">
+    <div>
+<h3>前言 &nbsp;&nbsp;</h3>
+</div>
+<div>&nbsp; &nbsp; 受《APP研发录》启发，里面讲到一名Android程序员，在工作一段时间后，会感觉到迷茫，想进阶的话接下去是看Android系统源码呢，还是每天继续做应用，毕竟每天都是画UI和利用MobileAPI处理Json还是蛮无聊的，做着重复的事情，没有技术的上提升空间的。所以，根据里面提到的Android应用开发人员所需要精通的20个技术点，写篇文章进行总结，一方面是梳理下基础知识和巩固知识，另一方面也是弥补自我不足之处。</div>
+<div>&nbsp; &nbsp; 那么，今天就来讲讲ProGuard代码混淆的相关技术知识点。</div>
+<div>
+<h3>内容目录</h3>
+<div>
+<ul>
+<li>ProGuard简介</li>
+<li>ProGuard工作原理</li>
+<li>如何编写一个ProGuard文件</li>
+<li>其他注意事项</li>
+<li>小结</li>
+</ul>
+<h3>ProGuard简介</h3>
+<div>因为Java代码是非常容易反编码的，况且Android开发的应用程序是用Java代码写的，为了很好的保护Java源代码，我们需要对编译好后的class文件进行混淆。</div>
+<div>ProGuard是一个混淆代码的开源项目，它的主要作用是混淆代码，殊不知ProGuard还包括以下4个功能。</div>
+<div><ol>
+<li>压缩(Shrink)：检测并移除代码中无用的类、字段、方法和特性（Attribute）。</li>
+<li>优化(Optimize)：对字节码进行优化，移除无用的指令。</li>
+<li>混淆(Obfuscate)：使用a，b，c，d这样简短而无意义的名称，对类、字段和方法进行重命名。</li>
+<li>预检(Preveirfy)：在Java平台上对处理后的代码进行预检，确保加载的class文件是可执行的。</li>
+</ol></div>
+<div>总而言之，根据官网的翻译：Proguard是一个Java类文件压缩器、优化器、混淆器、预校验器。压缩环节会检测以及移除没有用到的类、字段、方法以及属性。优化环节会分析以及优化方法的字节码。混淆环节会用无意义的短变量去重命名类、变量、方法。这些步骤让代码更精简，更高效，也更难被逆向（破解）。
+<div>&nbsp;</div>
+<div>
+<h3>ProGuard工作原理</h3>
+<div>ProGuar由shrink、optimize、obfuscate和preveirfy四个步骤组成，每个步骤都是可选的，我们可以通过配置脚本来决定执行其中的哪几个步骤。</div>
+<div><img alt="" src="images/android03201.png"></div>
+</div>
+<div>&nbsp;</div>
+<div>混淆就是移除没有用到的代码，然后对代码里面的类、变量、方法重命名为人可读性很差的简短名字。</div>
+<div>那么有一个问题，ProGuard怎么知道这个代码没有被用到呢？</div>
+<div>这里引入一个Entry Point（入口点）概念，Entry Point是在ProGuard过程中不会被处理的类或方法。在压缩的步骤中，ProGuard会从上述的Entry Point开始递归遍历，搜索哪些类和类的成员在使用，对于没有被使用的类和类的成员，就会在压缩段丢弃，在接下来的优化过程中，那些非Entry Point的类、方法都会被设置为private、static或final，不使用的参数会被移除，此外，有些方法会被标记为内联的，在混淆的步骤中，ProGuard会对非Entry Point的类和方法进行重命名。</div>
+<div>那么这个入口点怎么来呢？就是从ProGuard的配置文件来，只要这个配置了，那么就不会被移除。</div>
+<div>&nbsp;</div>
+<div>
+<h3>如何编写一个ProGuard文件</h3>
+<div>有个三步走的过程：</div>
+<div>
+<ul>
+<li>基本混淆</li>
+<li>针对APP的量身定制</li>
+<li>针对第三方jar包的解决方案</li>
+</ul>
+<h5><span style="font-size: medium;">基本混淆</span></h5>
+<div>混淆文件的基本配置信息，任何APP都要使用，可以作为模板使用，具体如下。</div>
+<div>1，基本指令</div>
+<div>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a title="复制代码" onclick="copyCnblogsCode(this)" href="javascript:void(0);"><img alt="复制代码" src="images/android03202.gif"></a></span></div>
+<pre><span style="color: rgb(0, 0, 0);"># 代码混淆压缩比，在0和7之间，默认为5，一般不需要改
+</span>-optimizationpasses 5<span style="color: rgb(0, 0, 0);">
+ 
+# 混淆时不使用大小写混合，混淆后的类名为小写
+</span>-<span style="color: rgb(0, 0, 0);">dontusemixedcaseclassnames
+ 
+# 指定不去忽略非公共的库的类
+</span>-<span style="color: rgb(0, 0, 0);">dontskipnonpubliclibraryclasses
+ 
+# 指定不去忽略非公共的库的类的成员
+</span>-<span style="color: rgb(0, 0, 0);">dontskipnonpubliclibraryclassmembers
+ 
+# 不做预校验，preverify是proguard的4个步骤之一
+# Android不需要preverify，去掉这一步可加快混淆速度
+</span>-<span style="color: rgb(0, 0, 0);">dontpreverify
+ 
+# 有了verbose这句话，混淆后就会生成映射文件
+# 包含有类名</span>-&gt;<span style="color: rgb(0, 0, 0);">混淆后类名的映射关系
+# 然后使用printmapping指定映射文件的名称
+</span>-<span style="color: rgb(0, 0, 0);">verbose
+</span>-<span style="color: rgb(0, 0, 0);">printmapping proguardMapping.txt
+ 
+# 指定混淆时采用的算法，后面的参数是一个过滤器
+# 这个过滤器是谷歌推荐的算法，一般不改变
+</span>-optimizations !code/simplification/arithmetic,!field<span style="color: rgb(0, 128, 0);">/*</span><span style="color: rgb(0, 128, 0);">,!class/merging/*
+ 
+# 保护代码中的Annotation不被混淆，这在JSON实体映射时非常重要，比如fastJson
+-keepattributes *Annotation*
+ 
+# 避免混淆泛型，这在JSON实体映射时非常重要，比如fastJson
+-keepattributes Signature
+ 
+//抛出异常时保留代码行号，在异常分析中可以方便定位
+-keepattributes SourceFile,LineNumberTable
+
+-dontskipnonpubliclibraryclasses用于告诉ProGuard，不要跳过对非公开类的处理。默认情况下是跳过的，因为程序中不会引用它们，有些情况下人们编写的代码与类库中的类在同一个包下，并且对包中内容加以引用，此时需要加入此条声明。
+
+-dontusemixedcaseclassnames，这个是给Microsoft Windows用户的，因为ProGuard假定使用的操作系统是能区分两个只是大小写不同的文件名，但是Microsoft Windows不是这样的操作系统，所以必须为ProGuard指定-dontusemixedcaseclassnames选项</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a title="复制代码" onclick="copyCnblogsCode(this)" href="javascript:void(0);"><img alt="复制代码" src="images/android03203.gif"></a></span></div></div>
+<p>&nbsp;2，需要保留的东西</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a title="复制代码" onclick="copyCnblogsCode(this)" href="javascript:void(0);"><img alt="复制代码" src="images/android03204.gif"></a></span></div>
+<pre><span style="color: rgb(0, 0, 0);"># 保留所有的本地native方法不被混淆
+</span>-keepclasseswithmembernames <span style="color: rgb(0, 0, 255);">class</span> *<span style="color: rgb(0, 0, 0);"> {
+    </span><span style="color: rgb(0, 0, 255);">native</span> &lt;methods&gt;<span style="color: rgb(0, 0, 0);">;
+}
+ 
+# 保留了继承自Activity、Application这些类的子类
+# 因为这些子类，都有可能被外部调用
+# 比如说，第一行就保证了所有Activity的子类不要被混淆
+</span>-keep <span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">class</span> * <span style="color: rgb(0, 0, 255);">extends</span><span style="color: rgb(0, 0, 0);"> android.app.Activity
+</span>-keep <span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">class</span> * <span style="color: rgb(0, 0, 255);">extends</span><span style="color: rgb(0, 0, 0);"> android.app.Application
+</span>-keep <span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">class</span> * <span style="color: rgb(0, 0, 255);">extends</span><span style="color: rgb(0, 0, 0);"> android.app.Service
+</span>-keep <span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">class</span> * <span style="color: rgb(0, 0, 255);">extends</span><span style="color: rgb(0, 0, 0);"> android.content.BroadcastReceiver
+</span>-keep <span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">class</span> * <span style="color: rgb(0, 0, 255);">extends</span><span style="color: rgb(0, 0, 0);"> android.content.ContentProvider
+</span>-keep <span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">class</span> * <span style="color: rgb(0, 0, 255);">extends</span><span style="color: rgb(0, 0, 0);"> android.app.backup.BackupAgentHelper
+</span>-keep <span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">class</span> * <span style="color: rgb(0, 0, 255);">extends</span><span style="color: rgb(0, 0, 0);"> android.preference.Preference
+</span>-keep <span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">class</span> * <span style="color: rgb(0, 0, 255);">extends</span><span style="color: rgb(0, 0, 0);"> android.view.View
+</span>-keep <span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">class</span><span style="color: rgb(0, 0, 0);"> com.android.vending.licensing.ILicensingService
+ 
+# 如果有引用android</span>-support-<span style="color: rgb(0, 0, 0);">v4.jar包，可以添加下面这行
+</span>-keep <span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">class</span> com.xxxx.app.ui.fragment.** {*<span style="color: rgb(0, 0, 0);">;}
+ 
+# 保留在Activity中的方法参数是view的方法，
+# 从而我们在layout里面编写onClick就不会被影响
+</span>-keepclassmembers <span style="color: rgb(0, 0, 255);">class</span> * <span style="color: rgb(0, 0, 255);">extends</span><span style="color: rgb(0, 0, 0);"> android.app.Activity {
+    </span><span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">void</span> *<span style="color: rgb(0, 0, 0);">(android.view.View);
+}
+ 
+# 枚举类不能被混淆
+</span>-keepclassmembers <span style="color: rgb(0, 0, 255);">enum</span> *<span style="color: rgb(0, 0, 0);"> {
+</span><span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">static</span> **<span style="color: rgb(0, 0, 0);">[] values();
+</span><span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">static</span> **<span style="color: rgb(0, 0, 0);"> valueOf(java.lang.String);
+}
+ 
+# 保留自定义控件（继承自View）不被混淆
+</span>-keep <span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">class</span> * <span style="color: rgb(0, 0, 255);">extends</span><span style="color: rgb(0, 0, 0);"> android.view.View {
+    </span>*** get*<span style="color: rgb(0, 0, 0);">();
+    </span><span style="color: rgb(0, 0, 255);">void</span> set*(***<span style="color: rgb(0, 0, 0);">);
+    </span><span style="color: rgb(0, 0, 255);">public</span> &lt;init&gt;<span style="color: rgb(0, 0, 0);">(android.content.Context);
+    </span><span style="color: rgb(0, 0, 255);">public</span> &lt;init&gt;<span style="color: rgb(0, 0, 0);">(android.content.Context, android.util.AttributeSet);
+    </span><span style="color: rgb(0, 0, 255);">public</span> &lt;init&gt;(android.content.Context, android.util.AttributeSet, <span style="color: rgb(0, 0, 255);">int</span><span style="color: rgb(0, 0, 0);">);
+}
+ 
+# 保留Parcelable序列化的类不被混淆
+</span>-keep <span style="color: rgb(0, 0, 255);">class</span> * <span style="color: rgb(0, 0, 255);">implements</span><span style="color: rgb(0, 0, 0);"> android.os.Parcelable {
+    </span><span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">static</span> <span style="color: rgb(0, 0, 255);">final</span> android.os.Parcelable$Creator *<span style="color: rgb(0, 0, 0);">;
+}
+ 
+# 保留Serializable序列化的类不被混淆
+</span>-keepclassmembers <span style="color: rgb(0, 0, 255);">class</span> * <span style="color: rgb(0, 0, 255);">implements</span><span style="color: rgb(0, 0, 0);"> java.io.Serializable {
+    </span><span style="color: rgb(0, 0, 255);">static</span> <span style="color: rgb(0, 0, 255);">final</span> <span style="color: rgb(0, 0, 255);">long</span><span style="color: rgb(0, 0, 0);"> serialVersionUID;
+    </span><span style="color: rgb(0, 0, 255);">private</span> <span style="color: rgb(0, 0, 255);">static</span> <span style="color: rgb(0, 0, 255);">final</span><span style="color: rgb(0, 0, 0);"> java.io.ObjectStreamField[] serialPersistentFields;
+    </span><span style="color: rgb(0, 0, 255);">private</span> <span style="color: rgb(0, 0, 255);">void</span><span style="color: rgb(0, 0, 0);"> writeObject(java.io.ObjectOutputStream);
+    </span><span style="color: rgb(0, 0, 255);">private</span> <span style="color: rgb(0, 0, 255);">void</span><span style="color: rgb(0, 0, 0);"> readObject(java.io.ObjectInputStream);
+    java.lang.Object writeReplace();
+    java.lang.Object readResolve();
+}
+ 
+# 对于R（资源）下的所有类及其方法，都不能被混淆
+</span>-keep <span style="color: rgb(0, 0, 255);">class</span> **.R$*<span style="color: rgb(0, 0, 0);"> {
+    </span>*<span style="color: rgb(0, 0, 0);">;
+}
+ 
+# 对于带有回调函数onXXEvent的，不能被混淆
+</span>-keepclassmembers <span style="color: rgb(0, 0, 255);">class</span> *<span style="color: rgb(0, 0, 0);"> {
+    </span><span style="color: rgb(0, 0, 255);">void</span> *(**On*<span style="color: rgb(0, 0, 0);">Event);
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a title="复制代码" onclick="copyCnblogsCode(this)" href="javascript:void(0);"><img alt="复制代码" src="images/android03205.gif"></a></span></div></div>
+<h5>针对APP的量身定制</h5>
+<div>1,保留实体类和成员被混淆</div>
+<div>对于实体，保留它们的set和get方法，对于boolean型get方法，有人喜欢命名isXXX的方式，所以不要遗漏。如下：</div>
+<div>
+<div class="cnblogs_code">
+<pre><span style="color: rgb(0, 0, 0);"># 保留实体类和成员不被混淆
+</span>-keep <span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">class</span> com.xxxx.entity.**<span style="color: rgb(0, 0, 0);"> {
+    </span><span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">void</span> set*(***<span style="color: rgb(0, 0, 0);">);
+    </span><span style="color: rgb(0, 0, 255);">public</span> *** get*<span style="color: rgb(0, 0, 0);">();
+    </span><span style="color: rgb(0, 0, 255);">public</span> *** is*<span style="color: rgb(0, 0, 0);">();
+}</span></pre>
+</div>
+<p>&nbsp;一种好的做法是把所有实体都放在一个包下进行管理，这样只写一次混淆就够了，避免以后在别的包中新增的实体而忘记保留，代码在混淆后因为找不到相应的实体类而崩溃。</p>
+<p>&nbsp;</p>
+</div>
+</div>
+<div>
+<p>2，内嵌类</p>
+<p>内嵌类经常会被混淆，结果在调用的时候为空就崩溃了，最好的解决方法就是把这个内嵌类拿出来，单独成为一个类。如果一定要内置，那么这个类就必须在混淆的时候保留，比如如下：</p>
+<div class="cnblogs_code">
+<pre><span style="color: rgb(0, 0, 0);"># 保留内嵌类不被混淆
+</span>-keep <span style="color: rgb(0, 0, 255);">class</span> com.example.xxx.MainActivity$* { *; }</pre>
+</div>
+<p>这个$符号就是用来分割内嵌类与其母体的标志。</p>
+<p>&nbsp;</p>
+<p>3，对WebView的处理</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a title="复制代码" onclick="copyCnblogsCode(this)" href="javascript:void(0);"><img alt="复制代码" src="images/android03206.gif"></a></span></div>
+<pre><span style="color: rgb(0, 0, 0);"># 对WebView的处理
+</span>-keepclassmembers <span style="color: rgb(0, 0, 255);">class</span> * <span style="color: rgb(0, 0, 255);">extends</span><span style="color: rgb(0, 0, 0);"> android.webkit.webViewClient {
+    </span><span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">void</span> *<span style="color: rgb(0, 0, 0);">(android.webkit.WebView, java.lang.String, android.graphics.Bitmap);
+    </span><span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">boolean</span> *<span style="color: rgb(0, 0, 0);">(android.webkit.WebView, java.lang.String)
+}
+</span>-keepclassmembers <span style="color: rgb(0, 0, 255);">class</span> * <span style="color: rgb(0, 0, 255);">extends</span><span style="color: rgb(0, 0, 0);"> android.webkit.webViewClient {
+    </span><span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">void</span> *<span style="color: rgb(0, 0, 0);">(android.webkit.webView, java.lang.String)
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a title="复制代码" onclick="copyCnblogsCode(this)" href="javascript:void(0);"><img alt="复制代码" src="images/android03207.gif"></a></span></div></div>
+<p>&nbsp;</p>
+<p>4，对JavaScript的处理</p>
+<div class="cnblogs_code">
+<pre><span style="color: rgb(0, 0, 0);"># 保留JS方法不被混淆
+</span>-keepclassmembers <span style="color: rgb(0, 0, 255);">class</span><span style="color: rgb(0, 0, 0);"> com.example.xxx.MainActivity$JSInterface1 {
+    </span>&lt;methods&gt;<span style="color: rgb(0, 0, 0);">;
+}</span></pre>
+</div>
+<p>&nbsp;其中JSInterface是MainActivity的子类</p>
+<p>&nbsp;</p>
+<p>5，处理反射</p>
+<div>在程序中使用SomeClass.class.method这样的静态方法，在ProGuard中是在压缩过程中被保留的，那么对于Class.forName("SomeClass")呢，SomeClass不会被压缩过程中移除，它会检查程序中使用的Class.forName方法，对参数SomeClass法外开恩，不会被移除。但是在混淆过程中，无论是Class.forName("SomeClass")，还是SomeClass.class，都不能蒙混过关，SomeClass这个类名称会被混淆，因此，我们要在ProGuard.cfg文件中保留这个类名称。</div>
+<div>
+<ul>
+<li><code>Class.forName("SomeClass")</code></li>
+<li><code>SomeClass.class</code></li>
+<li><code>SomeClass.class.getField("someField")</code></li>
+<li><code>SomeClass.class.getDeclaredField("someField")</code></li>
+<li><code>SomeClass.class.getMethod("someMethod", new Class[] {})</code></li>
+<li><code>SomeClass.class.getMethod("someMethod", new Class[] { A.class })</code></li>
+<li><code>SomeClass.class.getMethod("someMethod", new Class[] { A.class, B.class })</code></li>
+<li><code>SomeClass.class.getDeclaredMethod("someMethod", new Class[] {})</code></li>
+<li><code>SomeClass.class.getDeclaredMethod("someMethod", new Class[] { A.class })</code></li>
+<li><code>SomeClass.class.getDeclaredMethod("someMethod", new Class[] { A.class, B.class })</code></li>
+<li><code>AtomicIntegerFieldUpdater.newUpdater(SomeClass.class, "someField")</code></li>
+<li><code>AtomicLongFieldUpdater.newUpdater(SomeClass.class, "someField")</code></li>
+<li><code>AtomicReferenceFieldUpdater.newUpdater(SomeClass.class, SomeType.class, "someField")</code></li>
+</ul>
+<p>在混淆的时候，要在项目中搜索一下上述方法，将相应的类或者方法的名称进行保留而不被混淆。</p>
+<p>&nbsp;</p>
+<div>6，对于自定义View的解决方案</div>
+<div>但凡在Layout目录下的XML布局文件配置的自定义View，都不能进行混淆。为此要遍历Layout下的所有的XML布局文件，找到那些自定义View，然后确认其是否在ProGuard文件中保留。有一种思路是，在我们使用自定义View时，前面都必须加上我们的包名，比如com.a.b.customeview，我们可以遍历所有Layout下的XML布局文件，查找所有匹配com.a.b的标签即可。</div>
+<div>&nbsp;</div>
+<div>
+<h5>针对第三方jar包的解决方案</h5>
+<div>我们在Android项目中不可避免要使用很多第三方提供的SDK，一般而言，这些SDK是经过ProGuard混淆的，而我们所需要做的就是避免这些SDK的类和方法在我们APP被混淆。</div>
+<div>1，针对android-support-v4.jar的解决方案</div>
+<div>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a title="复制代码" onclick="copyCnblogsCode(this)" href="javascript:void(0);"><img alt="复制代码" src="images/android03208.gif"></a></span></div>
+<pre># 针对android-support-<span style="color: rgb(0, 0, 0);">v4.jar的解决方案
+</span>-libraryjars libs/android-support-<span style="color: rgb(0, 0, 0);">v4.jar
+</span>-dontwarn android.support.v4.**
+-keep <span style="color: rgb(0, 0, 255);">class</span> android.support.v4.**  { *<span style="color: rgb(0, 0, 0);">; }
+</span>-keep <span style="color: rgb(0, 0, 255);">interface</span> android.support.v4.app.** { *<span style="color: rgb(0, 0, 0);">; }
+</span>-keep <span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">class</span> * <span style="color: rgb(0, 0, 255);">extends</span> android.support.v4.**
+-keep <span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">class</span> * <span style="color: rgb(0, 0, 255);">extends</span> android.app.Fragment</pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a title="复制代码" onclick="copyCnblogsCode(this)" href="javascript:void(0);"><img alt="复制代码" src="images/android03209.gif"></a></span></div></div>
+<p>&nbsp;2，其他的第三方jar包的解决方案</p>
+<p>这个就取决于第三方包的混淆策略了，一般都有在各自的SDK中有关于混淆的说明文字，比如支付宝如下：</p>
+<div class="cnblogs_code">
+<pre><span style="color: rgb(0, 0, 0);"># 对alipay的混淆处理
+</span>-libraryjars libs/<span style="color: rgb(0, 0, 0);">alipaysdk.jar
+</span>-dontwarn com.alipay.android.app.**
+-keep <span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">class</span> com.alipay.**  { *; }</pre>
+</div>
+</div>
+</div>
+</div>
+值得注意的是，不是每个第三方SDK都需要-dontwarn&nbsp;指令，这取决于混淆时第三方SDK是否出现警告，需要的时候再加上。<br><br></div>
+<h3>其他注意事项</h3>
+<div>
+<div>当然在使用ProGuard过程中，还有一些注意的事项，如下。</div>
+<div>1，如何确保混淆不会对项目产生影响</div>
+<div>
+<ul>
+<li>测试工作要基于混淆包进行，才能尽早发现问题</li>
+<li>每天开发团队的冒烟测试，也要基于混淆包</li>
+<li>发版前，重点的功能和模块要额外的测试，包括推送，分享，打赏</li>
+
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+
+</div>
+<div>2，打包时忽略警告</div>
+<div>当导出包的时候，发现很多could not reference class之类的warning信息，如果确认App在运行中和那些引用没有什么关系，可以添加-dontwarn&nbsp;标签，就不会提示这些警告信息了</div>
+<div>&nbsp;</div>
+<div>3，对于自定义类库的混淆处理</div>
+<div>比如我们引用了一个叫做AndroidLib的类库，我们需要对Lib也进行混淆，然后在主项目的混淆文件中保留AndroidLib中的类和类的成员。</div>
+<div>&nbsp;</div>
+<div>
+<div>4，使用annotation避免混淆</div>
+<div>另一种类或者属性被混淆的方式是，使用annotation，比如这样：</div>
+<div>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a title="复制代码" onclick="copyCnblogsCode(this)" href="javascript:void(0);"><img alt="复制代码" src="images/android03210.gif"></a></span></div>
+<pre><span style="color: rgb(0, 0, 0);">@keep
+@keepPublicGetterSetters
+</span><span style="color: rgb(0, 0, 255);">public</span> <span style="color: rgb(0, 0, 255);">class</span><span style="color: rgb(0, 0, 0);"> Bean{
+    </span><span style="color: rgb(0, 0, 255);">public</span>  <span style="color: rgb(0, 0, 255);">boolean</span><span style="color: rgb(0, 0, 0);"> booleanProperty;
+    </span><span style="color: rgb(0, 0, 255);">public</span>  <span style="color: rgb(0, 0, 255);">int</span><span style="color: rgb(0, 0, 0);"> intProperty;
+    </span><span style="color: rgb(0, 0, 255);">public</span><span style="color: rgb(0, 0, 0);">  String stringProperty;
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a title="复制代码" onclick="copyCnblogsCode(this)" href="javascript:void(0);"><img alt="复制代码" src="images/android03211.gif"></a></span></div></div>
+<p>&nbsp;</p>
+<div>5，在项目中指定混淆文件</div>
+<div>到最后，发现没有介绍如何在项目中指定混淆文件。在项目中有一个project.properties文件，在其中写这么一句话，就可以确保每次手动打包生成的apk是混淆过的。</div>
+<div><span style='font-family: "Microsoft Yahei";'>proguard.config=proguard.cfg</span></div>
+<div><span style='font-family: "Microsoft Yahei";'>其中，proguard.cfg是混淆文件的名称。</span></div>
+<div>
+<h3>小结</h3>
+<div>总之ProGuard是一个比较枯燥的过程，但Android项目没有了ProGuard就真不行了，这样可以保证我们开发出的APK可以更健壮，毕竟很多核心代码质量也算是一个APK的核心竞争力吧。</div>
+<div>&nbsp;</div>
+<div>
+<h3>阅读扩展</h3>
+<div>源于对掌握的Android开发基础点进行整理，罗列下已经总结的文章，从中可以看到技术积累的过程。</div>
+<div>1，<a href="http://www.cnblogs.com/cr330326/p/4229026.html" target="_blank">Android系统简介</a></div>
+<div>2，<a href="http://www.cnblogs.com/cr330326/p/5534915.html" target="_blank">ProGuard代码混淆</a></div>
+<div>3，<a href="http://www.cnblogs.com/cr330326/p/5530222.html" target="_blank">讲讲Handler+Looper+MessageQueue关系</a></div>
+<div>4，<a href="http://www.cnblogs.com/cr330326/p/5585021.html" target="_blank">Android图片加载库理解</a></div>
+<div>5，<a href="http://www.cnblogs.com/cr330326/p/5181283.html" target="_blank">谈谈Android运行时权限理解</a></div>
+<div>6，<a href="http://www.cnblogs.com/cr330326/p/5176038.html" target="_blank">EventBus初理解</a></div>
+<div>7，<a href="http://www.cnblogs.com/cr330326/p/4422507.html" target="_blank">Android 常见工具类</a></div>
+<div>8，<a href="http://www.cnblogs.com/cr330326/p/5712022.html" target="_blank">对于Fragment的一些理解</a></div>
+<div>9，<a class="link-post-title" id="link_post_title" href="http://www.cnblogs.com/cr330326/p/4271699.html">Android 四大组件之 " Activity "</a></div>
+<div>10，<a class="link-post-title" id="link_post_title" href="http://www.cnblogs.com/cr330326/p/5741464.html">Android 四大组件之" Service "</a></div>
+<div>11，<a href="http://www.cnblogs.com/cr330326/p/5787971.html" target="_blank">Android 四大组件之“ BroadcastReceiver&nbsp;"</a></div>
+<div>11，<a class="link-post-title" id="link_post_title" href="http://www.cnblogs.com/cr330326/p/5889279.html">Android 四大组件之" ContentProvider "</a></div>
+<div>13，<a href="http://www.cnblogs.com/cr330326/p/5997433.html" target="_blank">讲讲 Android 事件拦截机制</a></div>
+<div>14，<a href="http://www.cnblogs.com/cr330326/p/6062032.html" target="_blank">Android 动画的理解</a></div>
+<div>15，<a href="http://www.cnblogs.com/cr330326/p/6269820.html" target="_blank">Android 生命周期和启动模式</a></div>
+<div>16，<a href="http://www.cnblogs.com/cr330326/p/6340958.html" target="_blank">Android IPC 机制</a></div>
+<div>17，<a href="http://www.cnblogs.com/cr330326/p/6340970.html" target="_blank">View 的事件体系</a></div>
+<div>18，<a href="http://www.cnblogs.com/cr330326/p/6340973.html" target="_blank">View 的工作原理</a></div>
+<div>19，<a href="http://www.cnblogs.com/cr330326/p/6364328.html" target="_blank">理解 Window 和 WindowManager</a></div>
+<div>20，<a href="http://www.cnblogs.com/cr330326/p/6382479.html" target="_blank">Activity 启动过程分析</a></div>
+<div>21，<a href="http://www.cnblogs.com/cr330326/p/6394071.html" target="_blank">Service 启动过程分析</a></div>
+<div>22，<a href="http://www.cnblogs.com/cr330326/p/6394094.html" target="_blank">Android 性能优化</a></div>
+<div>23，<a href="http://www.cnblogs.com/cr330326/p/6408617.html" target="_blank">Android 消息机制</a></div>
+<div>24，<a href="http://www.cnblogs.com/cr330326/p/6472999.html" target="_blank">Android Bitmap相关</a></div>
+<div>25，<a href="http://www.cnblogs.com/cr330326/p/6489716.html" target="_blank">Android 线程和线程池</a></div>
+<div>26，<a href="http://www.cnblogs.com/cr330326/p/6613872.html" target="_blank">Android 中的 Drawable 和动画</a></div>
+<div>27，<a href="http://www.cnblogs.com/cr330326/p/6647133.html" target="_blank">RecylerView 中的装饰者模式</a></div>
+<div>28，<a href="http://www.cnblogs.com/cr330326/p/6762542.html" target="_blank">Android 触摸事件机制</a></div>
+<div>29，<a href="http://www.cnblogs.com/cr330326/p/6796034.html" target="_blank">Android 事件机制应用</a></div>
+<div>30，<a href="http://www.cnblogs.com/cr330326/p/7082821.html" target="_blank">Cordova 框架的一些理解</a></div>
+<div>31，<a href="http://www.cnblogs.com/cr330326/p/7222489.html" target="_blank">有关 Android 插件化思考&nbsp;</a></div>
+<div>32，<a href="http://www.cnblogs.com/cr330326/p/7388143.html" target="_blank">开发人员必备技能——单元测试</a></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block"><div id="BlogPostCategory">
+    分类: 
+            <a href="https://www.cnblogs.com/cr330326/category/650958.html" target="_blank">Android</a></div>
+<div id="EntryTag">
+    标签: 
+            <a href="https://www.cnblogs.com/cr330326/tag/Android/">Android</a></div>
+
+    <div id="blog_post_info">
+<div id="green_channel">
+        <a id="green_channel_digg" onclick="DiggIt(5534915,cb_blogId,1);green_channel_success(this,'谢谢推荐！');" href="javascript:void(0);">好文要顶</a>
+        <a id="green_channel_follow" onclick="follow('274fe940-ddd9-e011-8ee0-842b2b196315');" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a title="分享至新浪微博" id="green_channel_weibo" onclick="ShareToTsina()" href="javascript:void(0);"><img alt="" src="images/android03212.png"></a>
+    <a title="分享至微信" id="green_channel_wechat" onclick="shareOnWechat()" href="javascript:void(0);"><img alt="" src="images/android03213.png"></a>
+</div>
+<div id="author_profile">
+    <div class="author_profile_info" id="author_profile_info">
+            <a href="https://home.cnblogs.com/u/cr330326/" target="_blank"><img class="author_avatar" alt="" src="images/android03214.png"></a>
+        <div class="author_profile_info" id="author_profile_detail">
+            <a href="https://home.cnblogs.com/u/cr330326/">cryAllen</a><br>
+            <a href="https://home.cnblogs.com/u/cr330326/followees/">关注 - 24</a><br>
+            <a href="https://home.cnblogs.com/u/cr330326/followers/">粉丝 - 199</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow">
+                <a onclick="follow('274fe940-ddd9-e011-8ee0-842b2b196315');return false;" href="javascript:void(0);">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(5534915,'Digg')">
+        <span class="diggnum" id="digg_count">4</span>
+    </div>
+    <div class="buryit" onclick="votePost(5534915,'Bury')">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+    <div class="clear"></div>
+    <div id="post_next_prev">
+
+    <a class="p_n_p_prefix" href="https://www.cnblogs.com/cr330326/p/5530222.html">« </a> 上一篇：    <a title="发布于 2016-05-26 10:53" href="https://www.cnblogs.com/cr330326/p/5530222.html">讲讲Handler+Looper+MessageQueue 关系</a>
+    <br>
+    <a class="p_n_p_prefix" href="https://www.cnblogs.com/cr330326/p/5585021.html">» </a> 下一篇：    <a title="发布于 2016-06-14 18:18" href="https://www.cnblogs.com/cr330326/p/5585021.html">Android图片加载库的理解</a>
+
+</div>
+</div>
+		</div>
+		<div class="postDesc">posted @ 
+<span id="post-date">2016-05-27 15:58</span>&nbsp;
+<a href="https://www.cnblogs.com/cr330326/">cryAllen</a>&nbsp;
+阅读(<span id="post_view_count">75216</span>)&nbsp;
+评论(<span id="post_comment_count">1</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=5534915" rel="nofollow">
+    编辑
+</a>
+<a onclick="AddToWz(5534915);return false;" href="javascript:void(0)">收藏</a></div>
+	</div>
+	
+	
+</div><!--end: topics 文章、评论容器-->
+<script src="https://common.cnblogs.com/highlight/9.12.0/highlight.min.js"></script>
+<script>markdown_highlight();</script>
+<script>
+    var allowComments = true, cb_blogId = 97441, cb_blogApp = 'cr330326', cb_blogUserGuid = '274fe940-ddd9-e011-8ee0-842b2b196315';
+    var cb_entryId = 5534915, cb_entryCreatedDate = '2016-05-27 15:58', cb_postType = 1; 
+    loadViewCount(cb_entryId);
+</script><a name="!comments"></a>
+<div id="blog-comments-placeholder">
+
+<div id="comment_pager_top">
+    
+</div>
+
+<!--done-->
+<br>
+<div class="feedback_area_title">评论</div>
+<div class="feedbackNoItems"><div class="feedbackNoItems"></div></div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+				<div class="feedbackManage">
+					&nbsp;&nbsp;
+
+<span class="comment_actions">
+    
+    
+    
+    
+</span>
+
+
+				</div>
+				
+<a class="layer" href="#3726302">#1楼</a>
+<a name="3726302" id="comment_anchor_3726302"></a>
+
+        <span id="comment-maxId" style="display: none;">3726302</span>
+        <span id="comment-maxDate" style="display: none;">2017/6/30 下午8:19:19</span>
+
+<span class="comment_date">2017-06-30 20:19</span>
+
+ | 
+
+            <a id="a_comment_author_3726302" href="https://www.cnblogs.com/zkjwp7/" target="_blank">I.Striving</a>
+
+			</div>
+			<div class="feedbackCon">
+				
+<div class="blog_comment_body" id="comment_body_3726302">
+    "ProGuar由shrink、optimize、obfuscate和preveirfy四个步骤组成，每个步骤都是可选的，我们可以通过配置脚本来决定执行其中的哪几个步骤"<br>请问这四个如何进行可选配置？我想在debug打包时只打开shrink可以吗？
+</div>
+        <div class="comment_vote">
+            <span class="comment_error" style="color: red;"></span>
+            <a class="comment_digg" onclick="return voteComment(3726302, 'Digg', this.parentElement, false);" href="javascript:void(0);">
+                支持(0)
+            </a>
+            <a class="comment_burry" onclick="return voteComment(3726302, 'Bury', this.parentElement, false);" href="javascript:void(0);">
+                反对(0)
+            </a>
+        </div>
+        <span id="comment_3726302_avatar" style="display: none;">
+            https://pic.cnblogs.com/face/u281597.jpg?id=19134915
+        </span>
+
+			</div>
+		</div>
+
+<div id="comment_pager_bottom">
+    
+</div>
+
+
+</div>
+<script>
+    var commentManager = new blogCommentManager();
+    commentManager.renderComments(0);
+</script>
+
+<div class="commentform" id="comment_form">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav"><span id="span_refresh_tips"></span><a id="lnk_RefreshComments" onclick="return RefreshCommentList();" href="javascript:void(0);" clientidmode="Static" runat="server">刷新评论</a><a onclick="return RefreshPage();" href="#">刷新页面</a><a href="#top">返回顶部</a></div>
+    <div id="comment_form_container"><div class="login_tips">
+    注册用户登录后才能发表评论，请 
+    <a class="underline" onclick="return login('commentform');" href="javascript:void(0);" rel="nofollow">登录</a>
+     或 
+    <a class="underline" onclick="return register();" href="javascript:void(0);" rel="nofollow">注册</a>，
+    <a href="https://www.cnblogs.com/">访问</a> 网站首页。
+</div></div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+    <div id="ad_t2"><a onclick="ga('send', 'event', 'Link', 'click', 'T2-工控')" href="http://www.ucancode.com/index.htm" target="_blank">【推荐】超50万行VC++源码: 大型组态工控、电力仿真CAD与GIS源码库</a><br><a onclick="ga('send', 'event', 'Link', 'click', 'T2-腾讯云')" href="https://cloud.tencent.com/act/pro/overseas?fromSource=gwzcw.3090393.3090393.3090393&amp;utm_medium=cpc&amp;utm_id=gwzcw.3090393.3090393.3090393" target="_blank">【推荐】腾讯云海外1核2G云服务器低至2折，半价续费券限量免费领取！</a><br><a onclick="ga('send', 'event', 'Link', 'click', 'T2-阿里云')" href="http://click.aliyun.com/m/1000081987/" target="_blank">【推荐】阿里云双11返场来袭，热门产品低至一折等你来抢！</a><br><a onclick="ga('send', 'event', 'Link', 'click', 'T2-天翼云')" href="https://www.ctyun.cn/activity/20191111?hmsr=%E7%9C%8B%E7%9C%8B-%E5%8D%9A%E5%AE%A2%E5%9B%AD-%E5%8F%8C11-1106&amp;hmpl=&amp;hmcu=&amp;hmkw=&amp;hmci=" target="_blank">【推荐】天翼云双十一翼降到底，云主机11.11元起，抽奖送大礼</a><br><a onclick="ga('send', 'event', 'Link', 'click', 'T2-uibot_T2')" href="https://www.uibot.com.cn/sem/bky.html" target="_blank">【推荐】流程自动化专家UiBot，体系化教程成就高薪RPA工程师</a><br><a onclick="ga('send', 'event', 'Link', 'click', 'T2-京东云')" href="https://www.jdcloud.com/cn/activity/year-end?utm_source=DMT_cnblogs&amp;utm_medium=CH&amp;utm_campaign=q4vm&amp;utm_term=Virtual-Machines" target="_blank">【活动】京东云服务器_云主机低于1折，低价高性能产品备战双11</a><br><a onclick="ga('send', 'event', 'Link', 'click', 'T2-七牛云')" href="https://www.qiniu.com/events/20191111?utm_campaign=2019_1111&amp;utm_content=cnblogs_1111&amp;utm_medium=banner&amp;utm_source=cnblogs&amp;utm_term=cnblogs_1111" target="_blank">【优惠】七牛云采购嘉年华，云存储、CDN等云产品低至1折</a><br></div>
+    <div id="opt_under_post"></div>
+    <script src="https://www.googletagservices.com/tag/js/gpt.js" async="async"></script>
+    <script>
+        var googletag = googletag || {};
+        googletag.cmd = googletag.cmd || [];
+    </script>
+    <script>
+        googletag.cmd.push(function () {
+            googletag.defineSlot("/1090369/C1", [300, 250], "div-gpt-ad-1546353474406-0").addService(googletag.pubads());
+            googletag.defineSlot("/1090369/C2", [468, 60], "div-gpt-ad-1539008685004-0").addService(googletag.pubads());
+            googletag.pubads().enableSingleRequest();
+            googletag.enableServices();
+        });
+    </script>
+    <div class="c_ad_block" id="cnblogs_c1">
+        <div id="div-gpt-ad-1546353474406-0" style="width: 300px; height: 250px;"><div id="google_ads_iframe_/1090369/C1_0__container__" style="border: 0pt currentColor; border-image: none; width: 300px; height: 250px;"></div></div>
+    </div>
+    <div id="under_post_news"></div>
+    <div class="c_ad_block" id="cnblogs_c2">
+        <div id="div-gpt-ad-1539008685004-0" style="width: 468px; height: 60px;">
+            <script>
+                if (new Date() >= new Date(2018, 9, 13)) {
+                    googletag.cmd.push(function () { googletag.display("div-gpt-ad-1539008685004-0"); });
+                }
+            </script>
+        <div id="google_ads_iframe_/1090369/C2_0__container__" style="border: 0pt currentColor; border-image: none; width: 468px; height: 60px;"></div></div>
+    </div>
+    <div id="under_post_kb">
+<div class="itnews c_ad_block">
+    <b>最新 IT 新闻</b>:
+    <br>
+ ·              <a href="//news.cnblogs.com/n/651207/" target="_blank">青云：已不只是云</a>
+            <br>
+ ·              <a href="//news.cnblogs.com/n/651206/" target="_blank">李国庆俞渝离婚案今日开庭，李国庆：希望快出结果，需要新生活</a>
+            <br>
+ ·              <a href="//news.cnblogs.com/n/651205/" target="_blank">首个5G磁悬浮上海开测 时速500公里下5G网稳定</a>
+            <br>
+ ·              <a href="//news.cnblogs.com/n/651204/" target="_blank">工业软件产品供应与服务商中智软创完成2500万元A轮融资</a>
+            <br>
+ ·              <a href="//news.cnblogs.com/n/651203/" target="_blank">百度与东软教育联合成立“东软百度人工智能学院”</a>
+            <br>
+    » <a title="IT 新闻" href="https://news.cnblogs.com/" target="_blank">更多新闻...</a>
+</div></div>
+    <div class="c_ad_block" id="HistoryToday"></div>
+    <script type="text/javascript">
+        fixPostBody();
+        setTimeout(function () { incrementViewCount(cb_entryId); }, 50);
+        deliverAdT2();
+        deliverAdC1();
+        deliverAdC2();
+        loadNewsAndKb();
+        loadBlogSignature();
+LoadPostCategoriesTags(cb_blogId, cb_entryId);        LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+        GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+        loadOptUnderPost();
+        GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+    </script>
+</div></div>
+
+</div>
+
+
+</body></html>

@@ -1,0 +1,461 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android 混淆：proguard实践 - 程序员闲谈 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                            <div class="article-copyright">
+                <span class="creativecommons">
+                    <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                    </a>
+                    <span>
+                        版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。                    </span>
+                    <div class="article-source-link2222">
+                        本文链接：<a href="https://blog.csdn.net/youyu_torch/article/details/78775100">https://blog.csdn.net/youyu_torch/article/details/78775100</a>
+                    </div>
+                </span>
+                    
+                </div>
+                                                    <!--一个博主专栏付费入口-->
+             
+             <!--一个博主专栏付费入口结束-->
+            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-4a3473df85.css" rel="stylesheet">
+                                        <div class="markdown_views" id="content_views">
+                    <!-- flowchart 箭头图标 勿删 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-linecap="round" d="M 5 0 L 0 2.5 L 5 5 Z" />
+                    </svg>
+                                            <h1 id="前言"><a name="t0"></a>前言</h1>
+
+<p>网上关于使用proguard进行混淆的文章很多，但大部分是从讲解proguard知识点这个角度去写的，为什么要混淆，如何去混淆，混淆的注意点等重要的问题反而都没有写。<br>
+所以想通过这篇文章来记录我学习proguard的过程，一来是整理android混淆相关的知识点，二来是总结此次学习混淆的方法，提高学习能力。</p>
+
+
+
+<h1 id="proguard实践"><a name="t1"></a>proguard实践</h1>
+
+<p>学习任何技术之前应该要有一个明确的目标，本次学习混淆的目标就是会使用android studio自带的proguard对APP项目进行混淆，混淆后的APP要能正常运行。<br>
+本次学习尝试采用“三段式理论”，三段式即<strong>提出问题，分析问题，解决问题</strong>。</p>
+
+
+
+<h2 id="提出问题"><a name="t2"></a>提出问题</h2>
+
+<ul>
+<li><p>APP为什么要进行混淆？ <br>
+混淆的首要目的是保护APP项目的代码，使APP更难被破解；其次是优化APP，去除无用代码和资源，减小APP的大小。</p></li>
+<li><p>为什么使用proguard进行混淆？ <br>
+因为proguard是一个很优秀的开源混淆代码项目，而且是google的android studio默认支持的混淆插件。<br></p></li>
+<li><p>怎么使用proguard进行混淆？ <br>
+这个就是后续要重点要分享和实践的内容了，别着急，往后看</p></li>
+<li><p>如何验证核心代码是否混淆了？ <br>
+我配置了proguard，用proguard打包生成了APK，那我怎么保证我想要混淆的代码已经混淆了呢。<br>
+其实反过来想就行了，就是通过反编译来验证，本篇将用<strong>jadx</strong>反编译工具来做。</p></li>
+</ul>
+
+
+
+<h2 id="分析问题"><a name="t3"></a>分析问题</h2>
+
+<p>经过前面的分析，我们了解到主要的问题集中在如何混淆和混淆验证两个方面上。曾经有某个伟人说过“<strong>实践是检验真理的唯一标准</strong>”，不知道怎么混淆，那就用起来试试。<br>
+接下来我们将通过去混淆OkHttpDemo这个项目来进行实践，源码下载<a href="http://download.csdn.net/download/youyu_torch/9839642" target="_blank" rel="nofollow">请戳这里</a></p>
+
+
+
+<h3 id="开始混淆"><a name="t4"></a>开始混淆</h3>
+
+<ol>
+<li>将项目的<code>build.gradle</code> 中的<code>minifyEnabled</code> 置为<code>true</code>。</li>
+</ol>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs ocaml has-numbering">apply plugin: <span class="hljs-string">'com.android.application'</span>
+
+android {
+    compileSdkVersion <span class="hljs-number">26</span>
+    buildToolsVersion <span class="hljs-string">"26.0.2"</span>
+    defaultConfig {
+        applicationId <span class="hljs-string">"com.torch.easydev.okhttpdemo"</span>
+        minSdkVersion <span class="hljs-number">17</span>
+        targetSdkVersion <span class="hljs-number">26</span>
+        versionCode <span class="hljs-number">1</span>
+        versionName <span class="hljs-string">"1.0"</span>
+        testInstrumentationRunner <span class="hljs-string">"android.support.test.runner.AndroidJUnitRunner"</span>
+    }
+    buildTypes {
+        release {
+            minifyEnabled <span class="hljs-keyword">true</span>
+            proguardFiles getDefaultProguardFile(<span class="hljs-string">'proguard-android.txt'</span>), <span class="hljs-string">'proguard-rules.pro'</span>
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: <span class="hljs-string">'libs'</span>, <span class="hljs-keyword">include</span>: [<span class="hljs-string">'*.jar'</span>])
+    androidTestCompile(<span class="hljs-string">'com.android.support.test.espresso:espresso-core:2.2.2'</span>, {
+        exclude group: <span class="hljs-string">'com.android.support'</span>, <span class="hljs-keyword">module</span>: <span class="hljs-string">'support-annotations'</span>
+    })
+    compile <span class="hljs-string">'com.android.support:appcompat-v7:26.+'</span>
+    testCompile <span class="hljs-string">'junit:junit:4.12'</span>
+    compile <span class="hljs-string">'com.squareup.okhttp3:okhttp:3.7.0'</span>
+    compile <span class="hljs-string">'com.google.code.gson:gson:2.8.0'</span>
+}
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li><li style="color: rgb(153, 153, 153);">28</li><li style="color: rgb(153, 153, 153);">29</li><li style="color: rgb(153, 153, 153);">30</li><li style="color: rgb(153, 153, 153);">31</li><li style="color: rgb(153, 153, 153);">32</li></ul></pre>
+
+<p><br></p>
+
+<p>2.使用<code>assembleRealease</code> 打包APK，<strong>注意</strong>这里不能直接run，默认编译运行的APP为debug版本，是不会进行混淆的。 <br>
+<img title="" alt="这里写图片描述" src="images/android03101.jpg"> <br>
+<br>
+3. 打包过程会发现报错了，提示okio包下的某个类找不到，以下是编译的详细过程。</p>
+
+<pre class="prettyprint" name="code"><code class="hljs delphi has-numbering"><span class="hljs-comment">// 此Task为proguard混淆的命令</span>
+:app:transformClassesAndResourcesWithProguardForRelease
+<span class="hljs-comment">// proguard 版本</span>
+ProGuard, version <span class="hljs-number">5.3</span>.<span class="hljs-number">2</span>
+Reading input...
+<span class="hljs-comment">// 读取的jar，包括libs/以及build.gradle的dependencies里用到的</span>
+Reading <span class="hljs-keyword">program</span> jar [/Users/torch/.android/build-cache/<span class="hljs-number">7880</span>ba2afce31630824a0110efd86274bc49bc30/output/jars/classes.jar] (filtered)
+Reading <span class="hljs-keyword">program</span> jar [/Users/torch/.android/build-cache/e6f71d5707a837d00ed85447f14b707f76ae20f0/output/jars/classes.jar] (filtered)
+Reading <span class="hljs-keyword">program</span> jar [/Users/torch/.gradle/caches/modules-<span class="hljs-number">2</span>/files-<span class="hljs-number">2.1</span>/com.squareup.okhttp3/okhttp/<span class="hljs-number">3.7</span>.<span class="hljs-number">0</span>/<span class="hljs-number">6</span>edbebdd8868708db718d15c09c4b28037fd487e/okhttp-<span class="hljs-number">3.7</span>.<span class="hljs-number">0</span>.jar] (filtered)
+Reading <span class="hljs-keyword">program</span> jar [/Users/torch/.gradle/caches/modules-<span class="hljs-number">2</span>/files-<span class="hljs-number">2.1</span>/com.google.code.gson/gson/<span class="hljs-number">2.8</span>.<span class="hljs-number">0</span>/c4ba5371a29ac9b2ad6129b1d39ea38750043eff/gson-<span class="hljs-number">2.8</span>.<span class="hljs-number">0</span>.jar] (filtered)
+Reading <span class="hljs-keyword">program</span> jar [/Users/torch/.android/build-cache/<span class="hljs-number">0</span>d42c3690aeb29caef324c71b7fc2421c8de1e5b/output/jars/classes.jar] (filtered)
+Reading <span class="hljs-keyword">program</span> jar [/Users/torch/.android/build-cache/b9555cd093d474b08b7ea2c011a82c2d4c627b86/output/jars/classes.jar] (filtered)
+Reading <span class="hljs-keyword">program</span> jar [/Users/torch/.gradle/caches/modules-<span class="hljs-number">2</span>/files-<span class="hljs-number">2.1</span>/com.squareup.okio/okio/<span class="hljs-number">1.12</span>.<span class="hljs-number">0</span>/<span class="hljs-number">3742</span>beff8024d0a0073d284b7c5e4cbf73d99b25/okio-<span class="hljs-number">1.12</span>.<span class="hljs-number">0</span>.jar] (filtered)
+Reading <span class="hljs-keyword">program</span> jar [/Users/torch/.android/build-cache/cb09c2323f3dd0b058deff4426ce2887c32c5698/output/jars/classes.jar] (filtered)
+Reading <span class="hljs-keyword">program</span> jar [/Users/torch/<span class="hljs-keyword">Library</span>/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/<span class="hljs-number">26.0</span>.<span class="hljs-number">0</span>-alpha1/support-annotations-<span class="hljs-number">26.0</span>.<span class="hljs-number">0</span>-alpha1.jar] (filtered)
+Reading <span class="hljs-keyword">program</span> jar [/Users/torch/.android/build-cache/<span class="hljs-number">446</span>d05455618d1e0c86af9ae0a41a910627b74e1/output/jars/classes.jar] (filtered)
+Reading <span class="hljs-keyword">program</span> jar [/Users/torch/.android/build-cache/<span class="hljs-number">5</span>a18253d3fd47698167249e46562f1794b833a76/output/jars/classes.jar] (filtered)
+Reading <span class="hljs-keyword">program</span> jar [/Users/torch/.android/build-cache/<span class="hljs-number">0</span>d75c8d0e60a38ec97c92a95e11ba8c609f3847d/output/jars/classes.jar] (filtered)
+Reading <span class="hljs-keyword">program</span> jar [/Users/torch/.android/build-cache/a23ef26dcf19d0326ebc9315975b5fd8c0e068f1/output/jars/classes.jar] (filtered)
+Reading <span class="hljs-keyword">program</span> jar [/Users/torch/Work/android/code/study/AndroidDemo/OkHttp/OkHttpDemo/app/build/intermediates/transforms/mergeJavaRes/release/jars/<span class="hljs-number">2</span>/<span class="hljs-number">1</span>f/main.jar] (filtered)
+Reading <span class="hljs-keyword">program</span> directory [/Users/torch/Work/android/code/study/AndroidDemo/OkHttp/OkHttpDemo/app/build/intermediates/classes/release] (filtered)
+Reading <span class="hljs-keyword">library</span> jar [/Users/torch/<span class="hljs-keyword">Library</span>/Android/sdk/platforms/android-<span class="hljs-number">26</span>/android.jar]
+Reading <span class="hljs-keyword">library</span> jar [/Users/torch/<span class="hljs-keyword">Library</span>/Android/sdk/platforms/android-<span class="hljs-number">26</span>/optional/org.apache.http.legacy.jar]
+Note: duplicate definition <span class="hljs-keyword">of</span> <span class="hljs-keyword">library</span> <span class="hljs-keyword">class</span> [org.apache.http.params.HttpConnectionParams]
+Note: duplicate definition <span class="hljs-keyword">of</span> <span class="hljs-keyword">library</span> <span class="hljs-keyword">class</span> [org.apache.http.params.HttpParams]
+Note: duplicate definition <span class="hljs-keyword">of</span> <span class="hljs-keyword">library</span> <span class="hljs-keyword">class</span> [org.apache.http.params.CoreConnectionPNames]
+Note: duplicate definition <span class="hljs-keyword">of</span> <span class="hljs-keyword">library</span> <span class="hljs-keyword">class</span> [org.apache.http.conn.ConnectTimeoutException]
+Note: duplicate definition <span class="hljs-keyword">of</span> <span class="hljs-keyword">library</span> <span class="hljs-keyword">class</span> [org.apache.http.conn.scheme.HostNameResolver]
+Note: duplicate definition <span class="hljs-keyword">of</span> <span class="hljs-keyword">library</span> <span class="hljs-keyword">class</span> [org.apache.http.conn.scheme.SocketFactory]
+Note: duplicate definition <span class="hljs-keyword">of</span> <span class="hljs-keyword">library</span> <span class="hljs-keyword">class</span> [org.apache.http.conn.scheme.LayeredSocketFactory]
+Note: duplicate definition <span class="hljs-keyword">of</span> <span class="hljs-keyword">library</span> <span class="hljs-keyword">class</span> [android.net.http.SslCertificate$DName]
+Note: duplicate definition <span class="hljs-keyword">of</span> <span class="hljs-keyword">library</span> <span class="hljs-keyword">class</span> [android.net.http.SslCertificate]
+Note: duplicate definition <span class="hljs-keyword">of</span> <span class="hljs-keyword">library</span> <span class="hljs-keyword">class</span> [android.net.http.HttpResponseCache]
+Note: duplicate definition <span class="hljs-keyword">of</span> <span class="hljs-keyword">library</span> <span class="hljs-keyword">class</span> [android.net.http.SslError]
+
+<span class="hljs-comment">// proguard 会优化、去除重复的类</span>
+Note: there were <span class="hljs-number">11</span> duplicate <span class="hljs-keyword">class</span> definitions.
+      (http:<span class="hljs-comment">//proguard.sourceforge.net/manual/troubleshooting.html#duplicateclass)</span>
+
+Initializing...
+
+<span class="hljs-comment">// 找不到okio包下的三个类</span>
+Warning: okio.DeflaterSink: can<span class="hljs-string">'t find referenced class org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+Warning: okio.Okio: can'</span>t find referenced <span class="hljs-keyword">class</span> org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+Warning: okio.Okio: can<span class="hljs-string">'t find referenced class org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+
+// 找不到gson包和okio包下的类
+Note: com.google.gson.internal.UnsafeAllocator: can'</span>t find dynamically referenced <span class="hljs-keyword">class</span> sun.misc.Unsafe
+Note: okhttp3.internal.platform.AndroidPlatform: can<span class="hljs-string">'t find dynamically referenced class com.android.org.conscrypt.SSLParametersImpl
+Note: okhttp3.internal.platform.AndroidPlatform: can'</span>t find dynamically referenced <span class="hljs-keyword">class</span> org.apache.harmony.xnet.provider.jsse.SSLParametersImpl
+Note: okhttp3.internal.platform.AndroidPlatform$CloseGuard: can<span class="hljs-string">'t find dynamically referenced class dalvik.system.CloseGuard
+Note: okhttp3.internal.platform.Platform: can'</span>t find dynamically referenced <span class="hljs-keyword">class</span> sun.security.ssl.SSLContextImpl
+Note: com.google.gson.internal.UnsafeAllocator accesses a declared field <span class="hljs-string">'theUnsafe'</span> dynamically
+Note: there were <span class="hljs-number">5</span> unresolved dynamic references <span class="hljs-keyword">to</span> classes <span class="hljs-keyword">or</span> interfaces.
+      You should check <span class="hljs-keyword">if</span> you need <span class="hljs-keyword">to</span> specify additional <span class="hljs-keyword">program</span> jars.
+      (http:<span class="hljs-comment">//proguard.sourceforge.net/manual/troubleshooting.html#dynamicalclass)</span>
+Note: there were <span class="hljs-number">1</span> accesses <span class="hljs-keyword">to</span> <span class="hljs-keyword">class</span> members by means <span class="hljs-keyword">of</span> introspection.
+      You should consider explicitly keeping the mentioned <span class="hljs-keyword">class</span> members
+      (using <span class="hljs-string">'-keep'</span> <span class="hljs-keyword">or</span> <span class="hljs-string">'-keepclassmembers'</span>).
+      (http:<span class="hljs-comment">//proguard.sourceforge.net/manual/troubleshooting.html#dynamicalclassmember)</span>
+
+Warning: there were <span class="hljs-number">3</span> unresolved references <span class="hljs-keyword">to</span> classes <span class="hljs-keyword">or</span> interfaces.
+         You may need <span class="hljs-keyword">to</span> add missing <span class="hljs-keyword">library</span> jars <span class="hljs-keyword">or</span> update their versions.
+         <span class="hljs-keyword">If</span> your code works fine without the missing classes, you can suppress
+         the warnings <span class="hljs-keyword">with</span> <span class="hljs-string">'-dontwarn'</span> options.
+         (http:<span class="hljs-comment">//proguard.sourceforge.net/manual/troubleshooting.html#unresolvedclass)</span>
+
+Warning: Exception <span class="hljs-keyword">while</span> processing task java.io.IOException: Please correct the above warnings first.
+:app:transformClassesAndResourcesWithProguardForRelease FAILED
+
+FAILURE: Build failed <span class="hljs-keyword">with</span> an exception.
+
+<span class="hljs-comment">// 执行proguard混淆失败</span>
+* What went wrong:
+Execution failed <span class="hljs-keyword">for</span> task <span class="hljs-string">':app:transformClassesAndResourcesWithProguardForRelease'</span>.
+&gt; Job failed, see logs <span class="hljs-keyword">for</span> details
+
+* <span class="hljs-keyword">Try</span>:
+Run <span class="hljs-keyword">with</span> --stacktrace option <span class="hljs-keyword">to</span> get the stack trace. Run <span class="hljs-keyword">with</span> --info <span class="hljs-keyword">or</span> --debug option <span class="hljs-keyword">to</span> get more log output.
+
+BUILD FAILED
+
+Total time: <span class="hljs-number">5.691</span> secs</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li><li style="color: rgb(153, 153, 153);">28</li><li style="color: rgb(153, 153, 153);">29</li><li style="color: rgb(153, 153, 153);">30</li><li style="color: rgb(153, 153, 153);">31</li><li style="color: rgb(153, 153, 153);">32</li><li style="color: rgb(153, 153, 153);">33</li><li style="color: rgb(153, 153, 153);">34</li><li style="color: rgb(153, 153, 153);">35</li><li style="color: rgb(153, 153, 153);">36</li><li style="color: rgb(153, 153, 153);">37</li><li style="color: rgb(153, 153, 153);">38</li><li style="color: rgb(153, 153, 153);">39</li><li style="color: rgb(153, 153, 153);">40</li><li style="color: rgb(153, 153, 153);">41</li><li style="color: rgb(153, 153, 153);">42</li><li style="color: rgb(153, 153, 153);">43</li><li style="color: rgb(153, 153, 153);">44</li><li style="color: rgb(153, 153, 153);">45</li><li style="color: rgb(153, 153, 153);">46</li><li style="color: rgb(153, 153, 153);">47</li><li style="color: rgb(153, 153, 153);">48</li><li style="color: rgb(153, 153, 153);">49</li><li style="color: rgb(153, 153, 153);">50</li><li style="color: rgb(153, 153, 153);">51</li><li style="color: rgb(153, 153, 153);">52</li><li style="color: rgb(153, 153, 153);">53</li><li style="color: rgb(153, 153, 153);">54</li><li style="color: rgb(153, 153, 153);">55</li><li style="color: rgb(153, 153, 153);">56</li><li style="color: rgb(153, 153, 153);">57</li><li style="color: rgb(153, 153, 153);">58</li><li style="color: rgb(153, 153, 153);">59</li><li style="color: rgb(153, 153, 153);">60</li><li style="color: rgb(153, 153, 153);">61</li><li style="color: rgb(153, 153, 153);">62</li><li style="color: rgb(153, 153, 153);">63</li><li style="color: rgb(153, 153, 153);">64</li><li style="color: rgb(153, 153, 153);">65</li><li style="color: rgb(153, 153, 153);">66</li><li style="color: rgb(153, 153, 153);">67</li><li style="color: rgb(153, 153, 153);">68</li><li style="color: rgb(153, 153, 153);">69</li><li style="color: rgb(153, 153, 153);">70</li><li style="color: rgb(153, 153, 153);">71</li><li style="color: rgb(153, 153, 153);">72</li><li style="color: rgb(153, 153, 153);">73</li><li style="color: rgb(153, 153, 153);">74</li><li style="color: rgb(153, 153, 153);">75</li><li style="color: rgb(153, 153, 153);">76</li><li style="color: rgb(153, 153, 153);">77</li><li style="color: rgb(153, 153, 153);">78</li><li style="color: rgb(153, 153, 153);">79</li><li style="color: rgb(153, 153, 153);">80</li><li style="color: rgb(153, 153, 153);">81</li><li style="color: rgb(153, 153, 153);">82</li><li style="color: rgb(153, 153, 153);">83</li></ul></pre>
+
+<p>以上是proguard混淆的整个编译过程，发现混淆失败报错了，但明明代码是对的，用debug编译运行都没问题，那是不是混淆的哪个步骤出错了呢？<br>
+接下来我们一起来了解一下android studio具体是怎么使用proguard进行编译混淆的。</p>
+
+
+
+<h3 id="proguard-相关知识点"><a name="t5"></a>proguard 相关知识点</h3>
+
+<p>Proguard是一个Java类文件压缩器、优化器、混淆器、预校验器。压缩环节会检测以及移除没有用到的类、字段、方法以及属性。优化环节会分析以及优化方法的字节码。混淆环节会用无意义的短变量去重命名类、变量、方法。这些步骤让代码更精简，更高效，也更难被逆向（破解）。 <br>
+<img title="" alt="这里写图片描述" src="images/android03102.jpg"></p>
+
+<ol>
+<li>压缩(Shrink)：检测并移除代码中无用的类、字段、方法和特性（Attribute）</li>
+<li>优化(Optimize)：对字节码进行优化，移除无用的指令</li>
+<li>混淆(Obfuscate)：使用a，b，c，d这样简短而无意义的名称，对类、字段和方法进行重命名</li>
+<li>预检(Preveirfy)：在Java平台上对处理后的代码进行预检，确保加载的class文件是可执行的 <br>
+<br></li>
+</ol>
+
+<p>混淆就是移除没有用到的代码，然后对代码里面的类、变量、方法重命名为人可读性很差的简短名字。 <br>
+那么有一个问题，ProGuard怎么知道这个代码没有被用到呢？ <br>
+这里引入一个<strong>Entry Point</strong>（入口点）概念，Entry Point是在ProGuard过程中不会被处理的类或方法。在压缩的步骤中，ProGuard会从上述的Entry Point开始递归遍历，搜索哪些类和类的成员在使用，对于没有被使用的类和类的成员，就会在压缩段丢弃，在接下来的优化过程中，那些非Entry Point的类、方法都会被设置为private、static或final，不使用的参数会被移除，此外，有些方法会被标记为内联的，在混淆的步骤中，ProGuard会对非Entry Point的类和方法进行重命名。 <br>
+那么这个入口点怎么来呢？就是从ProGuard的配置文件来，只要有这个配置了，那么就不会被移除。</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs bash has-numbering"> buildTypes {
+        release {
+            minifyEnabled <span class="hljs-literal">true</span>
+            <span class="hljs-comment"># 这里的proguard-android.txt以及proguard-rules.pro就是入口点的配置文件</span>
+            proguardFiles getDefaultProguardFile(<span class="hljs-string">'proguard-android.txt'</span>), <span class="hljs-string">'proguard-rules.pro'</span>
+        }
+    }</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li></ul></pre>
+
+<p><code>proguard-android.txt</code>文件在<code>Android_SDK_Home/tools/proguard</code> 文件夹下，是google官方提供的一个android app项目的默认通用配置文件，适用于所有android app项目。而<code>proguard-rules.pro</code>默认为空，可以在这里放置一些和特定app相关的配置。</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs vala has-numbering"><span class="hljs-preprocessor">## proguard-rules.pro文件</span>
+<span class="hljs-preprocessor"># 本文件用于添加应用特有混淆配置信息，这些信息会添加在默认配置信息中，作为入口点的判断依据</span>
+<span class="hljs-preprocessor"># Add project specific ProGuard rules here.</span>
+<span class="hljs-preprocessor"># By default, the flags in this file are appended to flags specified</span>
+<span class="hljs-preprocessor"># in E:\android\android-sdk/tools/proguard/proguard-android.txt</span>
+<span class="hljs-preprocessor"># You can edit the include path and order by changing the proguardFiles</span>
+<span class="hljs-preprocessor"># directive in build.gradle.</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># For more details, see</span>
+<span class="hljs-preprocessor">#   http://developer.android.com/guide/developing/tools/proguard.html</span>
+
+<span class="hljs-preprocessor"># Add any project specific keep options here:</span>
+
+<span class="hljs-preprocessor"># If your project uses WebView with JS, uncomment the following</span>
+<span class="hljs-preprocessor"># and specify the fully qualified class name to the JavaScript interface</span>
+<span class="hljs-preprocessor"># class:</span>
+<span class="hljs-preprocessor">#-keepclassmembers class fqcn.of.javascript.interface.for.webview {</span>
+<span class="hljs-preprocessor">#   public *;</span>
+<span class="hljs-preprocessor">#}</span></code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li></ul></pre>
+
+<p><br>
+接下来我们来一起看一下proguard-android.txt里面有哪些东西，默认哪些东西不能被混淆，了解了这些，我们对如何编译自定义的proguard-rules就能有一个大致的理解了。</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs avrasm has-numbering"><span class="hljs-preprocessor"># This is a configuration file for ProGuard.</span>
+<span class="hljs-preprocessor"># http://proguard.sourceforge.net/index.html#manual/usage.html</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># This file is no longer maintained and is not used by new (2.2+) versions of the</span>
+<span class="hljs-preprocessor"># Android plugin for Gradle. Instead, the Android plugin for Gradle generates the</span>
+<span class="hljs-preprocessor"># default rules at build time and stores them in the build directory.</span>
+
+<span class="hljs-preprocessor"># 混淆时不使用大小写混合，混淆后的类名为小写</span>
+-dontusemixedcaseclassnames
+
+<span class="hljs-preprocessor"># 指定不去忽略非公共的库的类</span>
+-dontskipnonpubliclibraryclasses
+
+<span class="hljs-preprocessor"># 有了verbose这句话，混淆后就会生成映射文件</span>
+<span class="hljs-preprocessor"># 包含有类名-&gt;混淆后类名的映射关系</span>
+<span class="hljs-preprocessor"># 然后可以使用printmapping指定映射文件的名称</span>
+-verbose
+
+<span class="hljs-preprocessor"># Optimization is turned off by default. Dex does not like code run</span>
+<span class="hljs-preprocessor"># through the ProGuard optimize and preverify steps (and performs some</span>
+<span class="hljs-preprocessor"># of these optimizations on its own).</span>
+<span class="hljs-preprocessor"># 不启用优化,建议使用此选项</span>
+<span class="hljs-preprocessor"># proguard的优化选项和java虚拟机中的字节码dex优化有冲突，可能会产生一些未知的问题</span>
+-dontoptimize
+
+<span class="hljs-preprocessor"># 不做预校验，preverify是proguard的4个步骤之一</span>
+<span class="hljs-preprocessor"># Android不需要preverify，去掉这一步可加快混淆速度</span>
+-dontpreverify
+
+<span class="hljs-preprocessor"># Note that if you want to enable optimization, you cannot just</span>
+<span class="hljs-preprocessor"># include optimization flags in your own project configuration file;</span>
+<span class="hljs-preprocessor"># instead you will need to point to the</span>
+<span class="hljs-preprocessor"># "proguard-android-optimize.txt" file instead of this one from your</span>
+<span class="hljs-preprocessor"># project.properties file.</span>
+
+<span class="hljs-preprocessor"># 保留注解，因为注解是通过反射机制来实现的</span>
+-keepattributes *Annotation*
+
+<span class="hljs-preprocessor"># 保留google的授权服务</span>
+-keep public class <span class="hljs-keyword">com</span><span class="hljs-preprocessor">.google</span><span class="hljs-preprocessor">.vending</span><span class="hljs-preprocessor">.licensing</span><span class="hljs-preprocessor">.ILicensingService</span>
+-keep public class <span class="hljs-keyword">com</span><span class="hljs-preprocessor">.android</span><span class="hljs-preprocessor">.vending</span><span class="hljs-preprocessor">.licensing</span><span class="hljs-preprocessor">.ILicensingService</span>
+
+<span class="hljs-preprocessor"># 保留本地NDK方法</span>
+<span class="hljs-preprocessor"># For native methods, see http://proguard.sourceforge.net/manual/examples.html#native</span>
+-keepclasseswithmembernames class * {
+    native &lt;methods&gt;<span class="hljs-comment">;</span>
+}
+
+<span class="hljs-preprocessor"># 保留View中的set和get方法</span>
+<span class="hljs-preprocessor"># keep setters in Views so that animations can still work.</span>
+<span class="hljs-preprocessor"># see http://proguard.sourceforge.net/manual/examples.html#beans</span>
+-keepclassmembers public class * extends android<span class="hljs-preprocessor">.view</span><span class="hljs-preprocessor">.View</span> {
+   void <span class="hljs-keyword">set</span>*(***)<span class="hljs-comment">;</span>
+   *** get*()<span class="hljs-comment">;</span>
+}
+
+<span class="hljs-preprocessor"># 保留Activity当中的View相关方法</span>
+<span class="hljs-preprocessor"># We want to keep methods in Activity that could be used in the XML attribute onClick</span>
+-keepclassmembers class * extends android<span class="hljs-preprocessor">.app</span><span class="hljs-preprocessor">.Activity</span> {
+   public void *(android<span class="hljs-preprocessor">.view</span><span class="hljs-preprocessor">.View</span>)<span class="hljs-comment">;</span>
+}
+
+<span class="hljs-preprocessor"># 保留枚举类</span>
+<span class="hljs-preprocessor"># For enumeration classes, see http://proguard.sourceforge.net/manual/examples.html#enumerations</span>
+-keepclassmembers enum * {
+    public static **[] values()<span class="hljs-comment">;</span>
+    public static ** valueOf(java<span class="hljs-preprocessor">.lang</span><span class="hljs-preprocessor">.String</span>)<span class="hljs-comment">;</span>
+}
+
+<span class="hljs-preprocessor"># 保留序列号相关类即方法</span>
+-keepclassmembers class * implements android<span class="hljs-preprocessor">.os</span><span class="hljs-preprocessor">.Parcelable</span> {
+  public static final android<span class="hljs-preprocessor">.os</span><span class="hljs-preprocessor">.Parcelable</span>$Creator CREATOR<span class="hljs-comment">;</span>
+}
+
+<span class="hljs-preprocessor"># 保留资源应用名</span>
+-keepclassmembers class **<span class="hljs-preprocessor">.R</span>$* {
+    public static &lt;fields&gt;<span class="hljs-comment">;</span>
+}
+
+
+<span class="hljs-preprocessor"># The support library contains references to newer platform versions.</span>
+<span class="hljs-preprocessor"># Don't warn about those in case this app is linking against an older</span>
+<span class="hljs-preprocessor"># platform version.  We know about them, and they are safe.</span>
+<span class="hljs-preprocessor"># 忽略support包下的警告</span>
+-dontwarn android<span class="hljs-preprocessor">.support</span>.**
+
+<span class="hljs-preprocessor"># Understand the @Keep support annotation.</span>
+<span class="hljs-preprocessor"># 保留support包下的动画</span>
+-keep class android<span class="hljs-preprocessor">.support</span><span class="hljs-preprocessor">.annotation</span><span class="hljs-preprocessor">.Keep</span>
+
+-keep @android<span class="hljs-preprocessor">.support</span><span class="hljs-preprocessor">.annotation</span><span class="hljs-preprocessor">.Keep</span> class * {*<span class="hljs-comment">;}</span>
+
+-keepclasseswithmembers class * {
+    @android<span class="hljs-preprocessor">.support</span><span class="hljs-preprocessor">.annotation</span><span class="hljs-preprocessor">.Keep</span> &lt;methods&gt;<span class="hljs-comment">;</span>
+}
+
+-keepclasseswithmembers class * {
+    @android<span class="hljs-preprocessor">.support</span><span class="hljs-preprocessor">.annotation</span><span class="hljs-preprocessor">.Keep</span> &lt;fields&gt;<span class="hljs-comment">;</span>
+}
+
+-keepclasseswithmembers class * {
+    @android<span class="hljs-preprocessor">.support</span><span class="hljs-preprocessor">.annotation</span><span class="hljs-preprocessor">.Keep</span> &lt;init&gt;(...)<span class="hljs-comment">;</span>
+}
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li><li style="color: rgb(153, 153, 153);">28</li><li style="color: rgb(153, 153, 153);">29</li><li style="color: rgb(153, 153, 153);">30</li><li style="color: rgb(153, 153, 153);">31</li><li style="color: rgb(153, 153, 153);">32</li><li style="color: rgb(153, 153, 153);">33</li><li style="color: rgb(153, 153, 153);">34</li><li style="color: rgb(153, 153, 153);">35</li><li style="color: rgb(153, 153, 153);">36</li><li style="color: rgb(153, 153, 153);">37</li><li style="color: rgb(153, 153, 153);">38</li><li style="color: rgb(153, 153, 153);">39</li><li style="color: rgb(153, 153, 153);">40</li><li style="color: rgb(153, 153, 153);">41</li><li style="color: rgb(153, 153, 153);">42</li><li style="color: rgb(153, 153, 153);">43</li><li style="color: rgb(153, 153, 153);">44</li><li style="color: rgb(153, 153, 153);">45</li><li style="color: rgb(153, 153, 153);">46</li><li style="color: rgb(153, 153, 153);">47</li><li style="color: rgb(153, 153, 153);">48</li><li style="color: rgb(153, 153, 153);">49</li><li style="color: rgb(153, 153, 153);">50</li><li style="color: rgb(153, 153, 153);">51</li><li style="color: rgb(153, 153, 153);">52</li><li style="color: rgb(153, 153, 153);">53</li><li style="color: rgb(153, 153, 153);">54</li><li style="color: rgb(153, 153, 153);">55</li><li style="color: rgb(153, 153, 153);">56</li><li style="color: rgb(153, 153, 153);">57</li><li style="color: rgb(153, 153, 153);">58</li><li style="color: rgb(153, 153, 153);">59</li><li style="color: rgb(153, 153, 153);">60</li><li style="color: rgb(153, 153, 153);">61</li><li style="color: rgb(153, 153, 153);">62</li><li style="color: rgb(153, 153, 153);">63</li><li style="color: rgb(153, 153, 153);">64</li><li style="color: rgb(153, 153, 153);">65</li><li style="color: rgb(153, 153, 153);">66</li><li style="color: rgb(153, 153, 153);">67</li><li style="color: rgb(153, 153, 153);">68</li><li style="color: rgb(153, 153, 153);">69</li><li style="color: rgb(153, 153, 153);">70</li><li style="color: rgb(153, 153, 153);">71</li><li style="color: rgb(153, 153, 153);">72</li><li style="color: rgb(153, 153, 153);">73</li><li style="color: rgb(153, 153, 153);">74</li><li style="color: rgb(153, 153, 153);">75</li><li style="color: rgb(153, 153, 153);">76</li><li style="color: rgb(153, 153, 153);">77</li><li style="color: rgb(153, 153, 153);">78</li><li style="color: rgb(153, 153, 153);">79</li><li style="color: rgb(153, 153, 153);">80</li><li style="color: rgb(153, 153, 153);">81</li><li style="color: rgb(153, 153, 153);">82</li><li style="color: rgb(153, 153, 153);">83</li><li style="color: rgb(153, 153, 153);">84</li><li style="color: rgb(153, 153, 153);">85</li><li style="color: rgb(153, 153, 153);">86</li><li style="color: rgb(153, 153, 153);">87</li><li style="color: rgb(153, 153, 153);">88</li><li style="color: rgb(153, 153, 153);">89</li><li style="color: rgb(153, 153, 153);">90</li><li style="color: rgb(153, 153, 153);">91</li><li style="color: rgb(153, 153, 153);">92</li><li style="color: rgb(153, 153, 153);">93</li><li style="color: rgb(153, 153, 153);">94</li><li style="color: rgb(153, 153, 153);">95</li><li style="color: rgb(153, 153, 153);">96</li><li style="color: rgb(153, 153, 153);">97</li><li style="color: rgb(153, 153, 153);">98</li><li style="color: rgb(153, 153, 153);">99</li><li style="color: rgb(153, 153, 153);">100</li><li style="color: rgb(153, 153, 153);">101</li><li style="color: rgb(153, 153, 153);">102</li><li style="color: rgb(153, 153, 153);">103</li><li style="color: rgb(153, 153, 153);">104</li></ul></pre>
+
+<p>可以看到，这里主要保留的是一些不能被混淆的类、方法或者变量名，编写配置文件的核心思想就是<code>尽可能地去做混淆，除非有不得不混淆的理由</code>。<br>
+那哪些东西是不能做混淆的呢？<br>
+以下列举一些常用的不能被混淆的情况：</p>
+
+<ol>
+<li>本地方法：因为本地方法是根据方法名去调用的，若混淆后会导致找不到此方法名。</li>
+<li>反射相关的方法和类：反射原理就是通过方法名和类名去实例化相应的对象，调用相关的方法，当然也不能混淆。</li>
+<li>setXX和getXX方法：这里指的是通过配置文件直接生成相应的set和get方法的相关库，所以javabean类很多情况下不能做混淆。</li>
+<li>第三方jar包：这个需要具体情况具体分析，很多知名库都会提供默认的混淆配置，大多数情况可以不用做混淆，毕竟不属于项目的核心代码。 <br>
+<br>
+常用的混淆配置关键字和通配符见下表： <br>
+<img title="" alt="这里写图片描述" src="images/android03103.jpg"> <br>
+<img title="" alt="这里写图片描述" src="images/android03104.jpg"> <br>
+关于proguard的知识点就分析到这，想要了解更多的知识可参考<strong>本篇blog附录的资料及proguard官网。</strong></li>
+</ol>
+
+
+
+<h2 id="解决问题"><a name="t6"></a>解决问题</h2>
+
+<p>好了，现在回过头来看一下刚才编译错误，是不是觉得没那么难了呢？ <br>
+之前编译错误提示是okio包和gson包下的某个类找不到，这两个包都是第三方开源的jar包，可以直接不混淆，并且忽略这两个包下的警告。</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs haml has-numbering">-<span class="ruby">keep <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">com</span>.<span class="hljs-title">google</span>.<span class="hljs-title">gson</span>.** { *;</span> }
+</span>-<span class="ruby">dontwarn okio.**
+</span>-<span class="ruby">keep <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">okhttp3</span>.** { *;</span> }</span></code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li></ul></pre>
+
+<p>clean工程后重新打包编译，这次编译成功了（终于成功了，值得庆祝一下^_^）。 <br>
+<strong>注意：</strong>虽然编译成功了，但一定要将应用跑起来，把各个功能都验证一下，看是否会影响。 <br>
+<br>
+编译后查看<strong>output</strong>文件夹，我们可以看到除了生成混淆后的apk文件后，还生成了一个<strong>mapping</strong>文件夹，如下图： <br>
+<img title="" alt="这里写图片描述" src="images/android03105.jpg"> <br>
+那这些文件有什么作用呢？ <br>
+打开<code>mapping.txt</code>看一下，可以发现这是一个混淆前和混淆后的类和类的方法、变量的映射文件。当想通过日志去排查代码问题时，就需要借助这个<code>mapping.txt</code>文件了，因为混淆后，很多类名、方法名都已经面目全非了。</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs avrasm has-numbering">// 这是okhttphelper类的对应映射表
+<span class="hljs-keyword">com</span><span class="hljs-preprocessor">.torch</span><span class="hljs-preprocessor">.easydev</span><span class="hljs-preprocessor">.okhttpdemo</span><span class="hljs-preprocessor">.OkHttpHelper</span> -&gt; <span class="hljs-keyword">com</span><span class="hljs-preprocessor">.torch</span><span class="hljs-preprocessor">.easydev</span><span class="hljs-preprocessor">.okhttpdemo</span><span class="hljs-preprocessor">.a</span>:
+    okhttp3<span class="hljs-preprocessor">.MediaType</span> JSON -&gt; a
+    okhttp3<span class="hljs-preprocessor">.MediaType</span> MARKDOWN -&gt; b
+    <span class="hljs-keyword">com</span><span class="hljs-preprocessor">.google</span><span class="hljs-preprocessor">.gson</span><span class="hljs-preprocessor">.Gson</span> gson -&gt; c
+    java<span class="hljs-preprocessor">.util</span><span class="hljs-preprocessor">.concurrent</span><span class="hljs-preprocessor">.ScheduledExecutorService</span> executor -&gt; d
+    okhttp3<span class="hljs-preprocessor">.OkHttpClient</span> httpClient -&gt; e
+    okhttp3<span class="hljs-preprocessor">.OkHttpClient</span> httpsClient -&gt; f
+    okhttp3<span class="hljs-preprocessor">.OkHttpClient</span> getOkHttpClient(android<span class="hljs-preprocessor">.content</span><span class="hljs-preprocessor">.Context</span>,boolean) -&gt; a
+    okhttp3<span class="hljs-preprocessor">.OkHttpClient</span> getOkHttpClient(android<span class="hljs-preprocessor">.content</span><span class="hljs-preprocessor">.Context</span>,boolean,boolean) -&gt; a
+    okhttp3<span class="hljs-preprocessor">.OkHttpClient</span> getOkHttpClientByCertificate(java<span class="hljs-preprocessor">.io</span><span class="hljs-preprocessor">.InputStream</span>[]) -&gt; a
+    okhttp3<span class="hljs-preprocessor">.OkHttpClient</span> getUnSafedOkHttpClient() -&gt; a
+    java<span class="hljs-preprocessor">.lang</span><span class="hljs-preprocessor">.String</span> doGet(android<span class="hljs-preprocessor">.content</span><span class="hljs-preprocessor">.Context</span>,java<span class="hljs-preprocessor">.lang</span><span class="hljs-preprocessor">.String</span>) -&gt; a
+    java<span class="hljs-preprocessor">.lang</span><span class="hljs-preprocessor">.String</span> doGet(android<span class="hljs-preprocessor">.content</span><span class="hljs-preprocessor">.Context</span>,java<span class="hljs-preprocessor">.lang</span><span class="hljs-preprocessor">.String</span>,boolean) -&gt; a
+    java<span class="hljs-preprocessor">.lang</span><span class="hljs-preprocessor">.String</span> doPostString(android<span class="hljs-preprocessor">.content</span><span class="hljs-preprocessor">.Context</span>) -&gt; a
+    void downloadFile(android<span class="hljs-preprocessor">.content</span><span class="hljs-preprocessor">.Context</span>,java<span class="hljs-preprocessor">.lang</span><span class="hljs-preprocessor">.String</span>,java<span class="hljs-preprocessor">.lang</span><span class="hljs-preprocessor">.String</span>,<span class="hljs-keyword">com</span><span class="hljs-preprocessor">.torch</span><span class="hljs-preprocessor">.easydev</span><span class="hljs-preprocessor">.okhttpdemo</span><span class="hljs-preprocessor">.OkHttpHelper</span>$DownloadStatusListener) -&gt; a
+    void &lt;clinit&gt;() -&gt; &lt;clinit&gt;</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li></ul></pre>
+
+<p><code>seed.txt</code>描述项目保留的没有被混淆的类、方法及变量名。 <br>
+<code>usage.txt</code>描述项目使用到的类、方法及变量名 <br>
+<code>dump.txt</code> 描述apk内所有class文件的内部结构</p>
+
+
+
+<h3 id="使用jadx验证混淆"><a name="t7"></a>使用jadx验证混淆</h3>
+
+<p>假定本项目核心代码为OkHttpHelper类里的方法，我们来看一下混淆后的APK，反编译出来以后变成什么样子了。 <br>
+使用命令编译后，得到反编译的代码如图：</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs lasso has-numbering">jadx<span class="hljs-attribute">-gui</span> app<span class="hljs-attribute">-release</span><span class="hljs-built_in">.</span>apk</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+
+<p><img title="" alt="这里写图片描述" src="images/android03106.jpg"> <br>
+从图中可知，使用proguard混淆代码已经成功了。 <br>
+<br></p>
+
+
+
+<h1 id="参考资料"><a name="t8"></a>参考资料</h1>
+
+<ul>
+<li><a href="https://www.guardsquare.com/en/proguard" target="_blank" rel="nofollow">proguard官网</a></li>
+<li><a href="https://www.cnblogs.com/cr330326/p/5534915.html" target="_blank" rel="nofollow">ProGuard代码混淆技术详解</a></li>
+<li><a href="http://blog.csdn.net/dzsw0117/article/details/51455377" target="_blank" rel="nofollow">Android代码混淆配置（Proguard文件解析）</a></li>
+<li><a href="http://blog.csdn.net/dzsw0117/article/details/51429683" target="_blank" rel="nofollow">win/mac下反编译Android安装包－APK文件</a></li>
+</ul>                                    </div>
+                <link href="https://csdnimg.cn/release/phoenix/mdeditor/markdown_views-b6c3c6d139.css" rel="stylesheet">
+                    </div>
+
+
+</div>
+
+
+</body></html>

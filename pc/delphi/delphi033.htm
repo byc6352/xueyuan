@@ -1,0 +1,77 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>windows 7 下让 Delphi 2010 开发的程序具备UAC管理员权限 - lizpen的专栏 - CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content">
+                                            <div class="article-copyright">
+                <span class="creativecommons">
+                    <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                    </a>
+                    <span>
+                        版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。                    </span>
+                    <div class="article-source-link2222">
+                        本文链接：<a href="https://blog.csdn.net/stosc/article/details/7015121">https://blog.csdn.net/stosc/article/details/7015121</a>
+                    </div>
+                </span>
+                    
+                </div>
+                                                    <!--一个博主专栏付费入口-->
+             
+             <!--一个博主专栏付费入口结束-->
+            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-4a3473df85.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-4a3473df85.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            
+<span style="color: rgb(48, 48, 48); line-height: 18px; font-family: Verdana, Helvetica, Arial;"></span>
+<p style="text-indent: 0px; margin-left: auto;">
+windows从Vista起引入了UAC控制，对应用程序的一些行为做出了限制，例如修改注册表的操作，如果程序没有申请到管理员权限就无法执行该操作。如何让delphi开发的程序可以支持在启动时就申请管理员权限呢，添加一个具备权限描述的资源文件就可以了。</p>
+<p style="text-indent: 0px; margin-left: auto;">
+&nbsp;　　需要特别说明的是如果使用Delphi2010开发，IDE会自动为项目添加一个资源文件，在这个资源文件中就有UAC控制节，资源文件的名称与项目名称相同，文件的内容如下：</p>
+<p style="text-indent: 0px; margin-left: auto;">
+<span style='color: rgb(48, 48, 48); line-height: 18px; font-family: "Courier New";'><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&lt;?</span><span style='color: rgb(255, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>xml&nbsp;version="1.0"&nbsp;encoding="UTF-8"&nbsp;standalone="yes"</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>?&gt;</span><span style='color: rgb(0, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br></span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&lt;</span><span style='color: rgb(128, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>assembly&nbsp;</span><span style='color: rgb(255, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>xmlns</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>="urn:schemas-microsoft-com:asm.v1"</span><span style='color: rgb(255, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&nbsp;manifestVersion</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>="1.0"</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&gt;</span><span style='color: rgb(0, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br>
+&nbsp;&nbsp;</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&lt;</span><span style='color: rgb(128, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>assemblyIdentity<br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='color: rgb(255, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>type</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>="win32"</span><span style='color: rgb(255, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br>
+&nbsp;&nbsp;&nbsp;&nbsp;name</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>="CodeGear&nbsp;RAD&nbsp;Studio"</span><span style='color: rgb(255, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br>
+&nbsp;&nbsp;&nbsp;&nbsp;version</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>="14.0.3615.26342"</span><span style='color: rgb(255, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;processorArchitecture</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>="*"</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>/&gt;</span><span style='color: rgb(0, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br>
+&nbsp;&nbsp;</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&lt;</span><span style='color: rgb(128, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>dependency</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&gt;</span><span style='color: rgb(0, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&lt;</span><span style='color: rgb(128, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>dependentAssembly</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&gt;</span><span style='color: rgb(0, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&lt;</span><span style='color: rgb(128, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>assemblyIdentity<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='color: rgb(255, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>type</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>="win32"</span><span style='color: rgb(255, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>="Microsoft.Windows.Common-Controls"</span><span style='color: rgb(255, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;version</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>="6.0.0.0"</span><span style='color: rgb(255, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;publicKeyToken</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>="6595b64144ccf1df"</span><span style='color: rgb(255, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;language</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>="*"</span><span style='color: rgb(255, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;processorArchitecture</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>="*"</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>/&gt;</span><span style='color: rgb(0, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&lt;/</span><span style='color: rgb(128, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>dependentAssembly</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&gt;</span><span style='color: rgb(0, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br>
+&nbsp;&nbsp;</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&lt;/</span><span style='color: rgb(128, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>dependency</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&gt;</span><span style='color: rgb(0, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br>
+&nbsp;&nbsp;</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&lt;</span><span style='color: rgb(128, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>trustInfo&nbsp;</span><span style='color: rgb(255, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>xmlns</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>="urn:schemas-microsoft-com:asm.v3"</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&gt;</span><span style='color: rgb(0, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&lt;</span><span style='color: rgb(128, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>security</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&gt;</span><span style='color: rgb(0, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&lt;</span><span style='color: rgb(128, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>requestedPrivileges</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&gt;</span><span style='color: rgb(0, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&lt;</span><span style='color: rgb(128, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>requestedExecutionLevel<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='color: rgb(255, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>level</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>="asInvoker"</span><span style='color: rgb(255, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;uiAccess</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>="false"</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>/&gt;</span><span style='color: rgb(0, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&lt;/</span><span style='color: rgb(128, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>requestedPrivileges</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&gt;</span><span style='color: rgb(0, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br>
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&lt;/</span><span style='color: rgb(128, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>security</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&gt;</span><span style='color: rgb(0, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br>
+&nbsp;&nbsp;</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&lt;/</span><span style='color: rgb(128, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>trustInfo</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&gt;</span><span style='color: rgb(0, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><br></span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&lt;/</span><span style='color: rgb(128, 0, 0); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>assembly</span><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'>&gt;</span></span><br></p>
+<p style="text-indent: 0px; margin-left: auto;">
+<span style='color: rgb(48, 48, 48); line-height: 18px; font-family: "Courier New";'><span style='color: rgb(0, 0, 255); line-height: 1.5; font-family: "Courier New"; font-size: 12px;'><span style="color: rgb(48, 48, 48); line-height: 18px; font-family: Verdana, Helvetica, Arial;"></span></span></span></p>
+<p style="text-indent: 0px; margin-left: auto;">
+可以看到默认的权限级别是 level="asInvoker" 因为这个文件的存在，会导致按照上述博文编译好的MANIFEST资源失效，最简单的解决办法，把IED自动生成的与项目同名的资源文件删除即可。</p>
+<p style="text-indent: 0px; margin-left: auto;">
+　　在这里提供一个已经制作好的包含MANIFEST的资源文件下载。</p>
+<p style="text-indent: 0px; margin-left: auto;">
+下载地址：<a href="http://download.csdn.net/detail/stosc/3846224" rel="nofollow">delphi UAC 实例</a></p>
+<br>                                    </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>
