@@ -1,0 +1,506 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NDK-JNI实战教程（二） JNI官方中文资料 - 工匠若水</title>
+  <link href="images/style.css" rel="stylesheet">
+<link href="https://adservice.google.com/adsid/integrator.js?domain=" rel="preload"><script src="https://adservice.google.com/adsid/integrator.js?domain=" type="text/javascript"></script><script src="https://securepubads.g.doubleclick.net/gpt/pubads_impl_2019121002.js" async=""></script></head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div id="mainContent">
+	<div class="forFlow">
+		<div id="post_detail">
+    <!--done-->
+    <div id="topics">
+        <div class="post">
+            <h1 class="postTitle">
+                
+<a class="postTitle2" id="cb_post_title_url" href="https://www.cnblogs.com/DeeLMind/p/6939744.html">APK伪加密</a>
+
+            </h1>
+            <div class="clear"></div>
+            <div class="postBody">
+                
+<div class="blogpost-body " id="cnblogs_post_body">
+    <h1 style="text-align: left;"><span class="main">一、伪加密技术原理</span></h1>
+<p>我们知道android apk本质上是zip格式的压缩包，我们将android应用程序的后缀.apk改为.zip就可以用解压软件轻松的将android应用程序解压缩。在日常生活或者工作中，我们通常为了保护我们自己的文件在进行压缩式都会进行加密处理。这样的方法对于android apk同样适用。原理很简单，在zip的文件格式中有一个位用来标示该zip压缩文件中的文件是否被加密，我们只要找到该标志位将其置1就可以实现我们的目的。而android的包安装服务（PackageManagerService）在进行apk安装时并不关心这个加密位（暂时我们就这么叫它吧）可以进行正常的安装并且也不会影响apk的运行。</p>
+<h1><span class="main">二、zip文件格式</span></h1>
+<p>zip的文件格式通常有三个部分组成：压缩文件源数据、压缩目录源数据、目录结束标识。这三个部分中和我们说的加密位有关的是压缩目录源数据部分，我们接下来详细介绍这一部分。</p>
+<p>压缩目录源数据部分记录着所有的压缩目录源数据。其结构如下：</p>
+<table style="width: 510px; height: 1470px;" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td width="439" valign="top" colspan="3">
+<p>Central directory file essay-header</p>
+</td>
+<td width="253" valign="top">&nbsp;</td>
+</tr>
+<tr>
+<td width="79" valign="top">
+<p><strong>Offset</strong></p>
+</td>
+<td width="68" valign="top">
+<p><strong>Bytes</strong></p>
+</td>
+<td width="292" valign="top">
+<p><strong>Description</strong>[18]</p>
+</td>
+<td width="253" valign="top">
+<p><strong>译</strong></p>
+</td>
+</tr>
+<tr>
+<td width="79" valign="top">
+<p>0</p>
+</td>
+<td width="68" valign="top">
+<p>4</p>
+</td>
+<td width="292" valign="top">
+<p>Central directory file essay-header signature =0x02014b50</p>
+</td>
+<td width="253" valign="top">
+<p>核心目录文件essay-header标识=（0x02014b50）</p>
+</td>
+</tr>
+<tr>
+<td width="79" valign="top">
+<p>4</p>
+</td>
+<td width="68" valign="top">
+<p>2</p>
+</td>
+<td width="292" valign="top">
+<p>Version made by</p>
+</td>
+<td width="253" valign="top">
+<p>压缩所用的pkware版本</p>
+</td>
+</tr>
+<tr>
+<td width="79" valign="top">
+<p>6</p>
+</td>
+<td width="68" valign="top">
+<p>2</p>
+</td>
+<td width="292" valign="top">
+<p>Version needed to extract (minimum)</p>
+</td>
+<td width="253" valign="top">
+<p>解压所需pkware的最低版本</p>
+</td>
+</tr>
+<tr>
+<td width="79" valign="top">
+<p>8</p>
+</td>
+<td width="68" valign="top">
+<p>2</p>
+</td>
+<td width="292" valign="top">
+<p>General purpose bit flag</p>
+</td>
+<td width="253" valign="top">
+<p>通用位标记</p>
+</td>
+</tr>
+<tr>
+<td width="79" valign="top">
+<p>10</p>
+</td>
+<td width="68" valign="top">
+<p>2</p>
+</td>
+<td width="292" valign="top">
+<p>Compression method</p>
+</td>
+<td width="253" valign="top">
+<p>压缩方法</p>
+</td>
+</tr>
+<tr>
+<td width="79" valign="top">
+<p>12</p>
+</td>
+<td width="68" valign="top">
+<p>2</p>
+</td>
+<td width="292" valign="top">
+<p>File last modification time</p>
+</td>
+<td width="253" valign="top">
+<p>文件最后修改时间</p>
+</td>
+</tr>
+<tr>
+<td width="79" valign="top">
+<p>14</p>
+</td>
+<td width="68" valign="top">
+<p>2</p>
+</td>
+<td width="292" valign="top">
+<p>File last modification date</p>
+</td>
+<td width="253" valign="top">
+<p>文件最后修改日期</p>
+</td>
+</tr>
+<tr>
+<td width="79" valign="top">
+<p>16</p>
+</td>
+<td width="68" valign="top">
+<p>4</p>
+</td>
+<td width="292" valign="top">
+<p>CRC-32</p>
+</td>
+<td width="253" valign="top">
+<p>CRC-32算法</p>
+</td>
+</tr>
+<tr>
+<td width="79" valign="top">
+<p>20</p>
+</td>
+<td width="68" valign="top">
+<p>4</p>
+</td>
+<td width="292" valign="top">
+<p>Compressed size</p>
+</td>
+<td width="253" valign="top">
+<p>压缩后大小</p>
+</td>
+</tr>
+<tr>
+<td width="79" valign="top">
+<p>24</p>
+</td>
+<td width="68" valign="top">
+<p>4</p>
+</td>
+<td width="292" valign="top">
+<p>Uncompressed size</p>
+</td>
+<td width="253" valign="top">
+<p>未压缩的大小</p>
+</td>
+</tr>
+<tr>
+<td width="79" valign="top">
+<p>28</p>
+</td>
+<td width="68" valign="top">
+<p>2</p>
+</td>
+<td width="292" valign="top">
+<p>File name length (<em>n</em>)</p>
+</td>
+<td width="253" valign="top">
+<p>文件名长度</p>
+</td>
+</tr>
+<tr>
+<td width="79" valign="top">
+<p>30</p>
+</td>
+<td width="68" valign="top">
+<p>2</p>
+</td>
+<td width="292" valign="top">
+<p>Extra field length (<em>m</em>)</p>
+</td>
+<td width="253" valign="top">
+<p>扩展域长度</p>
+</td>
+</tr>
+<tr>
+<td width="79" valign="top">
+<p>32</p>
+</td>
+<td width="68" valign="top">
+<p>2</p>
+</td>
+<td width="292" valign="top">
+<p>File comment length (<em>k</em>)</p>
+</td>
+<td width="253" valign="top">
+<p>文件注释长度</p>
+</td>
+</tr>
+<tr>
+<td width="79" valign="top">
+<p>34</p>
+</td>
+<td width="68" valign="top">
+<p>2</p>
+</td>
+<td width="292" valign="top">
+<p>Disk number where file starts</p>
+</td>
+<td width="253" valign="top">
+<p>文件开始位置的磁盘编号</p>
+</td>
+</tr>
+<tr>
+<td width="79" valign="top">
+<p>36</p>
+</td>
+<td width="68" valign="top">
+<p>2</p>
+</td>
+<td width="292" valign="top">
+<p>Internal file attributes</p>
+</td>
+<td width="253" valign="top">
+<p>内部文件属性</p>
+</td>
+</tr>
+<tr>
+<td width="79" valign="top">
+<p>38</p>
+</td>
+<td width="68" valign="top">
+<p>4</p>
+</td>
+<td width="292" valign="top">
+<p>External file attributes</p>
+</td>
+<td width="253" valign="top">
+<p>外部文件属性</p>
+</td>
+</tr>
+<tr>
+<td width="79" valign="top">
+<p>42</p>
+</td>
+<td width="68" valign="top">
+<p>4</p>
+</td>
+<td width="292" valign="top">
+<p>Relative offset of local file essay-header. This is the number of bytes between the start of the first disk on which the file occurs, and the start of the local file essay-header. This allows software reading the central directory to locate the position of the file inside the ZIP file.</p>
+</td>
+<td width="253" valign="top">
+<p>本地文件essay-header的相对位移。</p>
+</td>
+</tr>
+<tr>
+<td width="79" valign="top">
+<p>46</p>
+</td>
+<td width="68" valign="top">
+<p><em>n</em></p>
+</td>
+<td width="292" valign="top">
+<p>File name</p>
+</td>
+<td width="253" valign="top">
+<p>目录文件名</p>
+</td>
+</tr>
+<tr>
+<td width="79" valign="top">
+<p>46+<em>n</em></p>
+</td>
+<td width="68" valign="top">
+<p><em>m</em></p>
+</td>
+<td width="292" valign="top">
+<p>Extra field</p>
+</td>
+<td width="253" valign="top">
+<p>扩展域</p>
+</td>
+</tr>
+<tr>
+<td width="79" valign="top">
+<p>46+<em>n</em>+<em>m</em></p>
+</td>
+<td width="68" valign="top">
+<p><em>k</em></p>
+</td>
+<td width="292" valign="top">
+<p>File comment</p>
+</td>
+<td width="253" valign="top">
+<p>文件注释内容</p>
+<p>&nbsp;</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>该结构中的General purpose bit flag部分的第0位如果置1，标识该压缩包被加密；置为0标识该压缩包没有被加密。</p>
+<h1>三举例:</h1>
+<ul>
+<li>&nbsp;先给一个APK文件加密。</li>
+</ul>
+<p><img style="margin-right: auto; margin-left: auto; display: block;" alt="" src="images/android03701.png"></p>
+<ul>
+<li>用16进制编辑器打开它，搜索50 4B 01 02 注意大小端格式。</li>
+</ul>
+<p style="text-align: center;"><img alt="" src="images/android03702.png"></p>
+<ul>
+<li style="text-align: left;">修改这个红框之后偏移为5的字段01--&gt;00。</li>
+<li style="text-align: left;">&nbsp;你会发现对应的AndroidManifest.xml就没有加密啦。</li>
+</ul>
+<p><img style="margin-right: auto; margin-left: auto; display: block;" alt="" src="images/android03703.png"></p>
+</div>
+<div id="MySignature" style="display: block;">DeeLMind'Blog| 再坚持10十年就不信还不成大神！！！懂进攻-知防守--先正向-后逆向</div>
+<div class="clear"></div>
+<div id="blog_post_info_block"><div id="BlogPostCategory">
+    分类: 
+            <a href="https://www.cnblogs.com/DeeLMind/category/1000431.html" target="_blank">Android</a>,             <a href="https://www.cnblogs.com/DeeLMind/category/997620.html" target="_blank">逆向工程</a>,             <a href="https://www.cnblogs.com/DeeLMind/category/997628.html" target="_blank">其他杂项</a></div>
+
+
+    <div id="blog_post_info">
+<div id="green_channel">
+        <a id="green_channel_digg" onclick="DiggIt(6939744,cb_blogId,1);green_channel_success(this,'谢谢推荐！');" href="javascript:void(0);">好文要顶</a>
+        <a id="green_channel_follow" onclick="follow('40121f83-da32-e711-9fc1-ac853d9f53cc');" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a title="分享至新浪微博" id="green_channel_weibo" onclick="ShareToTsina()" href="javascript:void(0);"><img alt="" src="images/android03704.png"></a>
+    <a title="分享至微信" id="green_channel_wechat" onclick="shareOnWechat()" href="javascript:void(0);"><img alt="" src="images/android03705.png"></a>
+</div>
+<div id="author_profile">
+    <div class="author_profile_info" id="author_profile_info">
+            <a href="https://home.cnblogs.com/u/DeeLMind/" target="_blank"><img class="author_avatar" alt="" src="images/android03706.png"></a>
+        <div class="author_profile_info" id="author_profile_detail">
+            <a href="https://home.cnblogs.com/u/DeeLMind/">DeeLMind</a><br>
+            <a href="https://home.cnblogs.com/u/DeeLMind/followees/">关注 - 3</a><br>
+            <a href="https://home.cnblogs.com/u/DeeLMind/followers/">粉丝 - 18</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow">
+                <a onclick="follow('40121f83-da32-e711-9fc1-ac853d9f53cc');return false;" href="javascript:void(0);">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(6939744,'Digg')">
+        <span class="diggnum" id="digg_count">1</span>
+    </div>
+    <div class="buryit" onclick="votePost(6939744,'Bury')">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+    <div class="clear"></div>
+    <div id="post_next_prev">
+
+    <a class="p_n_p_prefix" href="https://www.cnblogs.com/DeeLMind/p/6934999.html">« </a> 上一篇：    <a title="发布于 2017-06-02 21:00" href="https://www.cnblogs.com/DeeLMind/p/6934999.html">格蠹汇编-01-blog</a>
+    <br>
+    <a class="p_n_p_prefix" href="https://www.cnblogs.com/DeeLMind/p/6941590.html">» </a> 下一篇：    <a title="发布于 2017-06-04 19:30" href="https://www.cnblogs.com/DeeLMind/p/6941590.html">隐藏控制台黑窗口</a>
+
+</div>
+</div>
+            </div>
+            <div class="postDesc">posted @ 
+<span id="post-date">2017-06-04 10:39</span>&nbsp;
+<a href="https://www.cnblogs.com/DeeLMind/">DeeLMind</a>&nbsp;
+阅读(<span id="post_view_count">397</span>)&nbsp;
+评论(<span id="post_comment_count">0</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=6939744" rel="nofollow">
+    编辑
+</a>
+<a onclick="AddToWz(6939744);return false;" href="javascript:void(0)">收藏</a></div>
+        </div>
+	    
+	    
+    </div><!--end: topics 文章、评论容器-->
+</div>
+<script src="https://common.cnblogs.com/highlight/9.12.0/highlight.min.js"></script>
+<script>markdown_highlight();</script>
+<script>
+    var allowComments = true, cb_blogId = 353836, cb_blogApp = 'DeeLMind', cb_blogUserGuid = '40121f83-da32-e711-9fc1-ac853d9f53cc';
+    var cb_entryId = 6939744, cb_entryCreatedDate = '2017-06-04 10:39', cb_postType = 1; 
+    loadViewCount(cb_entryId);
+</script><a name="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<script>
+    var commentManager = new blogCommentManager();
+    commentManager.renderComments(0);
+</script>
+
+<div class="commentform" id="comment_form">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav"><span id="span_refresh_tips"></span><a id="lnk_RefreshComments" onclick="return RefreshCommentList();" href="javascript:void(0);" clientidmode="Static" runat="server">刷新评论</a><a onclick="return RefreshPage();" href="#">刷新页面</a><a href="#top">返回顶部</a></div>
+    <div id="comment_form_container"><div class="login_tips">
+    注册用户登录后才能发表评论，请 
+    <a class="underline" onclick="return login('commentform');" href="javascript:void(0);" rel="nofollow">登录</a>
+     或 
+    <a class="underline" onclick="return register();" href="javascript:void(0);" rel="nofollow">注册</a>，
+    <a href="https://www.cnblogs.com/">访问</a> 网站首页。
+</div></div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+    <div id="ad_t2"><a onclick="ga('send', 'event', 'Link', 'click', 'T2-工控')" href="http://www.ucancode.com/index.htm" target="_blank">【推荐】超50万行VC++源码: 大型组态工控、电力仿真CAD与GIS源码库</a><br><a onclick="ga('send', 'event', 'Link', 'click', 'T2-腾讯云')" href="https://cloud.tencent.com/act/seckill?fromSource=gwzcw.3168381.3168381.3168381&amp;utm_medium=cpc&amp;utm_id=gwzcw.3168381.3168381.3168381" target="_blank">【推荐】腾讯云热门云产品限时秒杀，爆款1核2G云服务器99元/年！</a><br><a onclick="ga('send', 'event', 'Link', 'click', 'T2-阿里云')" href="http://click.aliyun.com/m/1000081987/" target="_blank">【推荐】阿里云双11返场来袭，热门产品低至一折等你来抢！</a><br><a onclick="ga('send', 'event', 'Link', 'click', 'T2-智者补')" href="https://bbs.huaweicloud.com/forum/thread-24443-1-1.html" target="_blank">【推荐】物理看板和电子看板该如何选择？</a><br><a onclick="ga('send', 'event', 'Link', 'click', 'T2-京东云')" href="https://www.jdcloud.com/cn/activity/year-end?utm_source=DMT_cnblogs&amp;utm_medium=CH&amp;utm_campaign=q4vm&amp;utm_term=Virtual-Machines" target="_blank">【活动】京东云服务器_云主机低于1折，低价高性能产品备战双11</a><br><a onclick="ga('send', 'event', 'Link', 'click', 'T2-七牛云')" href="http://hdxu.cn/JH9N4" target="_blank">【活动】ECUG For Future 技术者的年度盛会（杭州，1月4-5日）</a><br></div>
+    <div id="opt_under_post"></div>
+    <script src="https://www.googletagservices.com/tag/js/gpt.js" async="async"></script>
+    <script>
+        var googletag = googletag || {};
+        googletag.cmd = googletag.cmd || [];
+    </script>
+    <script>
+        googletag.cmd.push(function () {
+            googletag.defineSlot("/1090369/C1", [300, 250], "div-gpt-ad-1546353474406-0").addService(googletag.pubads());
+            googletag.defineSlot("/1090369/C2", [468, 60], "div-gpt-ad-1539008685004-0").addService(googletag.pubads());
+            googletag.pubads().enableSingleRequest();
+            googletag.enableServices();
+        });
+    </script>
+    <div class="c_ad_block" id="cnblogs_c1">
+        <div id="div-gpt-ad-1546353474406-0" style="width: 300px; height: 250px;" data-google-query-id="CPXHie3CueYCFcKHwgodTwwLvA"><div id="google_ads_iframe_/1090369/C1_0__container__" style="border: 0pt currentColor; border-image: none;"><iframe name="google_ads_iframe_/1090369/C1_0" width="300" height="250" title="3rd party ad content" id="google_ads_iframe_/1090369/C1_0" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border: 0px currentColor; border-image: none; vertical-align: bottom;" data-load-complete="true" data-google-container-id="1" srcdoc=""></iframe></div></div>
+    </div>
+    <div id="under_post_news"><div class="recomm-block"><b>相关博文：</b><br>·  <a title="android apk 自我保护技术-加密apk" onclick="clickRecomItmem(4418505)" href="https://www.cnblogs.com/lonelyonline/p/4418505.html" target="_blank">android apk 自我保护技术-加密apk</a><br>·  <a title="zip伪加密" onclick="clickRecomItmem(7713657)" href="https://www.cnblogs.com/xishaonian/p/7713657.html" target="_blank">zip伪加密</a><br>·  <a title="转发：ZIP文件格式详解(一)——文件数据格式" onclick="clickRecomItmem(3937261)" href="https://www.cnblogs.com/cmjason/p/3937261.html" target="_blank">转发：ZIP文件格式详解(一)——文件数据格式</a><br>·  <a title="Android Apk的反编译和加密" onclick="clickRecomItmem(7087373)" href="https://www.cnblogs.com/zhangyingai/p/7087373.html" target="_blank">Android Apk的反编译和加密</a><br>·  <a title="Linux下zip加密压缩" onclick="clickRecomItmem(2580467)" href="https://www.cnblogs.com/zfying/archive/2012/07/07/2580467.html" target="_blank">Linux下zip加密压缩</a><br>»  <a href="https://recomm.cnblogs.com/blogpost/6939744" target="_blank">更多推荐...</a><div id="cnblogs_t5"><a onclick="ga('send', 'event', 'Link', 'click', 'T5-阿里云开发者社区')" href="https://developer.aliyun.com/article/718700?utm_content=g_1000088931" target="_blank">免费下载《阿里工程师的自我修养》</a></div></div></div>
+    <div class="c_ad_block" id="cnblogs_c2">
+        <div id="div-gpt-ad-1539008685004-0" style="width: 468px; height: 60px;" data-google-query-id="CJzliu3CueYCFcKHwgodTwwLvA">
+            
+        <div id="google_ads_iframe_/1090369/C2_0__container__" style="border: 0pt currentColor; border-image: none;"><iframe name="google_ads_iframe_/1090369/C2_0" width="468" height="60" title="3rd party ad content" id="google_ads_iframe_/1090369/C2_0" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border: 0px currentColor; border-image: none; vertical-align: bottom;" data-load-complete="true" data-google-container-id="2" srcdoc=""></iframe></div></div>
+    </div>
+    <div id="under_post_kb">
+<div class="itnews c_ad_block">
+    <b>最新 IT 新闻</b>:
+    <br>
+ ·              <a href="//news.cnblogs.com/n/652003/" target="_blank">杨元庆：联想在2019年取得强劲业绩</a>
+            <br>
+ ·              <a href="//news.cnblogs.com/n/652002/" target="_blank">李子柒一年能赚多少钱，数据量化给你看</a>
+            <br>
+ ·              <a href="//news.cnblogs.com/n/652001/" target="_blank">斯坦福大学发布 2019 人工智能指数报告</a>
+            <br>
+ ·              <a href="//news.cnblogs.com/n/652000/" target="_blank">《时代》评选10年来影响重大的十大科技产品，苹果独占三席</a>
+            <br>
+ ·              <a href="//news.cnblogs.com/n/651999/" target="_blank">云计算标准化成绩亮眼：我国主导云服务计量计费国际标准即将发布</a>
+            <br>
+    » <a title="IT 新闻" href="https://news.cnblogs.com/" target="_blank">更多新闻...</a>
+</div></div>
+    <div class="c_ad_block" id="HistoryToday"></div>
+    <script type="text/javascript">
+        fixPostBody();
+        setTimeout(function () { incrementViewCount(cb_entryId); }, 50);
+        deliverAdT2();
+        deliverAdC1();
+        deliverAdC2();
+        loadNewsAndKb();
+        loadBlogSignature();
+LoadPostCategoriesTags(cb_blogId, cb_entryId);        LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+        GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+        loadOptUnderPost();
+        GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+    </script>
+</div>
+	</div><!--end: forFlow -->
+	</div>
+
+</div>
+
+
+</body></html>

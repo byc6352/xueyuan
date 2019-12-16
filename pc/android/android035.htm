@@ -1,0 +1,200 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JNI的基本语法 - Android移动开发者的专栏</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<section class="ouvJEz"><h1 class="_1RuRku">Eclipse上NDK开发与so生成</h1><div class="rEsl9f"><div class="_2mYfmT"><a class="_1OhGeD" href="/u/f25e66082966" target="_blank" rel="noopener noreferrer"><img class="_13D2Eh" alt="" src="images/android03501.jpg"></a><div style="margin-left: 8px;"><div class="_3U4Smb"><span class="FxYr8x"><a class="_1OhGeD" href="/u/f25e66082966" target="_blank" rel="noopener noreferrer">tjt852</a></span><button class="_3kba3h _1OyPqC _3Mi9q9 _34692-" type="button" data-locale="zh-CN"><span>关注</span></button></div><div class="s-dsoj"><time datetime="2016-12-03T10:39:36.000Z">2016.12.03 18:39:36</time><span>字数 3,097</span><span>阅读 3,020</span></div></div></div></div><article class="_2rhmJa"><h2>概述</h2>
+<blockquote>
+<p>相信网上有很多类似的文章，大家看到的也比较多，但对于Eclipse上创建so，我觉得网上并没有一个全面的介绍搭建过程来避免开发和编译中出现的一些问题，比如：一些C/C++库include失败（Unresolved inclusion: &lt;jni.h&gt;）、或者引入成功了确提示类型错误（Type 'size_t' could not be resolved）等等错误。<br>
+<strong>虽然在Android Studio 2.2后开始对ndk开发进行了有好的支持，而且使用了跨平台的cmake编译工具替换掉了之前的ndk-build方式进行so的生成，显而易见使用as成为必然，但是由于目前公司的so开发主要都是在eclipse上进行构建的，下一步打算迁移到as上了使用更高效的cmake，但是本人当初在eclipse上构建so的时候遇到了种种问题想把它记录下来，留作纪念，现在大家项目可能大部分ndk的编码还是用eclipse完成，也许也会帮助到一些朋友</strong></p>
+</blockquote>
+<h2>安装环境</h2>
+<ul>
+<li><p><strong>1、eclipse版本：</strong><br>
+Eclipse IDE for Java Developers（Luna 4.4.2）<br>
+本人使用的版本有点老，因为自从使用了as后就没有更新eclipse了，不过可以在eclipse官网下载到<br>
+<a href="https://link.jianshu.com?t=https://www.eclipse.org/downloads/packages/release/luna/sr2" target="_blank" rel="nofollow">下载地址</a> 第一个就是</p></li>
+<li><p><strong>2、ADT版本：</strong><br>
+使用的 23.0.6至于版本大家网上自行搜索，很好找到</p></li>
+<li><p><strong>3、NDK版本：</strong><br>
+android-ndk-r10e ，自行网上下载，目前最新版本为13.1，此处依然使用老的版本</p></li>
+</ul>
+<h2>搭建步骤</h2>
+<p><strong>1.  创建项目</strong></p>
+<ul>
+<li>
+<p>首先在Preferences里面把NDK的根路径设置好</p>
+<br>
+<div class="image-package">
+<div class="image-container" style="max-height: 553px; max-width: 700px; background-color: transparent;">
+<div class="image-container-fill" style="padding-bottom: 71.17%;"></div>
+<div class="image-view" data-height="553" data-width="777"><img src="images/android03502.jpg" data-image-index="0" data-original-filesize="35608" data-original-format="image/png" data-original-height="553" data-original-width="777" data-original-src="//upload-images.jianshu.io/upload_images/2582348-fb9c75e11b532ec3.png"></div>
+</div>
+<div class="image-caption"></div>
+</div>
+<br>
+<p>像创建普通Android项目一样创建一个叫NDKTest的项目</p>
+<br>
+<div class="image-package">
+<div class="image-container" style="max-height: 576px; max-width: 629px; background-color: transparent;">
+<div class="image-container-fill" style="padding-bottom: 91.57%;"></div>
+<div class="image-view" data-height="576" data-width="629"><img src="images/android03503.jpg" data-image-index="1" data-original-filesize="40779" data-original-format="image/png" data-original-height="576" data-original-width="629" data-original-src="//upload-images.jianshu.io/upload_images/2582348-916284faeedebe12.png"></div>
+</div>
+<div class="image-caption"></div>
+</div>
+<br>
+创建好后在项目上右键&gt;Android Tools&gt;Add Android Native Support 然后随便填写一个名词代表我们要生成的so名，此处我们随便写一个，后面会讲怎么修改。然后Finish，会在我们项目根目录生成一个jni的文件夹这个文件就是我们以后编写C/C++在目录。</li>
+</ul>
+<p><strong>2.  引入本地库文件</strong></p>
+<ul>
+<li>我们要与java交互需要用到jni头文件还有一些C的标准库比如:string.h、stdio.h、stdlib.h、time.h等等，还有android的、linux的、opengl的、系统相关的等等基本都包含在此目录下：<br>
+android-ndk-r10e\platforms\android-21\arch-arm\usr\include<br>
+我们来介绍一下ndk目录下的platforms，里面存放了android在Native层给我们提供的API引用库文件</li>
+</ul>
+<div class="image-package">
+<div class="image-container" style="max-height: 500px; max-width: 674px; background-color: transparent;">
+<div class="image-container-fill" style="padding-bottom: 74.18%;"></div>
+<div class="image-view" data-height="500" data-width="674"><img src="images/android03504.jpg" data-image-index="2" data-original-filesize="46575" data-original-format="image/png" data-original-height="500" data-original-width="674" data-original-src="//upload-images.jianshu.io/upload_images/2582348-f8be742a8101d198.png"></div>
+</div>
+<div class="image-caption"></div>
+</div>
+<ul>
+<li><p>此处有Android各系统版本所对应的引用库，我们这里选择了android-21，咱们再往里看里面是对应了各个CPU架构的库文件，所以这里我选择了arch-arm就行。一般如果我们不对特定的平台做单独特性开发的话不需要做其他选择，其实最终ndk-build编译的时候会根据Android.mk文件的配置来生成对应平台的so。</p></li>
+<li><p>我的项目中还用到了stddef.h、stdarg.h、stdbool.h等库，，但是这些头文件并没有在platforms目录下，这里我在在ndk的根目录通过模糊搜索搜出了这个目录：<br>
+android-ndk-r10e/toolchains/aarch64-linux-android-4.9/prebuilt/windows-x86_64/lib/gcc/aarch64-linux-android/4.9/include</p></li>
+</ul>
+<p>好了，这里确定我的项目中需要引入两个目录的库文件，在Eclipse中怎样引用呢？<br>
+首先在jni目录下创建一个名为ndktest.c的源文件，代码如下：</p>
+<div class="_2Uzcx_"><button class="VJbwyy" aria-label="复制代码" type="button"><i class="anticon anticon-copy" aria-label="icon: copy"><svg xmlns="http://www.w3.org/2000/svg" class="" aria-hidden="true" fill="currentColor" viewBox="64 64 896 896" focusable="false" width="1em" height="1em" data-icon="copy"><path d="M 832 64 H 296 c -4.4 0 -8 3.6 -8 8 v 56 c 0 4.4 3.6 8 8 8 h 496 v 688 c 0 4.4 3.6 8 8 8 h 56 c 4.4 0 8 -3.6 8 -8 V 96 c 0 -17.7 -14.3 -32 -32 -32 Z M 704 192 H 192 c -17.7 0 -32 14.3 -32 32 v 530.7 c 0 8.5 3.4 16.6 9.4 22.6 l 173.3 173.3 c 2.2 2.2 4.7 4 7.4 5.5 v 1.9 h 4.2 c 3.5 1.3 7.2 2 11 2 H 704 c 17.7 0 32 -14.3 32 -32 V 224 c 0 -17.7 -14.3 -32 -32 -32 Z M 350 856.2 L 263.9 770 H 350 v 86.2 Z M 664 888 H 414 V 746 c 0 -22.1 -17.9 -40 -40 -40 H 232 V 264 h 432 v 624 Z" /></svg></i></button><pre class="line-numbers  language-c"><code class="c  language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;jni.h&gt;</span></span>
+
+jstring <span class="token function">Java_com_example_ndktest_NativeApp_version</span><span class="token punctuation">(</span>JNIEnv <span class="token operator">*</span>env<span class="token punctuation">,</span> jobject thiz<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token operator">*</span>env<span class="token punctuation">)</span><span class="token operator">-&gt;</span><span class="token function">NewStringUTF</span><span class="token punctuation">(</span>env<span class="token punctuation">,</span> <span class="token string">"1.0.0"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="line-numbers-rows" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div>
+<p>此处我创建了一个jni方法，返回一个字符串，但是看图都是错误，我们需要关联我们需要使用的库文件才能正常使用。</p>
+<p>先不用着急我们再在Android.mk文件中进行如下修改</p>
+<div class="_2Uzcx_"><button class="VJbwyy" aria-label="复制代码" type="button"><i class="anticon anticon-copy" aria-label="icon: copy"><svg xmlns="http://www.w3.org/2000/svg" class="" aria-hidden="true" fill="currentColor" viewBox="64 64 896 896" focusable="false" width="1em" height="1em" data-icon="copy"><path d="M 832 64 H 296 c -4.4 0 -8 3.6 -8 8 v 56 c 0 4.4 3.6 8 8 8 h 496 v 688 c 0 4.4 3.6 8 8 8 h 56 c 4.4 0 8 -3.6 8 -8 V 96 c 0 -17.7 -14.3 -32 -32 -32 Z M 704 192 H 192 c -17.7 0 -32 14.3 -32 32 v 530.7 c 0 8.5 3.4 16.6 9.4 22.6 l 173.3 173.3 c 2.2 2.2 4.7 4 7.4 5.5 v 1.9 h 4.2 c 3.5 1.3 7.2 2 11 2 H 704 c 17.7 0 32 -14.3 32 -32 V 224 c 0 -17.7 -14.3 -32 -32 -32 Z M 350 856.2 L 263.9 770 H 350 v 86.2 Z M 664 888 H 414 V 746 c 0 -22.1 -17.9 -40 -40 -40 H 232 V 264 h 432 v 624 Z" /></svg></i></button><pre class="line-numbers  language-ruby"><code class="  language-ruby"><span class="token constant">LOCAL_PATH</span> <span class="token punctuation">:</span><span class="token operator">=</span> $<span class="token punctuation">(</span>call my<span class="token operator">-</span>dir<span class="token punctuation">)</span>
+
+include $<span class="token punctuation">(</span><span class="token constant">CLEAR_VARS</span><span class="token punctuation">)</span>
+
+<span class="token constant">LOCAL_MODULE</span>    <span class="token punctuation">:</span><span class="token operator">=</span> ndktest
+<span class="token constant">LOCAL_SRC_FILES</span> <span class="token punctuation">:</span><span class="token operator">=</span> ndktest<span class="token punctuation">.</span>c
+
+include $<span class="token punctuation">(</span><span class="token constant">BUILD_SHARED_LIBRARY</span><span class="token punctuation">)</span>
+
+<span class="line-numbers-rows" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div>
+<p>正常情况下我们项目右键Build Project就会为我们打好包并且会帮我们把引用库关联上，请看图：</p>
+<div class="image-package">
+<div class="image-container" style="max-height: 572px; max-width: 700px; background-color: transparent;">
+<div class="image-container-fill" style="padding-bottom: 57.19%;"></div>
+<div class="image-view" data-height="572" data-width="1000"><img src="images/android03505.jpg" data-image-index="3" data-original-filesize="53983" data-original-format="image/png" data-original-height="572" data-original-width="1000" data-original-src="//upload-images.jianshu.io/upload_images/2582348-03f29fce63243013.png"></div>
+</div>
+<div class="image-caption"></div>
+</div>
+<p>目前一切没有问题，该关联的只多不少，编译工具自动为我们Includes所需引用，并且还在libs目录下为我们打好了so包，也不知道是什么原因这次创建示例项目如此顺利，但是起初自己搭建环境时并没有那么顺利，遇到了些问题掉了些坑，如果有朋友在此步骤上遇到问题无法继续,请点击此处查看我的另一片文章: <strong><a href="https://www.jianshu.com/p/d58320e3888d" target="_blank">Eclipse NDK无法引用类库问题解决</a></strong></p>
+<p>接着我们创建一个java类，我们之前在jni目录下创建了一个ndktest.c文件里面声明了一个方法，方法名是这样的Java_com_example_ndktest_NativeApp_version ，大家一看此名字是不是很有规则，它是C程序与java代码相互调用的基本定义，以Java打头，后面以下划线分割，跟上包名类名，还有我们在这个类里定义的方法名，这样我们就来看看我们的java代码部分：</p>
+<div class="_2Uzcx_"><button class="VJbwyy" aria-label="复制代码" type="button"><i class="anticon anticon-copy" aria-label="icon: copy"><svg xmlns="http://www.w3.org/2000/svg" class="" aria-hidden="true" fill="currentColor" viewBox="64 64 896 896" focusable="false" width="1em" height="1em" data-icon="copy"><path d="M 832 64 H 296 c -4.4 0 -8 3.6 -8 8 v 56 c 0 4.4 3.6 8 8 8 h 496 v 688 c 0 4.4 3.6 8 8 8 h 56 c 4.4 0 8 -3.6 8 -8 V 96 c 0 -17.7 -14.3 -32 -32 -32 Z M 704 192 H 192 c -17.7 0 -32 14.3 -32 32 v 530.7 c 0 8.5 3.4 16.6 9.4 22.6 l 173.3 173.3 c 2.2 2.2 4.7 4 7.4 5.5 v 1.9 h 4.2 c 3.5 1.3 7.2 2 11 2 H 704 c 17.7 0 32 -14.3 32 -32 V 224 c 0 -17.7 -14.3 -32 -32 -32 Z M 350 856.2 L 263.9 770 H 350 v 86.2 Z M 664 888 H 414 V 746 c 0 -22.1 -17.9 -40 -40 -40 H 232 V 264 h 432 v 624 Z" /></svg></i></button><pre class="line-numbers  language-java"><code class="java  language-java"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>example<span class="token punctuation">.</span>ndktest</span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">NativeApp</span> <span class="token punctuation">{</span>
+    
+    <span class="token keyword">static</span><span class="token punctuation">{</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span><span class="token function">loadLibrary</span><span class="token punctuation">(</span><span class="token string">"ndktest"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">native</span> <span class="token class-name">String</span> <span class="token function">version</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="line-numbers-rows" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div>
+<p>最后在activity里面调用version方法显示在一个文本上，试试吧。</p>
+<h2>SO的生成</h2>
+<p>说到生成SO就离不开两个文件，Android.mk、Applicaiton.mk，想要了解这两个文件的语法这里推荐几篇文章<br>
+1、<a href="https://link.jianshu.com?t=http://blog.sina.com.cn/s/blog_602f8770010148ce.html" target="_blank" rel="nofollow">Android.mk的制作</a><br>
+2、<a href="https://link.jianshu.com?t=http://blog.sina.com.cn/s/blog_602f877001014kgj.html" target="_blank" rel="nofollow">Android.mk实例和NDK实用技巧</a><br>
+3、<a href="https://link.jianshu.com?t=http://blog.sina.com.cn/s/blog_602f877001014ptu.html" target="_blank" rel="nofollow">Application.mk简介</a><br>
+4、<a href="https://link.jianshu.com?t=http://blog.csdn.net/fu_zk/article/details/12836431" target="_blank" rel="nofollow"></a><a href="https://link.jianshu.com?t=http://blog.csdn.net/fu_zk/article/details/12836431" target="_blank" rel="nofollow">编写Android.mk中的LOCAL_SRC_FILES的终极技巧</a></p>
+<h4>Android.mk</h4>
+<p>这几篇文章写得很好，说的也比较全面，但在这里我也把我在实际工作中用到的关于这两个文件的内容简单介绍下，我们来看Android.mk里面的代码：</p>
+<div class="_2Uzcx_"><button class="VJbwyy" aria-label="复制代码" type="button"><i class="anticon anticon-copy" aria-label="icon: copy"><svg xmlns="http://www.w3.org/2000/svg" class="" aria-hidden="true" fill="currentColor" viewBox="64 64 896 896" focusable="false" width="1em" height="1em" data-icon="copy"><path d="M 832 64 H 296 c -4.4 0 -8 3.6 -8 8 v 56 c 0 4.4 3.6 8 8 8 h 496 v 688 c 0 4.4 3.6 8 8 8 h 56 c 4.4 0 8 -3.6 8 -8 V 96 c 0 -17.7 -14.3 -32 -32 -32 Z M 704 192 H 192 c -17.7 0 -32 14.3 -32 32 v 530.7 c 0 8.5 3.4 16.6 9.4 22.6 l 173.3 173.3 c 2.2 2.2 4.7 4 7.4 5.5 v 1.9 h 4.2 c 3.5 1.3 7.2 2 11 2 H 704 c 17.7 0 32 -14.3 32 -32 V 224 c 0 -17.7 -14.3 -32 -32 -32 Z M 350 856.2 L 263.9 770 H 350 v 86.2 Z M 664 888 H 414 V 746 c 0 -22.1 -17.9 -40 -40 -40 H 232 V 264 h 432 v 624 Z" /></svg></i></button><pre class="line-numbers  language-ruby"><code class="  language-ruby"><span class="token constant">LOCAL_PATH</span> <span class="token punctuation">:</span><span class="token operator">=</span> $<span class="token punctuation">(</span>call my<span class="token operator">-</span>dir<span class="token punctuation">)</span> <span class="token comment">#每个Android.mk文件必须以定义LOCAL_PATH为开始,my-dir返回包含Android.mk的目录路径</span>
+
+include $<span class="token punctuation">(</span><span class="token constant">CLEAR_VARS</span><span class="token punctuation">)</span> <span class="token comment">#此处是编译之前清除之前编译的信息，防止冲突，是编译一组模块的第一行</span>
+<span class="token constant">LOCAL_LDLIBS</span>    <span class="token punctuation">:</span><span class="token operator">=</span> <span class="token operator">-</span>llog <span class="token comment">#//打印logcat日志用的，此处打正式包的时候建议去掉，这样可以减少SO文件大小</span>
+<span class="token constant">LOCAL_MODULE</span>    <span class="token punctuation">:</span><span class="token operator">=</span> jni_mantou <span class="token comment">#生成的so文件名，编译器会自动添加前缀lib最后则生成libjni_mantou.so,如</span>
+<span class="token comment"># 果模块名被定为：lib_mantou.则生成lib_mantou.so. 不再加前缀。在java代码里加载so，只需要加载jni_mantou就行不加前缀和后缀</span>
+<span class="token constant">LOCAL_SRC_FILES</span> <span class="token punctuation">:</span><span class="token operator">=</span> device<span class="token punctuation">.</span>c codec<span class="token punctuation">.</span>c <span class="token comment">#此处是此SO库需要编译的源文件，此处为两个，如后面还要追加则用空格分离就行</span>
+include $<span class="token punctuation">(</span><span class="token constant">BUILD_SHARED_LIBRARY</span><span class="token punctuation">)</span>  <span class="token comment">#此处是编译一组模块的结尾</span>
+<span class="token comment">#BUILD_SHARED_LIBRARY：编译为动态库</span>
+<span class="token comment">#BUILD_STATIC_LIBRARY：编译为静态库。</span>
+<span class="token comment">#BUILD_EXECUTABLE：编译为二进制可执行程序</span>
+<span class="line-numbers-rows" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div>
+<p>在Android中只有动态库才能被打包到安装包中,静态库可以被引用用来生成动态库.对于静态链接库和动态链接库概念不清楚的朋友推荐一篇文章，可以去了解下：<a href="https://link.jianshu.com?t=http://blog.jobbole.com/86852/" target="_blank" rel="nofollow">C++静态库与动态库</a><br>
+简单归纳一下：</p>
+<h5>动态链接库：</h5>
+<ol>
+<li>动态库把对一些库函数的链接载入推迟到程序运行的时期。</li>
+<li>可以实现进程之间的资源共享。（因此动态库也称为共享库）</li>
+<li>将一些程序升级变得简单。</li>
+<li>甚至可以真正做到链接载入完全由程序员在程序代码中控制（显示调用）。</li>
+</ol>
+<h5>静态链接库：</h5>
+<ol>
+<li>静态库对函数库的链接是放在编译时期完成的。</li>
+<li>程序在运行时与函数库再无瓜葛，移植方便。</li>
+<li>浪费空间和资源，因为所有相关的目标文件与牵涉到的函数库被链接合成一个可执行文件。</li>
+</ol>
+<p>以上代码生成一个名为libjni_mantou.so的动态库文件，并且文件会自动放到libs目录和obj/local目录，我们只使用libs目录生成的文件即可。</p>
+<p>如果想要生成多个.so（动态库）文件、.s（静态库）文件或者二进制可执行程序，需要多组以include $(CLEAR_VARS)开始，并以include $(BUILD_SHARED_LIBRARY|BUILD_STATIC_LIBRARY|BUILD_EXECUTABLE)结束的语句。我们可以在Android.mk文件里面再编译一个二进制可执行程序只需在添加如下代码：</p>
+<div class="_2Uzcx_"><button class="VJbwyy" aria-label="复制代码" type="button"><i class="anticon anticon-copy" aria-label="icon: copy"><svg xmlns="http://www.w3.org/2000/svg" class="" aria-hidden="true" fill="currentColor" viewBox="64 64 896 896" focusable="false" width="1em" height="1em" data-icon="copy"><path d="M 832 64 H 296 c -4.4 0 -8 3.6 -8 8 v 56 c 0 4.4 3.6 8 8 8 h 496 v 688 c 0 4.4 3.6 8 8 8 h 56 c 4.4 0 8 -3.6 8 -8 V 96 c 0 -17.7 -14.3 -32 -32 -32 Z M 704 192 H 192 c -17.7 0 -32 14.3 -32 32 v 530.7 c 0 8.5 3.4 16.6 9.4 22.6 l 173.3 173.3 c 2.2 2.2 4.7 4 7.4 5.5 v 1.9 h 4.2 c 3.5 1.3 7.2 2 11 2 H 704 c 17.7 0 32 -14.3 32 -32 V 224 c 0 -17.7 -14.3 -32 -32 -32 Z M 350 856.2 L 263.9 770 H 350 v 86.2 Z M 664 888 H 414 V 746 c 0 -22.1 -17.9 -40 -40 -40 H 232 V 264 h 432 v 624 Z" /></svg></i></button><pre class="line-numbers  language-ruby"><code class="  language-ruby">include $<span class="token punctuation">(</span><span class="token constant">CLEAR_VARS</span><span class="token punctuation">)</span>
+<span class="token constant">LOCAL_MODULE</span>    <span class="token punctuation">:</span><span class="token operator">=</span> daemon <span class="token comment">#可执行文件名</span>
+<span class="token constant">LOCAL_SRC_FILES</span> <span class="token punctuation">:</span><span class="token operator">=</span> daemon<span class="token punctuation">.</span>c <span class="token comment">#需要编译的源文件，多个以空格隔开</span>
+<span class="token constant">LOCAL_LDLIBS</span> <span class="token operator">+</span><span class="token operator">=</span> <span class="token operator">-</span><span class="token constant">L</span>$<span class="token punctuation">(</span><span class="token constant">SYSROOT</span><span class="token punctuation">)</span><span class="token operator">/</span>usr<span class="token operator">/</span>lib <span class="token operator">-</span>llog <span class="token operator">-</span>lm <span class="token operator">-</span>lz <span class="token comment">#设置需要链接的库文件</span>
+<span class="token comment">#大写的-L表示附加库路径，$(SYSROOT)表示Linux系统根目录，在NDK里面则代表/platforms/android-21/arch-arm </span>
+<span class="token comment">#这个目录意思就是说定位到/platforms/android-21/arch-arm/usr/lib 目录下去找liblog.so(android输出日志库)</span>
+<span class="token comment">#、libm.so(数学库math)、libz.so(压缩库)</span>
+include $<span class="token punctuation">(</span><span class="token constant">BUILD_EXECUTABLE</span><span class="token punctuation">)</span>
+<span class="line-numbers-rows" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div>
+<p>以上代码生成一个名为daemon的文件，没有后缀名，依然会放到libs目和obj/local目录，我们只用libs下的文件即可，此文件在Android平台有一个好处，我们知道一般我们在C层用fork()函数生成一个进程它会复制父进程的进程信息和携带一个Dalvik或者ART虚拟机它可以直接与java代码通信，但是有些时候我们紧紧需要单独进程处理一些不需要直接java代码通信的任务，可以通过unistd.h库里面的execlp函数启动一个service或者activity间接来达到目的，或者通过icp通过其他进程来达到交互的作用，这时在Android端生成一个【二进制可执行文件】也就是我们刚才生成的daemon文件，它有的优点是暂用内存极少只有几百kb左右，普通调用fork函数普遍内存暂用在十多兆甚至在有些高端机器上达到二三十兆这样有些时候违背了我们创建一个进程的目的而显得大材小用，它的不携带虚拟机不赋值父进程信息所以很小巧，同样使用execlp函数启动一个二进制可执行程序，至于在Android上如何启动一个二进制可执行程序我有时间会另开一篇文章专门讲这一块。</p>
+<h4>Application.mk</h4>
+<div class="_2Uzcx_"><button class="VJbwyy" aria-label="复制代码" type="button"><i class="anticon anticon-copy" aria-label="icon: copy"><svg xmlns="http://www.w3.org/2000/svg" class="" aria-hidden="true" fill="currentColor" viewBox="64 64 896 896" focusable="false" width="1em" height="1em" data-icon="copy"><path d="M 832 64 H 296 c -4.4 0 -8 3.6 -8 8 v 56 c 0 4.4 3.6 8 8 8 h 496 v 688 c 0 4.4 3.6 8 8 8 h 56 c 4.4 0 8 -3.6 8 -8 V 96 c 0 -17.7 -14.3 -32 -32 -32 Z M 704 192 H 192 c -17.7 0 -32 14.3 -32 32 v 530.7 c 0 8.5 3.4 16.6 9.4 22.6 l 173.3 173.3 c 2.2 2.2 4.7 4 7.4 5.5 v 1.9 h 4.2 c 3.5 1.3 7.2 2 11 2 H 704 c 17.7 0 32 -14.3 32 -32 V 224 c 0 -17.7 -14.3 -32 -32 -32 Z M 350 856.2 L 263.9 770 H 350 v 86.2 Z M 664 888 H 414 V 746 c 0 -22.1 -17.9 -40 -40 -40 H 232 V 264 h 432 v 624 Z" /></svg></i></button><pre class="line-numbers  language-go"><code class="  language-go">APP_ABI <span class="token operator">:=</span> all
+APP_PLATFORM <span class="token operator">:=</span> android<span class="token operator">-</span><span class="token number">8</span>
+<span class="line-numbers-rows" aria-hidden="true"><span></span><span></span></span></code></pre></div>
+<p>此文件里有两个重要的属性：</p>
+<p>APP_ABI<br>
+代表我们所要编译的平台，比如arm64-v8a、armeabi、armeabi-v7a、mips、mips64、x86、x86_64，如果没有Application.mk这个文件依然能顺利编译，但是默认只会编译armeabi平台的so，此处all代表编译所有平台也就是刚才列出的7个或者直接申明需要编译的平台，<code>APP_ABI := armeabi armeabi-v7a</code> 多个用空格分开。</p>
+<p>APP_PLATFORM<br>
+表示使用的ndk库函数版本号。一般和SDK的版本相对应，各个版本在NDK目录下的platforms文件夹中，次属性配置不当可能导致ndk版本问题，比如你的值是APP_PLATFORM := android-21 或者你就没有创建Application.mk文件编译器默认以最高版本android-21来运行而你的manifest文件里面的minSdkVersion又是8而导致以下警告：<br>
+Android NDK: WARNING: APP_PLATFORM android-21 is larger than android:minSdkVersion 8 in ./AndroidManifest.xml<br>
+解决方法：这只是一个警告而已，不处理的话程序也照样运行，但是我们最好同manifest文件里的minSdkVersion版本一致把Application.mk里面的版本改为android-8。</p>
+<h4>C++的JNI方法申明</h4>
+<p>上面我们用c语言申明了一个version方法返回一个字符串，现在我们用c++来实现一遍，看看有哪些不同，我们新建一个ndktest.cpp源文件：</p>
+<div class="_2Uzcx_"><button class="VJbwyy" aria-label="复制代码" type="button"><i class="anticon anticon-copy" aria-label="icon: copy"><svg xmlns="http://www.w3.org/2000/svg" class="" aria-hidden="true" fill="currentColor" viewBox="64 64 896 896" focusable="false" width="1em" height="1em" data-icon="copy"><path d="M 832 64 H 296 c -4.4 0 -8 3.6 -8 8 v 56 c 0 4.4 3.6 8 8 8 h 496 v 688 c 0 4.4 3.6 8 8 8 h 56 c 4.4 0 8 -3.6 8 -8 V 96 c 0 -17.7 -14.3 -32 -32 -32 Z M 704 192 H 192 c -17.7 0 -32 14.3 -32 32 v 530.7 c 0 8.5 3.4 16.6 9.4 22.6 l 173.3 173.3 c 2.2 2.2 4.7 4 7.4 5.5 v 1.9 h 4.2 c 3.5 1.3 7.2 2 11 2 H 704 c 17.7 0 32 -14.3 32 -32 V 224 c 0 -17.7 -14.3 -32 -32 -32 Z M 350 856.2 L 263.9 770 H 350 v 86.2 Z M 664 888 H 414 V 746 c 0 -22.1 -17.9 -40 -40 -40 H 232 V 264 h 432 v 624 Z" /></svg></i></button><pre class="line-numbers  language-cpp"><code class="  language-cpp"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;jni.h&gt;</span></span>
+
+jstring <span class="token function">Java_com_example_ndktest_NativeApp_version</span><span class="token punctuation">(</span>JNIEnv <span class="token operator">*</span>env<span class="token punctuation">,</span> jobject thiz<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> env<span class="token operator">-&gt;</span><span class="token function">NewStringUTF</span><span class="token punctuation">(</span><span class="token string">"1.0.0"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="line-numbers-rows" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span></code></pre></div>
+<p>我们看之前我们创建的ndktest.c文件，在C中没有引用，传递的env是个两级指针，用<code>（*env）-&gt;</code>调用方法且方法中要传入env。而ndktest.cpp文件，C++中env为一级指针，用<code>env-&gt;</code>调用方法，无需传入env；<br>
+然后我们在Android.mk文件里把编译源文件修改一下 <code>LOCAL_SRC_FILES := ndktest.cpp</code>，然后我们在Activity里面调用NativeApp类的version方法，噢噢.... force close了，错误是：<br>
+<strong><code>java.lang.UnsatisfiedLinkError: No implementation found for java.lang.String com.example.ndktest.NativeApp.version() (tried Java_com_example_ndktest_NativeApp_version and Java_com_example_ndktest_NativeApp_version__)</code></strong><br>
+说是找不到我们在C++代码里实现的version方法，是什么原因呢？<br>
+C++语言在编译的时候为了解决函数的多态问题，会将函数名和参数联合起来生成一个中间的函数名称，而C语言则不会，因此会造成链接时找不到对应函数的情况，此时C函数就需要用extern "C"进行链接指定，这告诉编译器，请保持我的名称，不要给我生成用于链接的中间函数名；exter "C"{jni代码}。</p>
+<div class="_2Uzcx_"><button class="VJbwyy" aria-label="复制代码" type="button"><i class="anticon anticon-copy" aria-label="icon: copy"><svg xmlns="http://www.w3.org/2000/svg" class="" aria-hidden="true" fill="currentColor" viewBox="64 64 896 896" focusable="false" width="1em" height="1em" data-icon="copy"><path d="M 832 64 H 296 c -4.4 0 -8 3.6 -8 8 v 56 c 0 4.4 3.6 8 8 8 h 496 v 688 c 0 4.4 3.6 8 8 8 h 56 c 4.4 0 8 -3.6 8 -8 V 96 c 0 -17.7 -14.3 -32 -32 -32 Z M 704 192 H 192 c -17.7 0 -32 14.3 -32 32 v 530.7 c 0 8.5 3.4 16.6 9.4 22.6 l 173.3 173.3 c 2.2 2.2 4.7 4 7.4 5.5 v 1.9 h 4.2 c 3.5 1.3 7.2 2 11 2 H 704 c 17.7 0 32 -14.3 32 -32 V 224 c 0 -17.7 -14.3 -32 -32 -32 Z M 350 856.2 L 263.9 770 H 350 v 86.2 Z M 664 888 H 414 V 746 c 0 -22.1 -17.9 -40 -40 -40 H 232 V 264 h 432 v 624 Z" /></svg></i></button><pre class="line-numbers  language-cpp"><code class="  language-cpp"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;jni.h&gt;</span></span>
+
+<span class="token keyword">extern</span> <span class="token string">"C"</span><span class="token punctuation">{</span>
+    jstring <span class="token function">Java_com_example_ndktest_NativeApp_version</span><span class="token punctuation">(</span>JNIEnv <span class="token operator">*</span>env<span class="token punctuation">,</span> jobject thiz<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> env<span class="token operator">-&gt;</span><span class="token function">NewStringUTF</span><span class="token punctuation">(</span><span class="token string">"1.0.0"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="line-numbers-rows" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div>
+<p>好了，运行一切正常。下一篇文章会讲讲基本的jni语法、生命周期和内存回收方面的知识点，还有在eclipse上面进行native代码的断点调试和日志追踪问题查找，好了本篇文章到此结束！</p>
+</article><div></div><div class="_1kCBjS"><div class="_18vaTa"><div class="_3BUZPB"><div tabindex="-1" class="_2Bo4Th" role="button" aria-label="给文章点赞"><i class="anticon" aria-label="ic-like"><svg xmlns="http://www.w3.org/2000/svg" class="" aria-hidden="true" fill="currentColor" focusable="false" width="1em" height="1em"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ic-like" /></svg></i></div><span tabindex="-1" class="_1LOh_5" role="button" aria-label="查看点赞列表">5人点赞<i class="anticon anticon-right" aria-label="icon: right"><svg xmlns="http://www.w3.org/2000/svg" class="" aria-hidden="true" fill="currentColor" viewBox="64 64 896 896" focusable="false" width="1em" height="1em" data-icon="right"><path d="M 765.7 486.8 L 314.9 134.7 A 7.97 7.97 0 0 0 302 141 v 77.3 c 0 4.9 2.3 9.6 6.1 12.6 l 360 281.1 l -360 281.1 c -3.9 3 -6.1 7.7 -6.1 12.6 V 883 c 0 6.7 7.7 10.4 12.9 6.3 l 450.8 -352.1 a 31.96 31.96 0 0 0 0 -50.4 Z" /></svg></i></span></div><div class="_3BUZPB"><div tabindex="-1" class="_2Bo4Th" role="button"><i class="anticon" aria-label="ic-dislike"><svg xmlns="http://www.w3.org/2000/svg" class="" aria-hidden="true" fill="currentColor" focusable="false" width="1em" height="1em"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ic-dislike" /></svg></i></div></div></div><div class="_18vaTa"><a class="_3BUZPB _1x1ok9 _1OhGeD" href="/nb/8010290" target="_blank" rel="noopener noreferrer"><i class="anticon" aria-label="ic-notebook"><svg xmlns="http://www.w3.org/2000/svg" class="" aria-hidden="true" fill="currentColor" focusable="false" width="1em" height="1em"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ic-notebook" /></svg></i><span>android</span></a><div class="_3BUZPB ant-dropdown-trigger"><div class="_2Bo4Th"><i class="anticon" aria-label="ic-others"><svg xmlns="http://www.w3.org/2000/svg" class="" aria-hidden="true" fill="currentColor" focusable="false" width="1em" height="1em"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ic-others" /></svg></i></div></div></div></div><div class="_19DgIp" style="margin-top: 24px; margin-bottom: 24px;"></div><div class="_13lIbp"><div class="_191KSt">"小礼物走一走，来简书关注我"</div><button class="_1OyPqC _3Mi9q9 _2WY0RL _1YbC5u" type="button"><span>赞赏支持</span></button><span class="_3zdmIj">还没有人赞赏，支持一下</span></div><div class="d0hShY"><a class="_1OhGeD" href="/u/f25e66082966" target="_blank" rel="noopener noreferrer"><img class="_27NmgV" alt="  " src="images/android03506.jpg"></a><div class="Uz-vZq"><div class="Cqpr1X"><a title="tjt852" class="HC3FFO _1OhGeD" href="/u/f25e66082966" target="_blank" rel="noopener noreferrer">tjt852</a><span title="煙吻" class="_2WEj6j">煙吻</span></div><div class="lJvI3S"><span>总资产1 (约0.10元)</span><span>共写了4629字</span><span>获得10个赞</span><span>共7个粉丝</span></div></div><button class="_1OyPqC _3Mi9q9" type="button" data-locale="zh-CN"><span>关注</span></button></div></section>
+
+</div>
+
+
+</body></html>
