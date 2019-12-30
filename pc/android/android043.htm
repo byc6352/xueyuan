@@ -1,0 +1,568 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>（4.6.29）Android插件化框架总结 - JAVA成长之路</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                           <div class="blog-column-pay">
+                     <a href="https://bss.csdn.net/m/topic/blog_star2019" target="_blank" data-report-query="utm_source=bkzx_BWzd" data-report-click='{"mod":"popu_834","dest":"https://bss.csdn.net/m/topic/blog_star2019","strategy":"pc文章详情页博客之星广告位"}'>
+                         <img style="width: 100%;" src="images/android04301.png">
+                     </a>
+                 </div>
+                         <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                                        <div class="markdown_views prism-atom-one-dark" id="content_views">
+                    <!-- flowchart 箭头图标 勿删 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-linecap="round" d="M 5 0 L 0 2.5 L 5 5 Z" />
+                    </svg>
+                                            <p></p><div class="toc"><h3><a name="t0"></a><a name="t0"></a>文章目录</h3><ul><li><a href="#_8" target="_self" rel="nofollow">一、概述</a></li><ul><li><a href="#_29" target="_self" rel="nofollow">为什么需要插件化？</a></li><li><a href="#11__50" target="_self" rel="nofollow">1.1 发展历史</a></li><li><a href="#12__95" target="_self" rel="nofollow">1.2 需要知识</a></li><ul><li><a href="#121_Binder_100" target="_self" rel="nofollow">1.2.1 Binder</a></li><li><a href="#122_App_109" target="_self" rel="nofollow">1.2.2 App打包流程</a></li><li><a href="#123_App_116" target="_self" rel="nofollow">1.2.3 App安装流程</a></li><li><a href="#124_App_120" target="_self" rel="nofollow">1.2.4 App启动流程</a></li><li><a href="#125__126" target="_self" rel="nofollow">1.2.5 资源加载机制</a></li><li><a href="#126_Gradle_178" target="_self" rel="nofollow">1.2.6 Gradle配置打包</a></li></ul><li><a href="#13__182" target="_self" rel="nofollow">1.3 主流框架</a></li></ul><li><a href="#Dynamicloadapk_195" target="_self" rel="nofollow">Dynamic-load-apk详解</a></li><li><a href="#DroidPlugin_217" target="_self" rel="nofollow">DroidPlugin详解</a></li><li><a href="#Small_234" target="_self" rel="nofollow">Small框架详解</a></li><li><a href="#_245" target="_self" rel="nofollow">参考文献</a></li></ul></div><p></p>
+<p></p><div class="toc"><h3><a name="t1"></a><a name="t1"></a>文章目录</h3><ul><li><a href="#_8" target="_self" rel="nofollow">一、概述</a></li><ul><li><a href="#_29" target="_self" rel="nofollow">为什么需要插件化？</a></li><li><a href="#11__50" target="_self" rel="nofollow">1.1 发展历史</a></li><li><a href="#12__95" target="_self" rel="nofollow">1.2 需要知识</a></li><ul><li><a href="#121_Binder_100" target="_self" rel="nofollow">1.2.1 Binder</a></li><li><a href="#122_App_109" target="_self" rel="nofollow">1.2.2 App打包流程</a></li><li><a href="#123_App_116" target="_self" rel="nofollow">1.2.3 App安装流程</a></li><li><a href="#124_App_120" target="_self" rel="nofollow">1.2.4 App启动流程</a></li><li><a href="#125__126" target="_self" rel="nofollow">1.2.5 资源加载机制</a></li><li><a href="#126_Gradle_178" target="_self" rel="nofollow">1.2.6 Gradle配置打包</a></li></ul><li><a href="#13__182" target="_self" rel="nofollow">1.3 主流框架</a></li></ul><li><a href="#Dynamicloadapk_195" target="_self" rel="nofollow">Dynamic-load-apk详解</a></li><li><a href="#DroidPlugin_217" target="_self" rel="nofollow">DroidPlugin详解</a></li><li><a href="#Small_234" target="_self" rel="nofollow">Small框架详解</a></li><li><a href="#_245" target="_self" rel="nofollow">参考文献</a></li></ul></div><p></p>
+<ul>
+<li><a href="https://blog.csdn.net/fei20121106/article/details/80706883" rel="nofollow">（4.6.29.1）插件化：Android中的动态加载技术</a></li>
+<li><a href="https://blog.csdn.net/fei20121106/article/details/80782074" rel="nofollow">（4.6.29.2）插件化之代码加载：启动Activity</a></li>
+<li><a href="https://blog.csdn.net/fei20121106/article/details/80860343" rel="nofollow">（4.6.29.3）插件化之代码加载：启动Activity等四大组件之hook方式</a></li>
+<li><a href="https://blog.csdn.net/fei20121106/article/details/80774156" rel="nofollow">（4.6.29.4）插件化之资源加载：使用插件中的R资源</a></li>
+</ul>
+<h1><a name="t2"></a><a name="t2"></a><a id="_8"></a>一、概述</h1>
+<p>所谓插件化，就是让我们的应用<strong>不必再像原来一样把所有的内容都放在一个apk</strong>中，可以把一些功能和逻辑单独抽出来放在插件apk中，然后主apk做到［按需调用］，这样的好处是一来可以减少主apk的体积，让应用更轻便，二来可以做到热插拔，更加动态化</p>
+<blockquote>
+<p>采集时间:2018年6月14日11:52:21</p>
+</blockquote>
+
+<div class="table-box"><table>
+<thead>
+<tr>
+<th>header 1</th>
+<th>github-start</th>
+<th>lastUpadte</th>
+<th>四大组件</th>
+<th>组件无需在宿主manifest中预注册</th>
+<th>插件可以依赖宿主</th>
+<th>PendingIntent</th>
+<th>Android特性</th>
+<th>兼容性</th>
+<th>插件构建</th>
+<th>使用者</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/Qihoo360/RePlugin" rel="nofollow">Qihoo360/RePlugin</a></td>
+<td>4661</td>
+<td>1月前</td>
+<td>—</td>
+<td>-----</td>
+<td>—</td>
+<td>—</td>
+<td>-----</td>
+<td>—</td>
+<td>—</td>
+<td>360手机卫士、360 手机助手、360 手机浏览器</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Qihoo360/DroidPlugin" rel="nofollow">Qihoo360/DroidPlugin</a></td>
+<td>1724</td>
+<td>2年前</td>
+<td>√</td>
+<td>√</td>
+<td>×</td>
+<td>√</td>
+<td>all</td>
+<td>高</td>
+<td>无</td>
+<td>360手机助手</td>
+</tr>
+<tr>
+<td><a href="https://github.com/wequick/Small" rel="nofollow">wequick/Small</a></td>
+<td>4207</td>
+<td>2月前</td>
+<td>仅Activity</td>
+<td>√</td>
+<td>√</td>
+<td>×</td>
+<td>大部分</td>
+<td>中</td>
+<td>Gradle插件</td>
+<td>酷狗音乐、小伙伴TV</td>
+</tr>
+<tr>
+<td><a href="https://github.com/didi/VirtualAPK" rel="nofollow">didi/VirtualAPK</a></td>
+<td>5869</td>
+<td>23天前</td>
+<td>√</td>
+<td>√</td>
+<td>√</td>
+<td>√</td>
+<td>all</td>
+<td>高</td>
+<td>Gradle插件</td>
+<td>滴滴、Uber</td>
+</tr>
+<tr>
+<td><a href="https://github.com/CtripMobile/DynamicAPK" rel="nofollow">CtripMobile/DynamicAPK</a></td>
+<td>2763</td>
+<td>3年前</td>
+<td>仅Activity</td>
+<td>×</td>
+<td>√</td>
+<td>×</td>
+<td>most</td>
+<td>低</td>
+<td>aapt</td>
+<td>携程旅行</td>
+</tr>
+<tr>
+<td><a href="https://github.com/singwhatiwanna/dynamic-load-apk" rel="nofollow">singwhatiwanna/dynamic-load-apk</a></td>
+<td>5358</td>
+<td>1年前</td>
+<td>仅Activity</td>
+<td>√</td>
+<td>√</td>
+<td>×</td>
+<td>most</td>
+<td>低</td>
+<td>无</td>
+<td>—</td>
+</tr>
+<tr>
+<td><a href="https://github.com/mmin18/AndroidDynamicLoader" rel="nofollow">mmin18/AndroidDynamicLoader</a></td>
+<td>1339</td>
+<td>5 年前</td>
+<td>—</td>
+<td>-----</td>
+<td>—</td>
+<td>—</td>
+<td>-----</td>
+<td>—</td>
+<td>—</td>
+<td>大众点评</td>
+</tr>
+<tr>
+<td><a href="https://tech.meituan.com/android_hydra.html" rel="nofollow">仿Instant ,未开源</a></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>-----</td>
+<td>—</td>
+<td>—</td>
+<td>-----</td>
+<td>—</td>
+<td>—</td>
+<td>美团</td>
+</tr>
+<tr>
+<td><a href="https://github.com/alibaba/atlas" rel="nofollow">alibaba/atlas</a></td>
+<td>6132</td>
+<td>27天前</td>
+<td>—</td>
+<td>-----</td>
+<td>—</td>
+<td>—</td>
+<td>-----</td>
+<td>—</td>
+<td>—</td>
+<td>手机淘宝</td>
+</tr>
+<tr>
+<td><a href="https://github.com/houkx/android-pluginmgr" rel="nofollow">houkx/android-pluginmgr</a></td>
+<td>1396</td>
+<td>2年前</td>
+<td>—</td>
+<td>-----</td>
+<td>—</td>
+<td>—</td>
+<td>-----</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td><a href="https://github.com/woyaowenzi/ACDD" rel="nofollow">woyaowenzi/ACDD</a></td>
+<td>11</td>
+<td>3年前</td>
+<td>—</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/limpoxe/Android-Plugin-Framework" rel="nofollow">limpoxe/Android-Plugin-Framework</a></td>
+<td>1260</td>
+<td>6月前</td>
+<td>—</td>
+<td>—</td>
+<td>-----</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div><h2><a name="t3"></a><a name="t3"></a><a id="_29"></a>为什么需要插件化？</h2>
+<ol>
+<li>应用体积越来越大，需要拆分APK完成模块化与热部署</li>
+<li>应用频繁更新，导致用户粘性降低</li>
+<li>新功能的加入
+<ol>
+<li>不确定与用户需求的匹配性，需要动态增加或者更新，增加灵活性</li>
+<li>一旦不适用或发生严重问题，无法做平滑处理(动态切换)，只能紧急发布补丁版本升级</li>
+</ol>
+</li>
+<li>主应用用户量较大，同系应用需要导流，传统特性只能引导用户下载安装</li>
+</ol>
+<p>插件化的特定就是 <strong>“ 应用在运行的时候通过加载一些本地不存在的可执行文件实现一些特定的功能”</strong>，这些可执行文件是可以替换的( 更换静态资源,比如换启动图、换主题、或者用服务器参数开关控制广告的隐藏现实等,不属于动态加载)。</p>
+<p>Android中动态加载的核心思想是动态调用外部的 dex文件，极端的情况下，Android APK自身带有的Dex文件只是一个程序的入口（或者说空壳），所有的功能都通过从服务器下载最新的Dex文件完成</p>
+<p>实现插件化后，能够：</p>
+<ol>
+<li>减小主APK大小</li>
+<li>降低新功能版本发布的频繁性</li>
+<li>独立开发 A/B Test 模块</li>
+<li>bug修复工具</li>
+</ol>
+<h2><a name="t4"></a><a name="t4"></a><a id="11__50"></a>1.1 发展历史</h2>
+<p>很早之前已经有公司在研究插件化这项技术，淘宝做得比较早，但淘宝的这项技术一直是保密的。直到2015年才陆续出现很多框架，Android插件化分成很多技术流派，实现的方式都不太一样</p>
+<ul>
+<li>
+<p>2012.大众点评.屠毅敏.<a href="https://github.com/mmin18/AndroidDynamicLoader" rel="nofollow">mmin18/AndroidDynamicLoader 1339</a>框架</p>
+<ul>
+<li>用Fragment来实现。通过动态加载不同的Fragement，把想换的页面都换掉。</li>
+<li>在这个项目中第一次看到了如何通过addAssetPath来读取插件中的资源</li>
+</ul>
+</li>
+<li>
+<p>2013.23Code。</p>
+<ul>
+<li>23Code提供了一个壳，在这个壳里可以动态下载插件，然后动态运行。可以在壳外编写各种各样的控件，放在这个框架下去运行。</li>
+</ul>
+</li>
+<li>
+<p>2014年初.阿里.Altas技术</p>
+<ul>
+<li>网上出现一个视频，仅进行了大方向讲解，并未开源</li>
+</ul>
+</li>
+<li>
+<p>2014年底.滴滴.任玉刚.<a href="https://github.com/singwhatiwanna/dynamic-load-apk" rel="nofollow">singwhatiwanna/dynamic-load-apk 5358</a>【里程碑点】</p>
+<ul>
+<li>这跟后续介绍的很多插件化项目都不太一样。它没有Hook太多的系统底层方法，而是从上层，即App应用层解决问题，创建一个继承自Activity的ProxyActivity类，然后让插件中的所有Activity都继承自ProxyActivity，并重写Activity所有的方法。</li>
+<li>之所以说这个项目是里程碑式的，是因为在2015年之前业界没有太多资料可以参考</li>
+</ul>
+</li>
+<li>
+<p>201504.OpenAltas(<a href="https://github.com/woyaowenzi/ACDD" rel="nofollow">woyaowenzi/ACDD 11</a>)。</p>
+<ul>
+<li>这个框架参考了淘宝App的很多经验，主要就是Hook的思想，同时，还首次提出来通过扩展AAPT来解决插件与宿主的资源id冲突的问题。</li>
+</ul>
+</li>
+<li>
+<p>201508.张勇.<a href="https://github.com/Qihoo360/DroidPlugin" rel="nofollow">Qihoo360/DroidPlugin 1724</a>【里程碑点】</p>
+<ul>
+<li>这个项目太牛了，能把任意的App都加载到宿主里。可以基于这个框架写一个宿主App，然后就可以把别人写的App都当作插件来加载。这个框架的功能的确很强大，但强大的代价就是要改写很多Android系统的底层代码</li>
+<li>是 360 手机助手实现的一种插件化框架，它可以直接运行第三方的独立 APK 文件，完全不需要对 APK 进行修改或安装。一种新的插件机制，一种免安装的运行机制，是一个沙箱（但是不完全的沙箱。就是对于使用者来说，并不知道他会把 apk 怎么样）， 是模块化的基础</li>
+<li>说明文档较少，导致技术人员掌握这个框架不太容易</li>
+</ul>
+</li>
+<li>
+<p>201509.Andfix，Nuwa（女娲）…</p>
+<ul>
+<li>热修复技术陆续登场</li>
+</ul>
+</li>
+<li>
+<p>2015年底.林广亮.<a href="https://github.com/wequick/Small" rel="nofollow">wequick/Small 4207</a>框架</p>
+<ul>
+<li>这个机制不太一样的地方就是，通过脚本的方式来解决资源冲突的问题</li>
+</ul>
+</li>
+<li>
+<p>201703.ali.<a href="https://github.com/alibaba/atlas" rel="nofollow">alibaba/atlas 6132</a></p>
+<ul>
+<li>正式开源</li>
+</ul>
+</li>
+<li>
+<p>201706.滴滴.<a href="https://github.com/didi/VirtualAPK" rel="nofollow">didi/VirtualAPK 5869</a>插件化框架</p>
+<ul>
+<li>支持几乎所有的 Android 特性，四大组件方面</li>
+</ul>
+</li>
+<li>
+<p>201707.360手机卫士.<a href="https://github.com/Qihoo360/RePlugin" rel="nofollow">Qihoo360/RePlugin 4661</a></p>
+<ul>
+<li>是一套完整的、稳定的、适合全面使用的，占坑类插件化方案，也是业内首个提出”全面插件化“（全面特性、全面兼容、全面使用）的方案</li>
+</ul>
+</li>
+<li>
+<p>201710.美团.仿InstantRun框架</p>
+<ul>
+<li>发表技术<a href="https://tech.meituan.com/android_hydra.html" rel="nofollow">美团App 插件化实践</a>,但整体方案未开源</li>
+</ul>
+</li>
+</ul>
+<h2><a name="t5"></a><a name="t5"></a><a id="12__95"></a>1.2 需要知识</h2>
+<p>想完全明白插件化技术，首先需要了解Android系统的底层实现</p>
+<h3><a name="t6"></a><a name="t6"></a><a id="121_Binder_100"></a>1.2.1 Binder</h3>
+<ul>
+<li><a href="https://blog.csdn.net/fei20121106/article/details/78712943#41-binder%E9%80%9A%E4%BF%A1%E6%9C%BA%E5%88%B6" rel="nofollow">4.1 Binder通信机制</a></li>
+</ul>
+<p>你可以认为它是一个中介者模式，在客户端和服务器端之间，Binder就起到中介的作用，这是我这段时间对Binder的思考。</p>
+<p>要实现四大组件的插件化，就需要在Binder上做修改。</p>
+<h3><a name="t7"></a><a name="t7"></a><a id="122_App_109"></a>1.2.2 App打包流程</h3>
+<ul>
+<li><a href="https://blog.csdn.net/fei20121106/article/details/51245091" rel="nofollow">（4.6.11）从Android源码到apk——apk打包过程</a></li>
+</ul>
+<p>代码写完了，执行一次打包操作，中途经历了资源打包、dex生成、签名等过程。其中最重要的就是资源的打包，即AAPT这一步，如果宿主和插件的资源id冲突，一种解决办法就是在这里做修改</p>
+<h3><a name="t8"></a><a name="t8"></a><a id="123_App_116"></a>1.2.3 App安装流程</h3>
+<p>熟悉安装流程不仅对插件化有帮助，在遇到安装bug的时候也非常重要。手机安装App的时候，经常会有下载异常，提示资源包不能解析，这时需要知道安装App的这段代码在什么地方，这只是第一步。第二步需要知道，App下载到本地后，具体要做哪些事情。手机有些目录不能访问，App下载到本地之后，放到哪个目录下，然后会生成哪些文件。插件化有个增量更新的概念，如何下载一个增量包，从本地具体哪个位置取出一个包，这个包的具体命名规则是什么，等等。这些细节都必须要清楚明白</p>
+<h3><a name="t9"></a><a name="t9"></a><a id="124_App_120"></a>1.2.4 App启动流程</h3>
+<ul>
+<li><a href="https://blog.csdn.net/fei20121106/article/details/78712943" rel="nofollow">（4.1.52）Android启动流程分析</a></li>
+</ul>
+<p>Activity启动有几种方式？一种是写一个startActivity，第二种是点击手机App，通过手机系统里的Launcher机制，启动App里默认的Activity。通常，App开发人员喜闻乐见的方式是第二种。那么第一种方式的启动原理是什么呢？另外，启动的时候，main函数在哪里？这个main函数的位置很重要，我们可以对它所在的类做修改，从而实现插件化。</p>
+<h3><a name="t10"></a><a name="t10"></a><a id="125__126"></a>1.2.5 资源加载机制</h3>
+<ul>
+<li><a href="https://blog.csdn.net/fei20121106/article/details/80697664" rel="nofollow">（2.1.1.5）Java ClassLoader详解</a></li>
+<li><a href="https://blog.csdn.net/fei20121106/article/details/80706359" rel="nofollow">（4.1.53）Android ClassLoader详解</a>
+<ul>
+<li><a href="https://blog.csdn.net/fei20121106/article/details/80748219" rel="nofollow">（4.1.53.1）示例：基于PathClassLoader的仿MultiDex式动态加载assets中的apk</a></li>
+<li><a href="https://blog.csdn.net/fei20121106/article/details/80748655" rel="nofollow">（4.1.53.2）示例：基于DexClassLoader的动态加载assets中的apk</a></li>
+</ul>
+</li>
+<li><a href="https://blog.csdn.net/fei20121106/article/details/80706883" rel="nofollow">（4.6.29.1）插件化：Android中的动态加载技术</a></li>
+</ul>
+<p>使用ClassLoader动态加载一个外部的类是非常容易的事情，所以很容易就能实现动态加载新的可执行代码的功能，但是比起一般的Java程序，在Android程序中使用动态加载主要有两个麻烦的问题：</p>
+<ol>
+<li>
+<p><strong>[代码加载]</strong> 首先是插件Dex的加载，如何把插件Dex中的类加载到内存？</p>
+<ul>
+<li>[加载]类的加载可以使用Java的ClassLoader机制</li>
+<li>[代理]但是对于Android来说，并不是说类加载进来就可以用了，<strong>很多组件都是有“生命”的；因此对于这些有血有肉的类，必须给它们注入活力，也就是所谓的组件生命周期管理</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>[资源加载]</strong> 插件可能是apk也可能是so格式, 不管哪一种, 都不会生成 R.id.XX，从而没办法使用。</p>
+<ul>
+<li>一种解决方式是插件里需要用到的新资源都<strong>通过纯Java代码的方式创建（包括XML布局、动画、点九图等）</strong>，麻烦但是有效，不多过描述；</li>
+<li>一种是是重写Context的getAsset、getResource之类的方法，偷换概念，让插件读取插件里的资源，但缺点就是宿主和插件的资源id会冲突，需要重写AAPT。</li>
+<li>另一种是重写AMS中保存的插件列表，从而让宿主和插件分别去加载各自的资源而不会冲突。</li>
+<li>第三种方法，就是打包后，执行一个脚本，修改生成包中资源id。</li>
+</ul>
+</li>
+</ol>
+<p>说到底，抛开虚拟机的差别不说，一个Android程序和标准的Java程序最大的区别就在于他们的上下文环境（Context）不同。Android中，这个环境可以给程序提供组件需要用到的功能，也可以提供一些主题、Res等资源，其实上面说到的两个问题都可以统一说是这个环境的问题，而现在的各种Android动态加载框架中，核心要解决的东西也正是“如何给外部的新类提供上下文环境”的问题</p>
+<p>整体来说，需要以下知识点：</p>
+<ol>
+<li>ClassLoader类加载器</li>
+</ol>
+<p>要想实现加载外部dex文件（即插件）来实现热部署，那么必然要把其中的class文件加载到内存中。其中涉及到两种ClassLoader:DexClassLoader和PathClassLoader。而DexClassLoader可以加载外部的jar,dex等文件，正是我们需要的。</p>
+<p>关于ClassLoader详解，见<a href="https://blog.csdn.net/u012124438/article/details/53235848" rel="nofollow">ClassLoader完全解析</a>。</p>
+<ol start="2">
+<li>Java反射</li>
+</ol>
+<p>因为插件apk与宿主apk不在一个apk内，那么一些类的访问必然要通过反射进行获取。所以了解反射对插件化的学习是必须的。</p>
+<p>关于Java反射，见<a href="https://www.jianshu.com/p/779b3e27b26d" rel="nofollow">Java反射详解</a></p>
+<ol start="3">
+<li>代理模式</li>
+</ol>
+<p>插件化实现的过程主要靠欺上瞒下，坑蒙拐骗来实现。想想虽然加载进来了Activity等组件，但也仅仅是最为一个对象而存在，并没有在AndroidManifest中注册，没有生命周期的回调，并不能实现我们想要的效果。因此无论是dynamic_load_apk通过代理activity来操控插件activity的方式，还是DroidPlugin通过hook activity启动过程来启动插件activity的方式，都是对代理模式的应用</p>
+<p>关于代理模式，见<a href="https://www.jianshu.com/p/27b255a6f479" rel="nofollow">静态代理与动态代理</a></p>
+<ol start="4">
+<li>插件资源访问</li>
+</ol>
+<p>res里的每一个资源都会在R.java里生成一个对应的Integer类型的id，APP启动时会先把R.java注册到当前的上下文环境，我们在代码里以R文件的方式使用资源时正是通过使用这些id访问res资源，然而插件的R.java并没有注册到当前的上下文环境，所以插件的res资源也就无法通过id使用了。</p>
+<p>查看源码，通过“addAssetPath”方法重新生成一个新的Resource对象来保存插件中的资源，避免冲突。</p>
+<p>关于插件资源访问，见<a href="https://blog.csdn.net/u012124438/article/details/53236723" rel="nofollow">使用插件中的R资源</a></p>
+<h3><a name="t11"></a><a name="t11"></a><a id="126_Gradle_178"></a>1.2.6 Gradle配置打包</h3>
+<p>在实施插件化后，如何解决不同插件的开发人员的工作区问题。比如，插件1和插件2，需要分别下载哪些代码，如何独立运行？就像机票和火车票，如何只运行自己的插件，而不运行别人的插件？这是协同工作的问题。火车票和机票，这两个Android团队的各自工作区是不一样的，这时候就要用到Gradle脚本了，每个项目分别有各自的仓库，有各自不同的打包脚本，只需要把自己的插件跟宿主项目一起打包运行起来，而不用引入其他插件，还有更厉害的是，也可以把自己的插件当作一个App来打包并运行</p>
+<h2><a name="t12"></a><a name="t12"></a><a id="13__182"></a>1.3 主流框架</h2>
+<p>插件化框架各种各样，大致可以划分为：隔离型插件与非隔离型插件。</p>
+<ul>
+<li>隔离型插件
+<ul>
+<li>此类插件是指：每个插件都是相对独立的个体，而且都运行在各自不同的沙盒中各个插件及宿主之间，不能像同一个应用一样直接共享数据。</li>
+<li>比如360的RePlugin与DroidPlugin。DroidPlugin是不同插件有分别运行在不同的插件进程。RePlugin是每个插件都是使用的一个独立的classLoader来类加载器。都实现了代码级别的隔离，这两种都是隔离型插件。</li>
+</ul>
+</li>
+<li>非隔离型插件:
+<ul>
+<li>这种是对业务逻辑存在耦合的环境下，开发app最友好的插件化方案。这种插件框架，所有的插件都是运行在同一个进程中且未做隔离。宿主与插件、插件与插件之间可以直接共享数据。</li>
+<li>比如Small和VirtualAPK.</li>
+</ul>
+</li>
+</ul>
+<h1><a name="t13"></a><a name="t13"></a><a id="Dynamicloadapk_195"></a>Dynamic-load-apk详解</h1>
+<p>Dynamic-Load-Apk简称DL，这个开源框架作者是任玉刚，他的实现方式是，在宿主中埋一个代理Activity，更改ClassLoader后找到加载插件中的Activity，使用宿主中的Activity作为代理，回调给插件中Activity所以对应的生命周期。这个思路与AndroidDynamicLoader有点像，都是做一个代理，只不过Dynamic-load-apk加载的插件中的Activity</p>
+<ul>
+<li>
+<p>csdn伯努力不努力：Android插件化学习之路</p>
+<ul>
+<li><a href="https://blog.csdn.net/u012124438/article/details/53234223" rel="nofollow">Android插件化学习之路（一）之动态加载综述</a></li>
+<li><a href="https://blog.csdn.net/u012124438/article/details/53235848" rel="nofollow">Android插件化学习之路（二）之ClassLoader完全解析</a></li>
+<li><a href="https://blog.csdn.net/u012124438/article/details/53236472" rel="nofollow">Android插件化学习之路（三）之调用外部.dex文件中的代码</a></li>
+<li><a href="https://blog.csdn.net/u012124438/article/details/53236723" rel="nofollow">Android插件化学习之路（四）之使用插件中的R资源</a></li>
+<li><a href="https://blog.csdn.net/u012124438/article/details/53239370" rel="nofollow">Android插件化学习之路（五）之代理Activity</a></li>
+<li><a href="https://blog.csdn.net/u012124438/article/details/53239497" rel="nofollow">Android插件化学习之路（六）之动态创建Activity</a></li>
+<li><a href="https://blog.csdn.net/u012124438/article/details/53240585" rel="nofollow">Android插件化学习之路（七）之DL插件开发该注意的坑</a></li>
+<li><a href="https://blog.csdn.net/u012124438/article/details/53241755" rel="nofollow">Android插件化学习之路（八）之DynamicLoadApk 源码解析（上） </a></li>
+<li><a href="https://blog.csdn.net/u012124438/article/details/53242838" rel="nofollow">Android插件化学习之路（九）之DynamicLoadApk 源码解析（下）</a></li>
+</ul>
+</li>
+<li>
+<p>拥有者csdn:singwhatiwanna</p>
+<ul>
+<li><a href="https://blog.csdn.net/singwhatiwanna/article/details/22597587" rel="nofollow">Android apk动态加载机制的研究</a></li>
+<li><a href="https://blog.csdn.net/singwhatiwanna/article/details/23387079" rel="nofollow">Android apk动态加载机制的研究（二）：资源加载和activity生命周期管理</a></li>
+<li><a href="https://blog.csdn.net/singwhatiwanna/article/details/39937639" rel="nofollow">APK动态加载框架（DL）解析</a></li>
+</ul>
+</li>
+</ul>
+<h1><a name="t14"></a><a name="t14"></a><a id="DroidPlugin_217"></a>DroidPlugin详解</h1>
+<p>DroidPlugin是张勇实现的一套插件化方案，它的原理是Hook客户端一侧的系统Api</p>
+<ul>
+<li>Android插件化原理解析
+<ul>
+<li><a href="https://github.com/tiann/understand-plugin-framework" rel="nofollow">understand-plugin-framework</a></li>
+<li><a href="http://weishu.me/2016/01/28/understand-plugin-framework-overview/" rel="nofollow">Android插件化原理解析——概要</a></li>
+<li><a href="http://weishu.me/2016/01/28/understand-plugin-framework-proxy-hook/" rel="nofollow">Android插件化原理解析——Hook机制之动态代理</a></li>
+<li><a href="http://weishu.me/2016/02/16/understand-plugin-framework-binder-hook/" rel="nofollow">Android插件化原理解析——Hook机制之Binder Hook</a></li>
+<li><a href="http://weishu.me/2016/03/07/understand-plugin-framework-ams-pms-hook/" rel="nofollow">Android插件化原理解析——Hook机制之AMS&amp;PMS</a></li>
+<li><a href="http://weishu.me/2016/03/21/understand-plugin-framework-activity-management/" rel="nofollow">Android插件化原理解析——Android插件化原理解析——Activity生命周期管理</a></li>
+<li><a href="http://weishu.me/2016/04/05/understand-plugin-framework-classloader/" rel="nofollow">Android插件化原理解析——插件加载机制</a></li>
+<li><a href="http://weishu.me/2016/04/12/understand-plugin-framework-receiver/" rel="nofollow">Android插件化原理解析——广播的管理</a></li>
+<li><a href="http://weishu.me/2016/05/11/understand-plugin-framework-service/" rel="nofollow">Android插件化原理解析——Service的插件化</a></li>
+<li><a href="http://weishu.me/2016/07/12/understand-plugin-framework-content-provider/" rel="nofollow">Android插件化原理解析——ContentProvider的插件化</a></li>
+</ul>
+</li>
+</ul>
+<h1><a name="t15"></a><a name="t15"></a><a id="Small_234"></a>Small框架详解</h1>
+<ul>
+<li>
+<p><a href="http://code.wequick.net/Small/cn/quickstart" rel="nofollow">Small官网文档</a></p>
+</li>
+<li>
+<p><a href="https://github.com/wequick/Small" rel="nofollow">Small github主页</a></p>
+</li>
+<li>
+<p>病已的博客：安卓插件化</p>
+<ul>
+<li><a href="https://ivonhoe.github.io/2018/01/18/Small%E6%A1%86%E6%9E%B6%E5%AE%9E%E8%B7%B5%E6%80%BB%E7%BB%93/" rel="nofollow">Android插件化之Small框架实践总结</a></li>
+<li><a href="https://ivonhoe.github.io/2018/01/18/Small%E6%A1%86%E6%9E%B6%E5%8E%9F%E7%90%86/" rel="nofollow">Android插件化之Small框架原理</a></li>
+<li><a href="http://ivonhoe.github.io/2018/03/14/small-bug-555-fix/" rel="nofollow">Android插件化之资源加载</a></li>
+</ul>
+</li>
+</ul>
+<h1><a name="t16"></a><a name="t16"></a><a id="_245"></a>参考文献</h1>
+<ul>
+<li>
+<p><a href="http://lruheng.com/2017/07/01/Android%E6%8F%92%E4%BB%B6%E5%8C%96%E5%85%A5%E9%97%A8%E6%8C%87%E5%8D%97/" rel="nofollow">Android插件化入门指南</a></p>
+</li>
+<li>
+<p><a href="https://mp.weixin.qq.com/s?__biz=MzIwMzYwMTk1NA==&amp;mid=2247486927&amp;idx=1&amp;sn=29e7439c220387f34df232f04ab283ac" rel="nofollow">2017 Android插件化框架总结</a></p>
+</li>
+<li>
+<p>简书H3c:Android插件化开发</p>
+<ul>
+<li><a href="https://www.jianshu.com/p/01a91a9b7a19" rel="nofollow">Android插件化开发 第一篇 [动态加载apk]</a></li>
+<li><a href="https://www.jianshu.com/p/900f763e99fa" rel="nofollow">Android插件化开发 第二篇 [动态加载apk优化]</a></li>
+<li><a href="https://www.jianshu.com/p/30d65b7b6890" rel="nofollow">Android插件化开发 第三篇 [加载插件资源]</a></li>
+<li><a href="https://www.jianshu.com/p/ea774b301e51" rel="nofollow">Android插件化开发 第四篇 [加载插件Activity]</a></li>
+<li><a href="https://www.jianshu.com/p/d9342e1a6529" rel="nofollow">Android插件化开发 第五篇 [360 Droid Plugin]</a></li>
+</ul>
+</li>
+<li>
+<p>csdn郑海波：Android插件化</p>
+<ul>
+<li><a href="https://blog.csdn.net/nupt123456789/article/details/50411581" rel="nofollow"><br>
+Android插件化（一）：使用改进的MultiDex动态加载assets中的apk</a></li>
+<li><a href="https://blog.csdn.net/nupt123456789/article/details/50413953" rel="nofollow">Android插件化（二）：使用DexClassLoader动态加载assets中的apk</a></li>
+<li><a href="https://blog.csdn.net/nupt123456789/article/details/50414175" rel="nofollow">Android插件化（三）加载插件apk中的Resource资源</a></li>
+<li><a href="https://blog.csdn.net/nupt123456789/article/details/50531722" rel="nofollow">Android插件化基础（4），动态启动插件中的Activity</a></li>
+<li><a href="https://github.com/nuptboyzhb/AndroidPluginFramework" rel="nofollow">AndroidPluginFramework插件化框架系列文章以及DEMO</a></li>
+</ul>
+</li>
+<li>
+<p>csdn三精-大精wing：插件化技术</p>
+<ul>
+<li><a href="https://blog.csdn.net/wingichoy/article/details/54908513" rel="nofollow">插件化技术：宿主访问插件资源</a></li>
+<li><a href="https://blog.csdn.net/wingichoy/article/details/58586526" rel="nofollow">插件化之插件Service 新的Hook方法</a></li>
+</ul>
+</li>
+<li>
+<p>csdn  scholarSu:Android插件化</p>
+<ul>
+<li><a href="https://blog.csdn.net/sggdjfkf147896325/article/details/52066121" rel="nofollow">Android系统的启动流程</a></li>
+<li><a href="https://blog.csdn.net/sggdjfkf147896325/article/details/52172147" rel="nofollow">APK启动过程概述</a></li>
+<li><a href="https://blog.csdn.net/sggdjfkf147896325/article/details/52115929" rel="nofollow">Binder机制简单分析</a></li>
+<li><a href="https://blog.csdn.net/sggdjfkf147896325/article/details/52231933" rel="nofollow">Android插件化之资源动态加载</a></li>
+<li><a href="https://blog.csdn.net/sggdjfkf147896325/article/details/52237412" rel="nofollow">Android APK安装过程</a></li>
+<li><a href="https://blog.csdn.net/sggdjfkf147896325/article/details/52243352" rel="nofollow">Android插件化之Activity生命周期处理</a></li>
+<li><a href="https://blog.csdn.net/sggdjfkf147896325/article/details/52088837" rel="nofollow">Android插件研究系列之DL简析</a></li>
+</ul>
+</li>
+<li>
+<p><a href="https://segmentfault.com/a/1190000004062880#articleHeader12" rel="nofollow">Android动态加载基础 ClassLoader工作机制</a></p>
+</li>
+</ul>
+
+                                    </div>
+                <link href="https://csdnimg.cn/release/phoenix/mdeditor/markdown_views-b6c3c6d139.css" rel="stylesheet">
+                                    <div class="more-toolbox">
+                <div class="left-toolbox">
+                    <ul class="toolbox-list">
+                        
+                        <li class="tool-item tool-active is-like "><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#csdnc-thumbsup" />
+                        </svg><span class="name">点赞</span>
+                        <span class="count">1</span>
+                        </a></li>
+                        <li class="tool-item tool-active is-collection "><a href="javascript:;" data-report-click='{"mod":"popu_824"}'><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-Collection-G" />
+                        </svg><span class="name">收藏</span></a></li>
+                        <li class="tool-item tool-active is-share"><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-fenxiang" />
+                        </svg>分享</a></li>
+                        <!--打赏开始-->
+                                                <!--打赏结束-->
+                                                <li class="tool-item tool-more">
+                            <a>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024" width="200" height="200" version="1.1" p-id="5717" t="1575545411852"><defs><style type="text/css" /></defs><path d="M 179.176 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5718" /><path d="M 509.684 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5719" /><path d="M 846.175 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5720" /></svg>
+                            </a>
+                            <ul class="more-box">
+                                <li class="item"><a class="article-report">文章举报</a></li>
+                            </ul>
+                        </li>
+                                            </ul>
+                </div>
+                            </div>
+            <div class="person-messagebox">
+                <div class="left-message"><a href="https://blog.csdn.net/fei20121106">
+                    <img class="avatar_pic" src="images/android04302.jpg" username="fei20121106">
+                                            <img class="user-years" src="images/android04303.png">
+                                    </a></div>
+                <div class="middle-message">
+                                        <div class="title"><span class="tit"><a href="https://blog.csdn.net/fei20121106" target="_blank" data-report-click='{"mod":"popu_379"}'>fei20121106</a></span>
+                                            </div>
+                    <div class="text"><span>发布了319 篇原创文章</span> · <span>获赞 61</span> · <span>访问量 69万+</span></div>
+                </div>
+                                <div class="right-message">
+                                            <a class="btn btn-sm btn-red-hollow bt-button personal-messageboard" href="https://bbs.csdn.net/forums/p-fei20121106" target="_blank">他的留言板
+                        </a>
+                                                            <a class="btn btn-sm  bt-button personal-watch" data-report-click='{"mod":"popu_379"}'>关注</a>
+                                    </div>
+                            </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>

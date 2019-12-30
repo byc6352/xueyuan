@@ -1,0 +1,154 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android存储及getCacheDir()、getFilesDir()、getExternalFilesDir()、getExternalCacheDir()区别 - Kelaker的博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                           <div class="blog-column-pay">
+                     <a href="https://bss.csdn.net/m/topic/blog_star2019" target="_blank" data-report-query="utm_source=bkzx_BWzd" data-report-click='{"mod":"popu_834","dest":"https://bss.csdn.net/m/topic/blog_star2019","strategy":"pc文章详情页博客之星广告位"}'>
+                         <img style="width: 100%;" src="images/android04101.png">
+                     </a>
+                 </div>
+                         <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                                        <div class="markdown_views" id="content_views">
+                    <!-- flowchart 箭头图标 勿删 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-linecap="round" d="M 5 0 L 0 2.5 L 5 5 Z" />
+                    </svg>
+                                            <h2 id="存储介绍"><a name="t0"></a><a name="t0"></a>存储介绍</h2>
+
+<p>Android系统分为内部存储和外部存储，内部存储是手机系统自带的存储，一般空间都比较小，外部存储一般是SD卡的存储，空间一般都比较大，但不一定可用或者剩余空间可能不足。一般我们存储内容都会放在外部存储空间里。使用过程注意事项：</p>
+
+<blockquote>
+  <ol>
+  <li>先判断SD卡是否可用，可用时优先使用SD卡的存储，不可用时用内部存储</li>
+  <li>存储在SD卡上时，可以在SD卡上新建任意一个目录存放，也可以存放在应用程序内部文件夹，区别是在SD卡的任意目录存放时内容不会随应用程序的卸载而消失，而在应用程序内部的内容会随应用程序卸载消失。</li>
+  <li>一般缓存文件放在应用程序内部，用户主动保存的文件放在SD卡上的文件夹里。如果在SD卡上任意新建目录存放所有数据，用户卸载时会残存大量文件，招致用户反感。</li>
+  </ol>
+</blockquote>
+
+
+
+<h2 id="存储路径"><a name="t1"></a><a name="t1"></a>存储路径</h2>
+
+<p>一般我们可以通过 Context 和 Environment 相关的方法获取文件存取的路径。</p>
+
+
+
+<h3 id="1内部存储"><a name="t2"></a><a name="t2"></a>1.内部存储</h3>
+
+<p><strong>1.1 根目录(<code>$rootDir</code>)</strong>：<code>/data</code>，通过 <code>Environment.getDataDirectory()</code> 获取。 <br>
+<strong>1.2 应用程序目录(<code>$applicationDir</code>)</strong>：<code>$rootDir/data/包名</code>（不一定，不同设备可能不同） <br>
+<strong>应用缓存目录</strong>：<code>$applicationDir/cache</code>，通过<code>Context.getCacheDir()</code>获取。 <br>
+<strong>应用文件目录</strong>：<code>$applicationDir/files</code>，通过<code>Context.getFilesDir()</code>获取。<code>Context.getFileStreamPath(String name)</code>返回以name为文件名的子文件目录，若name为空，则返回文件根目录。假设我们的应用程序包名为com.learn.test，路径如下：</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs avrasm has-numbering">Environment<span class="hljs-preprocessor">.getDataDirectory</span>():      /data
+Context<span class="hljs-preprocessor">.getCacheDir</span>():               /data/data/<span class="hljs-keyword">com</span><span class="hljs-preprocessor">.learn</span><span class="hljs-preprocessor">.test</span>/cache
+Context<span class="hljs-preprocessor">.getFilesDir</span>():               /data/data/<span class="hljs-keyword">com</span><span class="hljs-preprocessor">.learn</span><span class="hljs-preprocessor">.test</span>/files
+Context<span class="hljs-preprocessor">.getFileStreamPath</span>(<span class="hljs-string">""</span>):       /data/data/<span class="hljs-keyword">com</span><span class="hljs-preprocessor">.learn</span><span class="hljs-preprocessor">.test</span>/files
+Context<span class="hljs-preprocessor">.getFileStreamPath</span>(<span class="hljs-string">"test"</span>):   /data/data/<span class="hljs-keyword">com</span><span class="hljs-preprocessor">.learn</span><span class="hljs-preprocessor">.test</span>/files/test
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li></ul></pre>
+
+<p><br></p>
+
+
+
+<h3 id="2外部存储"><a name="t3"></a><a name="t3"></a>2.外部存储</h3>
+
+<p><strong>2.1 根目录(<code>$rootDir</code>)</strong>：<code>/storage/emulated/0</code>（不一定，不同设备可能不同），通过 <code>Environment.getExternalStorageDirectory()</code> 获取。 <br>
+<strong>2.2 应用程序目录(<code>$applicationDir</code>)</strong>：<code>$rootDir/Andorid/data/包名</code> <br>
+<strong>应用缓存目录</strong>：<code>$applicationDir/cache</code>，通过<code>Context.getExternalCacheDir()</code>获取。 <br>
+<strong>应用文件目录</strong>：<code>$applicationDir/files</code>，通过<code>Context.getExternalFilesDir(String type)</code>，type为空字符串时获取。type系统给我们提供了很多常用的类型，比如图片和下载等等:</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs cs has-numbering"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String DIRECTORY_MUSIC = <span class="hljs-string">"Music"</span>;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String DIRECTORY_ALARMS = <span class="hljs-string">"Alarms"</span>;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String DIRECTORY_NOTIFICATIONS = <span class="hljs-string">"Notifications"</span>;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String DIRECTORY_PICTURES = <span class="hljs-string">"Pictures"</span>;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String DIRECTORY_MOVIES = <span class="hljs-string">"Movies"</span>;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String DIRECTORY_DOWNLOADS = <span class="hljs-string">"Download"</span>;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String DIRECTORY_DCIM = <span class="hljs-string">"DCIM"</span>;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String DIRECTORY_DOCUMENTS = <span class="hljs-string">"Documents"</span>;
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li></ul></pre>
+
+<p>假设我们的应用程序包名为com.learn.test，路径如下：</p>
+
+
+
+<pre class="prettyprint" name="code"><code class="hljs avrasm has-numbering">Environment<span class="hljs-preprocessor">.getExternalStorageDirectory</span>():               /storage/emulated/<span class="hljs-number">0</span>
+Context<span class="hljs-preprocessor">.getExternalCacheDir</span>():                           /storage/emulated/<span class="hljs-number">0</span>/Android/data/<span class="hljs-keyword">com</span><span class="hljs-preprocessor">.learn</span><span class="hljs-preprocessor">.test</span>/cache
+Context<span class="hljs-preprocessor">.getExternalFilesDir</span>(<span class="hljs-string">""</span>):                         /storage/emulated/<span class="hljs-number">0</span>/Android/data/<span class="hljs-keyword">com</span><span class="hljs-preprocessor">.learn</span><span class="hljs-preprocessor">.test</span>/files
+Context<span class="hljs-preprocessor">.getExternalFilesDir</span>(<span class="hljs-string">"test"</span>):                     /storage/emulated/<span class="hljs-number">0</span>/Android/data/<span class="hljs-keyword">com</span><span class="hljs-preprocessor">.learn</span><span class="hljs-preprocessor">.test</span>/files/test
+Context<span class="hljs-preprocessor">.getExternalFilesDir</span>(Environment<span class="hljs-preprocessor">.DIRECTORY</span>_PICTURES):    /storage/emulated/<span class="hljs-number">0</span>/Android/data/<span class="hljs-keyword">com</span><span class="hljs-preprocessor">.learn</span><span class="hljs-preprocessor">.test</span>/files/Pictures</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li></ul></pre>
+
+<p><strong>2.3 公共存储目录</strong>: 我们可以在外部存储上新建任意文件夹，不过在6.0及之后的系统需要动态申请权限，这些目录的内容不会随着应用的卸载而消失。如：</p>
+
+<pre class="prettyprint" name="code"><code class="hljs mathematica has-numbering"><span class="hljs-keyword">Environment</span>.getExternalStorageDirectory():                     /storage/emulated/<span class="hljs-number">0</span>
+<span class="hljs-keyword">Environment</span>.getExternalStoragePublicDirectory(<span class="hljs-string">""</span>):             /storage/emulated/<span class="hljs-number">0</span>
+<span class="hljs-keyword">Environment</span>.getExternalStoragePublicDirectory(<span class="hljs-string">"test"</span>):         /storage/emulated/<span class="hljs-number">0</span>/test
+<span class="hljs-keyword">Environment</span>.getExternalStoragePublicDirectory(<span class="hljs-keyword">Environment</span>.DIRECTORY_PICTURES)：  /storage/emulated/<span class="hljs-number">0</span>/Pictures</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li></ul></pre>
+
+
+
+<h2 id="参考"><a name="t4"></a><a name="t4"></a>参考</h2>
+
+<p><a href="https://www.liaohuqiu.net/cn/posts/storage-in-android/" rel="nofollow">Android 存储使用参考</a></p>                                    </div>
+                <link href="https://csdnimg.cn/release/phoenix/mdeditor/markdown_views-b6c3c6d139.css" rel="stylesheet">
+                                    <div class="more-toolbox">
+                <div class="left-toolbox">
+                    <ul class="toolbox-list">
+                        
+                        <li class="tool-item tool-active is-like "><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#csdnc-thumbsup" />
+                        </svg><span class="name">点赞</span>
+                        <span class="count">5</span>
+                        </a></li>
+                        <li class="tool-item tool-active is-collection "><a href="javascript:;" data-report-click='{"mod":"popu_824"}'><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-Collection-G" />
+                        </svg><span class="name">收藏</span></a></li>
+                        <li class="tool-item tool-active is-share"><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-fenxiang" />
+                        </svg>分享</a></li>
+                        <!--打赏开始-->
+                                                <!--打赏结束-->
+                                                <li class="tool-item tool-more">
+                            <a>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024" width="200" height="200" version="1.1" p-id="5717" t="1575545411852"><defs><style type="text/css" /></defs><path d="M 179.176 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5718" /><path d="M 509.684 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5719" /><path d="M 846.175 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5720" /></svg>
+                            </a>
+                            <ul class="more-box">
+                                <li class="item"><a class="article-report">文章举报</a></li>
+                            </ul>
+                        </li>
+                                            </ul>
+                </div>
+                            </div>
+            <div class="person-messagebox">
+                <div class="left-message"><a href="https://blog.csdn.net/Kelaker">
+                    <img class="avatar_pic" src="images/android04102.jpg" username="Kelaker">
+                                            <img class="user-years" src="images/android04103.png">
+                                    </a></div>
+                <div class="middle-message">
+                                        <div class="title"><span class="tit"><a href="https://blog.csdn.net/Kelaker" target="_blank" data-report-click='{"mod":"popu_379"}'>Jankin_W</a></span>
+                                            </div>
+                    <div class="text"><span>发布了13 篇原创文章</span> · <span>获赞 22</span> · <span>访问量 2万+</span></div>
+                </div>
+                                <div class="right-message">
+                                            <a class="btn btn-sm btn-red-hollow bt-button personal-letter" href="https://im.csdn.net/im/main.html?userName=Kelaker" target="_blank">私信
+                        </a>
+                                                            <a class="btn btn-sm  bt-button personal-watch" data-report-click='{"mod":"popu_379"}'>关注</a>
+                                    </div>
+                            </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>

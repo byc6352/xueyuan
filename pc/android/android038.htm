@@ -1,0 +1,542 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android插件化之DroidPlugin原理解析 - 拿节</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                           <div class="blog-column-pay">
+                     <a href="https://bss.csdn.net/m/topic/blog_star2019" target="_blank" data-report-query="utm_source=bkzx_BWzd" data-report-click='{"mod":"popu_834","dest":"https://bss.csdn.net/m/topic/blog_star2019","strategy":"pc文章详情页博客之星广告位"}'>
+                         <img style="width: 100%;" src="images/android03801.png">
+                     </a>
+                 </div>
+                         <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                                        <div class="markdown_views prism-atom-one-light" id="content_views">
+                    <!-- flowchart 箭头图标 勿删 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-linecap="round" d="M 5 0 L 0 2.5 L 5 5 Z" />
+                    </svg>
+                                            <p></p><div class="toc"><h3><a name="t0"></a><a name="t0"></a>文章目录</h3><ul><li><a href="#DroidPlugin_2" target="_self" rel="nofollow">DroidPlugin原理解析</a></li><ul><li><a href="#_23" target="_self" rel="nofollow">插件包安装</a></li><li><a href="#_29" target="_self" rel="nofollow">插件包解析和加载</a></li><li><a href="#Activity_41" target="_self" rel="nofollow">插件Activity启动解析</a></li><li><a href="#service_208" target="_self" rel="nofollow">插件service启动分析</a></li><li><a href="#receiver_287" target="_self" rel="nofollow">插件receiver分析</a></li><li><a href="#provider_289" target="_self" rel="nofollow">插件provider分析</a></li><li><a href="#_427" target="_self" rel="nofollow">插件加载独立性</a></li><li><a href="#resource_465" target="_self" rel="nofollow">插件resource获取</a></li><li><a href="#_477" target="_self" rel="nofollow">总结</a></li></ul></ul></div><p></p>
+<h1><a name="t1"></a><a name="t1"></a><a id="DroidPlugin_2"></a>DroidPlugin原理解析</h1>
+<p>从系统设计的角度，组件和窗口的逻辑实体都存在于系统服务，比如Activity创建后，其逻辑控制主体在AMS，对于窗口，其逻辑控制主体在WMS</p>
+<p>android将逻辑主体放置于系统服务，系统就可以对组件和窗口的生命周期，显示状态进行强掌控，这样就能做到在各种状态变更时能做到及时回调通知</p>
+<p>所以，创建任何组件，都需要通过RPC通讯到AMS创建 — <strong>第一个hook点</strong></p>
+<p>那逻辑主体确定后，AMS就需要创建进程去运行真实的Activity对象（可以认为它是一个提线木偶）</p>
+<p>Android进程启动后，JAVA的入口是ActivityThread.main</p>
+<p>ActivityThread主要干两件事件</p>
+<ul>
+<li>创建IApplicationThread native binder和AMS进行通讯</li>
+<li>收到AMS发来的RPC事件后，创建并保存各个组件相关的数据 ---- <strong>第二个hook点</strong></li>
+</ul>
+<p>组件相关数据主要包括两个</p>
+<ul>
+<li>组件所属包信息和对应的loadedApk - 保存于mPackages</li>
+<li>将AMS中逐渐的逻辑主体对象token和真实组件对象一同保存，便于后续跟踪操作 - 比如Activity相关的保存于mActivities，service相关保存于mServices</li>
+</ul>
+<p>还有，ActivityThread的设计本身好像就支持加载多个application，多个application会被保存到mAllApplications中</p>
+<h2><a name="t2"></a><a name="t2"></a><a id="_23"></a>插件包安装</h2>
+<p>DroidPlugin实现了一个简易的IPluginManagerImpl用于插件APK包的安装和解析，当然这部分代码是参考系统的PMS来实现的，主要职责：</p>
+<ul>
+<li>插件APK安装到本地目录</li>
+<li>对插件APK的组件等数据进行解析</li>
+</ul>
+<h2><a name="t3"></a><a name="t3"></a><a id="_29"></a>插件包解析和加载</h2>
+<ol>
+<li>插件包的解析，就是对AndroidManifest的解析，主要通过反射系统的PackageParser来完成</li>
+<li>在Activity启动前(hook见下面介绍)，会调用</li>
+</ol>
+<pre class="prettyprint"><code class="has-numbering"> PluginProcessManager.preLoadApk(mHostContext, targetActivityInfo);
+ preLoadApk内部会根据targetActivityInfo包含的包名来判断LoadedApk是
+ 否创建，如果未创建，则会通过反射调用ActivityThread的函数来创建插件
+ LoadedApk并保存到ActivityThread的mPackages中，接着创建
+ PluginClassLoader并设置到LoadedApk对象中
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li></ul></pre>
+<ol start="3">
+<li>最后通过反射调用LoadedApk的makeApplication创建插件Application对象并调用onCreate</li>
+</ol>
+<h2><a name="t4"></a><a name="t4"></a><a id="Activity_41"></a>插件Activity启动解析</h2>
+<p>我们先来看下Android常规Activity的启动流程</p>
+<ol>
+<li>调用Context.startActivity -&gt; ActivityManagerNative -&gt; AMS, AMS通过Intent从PMS拿到ActivityInfo并创建ActivityRecord和token放入前台ActivityStack，接着按需启动Activity所属进程</li>
+<li>进程启动后，马上执行入口ActivityThread.main并调用attachApplication将启动信息反馈到AMS，AMS通过pid找到对应的ProcessRecord并更新其数据</li>
+<li>接着从前台ActivityStack中拿到栈顶的ActivityRecord，如果其proecssrecord为null，并且uid和processname跟新创建的ProcessRecord一致，则正式调用app.thread.scheduleLaunchActivity</li>
+<li>ActivityThread在scheduleLaunchActivity中创建ActivityClientRecord，用于跟AMS中的ActivityRecord对应，ActivityClientRecord最重要的两个字段是token和activityinfo，token用于关联ActivityRecord，activityinfo则包含activity的描述和所属包等信息</li>
+<li>在scheduleLaunchActivity内部接着发送LAUNCH_ACTIVITY message到mH这个handler，mH收到LAUNCH_ACTIVITY message后的代码如下：<pre class="prettyprint"><code class="prism language-java has-numbering"> ActivityClientRecord r <span class="token operator">=</span> <span class="token punctuation">(</span>ActivityClientRecord<span class="token punctuation">)</span>msg<span class="token punctuation">.</span>obj<span class="token punctuation">;</span>
+ <span class="token comment">//通过activityinfo中包含的application信息创建loaedapk并保存于packageinfo</span>
+ r<span class="token punctuation">.</span>packageInfo <span class="token operator">=</span> <span class="token function">getPackageInfoNoCheck</span><span class="token punctuation">(</span>
+                         r<span class="token punctuation">.</span>activityInfo<span class="token punctuation">.</span>applicationInfo<span class="token punctuation">,</span> r<span class="token punctuation">.</span>compatInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+ <span class="token function">handleLaunchActivity</span><span class="token punctuation">(</span>r<span class="token punctuation">,</span> null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li></ul></pre>
+</li>
+</ol>
+<p>理解上面第1和第5步很重要，因为DroidPlugin的Activity hook就是基于这两个点来进行的，原理总结如下：</p>
+<ol>
+<li>DroidPlugin首先在host app的AndroidManifest预注册一堆stub<br>
+activity,这里只列出一部分，详细的可查看源码<pre class="prettyprint"><code class="prism language-java has-numbering">  <span class="token punctuation">.</span>stub<span class="token punctuation">.</span>ActivityStub$P00$Standard00
+  <span class="token punctuation">.</span>stub<span class="token punctuation">.</span>ActivityStub$P00$SingleInstance00
+  <span class="token punctuation">.</span>stub<span class="token punctuation">.</span>ActivityStub$P00$SingleInstance01
+  <span class="token punctuation">.</span>stub<span class="token punctuation">.</span>ActivityStub$P00$SingleInstance02
+  <span class="token punctuation">.</span>stub<span class="token punctuation">.</span>ActivityStub$P00$SingleInstance03
+  <span class="token punctuation">.</span>stub<span class="token punctuation">.</span>ActivityStub$P00$SingleTask00
+  <span class="token punctuation">.</span>stub<span class="token punctuation">.</span>ActivityStub$P00$SingleTask01
+  <span class="token punctuation">.</span>stub<span class="token punctuation">.</span>ActivityStub$P00$SingleTask02
+  <span class="token punctuation">.</span>stub<span class="token punctuation">.</span>ActivityStub$P00$SingleTask03
+  <span class="token punctuation">.</span>stub<span class="token punctuation">.</span>ActivityStub$P00$SingleTop00
+  <span class="token punctuation">.</span>stub<span class="token punctuation">.</span>ActivityStub$P00$SingleTop01
+  <span class="token punctuation">.</span>stub<span class="token punctuation">.</span>ActivityStub$P00$SingleTop02
+  <span class="token punctuation">.</span>stub<span class="token punctuation">.</span>ActivityStub$P00$SingleTop03
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li></ul></pre>
+</li>
+<li>通过动态代理和反射，hook ActivityManagerNative的接口，这个实现原理网上很多，这里不再赘述</li>
+<li>hook startActivity，相关代码在IActivityManagerHookHandle.startActivity中<pre class="prettyprint"><code class="prism language-java has-numbering">             ActivityInfo activityInfo <span class="token operator">=</span> <span class="token function">resolveActivity</span><span class="token punctuation">(</span>intent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+             <span class="token keyword">if</span> <span class="token punctuation">(</span>activityInfo <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> <span class="token function">isPackagePlugin</span><span class="token punctuation">(</span>activityInfo<span class="token punctuation">.</span>packageName<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                 ComponentName component <span class="token operator">=</span> <span class="token function">selectProxyActivity</span><span class="token punctuation">(</span>intent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                 <span class="token keyword">if</span> <span class="token punctuation">(</span>component <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                     Intent newIntent <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Intent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                     <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                         ClassLoader pluginClassLoader <span class="token operator">=</span> PluginProcessManager<span class="token punctuation">.</span><span class="token function">getPluginClassLoader</span><span class="token punctuation">(</span>component<span class="token punctuation">.</span><span class="token function">getPackageName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                         <span class="token function">setIntentClassLoader</span><span class="token punctuation">(</span>newIntent<span class="token punctuation">,</span> pluginClassLoader<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                     <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                         Log<span class="token punctuation">.</span><span class="token function">w</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"Set Class Loader to new Intent fail"</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                     <span class="token punctuation">}</span>
+                     newIntent<span class="token punctuation">.</span><span class="token function">setComponent</span><span class="token punctuation">(</span>component<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                     newIntent<span class="token punctuation">.</span><span class="token function">putExtra</span><span class="token punctuation">(</span>Env<span class="token punctuation">.</span>EXTRA_TARGET_INTENT<span class="token punctuation">,</span> intent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                     newIntent<span class="token punctuation">.</span><span class="token function">setFlags</span><span class="token punctuation">(</span>intent<span class="token punctuation">.</span><span class="token function">getFlags</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+                     String callingPackage <span class="token operator">=</span> <span class="token punctuation">(</span>String<span class="token punctuation">)</span> args<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+                     <span class="token keyword">if</span> <span class="token punctuation">(</span>TextUtils<span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span>mHostContext<span class="token punctuation">.</span><span class="token function">getPackageName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> callingPackage<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                         newIntent<span class="token punctuation">.</span><span class="token function">addFlags</span><span class="token punctuation">(</span>Intent<span class="token punctuation">.</span>FLAG_ACTIVITY_NEW_TASK<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+                     args<span class="token punctuation">[</span>intentOfArgIndex<span class="token punctuation">]</span> <span class="token operator">=</span> newIntent<span class="token punctuation">;</span>
+                     args<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> mHostContext<span class="token punctuation">.</span><span class="token function">getPackageName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                 <span class="token punctuation">}</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li></ul></pre>
+<ul>
+<li>根据intent从DroidPlugin的packagemanager中拿到activityinfo(如果已安装插件包中有匹配的activty)</li>
+<li>还是根据intent，根据目标activity的属性，去匹配一个最合适的stub activity，并将component信息保存到newIntent，同时将intent作为extra保存到newintent</li>
+<li>最后将args中intent替换称newintent达到偷梁换柱的效果<br>
+<br><br>经过上面的偷梁换柱后，系统实际上拿到的是newintent，进而启动stubactivity；DroidPlugin接下去要做的就是，将stubactivity还原成真正要启动的插件activity，这个是在上面启动流程第5步中完成的</li>
+</ul>
+</li>
+<li>上面启动流程第五部可以看出，ActivityThread在启动Activity的时候，最重要的两个参数就是ActivityClientRecord里的两个变量intent和activityinfo，activityinfo是用来创建packageinfo(loadedapk), intent是要在创建activity后传入的，所以DroidPlugin必须要在创建Acivity之前，也就是handleLaunchActivity(msg)之前将这两个变量替换成原始的插件intent，这就是DroidPlugin Hook mH的目的，下面是hook 也就是handleLaunchActivity的部分代码<pre class="prettyprint"><code class="prism language-java has-numbering"><span class="token comment">//PluginCallback.java</span>
+<span class="token keyword">private</span> <span class="token keyword">boolean</span> <span class="token function">handleLaunchActivity</span><span class="token punctuation">(</span>Message msg<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     <span class="token keyword">try</span> <span class="token punctuation">{</span>
+         Object obj <span class="token operator">=</span> msg<span class="token punctuation">.</span>obj<span class="token punctuation">;</span>
+         Intent stubIntent <span class="token operator">=</span> <span class="token punctuation">(</span>Intent<span class="token punctuation">)</span> FieldUtils<span class="token punctuation">.</span><span class="token function">readField</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token string">"intent"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+         <span class="token comment">//ActivityInfo activityInfo = (ActivityInfo) FieldUtils.readField(obj, "activityInfo", true);</span>
+         stubIntent<span class="token punctuation">.</span><span class="token function">setExtrasClassLoader</span><span class="token punctuation">(</span>mHostContext<span class="token punctuation">.</span><span class="token function">getClassLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+         Intent targetIntent <span class="token operator">=</span> stubIntent<span class="token punctuation">.</span><span class="token function">getParcelableExtra</span><span class="token punctuation">(</span>Env<span class="token punctuation">.</span>EXTRA_TARGET_INTENT<span class="token punctuation">)</span><span class="token punctuation">;</span>
+         <span class="token comment">// 这里多加一个isNotShortcutProxyActivity的判断，因为ShortcutProxyActivity的很特殊，启动它的时候，</span>
+         <span class="token comment">// 也会带上一个EXTRA_TARGET_INTENT的数据，就会导致这里误以为是启动插件Activity，所以这里要先做一个判断。</span>
+         <span class="token comment">// 之前ShortcutProxyActivity错误复用了key，但是为了兼容，所以这里就先这么判断吧。</span>
+         <span class="token keyword">if</span> <span class="token punctuation">(</span>targetIntent <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span><span class="token function">isShortcutProxyActivity</span><span class="token punctuation">(</span>stubIntent<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+             IPackageManagerHook<span class="token punctuation">.</span><span class="token function">fixContextPackageManager</span><span class="token punctuation">(</span>mHostContext<span class="token punctuation">)</span><span class="token punctuation">;</span>
+             ComponentName targetComponentName <span class="token operator">=</span> targetIntent<span class="token punctuation">.</span><span class="token function">resolveActivity</span><span class="token punctuation">(</span>mHostContext<span class="token punctuation">.</span><span class="token function">getPackageManager</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+             ActivityInfo targetActivityInfo <span class="token operator">=</span> PluginManager<span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getActivityInfo</span><span class="token punctuation">(</span>targetComponentName<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+             <span class="token keyword">if</span> <span class="token punctuation">(</span>targetActivityInfo <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+                 <span class="token keyword">if</span> <span class="token punctuation">(</span>targetComponentName <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> targetComponentName<span class="token punctuation">.</span><span class="token function">getClassName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">startsWith</span><span class="token punctuation">(</span><span class="token string">"."</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                     targetIntent<span class="token punctuation">.</span><span class="token function">setClassName</span><span class="token punctuation">(</span>targetComponentName<span class="token punctuation">.</span><span class="token function">getPackageName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> targetComponentName<span class="token punctuation">.</span><span class="token function">getPackageName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> targetComponentName<span class="token punctuation">.</span><span class="token function">getClassName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                 <span class="token punctuation">}</span>
+
+                 ResolveInfo resolveInfo <span class="token operator">=</span> mHostContext<span class="token punctuation">.</span><span class="token function">getPackageManager</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">resolveActivity</span><span class="token punctuation">(</span>stubIntent<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                 ActivityInfo stubActivityInfo <span class="token operator">=</span> resolveInfo <span class="token operator">!=</span> null <span class="token operator">?</span> resolveInfo<span class="token punctuation">.</span>activityInfo <span class="token operator">:</span> null<span class="token punctuation">;</span>
+                 <span class="token keyword">if</span> <span class="token punctuation">(</span>stubActivityInfo <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                     PluginManager<span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">reportMyProcessName</span><span class="token punctuation">(</span>stubActivityInfo<span class="token punctuation">.</span>processName<span class="token punctuation">,</span> targetActivityInfo<span class="token punctuation">.</span>processName<span class="token punctuation">,</span> targetActivityInfo<span class="token punctuation">.</span>packageName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                 <span class="token punctuation">}</span>
+                 PluginProcessManager<span class="token punctuation">.</span><span class="token function">preLoadApk</span><span class="token punctuation">(</span>mHostContext<span class="token punctuation">,</span> targetActivityInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                 ClassLoader pluginClassLoader <span class="token operator">=</span> PluginProcessManager<span class="token punctuation">.</span><span class="token function">getPluginClassLoader</span><span class="token punctuation">(</span>targetComponentName<span class="token punctuation">.</span><span class="token function">getPackageName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                 <span class="token function">setIntentClassLoader</span><span class="token punctuation">(</span>targetIntent<span class="token punctuation">,</span> pluginClassLoader<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                 <span class="token function">setIntentClassLoader</span><span class="token punctuation">(</span>stubIntent<span class="token punctuation">,</span> pluginClassLoader<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+                 <span class="token keyword">boolean</span> success <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+                 <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                     targetIntent<span class="token punctuation">.</span><span class="token function">putExtra</span><span class="token punctuation">(</span>Env<span class="token punctuation">.</span>EXTRA_TARGET_INFO<span class="token punctuation">,</span> targetActivityInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                     <span class="token keyword">if</span> <span class="token punctuation">(</span>stubActivityInfo <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                         targetIntent<span class="token punctuation">.</span><span class="token function">putExtra</span><span class="token punctuation">(</span>Env<span class="token punctuation">.</span>EXTRA_STUB_INFO<span class="token punctuation">,</span> stubActivityInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                     <span class="token punctuation">}</span>
+                     success <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+                 <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                     Log<span class="token punctuation">.</span><span class="token function">e</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"putExtra 1 fail"</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                 <span class="token punctuation">}</span>
+
+                 <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>success <span class="token operator">&amp;&amp;</span> Build<span class="token punctuation">.</span>VERSION<span class="token punctuation">.</span>SDK_INT <span class="token operator">&lt;=</span> Build<span class="token punctuation">.</span>VERSION_CODES<span class="token punctuation">.</span>KITKAT<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                     <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                         ClassLoader oldParent <span class="token operator">=</span> <span class="token function">fixedClassLoader</span><span class="token punctuation">(</span>pluginClassLoader<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                         targetIntent<span class="token punctuation">.</span><span class="token function">putExtras</span><span class="token punctuation">(</span>targetIntent<span class="token punctuation">.</span><span class="token function">getExtras</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+                         targetIntent<span class="token punctuation">.</span><span class="token function">putExtra</span><span class="token punctuation">(</span>Env<span class="token punctuation">.</span>EXTRA_TARGET_INFO<span class="token punctuation">,</span> targetActivityInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                         <span class="token keyword">if</span> <span class="token punctuation">(</span>stubActivityInfo <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                             targetIntent<span class="token punctuation">.</span><span class="token function">putExtra</span><span class="token punctuation">(</span>Env<span class="token punctuation">.</span>EXTRA_STUB_INFO<span class="token punctuation">,</span> stubActivityInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                         <span class="token punctuation">}</span>
+                         <span class="token function">fixedClassLoader</span><span class="token punctuation">(</span>oldParent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                         success <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+                     <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                         Log<span class="token punctuation">.</span><span class="token function">e</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"putExtra 2 fail"</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                     <span class="token punctuation">}</span>
+                 <span class="token punctuation">}</span>
+
+                 <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>success<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                     Intent newTargetIntent <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Intent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                     newTargetIntent<span class="token punctuation">.</span><span class="token function">setComponent</span><span class="token punctuation">(</span>targetIntent<span class="token punctuation">.</span><span class="token function">getComponent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                     newTargetIntent<span class="token punctuation">.</span><span class="token function">putExtra</span><span class="token punctuation">(</span>Env<span class="token punctuation">.</span>EXTRA_TARGET_INFO<span class="token punctuation">,</span> targetActivityInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                     <span class="token keyword">if</span> <span class="token punctuation">(</span>stubActivityInfo <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                         newTargetIntent<span class="token punctuation">.</span><span class="token function">putExtra</span><span class="token punctuation">(</span>Env<span class="token punctuation">.</span>EXTRA_STUB_INFO<span class="token punctuation">,</span> stubActivityInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                     <span class="token punctuation">}</span>
+                     FieldUtils<span class="token punctuation">.</span><span class="token function">writeDeclaredField</span><span class="token punctuation">(</span>msg<span class="token punctuation">.</span>obj<span class="token punctuation">,</span> <span class="token string">"intent"</span><span class="token punctuation">,</span> newTargetIntent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                 <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                     FieldUtils<span class="token punctuation">.</span><span class="token function">writeDeclaredField</span><span class="token punctuation">(</span>msg<span class="token punctuation">.</span>obj<span class="token punctuation">,</span> <span class="token string">"intent"</span><span class="token punctuation">,</span> targetIntent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                 <span class="token punctuation">}</span>
+                 FieldUtils<span class="token punctuation">.</span><span class="token function">writeDeclaredField</span><span class="token punctuation">(</span>msg<span class="token punctuation">.</span>obj<span class="token punctuation">,</span> <span class="token string">"activityInfo"</span><span class="token punctuation">,</span> targetActivityInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+                 Log<span class="token punctuation">.</span><span class="token function">i</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"handleLaunchActivity OK"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+             <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                 Log<span class="token punctuation">.</span><span class="token function">e</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"handleLaunchActivity oldInfo==null"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+             <span class="token punctuation">}</span>
+         <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+             Log<span class="token punctuation">.</span><span class="token function">e</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"handleLaunchActivity targetIntent==null"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+         <span class="token punctuation">}</span>
+     <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+         Log<span class="token punctuation">.</span><span class="token function">e</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"handleLaunchActivity FAIL"</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+     <span class="token punctuation">}</span>
+
+     <span class="token keyword">if</span> <span class="token punctuation">(</span>mCallback <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+         <span class="token keyword">return</span> mCallback<span class="token punctuation">.</span><span class="token function">handleMessage</span><span class="token punctuation">(</span>msg<span class="token punctuation">)</span><span class="token punctuation">;</span>
+     <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+         <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+     <span class="token punctuation">}</span>
+ <span class="token punctuation">}</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li><li style="color: rgb(153, 153, 153);">28</li><li style="color: rgb(153, 153, 153);">29</li><li style="color: rgb(153, 153, 153);">30</li><li style="color: rgb(153, 153, 153);">31</li><li style="color: rgb(153, 153, 153);">32</li><li style="color: rgb(153, 153, 153);">33</li><li style="color: rgb(153, 153, 153);">34</li><li style="color: rgb(153, 153, 153);">35</li><li style="color: rgb(153, 153, 153);">36</li><li style="color: rgb(153, 153, 153);">37</li><li style="color: rgb(153, 153, 153);">38</li><li style="color: rgb(153, 153, 153);">39</li><li style="color: rgb(153, 153, 153);">40</li><li style="color: rgb(153, 153, 153);">41</li><li style="color: rgb(153, 153, 153);">42</li><li style="color: rgb(153, 153, 153);">43</li><li style="color: rgb(153, 153, 153);">44</li><li style="color: rgb(153, 153, 153);">45</li><li style="color: rgb(153, 153, 153);">46</li><li style="color: rgb(153, 153, 153);">47</li><li style="color: rgb(153, 153, 153);">48</li><li style="color: rgb(153, 153, 153);">49</li><li style="color: rgb(153, 153, 153);">50</li><li style="color: rgb(153, 153, 153);">51</li><li style="color: rgb(153, 153, 153);">52</li><li style="color: rgb(153, 153, 153);">53</li><li style="color: rgb(153, 153, 153);">54</li><li style="color: rgb(153, 153, 153);">55</li><li style="color: rgb(153, 153, 153);">56</li><li style="color: rgb(153, 153, 153);">57</li><li style="color: rgb(153, 153, 153);">58</li><li style="color: rgb(153, 153, 153);">59</li><li style="color: rgb(153, 153, 153);">60</li><li style="color: rgb(153, 153, 153);">61</li><li style="color: rgb(153, 153, 153);">62</li><li style="color: rgb(153, 153, 153);">63</li><li style="color: rgb(153, 153, 153);">64</li><li style="color: rgb(153, 153, 153);">65</li><li style="color: rgb(153, 153, 153);">66</li><li style="color: rgb(153, 153, 153);">67</li><li style="color: rgb(153, 153, 153);">68</li><li style="color: rgb(153, 153, 153);">69</li><li style="color: rgb(153, 153, 153);">70</li><li style="color: rgb(153, 153, 153);">71</li><li style="color: rgb(153, 153, 153);">72</li><li style="color: rgb(153, 153, 153);">73</li><li style="color: rgb(153, 153, 153);">74</li><li style="color: rgb(153, 153, 153);">75</li><li style="color: rgb(153, 153, 153);">76</li><li style="color: rgb(153, 153, 153);">77</li><li style="color: rgb(153, 153, 153);">78</li><li style="color: rgb(153, 153, 153);">79</li><li style="color: rgb(153, 153, 153);">80</li><li style="color: rgb(153, 153, 153);">81</li><li style="color: rgb(153, 153, 153);">82</li><li style="color: rgb(153, 153, 153);">83</li><li style="color: rgb(153, 153, 153);">84</li><li style="color: rgb(153, 153, 153);">85</li><li style="color: rgb(153, 153, 153);">86</li><li style="color: rgb(153, 153, 153);">87</li><li style="color: rgb(153, 153, 153);">88</li></ul></pre>
+先用intent中拿出之前保存到extra的插件intent<pre class="prettyprint"><code class="prism language-java has-numbering">Intent targetIntent <span class="token operator">=</span> stubIntent<span class="token punctuation">.</span><span class="token function">getParcelableExtra</span><span class="token punctuation">(</span>Env<span class="token punctuation">.</span>EXTRA_TARGET_INTENT<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+接着根据targetIntent获取对应的activityinfo<pre class="prettyprint"><code class="prism language-java has-numbering">ComponentName targetComponentName <span class="token operator">=</span> targetIntent<span class="token punctuation">.</span><span class="token function">resolveActivity</span><span class="token punctuation">(</span>mHostContext<span class="token punctuation">.</span><span class="token function">getPackageManager</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ActivityInfo targetActivityInfo <span class="token operator">=</span> PluginManager<span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getActivityInfo</span><span class="token punctuation">(</span>targetComponentName<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li></ul></pre>
+最后将数据写回到ActivityClientRecord，完成最终的替换<pre class="prettyprint"><code class="prism language-java has-numbering"> FieldUtils<span class="token punctuation">.</span><span class="token function">writeDeclaredField</span><span class="token punctuation">(</span>msg<span class="token punctuation">.</span>obj<span class="token punctuation">,</span> <span class="token string">"intent"</span><span class="token punctuation">,</span> targetIntent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+ FieldUtils<span class="token punctuation">.</span><span class="token function">writeDeclaredField</span><span class="token punctuation">(</span>msg<span class="token punctuation">.</span>obj<span class="token punctuation">,</span> <span class="token string">"activityInfo"</span><span class="token punctuation">,</span> targetActivityInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li></ul></pre>
+</li>
+</ol>
+<h2><a name="t5"></a><a name="t5"></a><a id="service_208"></a>插件service启动分析</h2>
+<p>同样的，先来看看service的常规启动流程</p>
+<ul>
+<li>调用contextimpl.startService/bindService/stopService -&gt; AMS，AMS对应创建ServiceRecord和token后，通知ActivityThread</li>
+<li>ActivityThread收到startService后，会创建service并保存到mService map，key为token，接着调用oncreate</li>
+<li>ActivityThread接着收到handleServiceArgs, 根据token拿到service，接着调用onStartCommond并传入intent</li>
+<li>ActivityThread收到bindservice后，从根据token拿到service，接着调用onbind拿到native binder，接着调用publishService将native binder传到AMS</li>
+</ul>
+<pre class="prettyprint"><code class="prism language-java has-numbering"> ActivityManagerNative<span class="token punctuation">.</span><span class="token function">getDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">publishService</span><span class="token punctuation">(</span>
+                               data<span class="token punctuation">.</span>token<span class="token punctuation">,</span> data<span class="token punctuation">.</span>intent<span class="token punctuation">,</span> binder<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li></ul></pre>
+<p>Service跟Activity还是存在很大的区别的，service非常独立，也就是说，系统创建service后，除了调用规定的那些回调，传递intent外，剩下就是service自己玩自己的，跟系统一毛钱关系都没有了<br><br>
+Activity则不同，因为其涉及到窗口，所以会存在大量的交互，比如WMS，IMS等<br><br>
+对于DroidPlugin来说，插件service的hook，则会简单很多，只需要用一个stub service做为代理，在stubservice内部根据传入的intent去管理插件service对象即可：</p>
+<pre class="prettyprint"><code class="prism language-java has-numbering"><span class="token punctuation">.</span>stub<span class="token punctuation">.</span>ServiceStub$StubP00$P00
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>在startservice和bindservice时，只需要把目标sevice缓存stubservice，并将真实的intent作为extra传递到stub service就可以了</p>
+<pre class="prettyprint"><code class="prism language-java has-numbering">  <span class="token keyword">private</span> <span class="token keyword">static</span> ServiceInfo <span class="token function">replaceFirstServiceIntentOfArgs</span><span class="token punctuation">(</span>Object<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> RemoteException <span class="token punctuation">{</span>
+       <span class="token keyword">int</span> intentOfArgIndex <span class="token operator">=</span> <span class="token function">findFirstIntentIndexInArgs</span><span class="token punctuation">(</span>args<span class="token punctuation">)</span><span class="token punctuation">;</span>
+       <span class="token keyword">if</span> <span class="token punctuation">(</span>args <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> args<span class="token punctuation">.</span>length <span class="token operator">&gt;</span> <span class="token number">1</span> <span class="token operator">&amp;&amp;</span> intentOfArgIndex <span class="token operator">&gt;=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+           Intent intent <span class="token operator">=</span> <span class="token punctuation">(</span>Intent<span class="token punctuation">)</span> args<span class="token punctuation">[</span>intentOfArgIndex<span class="token punctuation">]</span><span class="token punctuation">;</span>
+           ServiceInfo serviceInfo <span class="token operator">=</span> <span class="token function">resolveService</span><span class="token punctuation">(</span>intent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+           <span class="token keyword">if</span> <span class="token punctuation">(</span>serviceInfo <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> <span class="token function">isPackagePlugin</span><span class="token punctuation">(</span>serviceInfo<span class="token punctuation">.</span>packageName<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+               ServiceInfo proxyService <span class="token operator">=</span> <span class="token function">selectProxyService</span><span class="token punctuation">(</span>intent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+               <span class="token keyword">if</span> <span class="token punctuation">(</span>proxyService <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                   Intent newIntent <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Intent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                   <span class="token comment">//FIXBUG：https://github.com/Qihoo360/DroidPlugin/issues/122</span>
+                   <span class="token comment">//如果插件中有两个Service：ServiceA和ServiceB，在bind ServiceA的时候会调用ServiceA的onBind并返回其IBinder对象，</span>
+                   <span class="token comment">// 但是再次bind ServiceA的时候还是会返回ServiceA的IBinder对象，这是因为插件系统对多个Service使用了同一个StubService</span>
+                   <span class="token comment">// 来代理，而系统对StubService的IBinder做了缓存的问题。这里设置一个Action则会穿透这种缓存。</span>
+                   newIntent<span class="token punctuation">.</span><span class="token function">setAction</span><span class="token punctuation">(</span>proxyService<span class="token punctuation">.</span>name <span class="token operator">+</span> <span class="token keyword">new</span> <span class="token class-name">Random</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">nextInt</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+                   newIntent<span class="token punctuation">.</span><span class="token function">setClassName</span><span class="token punctuation">(</span>proxyService<span class="token punctuation">.</span>packageName<span class="token punctuation">,</span> proxyService<span class="token punctuation">.</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                   newIntent<span class="token punctuation">.</span><span class="token function">putExtra</span><span class="token punctuation">(</span>Env<span class="token punctuation">.</span>EXTRA_TARGET_INTENT<span class="token punctuation">,</span> intent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                   newIntent<span class="token punctuation">.</span><span class="token function">setFlags</span><span class="token punctuation">(</span>intent<span class="token punctuation">.</span><span class="token function">getFlags</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                   args<span class="token punctuation">[</span>intentOfArgIndex<span class="token punctuation">]</span> <span class="token operator">=</span> newIntent<span class="token punctuation">;</span>
+                   <span class="token keyword">return</span> serviceInfo<span class="token punctuation">;</span>
+               <span class="token punctuation">}</span>
+           <span class="token punctuation">}</span>
+       <span class="token punctuation">}</span>
+       <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+   <span class="token punctuation">}</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li></ul></pre>
+<p>接着在stubservice会创建ServcesManager用于插件service管理，所有的stub service回调会同步到ServcesManager里：</p>
+<pre class="prettyprint"><code class="prism language-java has-numbering">   <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">onStart</span><span class="token punctuation">(</span>Context context<span class="token punctuation">,</span> Intent intent<span class="token punctuation">,</span> <span class="token keyword">int</span> flags<span class="token punctuation">,</span> <span class="token keyword">int</span> startId<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+       Intent targetIntent <span class="token operator">=</span> intent<span class="token punctuation">.</span><span class="token function">getParcelableExtra</span><span class="token punctuation">(</span>Env<span class="token punctuation">.</span>EXTRA_TARGET_INTENT<span class="token punctuation">)</span><span class="token punctuation">;</span>
+       <span class="token keyword">if</span> <span class="token punctuation">(</span>targetIntent <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+           ServiceInfo targetInfo <span class="token operator">=</span> PluginManager<span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">resolveServiceInfo</span><span class="token punctuation">(</span>targetIntent<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+           <span class="token keyword">if</span> <span class="token punctuation">(</span>targetInfo <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+               Service service <span class="token operator">=</span> mNameService<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>targetInfo<span class="token punctuation">.</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+               <span class="token keyword">if</span> <span class="token punctuation">(</span>service <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+                   <span class="token function">handleCreateServiceOne</span><span class="token punctuation">(</span>context<span class="token punctuation">,</span> intent<span class="token punctuation">,</span> targetInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+               <span class="token punctuation">}</span>
+               <span class="token function">handleOnStartOne</span><span class="token punctuation">(</span>targetIntent<span class="token punctuation">,</span> flags<span class="token punctuation">,</span> startId<span class="token punctuation">)</span><span class="token punctuation">;</span>
+           <span class="token punctuation">}</span>
+       <span class="token punctuation">}</span>
+       <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+   <span class="token punctuation">}</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li></ul></pre>
+<p>看到没，ServcesManager自己管理mNameService map，service信息则是通过extr中中真实的插件intent来获得，onbind函数同样：</p>
+<pre class="prettyprint"><code class="prism language-java has-numbering"> <span class="token keyword">public</span> IBinder <span class="token function">onBind</span><span class="token punctuation">(</span>Context context<span class="token punctuation">,</span> Intent intent<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+        Intent targetIntent <span class="token operator">=</span> intent<span class="token punctuation">.</span><span class="token function">getParcelableExtra</span><span class="token punctuation">(</span>Env<span class="token punctuation">.</span>EXTRA_TARGET_INTENT<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>targetIntent <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            ServiceInfo info <span class="token operator">=</span> PluginManager<span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">resolveServiceInfo</span><span class="token punctuation">(</span>targetIntent<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            Service service <span class="token operator">=</span> mNameService<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>info<span class="token punctuation">.</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>service <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">handleCreateServiceOne</span><span class="token punctuation">(</span>context<span class="token punctuation">,</span> intent<span class="token punctuation">,</span> info<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">return</span> <span class="token function">handleOnBindOne</span><span class="token punctuation">(</span>targetIntent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li></ul></pre>
+<p>这两个函数在mNameService未包含该service实例的时候，都会调用handleCreateServiceOne，通过反射调用ActivityThrea的方法创建service，从而达到调用oncreate的目地</p>
+<h2><a name="t6"></a><a name="t6"></a><a id="receiver_287"></a>插件receiver分析</h2>
+<p>在插件apk被启动的时候，会通过分析查看apk的receiver组件信息，然后动态注册</p>
+<h2><a name="t7"></a><a name="t7"></a><a id="provider_289"></a>插件provider分析</h2>
+<p>先介绍ContentProvider的实现原理</p>
+<ul>
+<li>本质肯定是基于binder，所以每一个ContentProvider都会实现Transport native binder</li>
+<li>当我们调用getContentResolve.insert/delete等操作时，前提肯定是需要根据authority来拿到对应ContentProvider绑定的Transport对应binder proxy</li>
+<li>拿到binder proxy后，数据连接建立</li>
+</ul>
+<p>数据连接建立后，后续跟系统也没一毛钱关系了，那理论上provider跟service是一样的，只要能hook数据发送端，接收端用一个stubprovider做代理就可以搞定了<br><br>
+DroidPlugin定义的stubprovider</p>
+<pre class="prettyprint"><code class="prism language-java has-numbering"><span class="token punctuation">.</span>stub<span class="token punctuation">.</span>ContentProviderStub$StubP00
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>发送端hook，就是替换binder proxy的过程，看DroidPlugin的getContentProvider的hook代码：</p>
+<pre class="prettyprint"><code class="prism language-java has-numbering">  <span class="token annotation punctuation">@Override</span>
+        <span class="token keyword">protected</span> <span class="token keyword">boolean</span> <span class="token function">beforeInvoke</span><span class="token punctuation">(</span>Object receiver<span class="token punctuation">,</span> Method method<span class="token punctuation">,</span> Object<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> Throwable <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>args <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">final</span> <span class="token keyword">int</span> index <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>args<span class="token punctuation">.</span>length <span class="token operator">&gt;</span> index <span class="token operator">&amp;&amp;</span> args<span class="token punctuation">[</span>index<span class="token punctuation">]</span> <span class="token keyword">instanceof</span> <span class="token class-name">String</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    String name <span class="token operator">=</span> <span class="token punctuation">(</span>String<span class="token punctuation">)</span> args<span class="token punctuation">[</span>index<span class="token punctuation">]</span><span class="token punctuation">;</span>
+                    mStubProvider <span class="token operator">=</span> null<span class="token punctuation">;</span>
+                    mTargetProvider <span class="token operator">=</span> null<span class="token punctuation">;</span>
+
+                    ProviderInfo info <span class="token operator">=</span> mHostContext<span class="token punctuation">.</span><span class="token function">getPackageManager</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">resolveContentProvider</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    mTargetProvider <span class="token operator">=</span> PluginManager<span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">resolveContentProvider</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token comment">//这里有个很坑爹的事情，就是当插件的contentprovider和host的名称一样，冲突的时候处理方式。</span>
+                    <span class="token comment">//在Android系统上，是不会出现这种事情的，因为系统在安装的时候做了处理。而我们目前没做处理。so，在出现冲突时候的时候优先用host的。</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>mTargetProvider <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> info <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> TextUtils<span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span>mTargetProvider<span class="token punctuation">.</span>packageName<span class="token punctuation">,</span> info<span class="token punctuation">.</span>packageName<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        mStubProvider <span class="token operator">=</span> PluginManager<span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">selectStubProviderInfo</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">//                        PluginManager.getInstance().reportMyProcessName(mStubProvider.processName, mTargetProvider.processName);</span>
+<span class="token comment">//                        PluginProcessManager.preLoadApk(mHostContext, mTargetProvider);</span>
+                        <span class="token keyword">if</span> <span class="token punctuation">(</span>mStubProvider <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                            args<span class="token punctuation">[</span>index<span class="token punctuation">]</span> <span class="token operator">=</span> mStubProvider<span class="token punctuation">.</span>authority<span class="token punctuation">;</span>
+                        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                            Log<span class="token punctuation">.</span><span class="token function">w</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"getContentProvider,fake fail 1"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token punctuation">}</span>
+                    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                        mTargetProvider <span class="token operator">=</span> null<span class="token punctuation">;</span>
+                        Log<span class="token punctuation">.</span><span class="token function">w</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"getContentProvider,fake fail 2=%s"</span><span class="token punctuation">,</span> name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">return</span> <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">beforeInvoke</span><span class="token punctuation">(</span>receiver<span class="token punctuation">,</span> method<span class="token punctuation">,</span> args<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li><li style="color: rgb(153, 153, 153);">28</li><li style="color: rgb(153, 153, 153);">29</li><li style="color: rgb(153, 153, 153);">30</li></ul></pre>
+<p>这里不管是什么请求，authority都会被改成stub provider的authority，在请求结束后，在将authority关联contentprovider对应的binder proxy设置成DroidPlugin自己的</p>
+<pre class="prettyprint"><code class="prism language-java has-numbering">Object provider <span class="token operator">=</span> FieldUtils<span class="token punctuation">.</span><span class="token function">readField</span><span class="token punctuation">(</span>invokeResult<span class="token punctuation">,</span> <span class="token string">"provider"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>provider <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        <span class="token keyword">boolean</span> localProvider <span class="token operator">=</span> FieldUtils<span class="token punctuation">.</span><span class="token function">readField</span><span class="token punctuation">(</span>toObj<span class="token punctuation">,</span> <span class="token string">"provider"</span><span class="token punctuation">)</span> <span class="token operator">==</span> null<span class="token punctuation">;</span>
+                        IContentProviderHook invocationHandler <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">IContentProviderHook</span><span class="token punctuation">(</span>mHostContext<span class="token punctuation">,</span> provider<span class="token punctuation">,</span> mStubProvider<span class="token punctuation">,</span> mTargetProvider<span class="token punctuation">,</span> localProvider<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        invocationHandler<span class="token punctuation">.</span><span class="token function">setEnable</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">&gt;</span> clazz <span class="token operator">=</span> provider<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        List<span class="token operator">&lt;</span>Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">&gt;&gt;</span> interfaces <span class="token operator">=</span> Utils<span class="token punctuation">.</span><span class="token function">getAllInterfaces</span><span class="token punctuation">(</span>clazz<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        Class<span class="token punctuation">[</span><span class="token punctuation">]</span> ifs <span class="token operator">=</span> interfaces <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> interfaces<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token number">0</span> <span class="token operator">?</span> interfaces<span class="token punctuation">.</span><span class="token function">toArray</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span>interfaces<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+                        Object proxyprovider <span class="token operator">=</span> MyProxy<span class="token punctuation">.</span><span class="token function">newProxyInstance</span><span class="token punctuation">(</span>clazz<span class="token punctuation">.</span><span class="token function">getClassLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> ifs<span class="token punctuation">,</span> invocationHandler<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        FieldUtils<span class="token punctuation">.</span><span class="token function">writeField</span><span class="token punctuation">(</span>invokeResult<span class="token punctuation">,</span> <span class="token string">"provider"</span><span class="token punctuation">,</span> proxyprovider<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        FieldUtils<span class="token punctuation">.</span><span class="token function">writeField</span><span class="token punctuation">(</span>toObj<span class="token punctuation">,</span> <span class="token string">"provider"</span><span class="token punctuation">,</span> proxyprovider<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li></ul></pre>
+<p>接着在IContentProviderHook对发送uri做替换</p>
+<pre class="prettyprint"><code class="prism language-java has-numbering">  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>mLocalProvider <span class="token operator">&amp;&amp;</span> mStubProvider <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+               <span class="token keyword">final</span> <span class="token keyword">int</span> index <span class="token operator">=</span> <span class="token function">indexFirstUri</span><span class="token punctuation">(</span>args<span class="token punctuation">)</span><span class="token punctuation">;</span>
+               <span class="token keyword">if</span> <span class="token punctuation">(</span>index <span class="token operator">&gt;=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                   Uri uri <span class="token operator">=</span> <span class="token punctuation">(</span>Uri<span class="token punctuation">)</span> args<span class="token punctuation">[</span>index<span class="token punctuation">]</span><span class="token punctuation">;</span>
+                   String authority <span class="token operator">=</span> uri<span class="token punctuation">.</span><span class="token function">getAuthority</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                   <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>TextUtils<span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span>authority<span class="token punctuation">,</span> mStubProvider<span class="token punctuation">.</span>authority<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                       Uri<span class="token punctuation">.</span>Builder b <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                       b<span class="token punctuation">.</span><span class="token function">scheme</span><span class="token punctuation">(</span>uri<span class="token punctuation">.</span><span class="token function">getScheme</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                       b<span class="token punctuation">.</span><span class="token function">authority</span><span class="token punctuation">(</span>mStubProvider<span class="token punctuation">.</span>authority<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                       b<span class="token punctuation">.</span><span class="token function">path</span><span class="token punctuation">(</span>uri<span class="token punctuation">.</span><span class="token function">getPath</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                       b<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span>uri<span class="token punctuation">.</span><span class="token function">getQuery</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                       b<span class="token punctuation">.</span><span class="token function">appendQueryParameter</span><span class="token punctuation">(</span>Env<span class="token punctuation">.</span>EXTRA_TARGET_AUTHORITY<span class="token punctuation">,</span> authority<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                       b<span class="token punctuation">.</span><span class="token function">fragment</span><span class="token punctuation">(</span>uri<span class="token punctuation">.</span><span class="token function">getFragment</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                       args<span class="token punctuation">[</span>index<span class="token punctuation">]</span> <span class="token operator">=</span> b<span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                   <span class="token punctuation">}</span>
+               <span class="token punctuation">}</span>
+           <span class="token punctuation">}</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li></ul></pre>
+<p>将uri的authority替换成stub provider的，将插件provider的authority保存到Env.EXTRA_TARGET_AUTHORITY这个parameter中<br><br>
+stubprovider实现就很简单了，根据Env.EXTRA_TARGET_AUTHORITY的值来创建插件provider，接着做代理就好了，这里不就贴代码了<br><br>
+<br>下面是contentprovider常规初始化流程，大家可以了解下</p>
+<ul>
+<li>ContextImpl.getContentResolver.insert-&gt;ApplicationContentResolver.acquireProvider-&gt;ActivityThread.acquireProvider-&gt;ActivityManagerNative.getContentProvider-&gt;AMS.getContentProvider</li>
+<li>接着ActivityThread.scheduleInstallProvider-&gt;ActivityThread.installProvider</li>
+<li>接着创建ContextProvider实例并获取内部native binder</li>
+</ul>
+<pre class="prettyprint"><code class="prism language-java has-numbering">  <span class="token keyword">try</span> <span class="token punctuation">{</span>
+               <span class="token keyword">final</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>ClassLoader cl <span class="token operator">=</span> c<span class="token punctuation">.</span><span class="token function">getClassLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+               localProvider <span class="token operator">=</span> <span class="token punctuation">(</span>ContentProvider<span class="token punctuation">)</span>cl<span class="token punctuation">.</span>
+                   <span class="token function">loadClass</span><span class="token punctuation">(</span>info<span class="token punctuation">.</span>name<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+               provider <span class="token operator">=</span> localProvider<span class="token punctuation">.</span><span class="token function">getIContentProvider</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+               <span class="token keyword">if</span> <span class="token punctuation">(</span>provider <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                   Slog<span class="token punctuation">.</span><span class="token function">e</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"Failed to instantiate class "</span> <span class="token operator">+</span>
+                         info<span class="token punctuation">.</span>name <span class="token operator">+</span> <span class="token string">" from sourceDir "</span> <span class="token operator">+</span>
+                         info<span class="token punctuation">.</span>applicationInfo<span class="token punctuation">.</span>sourceDir<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                   <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+               <span class="token punctuation">}</span>
+               <span class="token keyword">if</span> <span class="token punctuation">(</span>DEBUG_PROVIDER<span class="token punctuation">)</span> Slog<span class="token punctuation">.</span><span class="token function">v</span><span class="token punctuation">(</span>
+                   TAG<span class="token punctuation">,</span> <span class="token string">"Instantiating local provider "</span> <span class="token operator">+</span> info<span class="token punctuation">.</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+               <span class="token comment">// XXX Need to create the correct context for this provider.</span>
+               localProvider<span class="token punctuation">.</span><span class="token function">attachInfo</span><span class="token punctuation">(</span>c<span class="token punctuation">,</span> info<span class="token punctuation">)</span><span class="token punctuation">;</span>
+           <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+               <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>mInstrumentation<span class="token punctuation">.</span><span class="token function">onException</span><span class="token punctuation">(</span>null<span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                   <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span>
+                           <span class="token string">"Unable to get provider "</span> <span class="token operator">+</span> info<span class="token punctuation">.</span>name
+                           <span class="token operator">+</span> <span class="token string">": "</span> <span class="token operator">+</span> e<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+               <span class="token punctuation">}</span>
+               <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+           <span class="token punctuation">}</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li></ul></pre>
+<p>从代码里可以看出getIContentProvider返回的native binder才是contentprovider数据传输的核心</p>
+<ul>
+<li>接着调用ActivityManagerNative.publishContentProviders将新创建的provider同步到AMS</li>
+</ul>
+<p>还有一点很重要，通过AMS.getContentProvider-&gt;ActivityThread.acquireProvider,由于ActivityThread处理都是发送消息到mH，所以它是异步的，AMS.getContentProvider如果立即返回，肯定是空的，所以它必须要等待后续ActivityManagerNative.publishContentProviders执行完成后才返回，看AMS.getContentProviderImpl部分代码：</p>
+<pre class="prettyprint"><code class="prism language-java has-numbering"> <span class="token comment">//ActivityManagerService.getContentProviderImpl</span>
+ <span class="token comment">//.....前面代码没贴</span>
+ <span class="token comment">// Wait for the provider to be published...</span>
+        <span class="token keyword">synchronized</span> <span class="token punctuation">(</span>cpr<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">while</span> <span class="token punctuation">(</span>cpr<span class="token punctuation">.</span>provider <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>cpr<span class="token punctuation">.</span>launchingApp <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>conn <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        conn<span class="token punctuation">.</span>waiting <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                    cpr<span class="token punctuation">.</span><span class="token function">wait</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">InterruptedException</span> ex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>conn <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        conn<span class="token punctuation">.</span>waiting <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+  <span class="token keyword">return</span> cpr <span class="token operator">!=</span> null <span class="token operator">?</span> cpr<span class="token punctuation">.</span><span class="token function">newHolder</span><span class="token punctuation">(</span>conn<span class="token punctuation">)</span> <span class="token operator">:</span> null<span class="token punctuation">;</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li></ul></pre>
+<h2><a name="t8"></a><a name="t8"></a><a id="_427"></a>插件加载独立性</h2>
+<p>如果插件都在主进程启动运行，可能有人会有疑问，LoadedApk会不会乱掉？答案肯定是不会的，因为这个是DroidPlugin这个实现方案的前提，咱们看LoadedApk的生成代码</p>
+<pre class="prettyprint"><code class="has-numbering"> private LoadedApk getPackageInfo(ApplicationInfo aInfo, CompatibilityInfo compatInfo,
+            ClassLoader baseLoader, boolean securityViolation, boolean includeCode) {
+        synchronized (mResourcesManager) {
+            WeakReference&lt;LoadedApk&gt; ref;
+            if (includeCode) {
+                ref = mPackages.get(aInfo.packageName);
+            } else {
+                ref = mResourcePackages.get(aInfo.packageName);
+            }
+            LoadedApk packageInfo = ref != null ? ref.get() : null;
+            if (packageInfo == null || (packageInfo.mResources != null
+                    &amp;&amp; !packageInfo.mResources.getAssets().isUpToDate())) {
+                if (localLOGV) Slog.v(TAG, (includeCode ? "Loading code package "
+                        : "Loading resource-only package ") + aInfo.packageName
+                        + " (in " + (mBoundApplication != null
+                                ? mBoundApplication.processName : null)
+                        + ")");
+                packageInfo =
+                    new LoadedApk(this, aInfo, compatInfo, this, baseLoader,
+                            securityViolation, includeCode &amp;&amp;
+                            (aInfo.flags&amp;ApplicationInfo.FLAG_HAS_CODE) != 0);
+                if (includeCode) {
+                    mPackages.put(aInfo.packageName,
+                            new WeakReference&lt;LoadedApk&gt;(packageInfo));
+                } else {
+                    mResourcePackages.put(aInfo.packageName,
+                            new WeakReference&lt;LoadedApk&gt;(packageInfo));
+                }
+            }
+            return packageInfo;
+        }
+    }
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li><li style="color: rgb(153, 153, 153);">28</li><li style="color: rgb(153, 153, 153);">29</li><li style="color: rgb(153, 153, 153);">30</li><li style="color: rgb(153, 153, 153);">31</li><li style="color: rgb(153, 153, 153);">32</li></ul></pre>
+<p>ActivityThread会保存LoadeApk的map，key就是package name，所以各个插件的LoadedApk可以独立的存在ActivityThread中</p>
+<h2><a name="t9"></a><a name="t9"></a><a id="resource_465"></a>插件resource获取</h2>
+<p>Android资源获取依赖</p>
+<ul>
+<li>resource id，即开发中用到R.<em>.</em></li>
+<li>还有就是context.getResource()</li>
+</ul>
+<p>由于四大组件和Application这五个入口类的创建使用的是插件的class loader，那他们使用过程中用到的R.java肯定是对应插件的，这个不会有任何问题</p>
+<p>不过context本质是ContextImpl对象实例，这个对象不是基于插件的class loader创建的，这个要注意，但是它对插件resource独立获取没任何影响，因为</p>
+<ol>
+<li>context实例跟组件和Application都是一对一创建的，这就导致它不可能跟其他插件混淆</li>
+<li>context.getresource本质还是使用插件package res info创建AssertManager，它跟插件也是一对一绑定的</li>
+</ol>
+<p>所以，只要完成了插件LoadedApk的创建，组件运行过程中的resource就可以正常获取</p>
+<h2><a name="t10"></a><a name="t10"></a><a id="_477"></a>总结</h2>
+<p>DroidPlugin的设计真的很巧妙，作者能构思出这种方案，对组件的初始化肯定是非常熟悉的，这套插件化方案出来也很多年了，最近看一遍，主要还是想学习作者的实现思路，同时也加深自己对组件初始化相关代码的理解<br><br>
+组件实现能被偷天换日是基于Android这么一个设计前提，AMS只是保存组件的逻辑对象主体，ActivityThread只是基于逻辑主体token来创建本地组件对象并做后续跟踪，这就为修改本地组件对象提供了可能<br><br>
+不过这种方式对系统潜入太大了，兼容性会比较差</p>
+
+                                    </div>
+                <link href="https://csdnimg.cn/release/phoenix/mdeditor/markdown_views-b6c3c6d139.css" rel="stylesheet">
+                                    <div class="more-toolbox">
+                <div class="left-toolbox">
+                    <ul class="toolbox-list">
+                        
+                        <li class="tool-item tool-active is-like "><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#csdnc-thumbsup" />
+                        </svg><span class="name">点赞</span>
+                        <span class="count">1</span>
+                        </a></li>
+                        <li class="tool-item tool-active is-collection "><a href="javascript:;" data-report-click='{"mod":"popu_824"}'><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-Collection-G" />
+                        </svg><span class="name">收藏</span></a></li>
+                        <li class="tool-item tool-active is-share"><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-fenxiang" />
+                        </svg>分享</a></li>
+                        <!--打赏开始-->
+                                                <!--打赏结束-->
+                                                <li class="tool-item tool-more">
+                            <a>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024" width="200" height="200" version="1.1" p-id="5717" t="1575545411852"><defs><style type="text/css" /></defs><path d="M 179.176 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5718" /><path d="M 509.684 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5719" /><path d="M 846.175 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5720" /></svg>
+                            </a>
+                            <ul class="more-box">
+                                <li class="item"><a class="article-report">文章举报</a></li>
+                            </ul>
+                        </li>
+                                            </ul>
+                </div>
+                            </div>
+            <div class="person-messagebox">
+                <div class="left-message"><a href="https://blog.csdn.net/zhejiang9">
+                    <img class="avatar_pic" src="images/android03802.jpg" username="zhejiang9">
+                                            <img class="user-years" src="images/android03803.png">
+                                    </a></div>
+                <div class="middle-message">
+                                        <div class="title"><span class="tit"><a href="https://blog.csdn.net/zhejiang9" target="_blank" data-report-click='{"mod":"popu_379"}'>拿节</a></span>
+                                            </div>
+                    <div class="text"><span>发布了44 篇原创文章</span> · <span>获赞 25</span> · <span>访问量 16万+</span></div>
+                </div>
+                                <div class="right-message">
+                                            <a class="btn btn-sm btn-red-hollow bt-button personal-letter" href="https://im.csdn.net/im/main.html?userName=zhejiang9" target="_blank">私信
+                        </a>
+                                                            <a class="btn btn-sm  bt-button personal-watch" data-report-click='{"mod":"popu_379"}'>关注</a>
+                                    </div>
+                            </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>

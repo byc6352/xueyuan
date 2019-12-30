@@ -1,0 +1,175 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android9.0下Hook式插件化改动 - wby371427的博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+                                           <div class="blog-column-pay">
+                     <a href="https://bss.csdn.net/m/topic/blog_star2019" target="_blank" data-report-query="utm_source=bkzx_BWzd" data-report-click='{"mod":"popu_834","dest":"https://bss.csdn.net/m/topic/blog_star2019","strategy":"pc文章详情页博客之星广告位"}'>
+                         <img style="width: 100%;" src="images/android04401.png">
+                     </a>
+                 </div>
+                         <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                                        <div class="markdown_views prism-atom-one-dark" id="content_views">
+                    <!-- flowchart 箭头图标 勿删 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-linecap="round" d="M 5 0 L 0 2.5 L 5 5 Z" />
+                    </svg>
+                                            <h4><a id="1IActivityManager_0"></a>1.IActivityManager</h4>
+<h6><a id="1ActivityInstrumentationexecStartActivityAndroid_26_1"></a>1启动Activity执行到Instrumentation的execStartActivity方法时，Android 26以下版本的代码为：</h6>
+<pre class="prettyprint"><code class="prism language-java has-numbering"><span class="token keyword">public</span> ActivityResult <span class="token function">execStartActivity</span><span class="token punctuation">(</span>Context who<span class="token punctuation">,</span> IBinder contextThread<span class="token punctuation">,</span> IBinder token<span class="token punctuation">,</span> Activity target<span class="token punctuation">,</span>Intent intent<span class="token punctuation">,</span> <span class="token keyword">int</span> requestCode<span class="token punctuation">,</span> Bundle options<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          <span class="token keyword">try</span> <span class="token punctuation">{</span>
+              intent<span class="token punctuation">.</span><span class="token function">migrateExtraStreamToClipData</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+              intent<span class="token punctuation">.</span><span class="token function">prepareToLeaveProcess</span><span class="token punctuation">(</span>who<span class="token punctuation">)</span><span class="token punctuation">;</span>
+              <span class="token comment">//获取IActivityManager</span>
+              <span class="token keyword">int</span> result <span class="token operator">=</span> ActivityManagerNative<span class="token punctuation">.</span><span class="token function">getDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                 <span class="token punctuation">.</span><span class="token function">startActivity</span><span class="token punctuation">(</span>whoThread<span class="token punctuation">,</span> who<span class="token punctuation">.</span><span class="token function">getBasePackageName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> intent<span class="token punctuation">,</span>intent<span class="token punctuation">.</span><span class="token function">resolveTypeIfNeeded</span><span class="token punctuation">(</span>who<span class="token punctuation">.</span><span class="token function">getContentResolver</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>token<span class="token punctuation">,</span> target <span class="token operator">!=</span> null <span class="token operator">?</span> target<span class="token punctuation">.</span>mEmbeddedID <span class="token operator">:</span> null<span class="token punctuation">,</span>requestCode<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> null<span class="token punctuation">,</span> options<span class="token punctuation">)</span><span class="token punctuation">;</span>
+              <span class="token function">checkStartActivityResult</span><span class="token punctuation">(</span>result<span class="token punctuation">,</span> intent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">RemoteException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+              <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span><span class="token string">"Failure from system"</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token punctuation">}</span>
+          <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li></ul></pre>
+<h6><a id="Android_26_17"></a>Android 26以上版本的代码为：</h6>
+<pre class="prettyprint"><code class="prism language-java has-numbering">    <span class="token keyword">public</span> ActivityResult <span class="token function">execStartActivity</span><span class="token punctuation">(</span>Context who<span class="token punctuation">,</span> IBinder contextThread<span class="token punctuation">,</span> IBinder token<span class="token punctuation">,</span> Activity target<span class="token punctuation">,</span>Intent intent<span class="token punctuation">,</span> <span class="token keyword">int</span> requestCode<span class="token punctuation">,</span> Bundle options<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            intent<span class="token punctuation">.</span><span class="token function">migrateExtraStreamToClipData</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            intent<span class="token punctuation">.</span><span class="token function">prepareToLeaveProcess</span><span class="token punctuation">(</span>who<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment">//获取IActivityManager</span>
+            <span class="token keyword">int</span> result <span class="token operator">=</span> ActivityManager<span class="token punctuation">.</span><span class="token function">getService</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">startActivity</span><span class="token punctuation">(</span>whoThread<span class="token punctuation">,</span> who<span class="token punctuation">.</span><span class="token function">getBasePackageName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> intent<span class="token punctuation">,</span>intent<span class="token punctuation">.</span><span class="token function">resolveTypeIfNeeded</span><span class="token punctuation">(</span>who<span class="token punctuation">.</span><span class="token function">getContentResolver</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                        token<span class="token punctuation">,</span> target <span class="token operator">!=</span> null <span class="token operator">?</span> target<span class="token punctuation">.</span>mEmbeddedID <span class="token operator">:</span> null<span class="token punctuation">,</span>requestCode<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> null<span class="token punctuation">,</span> options<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">checkStartActivityResult</span><span class="token punctuation">(</span>result<span class="token punctuation">,</span> intent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">RemoteException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span><span class="token string">"Failure from system"</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li></ul></pre>
+<h6><a id="HookIntentIActivityManagerAndroid_26_35"></a>在Hook进行Intent替换时，获取IActivityManager的方式不同，Android 26以下版本如下：</h6>
+<pre class="prettyprint"><code class="prism language-java has-numbering">Class <span class="token class-name">mActivityManagerClass</span> <span class="token operator">=</span> Class<span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span><span class="token string">"android.app.ActivityManagerNative"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Method getDefaultMethod <span class="token operator">=</span> mActivityManagerClass<span class="token punctuation">.</span><span class="token function">getDeclaredMethod</span><span class="token punctuation">(</span><span class="token string">"getDefault"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+getDefaultMethod<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+mIActivityManager <span class="token operator">=</span> getDefaultMethod<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span>null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li></ul></pre>
+<h6><a id="Android_26_42"></a>Android 26以上版本如下：</h6>
+<pre class="prettyprint"><code class="prism language-java has-numbering">Class <span class="token class-name">mActivityManagerClass</span> <span class="token operator">=</span> Class<span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span><span class="token string">"android.app.ActivityManager"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+mIActivityManager <span class="token operator">=</span> mActivityManagerClass<span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token string">"getService"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span>null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+Field mIActivityManagerSingletonField <span class="token operator">=</span> mActivityManagerClass<span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"IActivityManagerSingleton"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+mIActivityManagerSingletonField<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+mIActivityManagerSingleton <span class="token operator">=</span> mIActivityManagerSingletonField<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li></ul></pre>
+<h4><a id="2_Handler_H_50"></a>2. Handler H</h4>
+<h6><a id="Android_28ActivityThreadHandler_H_51"></a>在Android 28版本中，ActivityThread的内部类Handler H去掉了以下消息类型：</h6>
+<pre class="prettyprint"><code class="prism language-java has-numbering"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">int</span> LAUNCH_ACTIVITY         <span class="token operator">=</span> <span class="token number">100</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">int</span> PAUSE_ACTIVITY          <span class="token operator">=</span> <span class="token number">101</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">int</span> PAUSE_ACTIVITY_FINISHING<span class="token operator">=</span> <span class="token number">102</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">int</span> STOP_ACTIVITY_SHOW      <span class="token operator">=</span> <span class="token number">103</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">int</span> STOP_ACTIVITY_HIDE      <span class="token operator">=</span> <span class="token number">104</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">int</span> SHOW_WINDOW             <span class="token operator">=</span> <span class="token number">105</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">int</span> HIDE_WINDOW             <span class="token operator">=</span> <span class="token number">106</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">int</span> RESUME_ACTIVITY         <span class="token operator">=</span> <span class="token number">107</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">int</span> SEND_RESULT             <span class="token operator">=</span> <span class="token number">108</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">int</span> DESTROY_ACTIVITY        <span class="token operator">=</span> <span class="token number">109</span><span class="token punctuation">;</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li></ul></pre>
+<h6><a id="ActivityhandleMessage_65"></a>当启动Activity时，会跳转到handleMessage方法的以下代码：</h6>
+<pre class="prettyprint"><code class="prism language-java has-numbering"><span class="token keyword">case</span> EXECUTE_TRANSACTION<span class="token operator">:</span>
+       <span class="token keyword">final</span> ClientTransaction transaction <span class="token operator">=</span> <span class="token punctuation">(</span>ClientTransaction<span class="token punctuation">)</span>msg<span class="token punctuation">.</span>obj<span class="token punctuation">;</span>
+       mTransactionExecutor<span class="token punctuation">.</span><span class="token function">execute</span><span class="token punctuation">(</span>transaction<span class="token punctuation">)</span><span class="token punctuation">;</span>
+       <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isSystem</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+       <span class="token comment">// Client transactions inside system process are recycled on the client side</span>
+       <span class="token comment">// instead of ClientLifecycleManager to avoid being cleared before this</span>
+       <span class="token comment">// message is handled.</span>
+       	transaction<span class="token punctuation">.</span><span class="token function">recycle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+       <span class="token punctuation">}</span>
+       <span class="token comment">// TODO(lifecycler): Recycle locally scheduled transactions.</span>
+       <span class="token keyword">break</span><span class="token punctuation">;</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li></ul></pre>
+<h6><a id="IntentAMSIntentClientTransactionClientTransactionListClientTransactionItem_mActivityCallbacksClientTransactionItemLaunchActivityItemLaunchActivityItemIntentIntent_79"></a>在以上代码执行前，需要把真实的Intent注入其中，替换掉绕过AMS检查的代理Intent。以上代码首先获得了ClientTransaction对象，ClientTransaction中有一个成员变量List mActivityCallbacks，ClientTransactionItem的其中一个子类是LaunchActivityItem，LaunchActivityItem中的成员变量Intent就是需要替换的Intent。</h6>
+<h6><a id="MyHandlerandroidosHandlerMyHandlerActivityThreadHhandlerMessagemActivityCallbacks_80"></a>新建一个MyHandler继承android.os.Handler，使用MyHandler替换ActivityThread中的H，在handlerMessage中，首先获取mActivityCallbacks。</h6>
+<pre class="prettyprint"><code class="prism language-java has-numbering">Object mClientTransaction <span class="token operator">=</span> msg<span class="token punctuation">.</span>obj<span class="token punctuation">;</span>
+<span class="token comment">//获取mClientTransaction中的List&lt;ClientTransactionItem&gt; mActivityCallbacks</span>
+Field mactivityCallbacks <span class="token operator">=</span> mClientTransaction<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"mActivityCallbacks"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+mactivityCallbacks<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+List mActivityCallbacks <span class="token operator">=</span> <span class="token punctuation">(</span>List<span class="token punctuation">)</span>mactivityCallbacks<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>mClientTransaction<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>mActivityCallbacks<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li></ul></pre>
+<h6><a id="LaunchActivityItem_91"></a>获取LaunchActivityItem：</h6>
+<pre class="prettyprint"><code class="prism language-java has-numbering">Class <span class="token class-name">mLaunchActivityItemClass</span> <span class="token operator">=</span> Class<span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span><span class="token string">"android.app.servertransaction.LaunchActivityItem"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Object mLaunchActivityItem <span class="token operator">=</span> mActivityCallbacks<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+<span class="token keyword">if</span> <span class="token punctuation">(</span>mLaunchActivityItemClass<span class="token punctuation">.</span><span class="token function">isInstance</span><span class="token punctuation">(</span>mLaunchActivityItem<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token boolean">false</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token comment">//拿到LaunchActivityItem中的Intent</span>
+Field mIntentField <span class="token operator">=</span> mLaunchActivityItemClass<span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"mIntent"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+mIntentField<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Intent proxyIntent <span class="token operator">=</span> <span class="token punctuation">(</span>Intent<span class="token punctuation">)</span> mIntentField<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>mLaunchActivityItem<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li></ul></pre>
+<h6><a id="Intent_104"></a>替换Intent：</h6>
+<pre class="prettyprint"><code class="prism language-java has-numbering">Intent targetIntent <span class="token operator">=</span> proxyIntent<span class="token punctuation">.</span><span class="token function">getParcelableExtra</span><span class="token punctuation">(</span><span class="token string">"targetIntent"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>targetIntent <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     mIntentField<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+     mIntentField<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>mLaunchActivityItem<span class="token punctuation">,</span> targetIntent<span class="token punctuation">)</span><span class="token punctuation">;</span> 
+<span class="token punctuation">}</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li></ul></pre>
+
+                                    </div>
+                <link href="https://csdnimg.cn/release/phoenix/mdeditor/markdown_views-b6c3c6d139.css" rel="stylesheet">
+                                    <div class="more-toolbox">
+                <div class="left-toolbox">
+                    <ul class="toolbox-list">
+                        
+                        <li class="tool-item tool-active is-like "><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#csdnc-thumbsup" />
+                        </svg><span class="name">点赞</span>
+                        <span class="count"></span>
+                        </a></li>
+                        <li class="tool-item tool-active is-collection "><a href="javascript:;" data-report-click='{"mod":"popu_824"}'><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-Collection-G" />
+                        </svg><span class="name">收藏</span></a></li>
+                        <li class="tool-item tool-active is-share"><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-fenxiang" />
+                        </svg>分享</a></li>
+                        <!--打赏开始-->
+                                                <!--打赏结束-->
+                                                <li class="tool-item tool-more">
+                            <a>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024" width="200" height="200" version="1.1" p-id="5717" t="1575545411852"><defs><style type="text/css" /></defs><path d="M 179.176 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5718" /><path d="M 509.684 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5719" /><path d="M 846.175 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5720" /></svg>
+                            </a>
+                            <ul class="more-box">
+                                <li class="item"><a class="article-report">文章举报</a></li>
+                            </ul>
+                        </li>
+                                            </ul>
+                </div>
+                            </div>
+            <div class="person-messagebox">
+                <div class="left-message"><a href="https://blog.csdn.net/wby371427">
+                    <img class="avatar_pic" src="images/android04402.jpg" username="wby371427">
+                                            <img class="user-years" src="images/android04403.png">
+                                    </a></div>
+                <div class="middle-message">
+                                        <div class="title"><span class="tit"><a href="https://blog.csdn.net/wby371427" target="_blank" data-report-click='{"mod":"popu_379"}'>wby93</a></span>
+                                            </div>
+                    <div class="text"><span>发布了16 篇原创文章</span> · <span>获赞 0</span> · <span>访问量 322</span></div>
+                </div>
+                                <div class="right-message">
+                                            <a class="btn btn-sm btn-red-hollow bt-button personal-letter" href="https://im.csdn.net/im/main.html?userName=wby371427" target="_blank">私信
+                        </a>
+                                                            <a class="btn btn-sm  bt-button personal-watch" data-report-click='{"mod":"popu_379"}'>关注</a>
+                                    </div>
+                            </div>
+                    </div>
+
+
+</div>
+
+
+</body></html>
