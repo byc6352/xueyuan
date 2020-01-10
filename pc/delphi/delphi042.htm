@@ -1,0 +1,73 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delphi字符串长度不够前面补0,该如何处理_Delphi知识局QQ群:32422310-CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content">
+            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            <p><span style="color: rgb(0, 0, 0);">字符串长度不够前面补0</span><br><span style="color: rgb(0, 0, 0);">str&nbsp;:=&nbsp;'29';&nbsp;我想要str长度为5位，什么方法可以前面补0&nbsp;？</span></p>
+
+<p><span style="color: rgb(0, 0, 0);">分享到：更多</span></p>
+
+<p><br><span style="color: rgb(255, 128, 0);">------解决方案--------------------</span><br><span style="color: rgb(0, 0, 0);">才5位..自己加拉..</span><br><br><span style="color: rgb(0, 0, 0);">str&nbsp;:=&nbsp;rightstr('00000'&nbsp;+&nbsp;str,&nbsp;5)</span><br><span style="color: rgb(255, 128, 0);">------解决方案--------------------</span><br><span style="color: rgb(0, 0, 0);">1.如2楼的写法，先拼上五个0后右截取;</span><br><span style="color: rgb(0, 0, 0);">2.写个循环判断长度小于五位就左补0的；</span><br><span style="color: rgb(0, 0, 0);">3.Format('%.5d',[strToInt(str)])&nbsp;，前提是str能转换成整数.</span><br><span style="color: rgb(255, 128, 0);">------解决方案--------------------</span></p>
+
+<pre class="has" style="margin-left: 0px;" name="code"><code class="language-brush: hljs"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">&lt;span style="color:#000000"&gt;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">uses&nbsp;System.StrUtils;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">var</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">&nbsp;&nbsp;str:&nbsp;string;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">begin</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">&nbsp;&nbsp;str&nbsp;:=&nbsp;'34';</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="15"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">&nbsp;&nbsp;str&nbsp;:=&nbsp;Format('%5s',&nbsp;[str]);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//格式化字符串，用空格式填充</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="16"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="17"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">&nbsp;&nbsp;str&nbsp;:=&nbsp;ReplaceStr(str,&nbsp;'&nbsp;',&nbsp;'0');&nbsp;&nbsp;//将空格替代换0</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="18"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="19"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">&nbsp;&nbsp;ShowMessage(str);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="20"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="21"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">&lt;/span&gt;</div></div></li></ol></code></pre>
+
+<p><br><span style="color: rgb(255, 128, 0);">------解决方案--------------------</span><br><span style="color: rgb(0, 0, 0);">uses</span><br><span style="color: rgb(0, 0, 0);">&nbsp;&nbsp;strutils;</span><br><br><span style="color: rgb(0, 0, 0);">...</span><br><span style="color: rgb(0, 0, 0);">str&nbsp;:=&nbsp;dupestring('0',5-length(str))&nbsp;&nbsp;+str;</span><br><span style="color: rgb(255, 128, 0);">------解决方案--------------------</span><br><span style="color: rgb(0, 0, 0);">Format('%5.5d',[StrToInt(s)]);</span></p>
+                                    </div>
+                                                <div class="more-toolbox">
+                <div class="left-toolbox">
+                    <ul class="toolbox-list">
+                        
+                        <li class="tool-item tool-active is-like "><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#csdnc-thumbsup" />
+                        </svg><span class="name">点赞</span>
+                        <span class="count"></span>
+                        </a></li>
+                        <li class="tool-item tool-active is-collection "><a href="javascript:;" data-report-click='{"mod":"popu_824"}'><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-Collection-G" />
+                        </svg><span class="name">收藏</span></a></li>
+                        <li class="tool-item tool-active is-share"><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-fenxiang" />
+                        </svg>分享</a></li>
+                        <!--打赏开始-->
+                                                <!--打赏结束-->
+                                                <li class="tool-item tool-more">
+                            <a>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024" width="200" height="200" version="1.1" p-id="5717" t="1575545411852"><defs><style type="text/css" /></defs><path d="M 179.176 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5718" /><path d="M 509.684 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5719" /><path d="M 846.175 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5720" /></svg>
+                            </a>
+                            <ul class="more-box">
+                                <li class="item"><a class="article-report">文章举报</a></li>
+                            </ul>
+                        </li>
+                                            </ul>
+                </div>
+                            </div>
+            <div class="person-messagebox">
+                <div class="left-message"><a href="https://blog.csdn.net/xyzhan">
+                    <img class="avatar_pic" src="images/delphi04201.jpg" username="xyzhan">
+                                            <img class="user-years" src="images/delphi04202.png">
+                                    </a></div>
+                <div class="middle-message">
+                                        <div class="title"><span class="tit"><a href="https://blog.csdn.net/xyzhan" target="_blank" data-report-click='{"mod":"popu_379"}'>xyzhan</a></span>
+                                            </div>
+                    <div class="text"><span>发布了53 篇原创文章</span> · <span>获赞 10</span> · <span>访问量 3万+</span></div>
+                </div>
+                                <div class="right-message">
+                                            <a class="btn btn-sm btn-red-hollow bt-button personal-letter" href="https://im.csdn.net/im/main.html?userName=xyzhan" target="_blank">私信
+                        </a>
+                                                            <a class="btn btn-sm  bt-button personal-watch" data-report-click='{"mod":"popu_379"}'>关注</a>
+                                    </div>
+                            </div>
+                    </div>
+
+</div>
+
+
+</body></html>

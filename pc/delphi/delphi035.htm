@@ -1,0 +1,109 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="blogpost-body " id="cnblogs_post_body">
+    TStream 是一个抽象的基类, 不能直接生成对象. 在具体的应用中, 主要使用它的子孙类:<br>
+TFileStream: 文件流<br>
+TStringStream: 字符串流<br>
+TMemoryStream: 内存流<br>
+TResourceStream: 资源文件流<br><br>
+THandleStream: 是 TFileStream 的父类、TStream 的子类<br>
+TCustomMemoryStream: 是 TMemoryStream 和 TResourceStream 的父类、TStream 的子类<br><br>
+与流相关的常用类还有: TReader、TWriter、TCompressionStream、TDecompressionStream<br><br>
+来一个文件流的例子:
+<hr><br>
+<pre class="Delphi"><pre><font color="#008000"></font><font color="#008284"></font><font color="#0000ff"></font><font color="#000080"><b>procedure</b></font> TForm1.Button1Click(Sender: TObject);
+<font color="#008000"></font><font color="#008284"></font><font color="#0000ff"></font><font color="#000080"><b>var</b></font>
+&nbsp; getStream,setStream: TFileStream; <font color="#008000">{声明一个文件流}</font><font color="#008284"></font><font color="#0000ff"></font><font color="#000080"><b></b></font>
+&nbsp; getPath,setPath: <font color="#008000"></font><font color="#008284"></font><font color="#0000ff"></font><font color="#000080"><b>string</b></font>;
+<font color="#008000"></font><font color="#008284"></font><font color="#0000ff"></font><font color="#000080"><b>begin</b></font>
+&nbsp; getPath := <font color="#008000"></font><font color="#008284"></font><font color="#0000ff">'c:\temp\get.jpg'</font><font color="#000080"><b></b></font>; <font color="#008000">{需要这个文件存在}</font><font color="#008284"></font><font color="#0000ff"></font><font color="#000080"><b></b></font>
+&nbsp; setPath := <font color="#008000"></font><font color="#008284"></font><font color="#0000ff">'c:\temp\set.jpg'</font><font color="#000080"><b></b></font>; <font color="#008000">{这个会自动建立}</font><font color="#008284"></font><font color="#0000ff"></font><font color="#000080"><b></b></font>
+&nbsp; <font color="#008000"></font><font color="#008284"></font><font color="#0000ff"></font><font color="#000080"><b>if</b></font> <font color="#008000"></font><font color="#008284"></font><font color="#0000ff"></font><font color="#000080"><b>not</b></font> FileExists(getPath) <font color="#008000"></font><font color="#008284"></font><font color="#0000ff"></font><font color="#000080"><b>then</b></font>
+&nbsp; <font color="#008000"></font><font color="#008284"></font><font color="#0000ff"></font><font color="#000080"><b>begin</b></font>
+&nbsp; &nbsp; ShowMessage(<font color="#008000"></font><font color="#008284"></font><font color="#0000ff">'找不到我们要测试的图片文件: '</font><font color="#000080"><b></b></font> + getPath);
+&nbsp; &nbsp; Exit;
+&nbsp; <font color="#008000"></font><font color="#008284"></font><font color="#0000ff"></font><font color="#000080"><b>end</b></font>;
+
+&nbsp; getStream := TFileStream.Create(getPath, fmOpenRead <font color="#008000"></font><font color="#008284"></font><font color="#0000ff"></font><font color="#000080"><b>or</b></font> fmShareExclusive);
+&nbsp; setStream := TFileStream.Create(setPath, fmCreate);
+&nbsp; <font color="#008000">{建立文件流需要两个参数: 参数 1 是路径, 参数 2 是打开模式}</font><font color="#008284"></font><font color="#0000ff"></font><font color="#000080"><b></b></font>
+
+&nbsp; getStream.Position := <font color="#008000"></font><font color="#008284"></font><font color="#0000ff">0</font><font color="#000080"><b></b></font>; <font color="#008000">{流指针移到开始, 复制时从这里开始}</font><font color="#008284"></font><font color="#0000ff"></font><font color="#000080"><b></b></font>
+&nbsp; setStream.CopyFrom(getStream, getStream.Size); <font color="#008000">{Copy 流}</font><font color="#008284"></font><font color="#0000ff"></font><font color="#000080"><b></b></font>
+&nbsp; <font color="#008000">{CopyFrom 的参数 2 是要复制的内容大小; 如果为 0 , 不管指针在什么位置都会复制所有内容}</font><font color="#008284"></font><font color="#0000ff"></font><font color="#000080"><b></b></font>
+&nbsp; <font color="#008000">{CopyFrom 返回实际拷贝的字节数}</font><font color="#008284"></font><font color="#0000ff"></font><font color="#000080"><b></b></font>
+
+&nbsp; <font color="#008000">{这时硬盘上就有 set.jpg 文件, 与 get.jpg 一么一样}</font><font color="#008284"></font><font color="#0000ff"></font><font color="#000080"><b></b></font>
+&nbsp; <font color="#008000">{其实就是复制文件, 不过这里我们是用文件流实现的}</font><font color="#008284"></font><font color="#0000ff"></font><font color="#000080"><b></b></font>
+
+&nbsp; getStream.Free;
+&nbsp; setStream.Free;
+<font color="#008000"></font><font color="#008284"></font><font color="#0000ff"></font><font color="#000080"><b>end</b></font>;
+<hr>
+</pre></pre>
+TFileStream 打开模式与共享模式:<br><br>
+<table bordercolor="#808080" style="border-collapse: collapse;" border="1" cellspacing="1">
+<tbody><tr>
+<th>分类</th>
+<th>参数</th>
+<th>说明</th>
+</tr>
+<tr>
+<th rowspan="4">打<br>
+  开<br>
+  模<br>
+  式</th>
+<td>fmCreate&nbsp;</td>
+<td> 建立文件, 如果存在则打开它。</td>
+</tr>
+<tr>
+<td>fmOpenRead</td>
+<td> 只读打开</td>
+</tr>
+<tr>
+<td>fmOpenWrite</td>
+<td>只写打开</td>
+</tr>
+<tr>
+<td>fmOpenReadWrite</td>
+<td>读写打开</td>
+</tr>
+<tr>
+<th rowspan="5">共<br>
+  享<br>
+  模<br>
+  式</th>
+<td>fmShareCompat</td>
+<td> 共享模式, 兼容 Dos</td> 
+</tr>
+<tr>
+<td>fmShareExclusive&nbsp;</td>
+<td> 不允许别人以任何方式打开</td>
+</tr>
+<tr>
+<td>fmShareDenyWrite&nbsp;</td>
+<td>允许别人以只写方式打开</td>
+</tr>
+<tr>
+<td>fmShareDenyRead</td>
+<td> 允许别人以只读方式打开</td>
+</tr>
+<tr>
+<td>fmShareDenyNone</td>
+<td>允许别人以任何方式打开</td>
+</tr>
+</tbody></table>
+<hr><br>
+</div>
+
+</div>
+
+
+</body></html>

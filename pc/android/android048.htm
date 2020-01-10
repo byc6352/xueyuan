@@ -1,0 +1,205 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VirtualApp技术黑产利用研究报告_weixin_34128237的博客-CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            <div class="blogpost-body" id="cnblogs_post_body"><h2><a name="t0"></a><a name="t0"></a>一、 前言</h2>
+<p>VirtualApp（以下称VA）是一个App虚拟化引擎（简称VA）。VirtualApp创建了一个虚拟空间，你可以在虚拟空间内任意的安装、启动和卸载APK，这一切都与外部隔离，如同一个沙盒。运行在VA中的APK无需在Android系统中安装即可运行，也就是我们熟知的多开应用。</p>
+<p>VA免安装运行APK的特性使得VA内应用与VA相比具有不同的应用特征，这使得VA可用于免杀。此外，VA对被多开应用有较大权限，可能构成安全风险。</p>
+<p>本报告首先简要介绍VA的多开实现原理，之后分析目前在灰色产业的应用，针对在免杀的应用，安全云对此的应对，并给出色情应用作为例子。另一方面，通过对样本分析，展示了VA对于安装在其内应用的高度控制能力，及其带来的安全风险。最后对本报告进行总结。</p>
+<h2><a name="t1"></a><a name="t1"></a>二、 VirtualApp原理</h2>
+<p>Android应用启动Activity时，无论通过何种API调用，最终会调用到ActivityManager.startActivity()方法。该调用为远程Binder服务(加速该调用，Android应用会先在本地进程查找Binder服务缓存，如果找到，则直接调用。VA介入了该调用过程，通过以下方式：</p>
+<blockquote>
+<p>1. 替换本地的ActivityManagerServise Binder服务为VA构造的代理对象，以接管该调用。这一步通过反射实现。</p>
+<p>2. 接管后，当调用startActivity启动多开应用时，VA修改Intent中的Activity为VA中己声明的占位Activity。这一步的目的是绕过Android无法启动未在AndroidManifest.xml中声明Activity的限制。</p>
+<p>3. 在被多开应用进程启动后，增加ActivityThread.mH.mCallback的消息处理回调。这一步接管了多开应用主线程的消息回调。</p>
+</blockquote>
+<p>在以上修改的基础上，多开应用的Activity启动过程可分为以下两步骤：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090844795939.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04801.jpg"></a></p>
+<p>步骤一 修改Activity为己声明的StubActivity</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090845274584.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04802.jpg"></a></p>
+<p>步骤二 mCallback从Intent中恢复Acitivty信息</p>
+<p>AMS：Android系统的ActivityManagerService，是管理Activity的系统服务</p>
+<p>VAMS：VA用于管理多开应用Activity的服务，大量API名称与AMS雷同。</p>
+<p>VApp：被多开应用所在的进程，该进程实际为VA派生的进程。</p>
+<p>由图可知，VA在AMS和VApp中通过增加VAMS对启动Intent进行了修改，实现了对Android系统的欺骗，而当应用进程启动后，还原Activity信息。通过自定义Classloader令使得Android加载并构造了未在VA的AndroidManifest.xml中声明的Activity。</p>
+<p>以上是启动过程的简化描述，实际上，VA对大量Android 系统API进行了Hook，这使得运行在其中的应用在VA的控制下，为VA的应用带来可能性。</p>
+<h2><a name="t2"></a><a name="t2"></a>三、 在灰色产业的应用</h2>
+<h3><a name="t3"></a><a name="t3"></a>3.1 免杀</h3>
+<p>VA等多开工具将Android系统与VA内的应用隔离，使得应用的静态特征被掩盖，目前己有恶意应用使用VA对自身重打包，重打包后的应用包名、软件名与原应用不同，从而实现免杀。安全云使用动态检测关联恶意应用和VA的方式应对该免杀技术。</p>
+<p>免杀的常见做法是：恶意应用加密后打包在VA内，由VA在运行时解密APK，将恶意应用的APK安装到VA内并运行。</p>
+<p>经过打包后，VA用的包名、证书可以与恶意应用不同，资源文件、二进制库文件与恶意应用相互独立。基于包名、证书等特征维度的静态检测方式的准确性受到影响。</p>
+<p>如图，当静态引擎对VA应用检测时，获得的应用信息（包名、证书、代码等）是VA的信息，没有恶意特征。而当VA运行时，可以解密恶意应用APK，通过反射等技术欺骗Android系统运行未安装在系统中的APK，实现了免杀。</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090846881797.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04803.jpg"></a></p>
+<p>传统静态检测方式</p>
+<p>针对该免杀方式，安全云的APK动态检测实现了VA内应用APK的自动化提取，可将VA母包与恶意应用APK子包进行关联查杀。</p>
+<p>如图，动态引擎安装并启动APK，当识别出是VA应用时，提取出VA内的己解密的子包，对提取的子包进行检测。根据子包检测结果综合判定母包安全性，并对母包的安全风险进行标记查杀。</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090847808345.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04804.jpg"></a></p>
+<p>动态检测查杀示意图</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090848386871.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04805.jpg"></a></p>
+<p>免杀案例 色情应用</p>
+<p>2017年8月以来，安全云监测到部分色情应用使用VA的对自身打包，以达到绕过安全检测的目的。这些应用使用了随机的包名和软件名，并且均对恶意应用子包进行了加密。部分包名如表所示：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090849815284.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04806.jpg"></a></p>
+<p>从动态检测引擎提取的子包看，一个色情应用子包对应的带VA壳的母包（SHA1维度）数量从1到529不等。27个色情APK共对应1464个VA母包。</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/1509085055409.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04807.jpg"></a></p>
+<p>该类应用会以各种理由诱导用户升到更高等级的VIP不断支付：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090851155715.png" rel="nofollow"><img width="553" alt="VirtualApp技术黑产利用研究报告" src="images/android04808.jpg"></a></p>
+<p>读取用户短信收件箱：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090851794836.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04809.jpg"></a></p>
+<p>并且可以通过远程服务器控制应用是否运行，控制支付宝和微信支付的开启以逃避支付平台打击：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090852333764.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04810.jpg"></a></p>
+<p>目前该类色情应用的VA母包和子包均己被标记为灰色。</p>
+<h3><a name="t4"></a><a name="t4"></a>3.2 重打包</h3>
+<p>相较于以往反编译后插入代码进行打包编译的方式，使用VA进行重打包具有以下优点：</p>
+<p>1. 不需要对原应用进行反编译修改。</p>
+<p>由于VA是多开工具，这一优点是显然的。传统的重打包方式是对应用进行反编译成Smali代码，对Application类或Activity进行修改，插入广告展示等代码，再重编译打包回去。而VA重打包的应用只要让应用运行在VA内即可。</p>
+<p>2. 有效规避重打包检测</p>
+<p>应用可能通过检测签名、包名等方式检查是否被修改。而VA对Android系统的API进行了Hook，其中包括PackageManager的API，这些API用于获得包括签名在内的软件包信息。</p>
+<p>3. 通用性强</p>
+<p>同样的VA代码未经修改就可打包众多应用，可批量制造多开应用。</p>
+<p>4. 功能众多</p>
+<p>由于应用运行在VA进程内，VA代码具有与应用等同的权限，从下面的例子可知VA能做到包括但不限于：模拟点击、截图、在Activity创建时插入广告。以</p>
+<p>以某一类重打包样本为例，应用被重打包后启动界面增加一个插屏广告，如图：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090853446147.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04811.jpg"></a></p>
+<p>点击插屏广告后，将下载对应的应用（图中为“斗地主”及”炸金花”）并安装到VA中，并在桌面添加图标。区别于其他应用推广方式，此种方式安装的应用不必通过Android的包管理器进行安装，必要时也可静默安装。</p>
+<p>除了增加启动时的插屏广告，该应用还有以下行为</p>
+<p>1. 检查反病毒软件</p>
+<p>检查手机上是否安装了反病毒软件，如果存在，则不连接服务器获取命令。</p>
+<p>反病毒软件列表由服务器下发：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090861214024.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04812.jpg"></a></p>
+<p>内容如下：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090861777839.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04813.jpg"></a></p>
+<p>主流的手机安全应用如30、QQ手机管家、LE安全大师等均在该列表中。</p>
+<p>如果存在，则不连接服务器读取命令脚本：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/1509086217809.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04814.jpg"></a></p>
+<p>2. 启动应用</p>
+<p>可由服务器下发指令控制运行VA内的指定应用：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090862516902.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04815.jpg"></a></p>
+<p>3. 模拟点击</p>
+<p>可对运行在VA内的应用进行点击。</p>
+<p>1) 当VA内应用启动时注册Broadcast Receiver：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090863385152.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04816.jpg"></a></p>
+<p>2) 接收服务器脚本，发送广播</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090863966763.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04817.jpg"></a></p>
+<p>3) 执行点击脚本</p>
+<p>（1） 获得DecorViews，该View为Android应用的底层View。因为被多开的应用跑在VA内，因此VA有权限对应用类进行操作。</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/1509086454307.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04818.jpg"></a></p>
+<p>（2） 对(1)获得的View，调用View.dispatchTouchEvent()模拟触摸操作，支持的操作有，ACTION_DOWN（按下）、ACTION_MOVE（按下和抬起之间的操作）、ACTION_UP（抬起）。</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090865108410.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04819.jpg"></a></p>
+<p>（3） 值得注意的是，只有当用户不存在（未点亮屏幕，未锁屏）时，服务器的任务才会执行：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090865432477.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04820.jpg"></a></p>
+<p>4. 部分版本可对应用界面进行截图</p>
+<p>实现方式与模拟触摸操作类似，先获得DecorView，之后调用Android系统提供的方法进行截屏：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090865953605.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04821.jpg"></a></p>
+<p>对广播进行响应，并保存截图：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090866237116.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04822.jpg"></a></p>
+<p>相应的上传截图功能：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090866428398.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04823.jpg"></a></p>
+<p>5. 在Activity创建时显示广告</p>
+<p>VA对Activity的生命周期函数进行了Hook，因此可以方便地在Activity调用onCreate函数时显示广告：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090866784682.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04824.jpg"></a></p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/1509086704862.png" rel="nofollow"><img alt="" src="images/android04825.jpg"></a></p>
+<p>6. 上传设备信息</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090867291588.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04826.jpg"></a></p>
+<p>包括设备的型号、Android Id、分辨率等信息。</p>
+<p>7. 上传己安装应用列表</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090867589267.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04827.jpg"></a></p>
+<h3><a name="t5"></a><a name="t5"></a>3.3 免Root Hook</h3>
+<p>VA可在应用Application类创建时执行代码，这些代码先于应用执行。通过结合Hook框架（如YAHFA、AndFix）、VA可以方便对应用进行Hook，其Hook能力与Xposed框架等同。与Xposed框架比较如表所示：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090868207165.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04828.jpg"></a></p>
+<p>相较于Xposed框架，通过此方式Hook具有如下优点：</p>
+<blockquote>
+<p>1. 不需要Root权限</p>
+<p>2. 不需要重启系统就可以重新加载Hook代码，重启应用即可</p>
+<p>3. 可与Native Hook框架结合，Hook二进制库。实际上VA本身己使用Native Hook框架对应用的IO操作进行了重定向</p>
+</blockquote>
+<p>VA的免Root Hook能力对于被多开应用是一种安全威胁。VA可做到的包括但不限于：</p>
+<blockquote>
+<p>1. Hook密码相关函数，截取用户输入的密码</p>
+<p>2. Hook网络通信函数，监听网络通信</p>
+<p>3. Hook Android API。伪造Android设备信息、GPS定位记录等。</p>
+</blockquote>
+<p>下面分析某微信抢红包应用，以展示VA免Root Hook的能力。</p>
+<p>该样本是一个微信抢红包应用。目前流行的抢红包功能实现上有两种方案，一种是通过Android AccessiblityServices监测用户窗口，当红包关键字出现时，点击对应的View对象；一种是使用Xposed框架对红包相关的函数进行Hook，这种方案需要Root权限，但是不必打开微信界面即可抢红包。此应用抢红包也使用Hook红包相关函数的方式，但是不需要Root。</p>
+<p>1. 注入代码</p>
+<p>VA实现了插件化的注入模块，其中一个注入模块为FixBug_AppInstrumentation，该模块替换了ActivityThread的mInstrumentation对象：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090868624340.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04829.jpg"></a></p>
+<p>mInstrumentation对象会在应用Application类及Activity类创建时被执行相应的回调，该应用了修改了其中一个回调callApplicationOnCreate，在Application执行了红包代码：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090869197969.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04830.jpg"></a></p>
+<p>其中LuckyMoneyDispatcher为红包功能模块。</p>
+<p>函数LuckyMoneyDispatcher.andFixForLuckMoney()实现了方法替换：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090869523724.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04831.jpg"></a></p>
+<p>使用开源热修补框架AndFix替换com.tencent.mm.booter.notification.b.a()为LuckMoneyMethProxy.a()，并将被替换函数保存为LuckMoneyMethProxy.aOriginal()。</p>
+<p>2. 模拟点击红包消息</p>
+<p>LuckMoneyMethProxy.a()为替换后的函数，当微信接收到消息时被调用。</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090869815707.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04832.jpg"></a></p>
+<p>函数先判断消息类型，当确定是红包（436207665）后，解析消息，构造Intent并发送。这一步模拟了点击红包消息时的弹窗。</p>
+<p>3. 模拟拆开红包</p>
+<p>上一步的弹窗是一个Activity，当弹出时（对应Activity的onResume），mInstrumentation将被回调：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090870317809.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04833.jpg"></a></p>
+<p>onLuckyMoneyResume根据版本号确定要反射调用的“拆开红包按钮”（包括BUTTON_OPEN、OBJECT_OPEN、METHOD_OPEN）</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090870501370.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04834.jpg"></a></p>
+<p>最终由MonitorHandler反射调用拆开红包函数：</p>
+<p><a class="highslide-image" href="http://image.3001.net/images/20171027/15090870836148.png" rel="nofollow"><img alt="VirtualApp技术黑产利用研究报告" src="images/android04835.jpg"></a></p>
+<h2><a name="t6"></a><a name="t6"></a>四、 总结</h2>
+<p>VirtualApp作为开源的多开应用框架，可以被任何人使用。它在Android系统和被多开应用间增加了中间层。这带来了两方面问题，一方面，VA可掩盖应用的静态特征（包名、证书、资源文件、代码等），使得单纯的静态检测方法失效，应用具有了一定免杀的能力。同一个恶意应用可以有众多VA母包，且母包不包含恶意特征，这给检测引擎识别恶意应用带来了难度。安全云通过动态检测在VA母包运行时动态提取VA应用中的子包，并结合子包的恶意情况对母包的恶意情况进行综合判定，可有效对恶意应用的VA母包进行标记查杀。</p>
+<p>另一方面，由于多开应用运行在VA中，VA对被多开应用具有不弱于Root的权限，可方便有效介入应用运行流程。例如：当应用运行时展示广告，对多开应用进行截屏、模拟点击。更进一步的，VA可通过Hook修改应用的执行流程，获得应用的隐私数据，包括但不限于密码、与服务器的数据通信、照片等。应用应当对运行在VA或其他多开应用内的带来的安全风险有所了解并加以防范，特别是金融、通讯类应用。</p>
+<p>安全云己对相关VA应用进行监测，并及时对新型安全威胁作出响应。</p></div>                                    </div>
+                                                <div class="more-toolbox">
+                <div class="left-toolbox">
+                    <ul class="toolbox-list">
+                        
+                        <li class="tool-item tool-active is-like "><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#csdnc-thumbsup" />
+                        </svg><span class="name">点赞</span>
+                        <span class="count"></span>
+                        </a></li>
+                        <li class="tool-item tool-active is-collection "><a href="javascript:;" data-report-click='{"mod":"popu_824"}'><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-Collection-G" />
+                        </svg><span class="name">收藏</span></a></li>
+                        <li class="tool-item tool-active is-share"><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-fenxiang" />
+                        </svg>分享</a></li>
+                        <!--打赏开始-->
+                                                <!--打赏结束-->
+                                                <li class="tool-item tool-more">
+                            <a>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024" width="200" height="200" version="1.1" p-id="5717" t="1575545411852"><defs><style type="text/css" /></defs><path d="M 179.176 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5718" /><path d="M 509.684 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5719" /><path d="M 846.175 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5720" /></svg>
+                            </a>
+                            <ul class="more-box">
+                                <li class="item"><a class="article-report">文章举报</a></li>
+                            </ul>
+                        </li>
+                                            </ul>
+                </div>
+                            </div>
+            <div class="person-messagebox">
+                <div class="left-message"><a href="https://blog.csdn.net/weixin_34128237">
+                    <img class="avatar_pic" src="images/android04836.jpg" username="weixin_34128237">
+                                            <img class="user-years" src="images/android04837.png">
+                                    </a></div>
+                <div class="middle-message">
+                                        <div class="title"><span class="tit"><a href="https://blog.csdn.net/weixin_34128237" target="_blank" data-report-click='{"mod":"popu_379"}'>weixin_34128237</a></span>
+                                            </div>
+                    <div class="text"><span>发布了145 篇原创文章</span> · <span>获赞 46</span> · <span>访问量 16万+</span></div>
+                </div>
+                                <div class="right-message">
+                                            <a class="btn btn-sm btn-red-hollow bt-button personal-letter" href="https://im.csdn.net/im/main.html?userName=weixin_34128237" target="_blank">私信
+                        </a>
+                                                            <a class="btn btn-sm  bt-button personal-watch" data-report-click='{"mod":"popu_379"}'>关注</a>
+                                    </div>
+                            </div>
+                    </div>
+
+</div>
+
+
+</body></html>

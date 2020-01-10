@@ -1,0 +1,261 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android系统服务 —— WMS与AMS_byc6352的专栏-CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                                        <div class="markdown_views prism-atom-one-dark" id="content_views">
+                    <!-- flowchart 箭头图标 勿删 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-linecap="round" d="M 5 0 L 0 2.5 L 5 5 Z" />
+                    </svg>
+                                            <article class="_2rhmJa"><p><strong>“可以毫不夸张的说，Android的framework层主要是由WMS、AMS还有View所构成，这三个模块穿插交互在整个framework中，掌握了它们之间的关系和每一个逻辑步骤，你对framework的了解至少有百分之五十”。这是《Android源码与设计模式》作者的原话，最近学习WMS和AMS相关知识，的确非常复杂，这篇文章是在学习之初的初步整理，虽然内容不够细致，但对其也算有个宏观的了解。难点是其中具体的代码逻辑，也都在相应框架下给出了参考链接，日后的工作就是详细学习其中的代码逻辑，让整个框架在脑海中越来越细致、清晰。</strong></p>
+<h1><a name="t0"></a><a name="t0"></a>AMS与WMS</h1>
+<p>在没有深入了解AMS与WMS前，对它俩负责的功能一直很模糊，一直搞不清区别。所以在深入理解其中之一时，先对它们在Android中各自负责的任务有个基本的了解和区分。</p>
+<p>此外，AMS和WMS都属于Android中的系统服务，系统服务有很多，它们在Android体系架构中都属于同一层次，所以最好在深入了解它们各自的运行机理前，对系统的宏观架构能够有所掌握，也就是在自己的脑海中能够搭建一个简单的模型和框架，搞清楚它们在系统中所扮演的角色。每当我们学习了一个新的知识点，都是对这个模型的填充和细化，并能够较好的与之前所学的知识结合起来，既有利于理解，也有利于记忆，而且还能够感受到自己的积累与进步。</p>
+<p>下面先简单对AMS与WMS作个简单的介绍，以解我之前的疑惑。</p>
+<p><strong>Activity与WIndow：</strong></p>
+<ul>
+<li>Activity只负责生命周期和事件处理</li>
+<li>Window只控制视图</li>
+<li>一个Activity包含一个Window，如果Activity没有Window，那就相当于Service</li>
+</ul>
+<p><strong>AMS与WMS：</strong></p>
+<ul>
+<li>AMS统一调度所有应用程序的Activity</li>
+<li>WMS控制所有Window的显示与隐藏以及要显示的位置</li>
+</ul>
+<p>在视图层次中，Activity在WIndow之上，如下图，直接截取自我的另一篇博客：</p>
+<div class="image-package">
+<div class="image-container">
+<div class="image-container-fill"></div>
+<div class="image-view"><img src="images/android04901.jpg"></div>
+</div>
+<div class="image-caption">Android应用程序窗口模型</div>
+</div>
+<p>下面进入到对WMS的介绍。</p>
+<h1><a name="t1"></a><a name="t1"></a>WMS</h1>
+<h2><a name="t2"></a><a name="t2"></a>基础了解</h2>
+<p>WindowManagerService服务的实现是相当复杂的，毕竟它要管理的整个系统所有窗口的UI，而在任何一个系统中，窗口管理子系统都是极其复杂的。</p>
+<h3><a name="t3"></a><a name="t3"></a>作用</h3>
+<ul>
+<li>为所有窗口分配Surface。客户端向WMS添加一个窗口的过程，其实就是WMS为其分配一块Suiface的过程，一块块Surface在WMS的管理下有序的排布在屏幕上。Window的本质就是Surface。</li>
+<li>管理Surface的显示顺序、尺寸、位置</li>
+<li>管理窗口动画</li>
+<li>输入系统相关：WMS是派发系统按键和触摸消息的最佳人选，当接收到一个触摸事件，它需要寻找一个最合适的窗口来处理消息，而WMS是窗口的管理者，系统中所有的窗口状态和信息都在其掌握之中，完成这一工作不在话下。</li>
+</ul>
+<h3><a name="t4"></a><a name="t4"></a>什么是Window</h3>
+<p>“Window”表明它是和窗口相关的，“窗口”是一个抽象的概念，从用户的角度来讲，它是一个“界面”；从SurfaceFlinger的角度来看，它是一个Layer，承载着和界面有关的数据和属性；从WMS角度来看，它是一个WIndowState，用于管理和界面有关的状态。</p>
+<p>在《深入理解Android内核设计思想》一书中看到一个比喻非常好，整个界面就像由N个演员参与的话剧：SurfaceFling是摄像机，它只负责客观的捕捉当前的画面，然后真实的呈现给观众；WMS就是导演，它要负责话剧的舞台效果、演员站位；ViewRoot就是各个演员的长相和表情，取决于它们各自的条件与努力。可见，WMS与SurfaceFling的一个重要区别就是——后者只做与“显示”相关的事情，而WMS要处理对输入事件的派发。</p>
+<p>Android支持的窗口类型很多，统一可以分为三大类，另外各个种类下还细分为若干子类型，且都在<code>WindowManager.java</code>中有定义。</p>
+<ul>
+<li><strong>Application Window</strong></li>
+<li><strong>SystemWindow</strong></li>
+<li><strong>Sub Window</strong></li>
+</ul>
+<h2><a name="t5"></a><a name="t5"></a>类间关系</h2>
+<p>上面那些都是对WMS相关功能的介绍，对WMS有个感性的认识，现在开始进入相关类。</p>
+<h3><a name="t6"></a><a name="t6"></a>使用的设计模式</h3>
+<ul>
+<li><strong>桥接模式</strong></li>
+</ul>
+<p>关于桥接模式这里就不再讲解，参考《Android源码设计模式》第24章。</p>
+<h3><a name="t7"></a><a name="t7"></a>UML</h3>
+<div class="image-package">
+<div class="image-container">
+<div class="image-container-fill"></div>
+<div class="image-view"><img src="images/android04902.jpg"></div>
+</div>
+<div class="image-caption"></div>
+</div>
+<h2><a name="t8"></a><a name="t8"></a>代码逻辑</h2>
+<h3><a name="t9"></a><a name="t9"></a>启动流程</h3>
+<p>………………<br>
+………………<br>
+………………</p>
+<h3><a name="t10"></a><a name="t10"></a>工作流程</h3>
+<ul>
+<li><strong><a href="https://link.jianshu.com?t=http://blog.csdn.net/luoshengyang/article/details/8479101" target="_blank" rel="nofollow">窗口大小和位置（X轴和Y轴）的计算过程</a></strong></li>
+<li><strong><a href="https://link.jianshu.com?t=http://blog.csdn.net/luoshengyang/article/details/8498908" target="_blank" rel="nofollow">窗口的组织方式</a></strong></li>
+<li><strong><a href="https://link.jianshu.com?t=http://blog.csdn.net/luoshengyang/article/details/8526644" target="_blank" rel="nofollow">输入法窗口的调整过程</a></strong></li>
+<li><strong><a href="https://link.jianshu.com?t=http://blog.csdn.net/luoshengyang/article/details/8550820" target="_blank" rel="nofollow">壁纸窗口的调整过程</a></strong></li>
+<li><strong><a href="https://link.jianshu.com?t=http://blog.csdn.net/luoshengyang/article/details/8570428" target="_blank" rel="nofollow">窗口Z轴位置的计算和调整过程</a></strong></li>
+<li><strong><a href="https://link.jianshu.com?t=http://blog.csdn.net/luoshengyang/article/details/8577789" target="_blank" rel="nofollow">Activity窗口的启动窗口的显示过程</a></strong></li>
+<li><strong><a href="https://link.jianshu.com?t=http://blog.csdn.net/luoshengyang/article/details/8596449" target="_blank" rel="nofollow">Activity窗口的切换过程</a></strong></li>
+<li><strong><a href="https://link.jianshu.com?t=http://blog.csdn.net/luoshengyang/article/details/8611754" target="_blank" rel="nofollow">Activity窗口的动画显示过程</a></strong></li>
+</ul>
+<h2><a name="t11"></a><a name="t11"></a>解惑</h2>
+<p>Q：WMS是系统服务，有SystemServer负责启动，启动时机相对较晚，那么在WMS运行之前，终端显示屏就一团黑？</p>
+<p>A：在WMS启动之前，系统只需显示开机动画，它们都有特殊的方式来向屏幕输出图像，比如直接通过OpenGL ES与SurfaceFling的配合来完成。这也从侧面告诉我们，要想在Android上显示UI，并不一定要通过WMS。</p>
+<h1><a name="t12"></a><a name="t12"></a>AMS</h1>
+<h2><a name="t13"></a><a name="t13"></a>基础了解</h2>
+<h3><a name="t14"></a><a name="t14"></a>作用</h3>
+<ul>
+<li>统一调度所有应用程序的Activity的生命周期</li>
+<li>启动或杀死应用程序的进程</li>
+<li>启动并调度Service的生命周期</li>
+<li>注册BroadcastReceiver，并接收和分发Broadcast</li>
+<li>启动并发布ContentProvider</li>
+<li>调度task</li>
+<li>处理应用程序的Crash</li>
+<li>查询系统当前运行状态</li>
+</ul>
+<h2><a name="t15"></a><a name="t15"></a>类间关系</h2>
+<h3><a name="t16"></a><a name="t16"></a>设计模式</h3>
+<ul>
+<li><strong>代理模式</strong></li>
+</ul>
+<p>关于代理模式这里就不再讲解，参考《Android源码设计模式》第18章。</p>
+<p><strong>WMS与AMS设计模式的不同的思考…………</strong></p>
+<h3><a name="t17"></a><a name="t17"></a>UML（类间关系）</h3>
+<div class="image-package">
+<div class="image-container">
+<div class="image-container-fill"></div>
+<div class="image-view"><img src="images/android04903.jpg"></div>
+</div>
+<div class="image-caption"></div>
+</div>
+<p>从类图可以看出，<code>ActivityManagerProxy</code>和<code>ActivityManagerNative</code>都实现了<code>IActivityManager</code>，<code>ActivityManagerProxy</code>就是代理部分，<code>ActivityManagerNative</code>就是实现部分，但<code>ActivityManagerNative</code>是个抽象类，并不处理过多的具体逻辑，大部分具体逻辑是由<code>ActivityManagerService</code>承担，这就是为什么我们说真实部分应该为<code>ActivityManagerService</code>。</p>
+<h2><a name="t18"></a><a name="t18"></a>代码逻辑</h2>
+<h3><a name="t19"></a><a name="t19"></a>启动流程</h3>
+<ul>
+<li>
+<strong>第一阶段：</strong>启动<code>ActivityManagerService</code>。</li>
+<li>
+<strong>第二阶段：</strong>调用<code>setSystemProcess</code>。</li>
+<li>
+<strong>第三阶段：</strong>调用<code>installSystemProviders</code>方法。</li>
+<li>
+<strong>第四阶段：</strong>调用<code>systemReady</code>方法。</li>
+</ul>
+<p>这里只给出了非常粗糙的整体流程，也没有深入的去了解，是因为觉得目前还用不着去理解这些内容，工作时用不到，而且即使现在明白了，如果不用，很快也会忘记。</p>
+<p>如果想深入了解，可以参考《Android的设计与实现》，讲的挺好的，思路非常清晰。</p>
+<h3><a name="t20"></a><a name="t20"></a>工作流程</h3>
+<p>AMS的工作流程，其实就是Activity的启动和调度的过程，所有的启动方式，最终都是通过Binder机制的Client端，调用Server端的AMS的<code>startActivityXXX()</code>系列方法。所以可见，工作流程又包括Client端和Server端两个。</p>
+<h4>Client端流程</h4>
+<ul>
+<li>Launcher主线程捕获<code>onClick()</code>点击事件后，调用<code>Launcher.startActivitySafely()</code>方法。<code>Launcher.startActivitySafely()</code>内部调用了Launcher.startActivity()方法，<code>Launcher.startActivity()</code>内部调用了Launcher的父类Activity的<code>startActivity()</code>方法。</li>
+<li>
+<code>Activity.startActivity()</code>调用<code>Activity.startActivityForResult()</code>方法，传入该方法的requestCode参数若为-1，则表示Activity启动成功后，不需要执行<code>Launcher.onActivityResult()</code>方法处理返回结果。</li>
+<li>启动Activity需要与系统ActivityManagerService交互，必须纳入Instrumentation的监控，因此需要将启动请求转交instrumentation，即调用<code>Instrumentation.execStartActivity()</code>方法。</li>
+<li>
+<code>Instrumentation.execStartActivity()</code>首先通过ActivityMonitor检查启动请求，然后调用<code>ActivityManagerNative.getDefault()</code>得到ActivityManagerProxy代理对象，进而调用该代理对象的<code>startActivity()</code>方法。</li>
+<li>ActivityManagerProxy是ActivityManagerService的代理对象，因此其内部存储的是BinderProxy，调用<code>ActivityManagerProxy.startActivity()</code>实质是调用<code>BinderProxy.transact()</code>向Binder驱动发送START_ACTIVITY_TRANSACTION命令。Binder驱动将处理逻辑从Launcher所在进程切换到ActivityManagerService所在进程。</li>
+</ul>
+<h4>Server端流程</h4>
+<p>启动Activity的请求从Client端传递给Server端后，便进入了启动应用的七个阶段，这里也是整理出具体流程，细节可以参考《Android的设计与实现》第十一章内容。</p>
+<p><strong>1）预启动</strong></p>
+<ul>
+<li>ActivityManagerService.startActivity()</li>
+<li>ActivityStack.startActivityMayWait()</li>
+<li>ActivityStack.startActivityLocked()</li>
+<li>ActivityStack.startActivityUncheckedLocked()</li>
+<li>ActivityStack.startActivityLocked()（重载）</li>
+<li>ActivityStack.resumeTopActivityLocked()</li>
+</ul>
+<p><strong>2）暂停</strong></p>
+<ul>
+<li>ActivityStack.startPausingLocked()</li>
+<li>ApplicationThreadProxy.schedulePauseActivity()</li>
+<li>ActivityThread.handlePauseActivity()</li>
+<li>ActivityThread.performPauseActivity()</li>
+<li>ActivityManagerProxy.activityPaused()</li>
+<li>completePausedLocked()</li>
+</ul>
+<p><strong>3）启动应用程序进程</strong></p>
+<ul>
+<li>第二次进入ActivityStack.resumeTopActivityLocked()</li>
+<li>ActivityStack.startSpecificActivityLocked()</li>
+<li>startProcessLocked()</li>
+<li>startProcessLocked()（重载）</li>
+<li>Process.start()</li>
+</ul>
+<p><strong>4）加载应用程序Activity</strong></p>
+<ul>
+<li>ActivityThread.main()</li>
+<li>ActivityThread.attach()</li>
+<li>ActivityManagerService.attachApplication()</li>
+<li>ApplicationThread.bindApplication()</li>
+<li>ActivityThread.handleBindApplication()</li>
+</ul>
+<p><strong>5）显示Activity</strong></p>
+<ul>
+<li>ActivityStack.realStartActivityLocked()</li>
+<li>ApplicationThread.scheduleLaunchActivity()</li>
+<li>ActivityThead.handleLaunchActivity()</li>
+<li>ActivityThread.performLaunchActivity()</li>
+<li>ActivityThread.handleResumeActivity()</li>
+<li>ActivityThread.performResumeActivity()</li>
+<li>Activity.performResume()</li>
+<li>ActivityStack.completeResumeLocked()</li>
+</ul>
+<p><strong>6）Activity Idle状态的处理</strong></p>
+<p><strong>7）停止源Activity</strong></p>
+<ul>
+<li>ActivityStack.stopActivityLocked()</li>
+<li>ApplicationThreadProxy.scheduleStopActivity()</li>
+<li>ActivityThread.handleStopActivity()</li>
+<li>ActivityThread.performStopActivityInner()</li>
+</ul>
+</article>
+
+                                    </div>
+                <link href="https://csdnimg.cn/release/phoenix/mdeditor/markdown_views-b6c3c6d139.css" rel="stylesheet">
+                                                <div class="more-toolbox">
+                <div class="left-toolbox">
+                    <ul class="toolbox-list">
+                        
+                        <li class="tool-item tool-active is-like "><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#csdnc-thumbsup" />
+                        </svg><span class="name">点赞</span>
+                        <span class="count"></span>
+                        </a></li>
+                        <li class="tool-item tool-active is-collection "><a href="javascript:;" data-report-click='{"mod":"popu_824"}'><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-Collection-G" />
+                        </svg><span class="name">收藏</span></a></li>
+                        <li class="tool-item tool-active is-share"><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-fenxiang" />
+                        </svg>分享</a></li>
+                        <!--打赏开始-->
+                                                <!--打赏结束-->
+                                                <li class="tool-item tool-more">
+                            <a>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024" width="200" height="200" version="1.1" p-id="5717" t="1575545411852"><defs><style type="text/css" /></defs><path d="M 179.176 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5718" /><path d="M 509.684 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5719" /><path d="M 846.175 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5720" /></svg>
+                            </a>
+                            <ul class="more-box">
+                                <li class="item"><a class="article-report">文章举报</a></li>
+                            </ul>
+                        </li>
+                                            </ul>
+                </div>
+                                <div class="right-toolbox"><a class="jump-net-article" href="https://blog.csdn.net/weixin_41828085/article/details/81741882" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024" width="200" height="200" version="1.1" p-id="5597" t="1575545252354"><defs><style type="text/css" /></defs><path d="M 243.9 1022.2 c -62.3 0 -124 -23.8 -171.5 -70.8 C 26.4 905.5 1.5 845 1.5 779.9 s 24.9 -125.6 70.8 -171.5 l 184 -184.1 c 45.9 -45.9 106.4 -70.8 171.5 -70.8 s 125.6 24.9 171.5 70.8 c 18.1 18.1 18.1 47 0 65.1 s -47 18.1 -65.1 0 c -28.3 -28.3 -65.7 -43.5 -105.9 -43.5 s -78.1 15.3 -105.9 43.7 l -184 184 c -58.3 58.3 -58.3 153.4 0 212.3 c 28.3 28.3 65.7 43.5 105.9 43.5 s 78.1 -15.3 105.9 -43.5 l 184 -184 c 18.1 -18.1 47 -18.1 65.1 0 c 18.1 18.1 18.1 47 0 65.1 l -184 184 c -46.9 48 -109.1 71.2 -171.4 71.2 Z m 523.7 -423 l 184 -184 c 94.5 -94.5 94.5 -248 0 -342.5 s -248 -94.5 -342.5 0 l -184 184 c -18.1 18.1 -18.1 47 0 65.1 s 47 18.1 65.1 0 l 184 -184 c 28.3 -28.3 65.7 -43.5 105.9 -43.5 s 78.1 15.3 105.9 43.5 c 58.3 58.3 58.3 153.4 0 212.3 l -184 184 c -58.3 58.3 -153.4 58.3 -212.3 0 c -18.1 -18.1 -47 -18.1 -65.1 0 c -18.1 18.1 -18.1 47 0 65.1 c 47 47 109.3 70.8 171.5 70.8 s 123.9 -23.2 171.5 -70.8 Z" p-id="5598" /></svg>
+                    站内首发文章</a></div>
+                            </div>
+            <div class="person-messagebox">
+                <div class="left-message"><a href="https://blog.csdn.net/byc6352">
+                    <img class="avatar_pic" src="images/android04904.jpg" username="byc6352">
+                                            <img class="user-years" src="images/android04905.png">
+                                    </a></div>
+                <div class="middle-message">
+                                        <div class="title"><span class="tit"><a href="https://blog.csdn.net/byc6352" target="_blank" data-report-click='{"mod":"popu_379"}'>byc6352</a></span>
+                                            </div>
+                    <div class="text"><span>发布了28 篇原创文章</span> · <span>获赞 9</span> · <span>访问量 1万+</span></div>
+                </div>
+                                <div class="right-message">
+                                            <a class="btn btn-sm btn-red-hollow bt-button personal-letter" href="https://im.csdn.net/im/main.html?userName=byc6352" target="_blank">私信
+                        </a>
+                                                            <a class="btn btn-sm  bt-button personal-watch" data-report-click='{"mod":"popu_379"}'>关注</a>
+                                    </div>
+                            </div>
+                    </div>
+
+</div>
+
+
+</body></html>

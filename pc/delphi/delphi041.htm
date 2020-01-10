@@ -1,0 +1,193 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>delphi 判断并删除utf8文本文件中的前三个字节BOM_byc6352的专栏-CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                                        <div class="markdown_views prism-atom-one-dark" id="content_views">
+                    <!-- flowchart 箭头图标 勿删 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-linecap="round" d="M 5 0 L 0 2.5 L 5 5 Z" />
+                    </svg>
+                                            <pre class="prettyprint"><code class="prism language-bash has-numbering"><span class="token punctuation">{</span>-------------------------------------------------------------------------------
+过程名:    DelBomFromUtf8File 判断并删除utf8文本文件中的前三个字节BOM
+参数:      filename:string   1.文件名
+返回值:    boolean   是否删除
+
+-------------------------------------------------------------------------------<span class="token punctuation">}</span>
+<span class="token keyword">function</span> DelBomFromUtf8File<span class="token punctuation">(</span>filename:string<span class="token punctuation">)</span>:boolean<span class="token punctuation">;</span>
+const
+  UTF8_FLAG<span class="token operator">=</span><span class="token variable">$EFBB</span><span class="token punctuation">;</span>
+var
+  fsRead,fsWrite:TFileStream<span class="token punctuation">;</span>
+  w:word<span class="token punctuation">;</span>
+  b:byte<span class="token punctuation">;</span>
+  filename_tmp:string<span class="token punctuation">;</span>
+  len:integer<span class="token punctuation">;</span>
+<span class="token keyword">function</span> WordLoHiExchange<span class="token punctuation">(</span>w: Word<span class="token punctuation">)</span>: Word<span class="token punctuation">;</span> register<span class="token punctuation">;</span>
+asm
+   XCHG AL, AH
+end<span class="token punctuation">;</span>
+begin
+  result:<span class="token operator">=</span>false<span class="token punctuation">;</span>
+  if<span class="token punctuation">(</span>fileexists<span class="token punctuation">(</span>filename<span class="token punctuation">)</span><span class="token operator">=</span>false<span class="token punctuation">)</span>then <span class="token keyword">exit</span><span class="token punctuation">;</span>
+  fsRead:<span class="token operator">=</span>TFileStream.Create<span class="token punctuation">(</span>filename, fmOpenRead or fmShareDenyNone<span class="token punctuation">)</span><span class="token punctuation">;</span> // or fmOpenWrite
+try
+  fsRead.Seek<span class="token punctuation">(</span>0, soFromBeginning<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  fsRead.Read<span class="token punctuation">(</span>w,2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  w:<span class="token operator">=</span> WordLoHiExchange<span class="token punctuation">(</span>w<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> w<span class="token operator">=</span>UTF8_FLAG <span class="token keyword">then</span>
+  begin
+    fsRead.Read<span class="token punctuation">(</span>b,1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    len:<span class="token operator">=</span>fsRead.Size-fsRead.Position<span class="token punctuation">;</span>
+    filename_tmp:<span class="token operator">=</span>filename+<span class="token string">'tmp'</span><span class="token punctuation">;</span>
+    fsWrite:<span class="token operator">=</span>TFileStream.Create<span class="token punctuation">(</span>filename_tmp, fmCreate<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    fsWrite.CopyFrom<span class="token punctuation">(</span>fsRead, len<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    fsWrite.Free<span class="token punctuation">;</span>
+    result:<span class="token operator">=</span>true<span class="token punctuation">;</span>
+  end<span class="token punctuation">;</span>
+finally
+  fsRead.Free<span class="token punctuation">;</span>
+  if<span class="token punctuation">(</span>result<span class="token punctuation">)</span>then
+  begin
+    deletefile<span class="token punctuation">(</span>filename<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    movefile<span class="token punctuation">(</span>pchar<span class="token punctuation">(</span>filename_tmp<span class="token punctuation">)</span>,pchar<span class="token punctuation">(</span>filename<span class="token punctuation">))</span><span class="token punctuation">;</span>
+  end<span class="token punctuation">;</span>
+end<span class="token punctuation">;</span>
+
+<span class="token punctuation">{</span>-------------------------------------------------------------------------------
+过程名:    RenameDir 重命名文件夹
+参数:      fromName,toName:string   1.旧名 2.新名  全路径
+返回值:    boolean  是否成功
+-------------------------------------------------------------------------------<span class="token punctuation">}</span>
+<span class="token keyword">function</span> TReplaceString.RenameDir<span class="token punctuation">(</span>const fromName,toName:string<span class="token punctuation">)</span>: boolean<span class="token punctuation">;</span>
+var
+  fo: TSHFILEOPSTRUCT<span class="token punctuation">;</span>
+begin
+  FillChar<span class="token punctuation">(</span>fo,SizeOf<span class="token punctuation">(</span>fo<span class="token punctuation">)</span>,0<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  with  fo  <span class="token keyword">do</span>
+  begin
+    Wnd   :<span class="token operator">=</span>   0<span class="token punctuation">;</span>
+    wFunc   :<span class="token operator">=</span>   FO_RENAME<span class="token punctuation">;</span>
+    pFrom   :<span class="token operator">=</span>   PChar<span class="token punctuation">(</span>fromName+<span class="token comment">#0);</span>
+    pTo   :<span class="token operator">=</span>   pchar<span class="token punctuation">(</span>toName+<span class="token comment">#0);</span>
+    fFlags   :<span class="token operator">=</span>   FOF_NOCONFIRMATION+FOF_SILENT<span class="token punctuation">;</span>
+  end<span class="token punctuation">;</span>
+  Result   :<span class="token operator">=</span>   <span class="token punctuation">(</span>SHFileOperation<span class="token punctuation">(</span>fo<span class="token punctuation">)</span>   <span class="token operator">=</span>   0<span class="token punctuation">)</span><span class="token punctuation">;</span>
+end<span class="token punctuation">;</span>
+
+
+<span class="token punctuation">{</span>-------------------------------------------------------------------------------
+过程名:    MakeFileList 遍历文件夹及子文件夹
+参数:      Path,FileExt:string   1.需要遍历的目录 2.要遍历的文件扩展名
+返回值:    TStringList
+
+USE StrUtils
+
+   Eg：ListBox1.Items:<span class="token operator">=</span> MakeFileList<span class="token punctuation">(</span> <span class="token string">'E:\a'</span>,<span class="token string">'.exe'</span><span class="token punctuation">)</span> <span class="token punctuation">;</span>
+       ListBox1.Items:<span class="token operator">=</span> MakeFileList<span class="token punctuation">(</span> <span class="token string">'E:\a'</span>,<span class="token string">'.*'</span><span class="token punctuation">)</span> <span class="token punctuation">;</span>
+-------------------------------------------------------------------------------<span class="token punctuation">}</span>
+<span class="token keyword">function</span> MakeFileList<span class="token punctuation">(</span>Path,FileExt:string<span class="token punctuation">)</span>:TStringList <span class="token punctuation">;</span>
+var
+sch:TSearchrec<span class="token punctuation">;</span>
+begin
+Result:<span class="token operator">=</span>TStringlist.Create<span class="token punctuation">;</span>
+
+<span class="token keyword">if</span> rightStr<span class="token punctuation">(</span>trim<span class="token punctuation">(</span>Path<span class="token punctuation">)</span>, 1<span class="token punctuation">)</span> <span class="token operator">&lt;</span><span class="token operator">&gt;</span> <span class="token string">'\' then
+    Path := trim(Path) + '</span>\<span class="token string">'
+else
+    Path := trim(Path);
+
+if not DirectoryExists(Path) then
+begin
+    Result.Clear;
+    exit;
+end;
+
+if FindFirst(Path + '</span>*<span class="token string">', faAnyfile, sch) = 0 then
+begin
+    repeat
+       Application.ProcessMessages;
+       if ((sch.Name = '</span><span class="token keyword">.</span><span class="token string">') or (sch.Name = '</span><span class="token punctuation">..</span><span class="token string">')) then Continue;
+       if DirectoryExists(Path+sch.Name) then
+       begin
+         Result.AddStrings(MakeFileList(Path+sch.Name,FileExt));
+       end
+       else
+       begin
+         if (UpperCase(extractfileext(Path+sch.Name)) = UpperCase(FileExt)) or (FileExt='</span>.*'<span class="token punctuation">)</span> <span class="token keyword">then</span>
+         Result.Add<span class="token punctuation">(</span>Path+sch.Name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+       end<span class="token punctuation">;</span>
+    <span class="token keyword">until</span> FindNext<span class="token punctuation">(</span>sch<span class="token punctuation">)</span> <span class="token operator">&lt;</span><span class="token operator">&gt;</span> 0<span class="token punctuation">;</span>
+    SysUtils.FindClose<span class="token punctuation">(</span>sch<span class="token punctuation">)</span><span class="token punctuation">;</span>
+end<span class="token punctuation">;</span>
+end<span class="token punctuation">;</span>
+
+<span class="token keyword">function</span> replaceStr<span class="token punctuation">(</span>oldstr,newstr:string<span class="token punctuation">;</span>var str:string<span class="token punctuation">)</span>:boolean<span class="token punctuation">;</span>
+begin
+  result:<span class="token operator">=</span>false<span class="token punctuation">;</span>
+  if<span class="token punctuation">(</span>pos<span class="token punctuation">(</span>oldstr,str<span class="token punctuation">)</span><span class="token operator">&gt;</span>0<span class="token punctuation">)</span>then
+  begin
+    str:<span class="token operator">=</span>StringReplace <span class="token punctuation">(</span>str, oldstr,newstr, <span class="token punctuation">[</span>rfReplaceAll<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    result:<span class="token operator">=</span>true<span class="token punctuation">;</span>
+  end<span class="token punctuation">;</span>
+end<span class="token punctuation">;</span>
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li><li style="color: rgb(153, 153, 153);">8</li><li style="color: rgb(153, 153, 153);">9</li><li style="color: rgb(153, 153, 153);">10</li><li style="color: rgb(153, 153, 153);">11</li><li style="color: rgb(153, 153, 153);">12</li><li style="color: rgb(153, 153, 153);">13</li><li style="color: rgb(153, 153, 153);">14</li><li style="color: rgb(153, 153, 153);">15</li><li style="color: rgb(153, 153, 153);">16</li><li style="color: rgb(153, 153, 153);">17</li><li style="color: rgb(153, 153, 153);">18</li><li style="color: rgb(153, 153, 153);">19</li><li style="color: rgb(153, 153, 153);">20</li><li style="color: rgb(153, 153, 153);">21</li><li style="color: rgb(153, 153, 153);">22</li><li style="color: rgb(153, 153, 153);">23</li><li style="color: rgb(153, 153, 153);">24</li><li style="color: rgb(153, 153, 153);">25</li><li style="color: rgb(153, 153, 153);">26</li><li style="color: rgb(153, 153, 153);">27</li><li style="color: rgb(153, 153, 153);">28</li><li style="color: rgb(153, 153, 153);">29</li><li style="color: rgb(153, 153, 153);">30</li><li style="color: rgb(153, 153, 153);">31</li><li style="color: rgb(153, 153, 153);">32</li><li style="color: rgb(153, 153, 153);">33</li><li style="color: rgb(153, 153, 153);">34</li><li style="color: rgb(153, 153, 153);">35</li><li style="color: rgb(153, 153, 153);">36</li><li style="color: rgb(153, 153, 153);">37</li><li style="color: rgb(153, 153, 153);">38</li><li style="color: rgb(153, 153, 153);">39</li><li style="color: rgb(153, 153, 153);">40</li><li style="color: rgb(153, 153, 153);">41</li><li style="color: rgb(153, 153, 153);">42</li><li style="color: rgb(153, 153, 153);">43</li><li style="color: rgb(153, 153, 153);">44</li><li style="color: rgb(153, 153, 153);">45</li><li style="color: rgb(153, 153, 153);">46</li><li style="color: rgb(153, 153, 153);">47</li><li style="color: rgb(153, 153, 153);">48</li><li style="color: rgb(153, 153, 153);">49</li><li style="color: rgb(153, 153, 153);">50</li><li style="color: rgb(153, 153, 153);">51</li><li style="color: rgb(153, 153, 153);">52</li><li style="color: rgb(153, 153, 153);">53</li><li style="color: rgb(153, 153, 153);">54</li><li style="color: rgb(153, 153, 153);">55</li><li style="color: rgb(153, 153, 153);">56</li><li style="color: rgb(153, 153, 153);">57</li><li style="color: rgb(153, 153, 153);">58</li><li style="color: rgb(153, 153, 153);">59</li><li style="color: rgb(153, 153, 153);">60</li><li style="color: rgb(153, 153, 153);">61</li><li style="color: rgb(153, 153, 153);">62</li><li style="color: rgb(153, 153, 153);">63</li><li style="color: rgb(153, 153, 153);">64</li><li style="color: rgb(153, 153, 153);">65</li><li style="color: rgb(153, 153, 153);">66</li><li style="color: rgb(153, 153, 153);">67</li><li style="color: rgb(153, 153, 153);">68</li><li style="color: rgb(153, 153, 153);">69</li><li style="color: rgb(153, 153, 153);">70</li><li style="color: rgb(153, 153, 153);">71</li><li style="color: rgb(153, 153, 153);">72</li><li style="color: rgb(153, 153, 153);">73</li><li style="color: rgb(153, 153, 153);">74</li><li style="color: rgb(153, 153, 153);">75</li><li style="color: rgb(153, 153, 153);">76</li><li style="color: rgb(153, 153, 153);">77</li><li style="color: rgb(153, 153, 153);">78</li><li style="color: rgb(153, 153, 153);">79</li><li style="color: rgb(153, 153, 153);">80</li><li style="color: rgb(153, 153, 153);">81</li><li style="color: rgb(153, 153, 153);">82</li><li style="color: rgb(153, 153, 153);">83</li><li style="color: rgb(153, 153, 153);">84</li><li style="color: rgb(153, 153, 153);">85</li><li style="color: rgb(153, 153, 153);">86</li><li style="color: rgb(153, 153, 153);">87</li><li style="color: rgb(153, 153, 153);">88</li><li style="color: rgb(153, 153, 153);">89</li><li style="color: rgb(153, 153, 153);">90</li><li style="color: rgb(153, 153, 153);">91</li><li style="color: rgb(153, 153, 153);">92</li><li style="color: rgb(153, 153, 153);">93</li><li style="color: rgb(153, 153, 153);">94</li><li style="color: rgb(153, 153, 153);">95</li><li style="color: rgb(153, 153, 153);">96</li><li style="color: rgb(153, 153, 153);">97</li><li style="color: rgb(153, 153, 153);">98</li><li style="color: rgb(153, 153, 153);">99</li><li style="color: rgb(153, 153, 153);">100</li><li style="color: rgb(153, 153, 153);">101</li><li style="color: rgb(153, 153, 153);">102</li><li style="color: rgb(153, 153, 153);">103</li><li style="color: rgb(153, 153, 153);">104</li><li style="color: rgb(153, 153, 153);">105</li><li style="color: rgb(153, 153, 153);">106</li><li style="color: rgb(153, 153, 153);">107</li><li style="color: rgb(153, 153, 153);">108</li><li style="color: rgb(153, 153, 153);">109</li><li style="color: rgb(153, 153, 153);">110</li><li style="color: rgb(153, 153, 153);">111</li><li style="color: rgb(153, 153, 153);">112</li><li style="color: rgb(153, 153, 153);">113</li><li style="color: rgb(153, 153, 153);">114</li><li style="color: rgb(153, 153, 153);">115</li><li style="color: rgb(153, 153, 153);">116</li><li style="color: rgb(153, 153, 153);">117</li><li style="color: rgb(153, 153, 153);">118</li><li style="color: rgb(153, 153, 153);">119</li><li style="color: rgb(153, 153, 153);">120</li><li style="color: rgb(153, 153, 153);">121</li><li style="color: rgb(153, 153, 153);">122</li><li style="color: rgb(153, 153, 153);">123</li></ul></pre>
+
+                                    </div>
+                <link href="https://csdnimg.cn/release/phoenix/mdeditor/markdown_views-b6c3c6d139.css" rel="stylesheet">
+                                                <div class="more-toolbox">
+                <div class="left-toolbox">
+                    <ul class="toolbox-list">
+                        
+                        <li class="tool-item tool-active is-like "><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#csdnc-thumbsup" />
+                        </svg><span class="name">点赞</span>
+                        <span class="count"></span>
+                        </a></li>
+                        <li class="tool-item tool-active is-collection "><a href="javascript:;" data-report-click='{"mod":"popu_824"}'><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-Collection-G" />
+                        </svg><span class="name">收藏</span></a></li>
+                        <li class="tool-item tool-active is-share"><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-fenxiang" />
+                        </svg>分享</a></li>
+                        <!--打赏开始-->
+                                                <!--打赏结束-->
+                                                <li class="tool-item tool-more">
+                            <a>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024" width="200" height="200" version="1.1" p-id="5717" t="1575545411852"><defs><style type="text/css" /></defs><path d="M 179.176 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5718" /><path d="M 509.684 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5719" /><path d="M 846.175 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5720" /></svg>
+                            </a>
+                            <ul class="more-box">
+                                <li class="item"><a class="article-report">文章举报</a></li>
+                            </ul>
+                        </li>
+                                            </ul>
+                </div>
+                            </div>
+            <div class="person-messagebox">
+                <div class="left-message"><a href="https://blog.csdn.net/byc6352">
+                    <img class="avatar_pic" src="images/delphi04101.jpg" username="byc6352">
+                                            <img class="user-years" src="images/delphi04102.png">
+                                    </a></div>
+                <div class="middle-message">
+                                        <div class="title"><span class="tit"><a href="https://blog.csdn.net/byc6352" target="_blank" data-report-click='{"mod":"popu_379"}'>byc6352</a></span>
+                                            </div>
+                    <div class="text"><span>发布了28 篇原创文章</span> · <span>获赞 9</span> · <span>访问量 1万+</span></div>
+                </div>
+                                <div class="right-message">
+                                            <a class="btn btn-sm btn-red-hollow bt-button personal-letter" href="https://im.csdn.net/im/main.html?userName=byc6352" target="_blank">私信
+                        </a>
+                                                            <a class="btn btn-sm  bt-button personal-watch" data-report-click='{"mod":"popu_379"}'>关注</a>
+                                    </div>
+                            </div>
+                    </div>
+
+</div>
+
+
+</body></html>

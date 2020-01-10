@@ -1,0 +1,158 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>手把手教你纯命令行打包apk_xiaochuanding的博客-CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            
+<p align="left">我使用的环境变量的配置：</p>
+<p align="left">Jdk1.6\bin</p>
+<p align="left">Sdk\tools</p>
+<p align="left">&nbsp;</p>
+<p align="left">第一部分：通过命令行创建简单的<span style="font-family: Calibri;">android</span><span style='font-family: "宋体";'>项目</span></p>
+<div align="left">
+<blockquote>
+<p>1.在创建安卓项目的目录中打开命令行窗口</p>
+<p>2.在命令行窗口中输入命令（命令写在一行上）</p>
+<blockquote>
+<p><span>&gt;</span><span>android create project</span></p>
+<p><span>--target &lt;target_ID&gt; </span></p>
+<p><span>--name &lt;</span><span>项目名称</span><span>&gt;</span></p>
+<p><span>--path </span><span>&lt;<span style='font-family: "宋体";'>项目的路径</span><span style='font-family: "Courier New";'>&gt;</span></span><span>&nbsp;</span></p>
+<p><span>--activity &lt;</span><span>Activity<span style='font-family: "宋体";'>的名称</span></span><span>&gt;</span></p>
+<p><span>--package &lt;</span><span>项目的包名</span><span>&gt;</span></p>
+</blockquote>
+</blockquote>
+</div>
+<p align="left"><span>&nbsp;</span></p>
+<div align="left">
+<blockquote>
+<p><span>&nbsp;android create project</span><span>&nbsp;</span><span>--target</span><span>7</span><span>--name</span><span>Demo
+</span><span>--path</span><span>&nbsp;D:\Z_test\Demo</span><span>--activity</span><span>&nbsp;MainActivity</span><span>--package<span></span>com.demo.www</span></p>
+</blockquote>
+</div>
+<p align="left"><span><br></span></p>
+<div align="left">
+<blockquote>
+<p><span><img width="646" height="247" alt="" src="images/android04501.jpg"></span></p>
+</blockquote>
+</div>
+<p align="left"><br></p>
+<p align="left"><br><span></span></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 注：<span style="font-family: Calibri;">1.</span><span style='font-family: "宋体";'>不知道的命令可以使用</span><span>&nbsp;&gt;android --help</span><span style="color: rgb(0, 0, 0);">来查看</span></p>
+<span></span>
+<p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.</span><span>target_ID</span><span style="color: rgb(0, 0, 0);">指的是当前拥有的<span style="font-family: Calibri;">API</span><span style='font-family: "宋体";'>的</span><span style="font-family: Calibri;">id</span><span style='font-family: "宋体";'>号，使用命令</span></span><span>&gt;android
+ list target &nbsp;</span><span style="color: rgb(0, 0, 0);">来查看</span></p>
+<p><span style="color: rgb(0, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.<span style='font-family: "宋体";'>接下来进入项目中进行操作</span></span><span>&nbsp;&gt;cd Demo</span></p>
+<p><span style="color: rgb(0, 0, 0);">第二部分：命令行打包（有的目录没有随着安卓项目的创建而创建，需要手动创建<span style="font-family: Calibri;">,</span><span style='font-family: "宋体";'>使用命令</span></span><span>&gt;mkdir &lt;<span style='font-family: "宋体";'>文件名</span><span style="font-family: Calibri;">&gt;</span></span><span style="color: rgb(0, 0, 0);">）</span></p>
+<p align="left"><span></span></p>
+<p><span style="color: rgb(0, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1.</span><span style="color: rgb(0, 0, 0);">生成<span style="font-family: Calibri;">R.java</span><span style='font-family: "宋体";'>文件</span></span></p>
+<p><span style="color: rgb(0, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a.</span><span style="color: rgb(0, 0, 0);">创建<span style="font-family: Calibri;">gen</span><span style='font-family: "宋体";'>目录</span></span><span>&gt;mkdir gen</span><span style="color: rgb(0, 0, 0);">&nbsp;&nbsp;这是在当前项目的目录下的命令行，所以直接输入想起的文件名就可以了，绝对路径也是可以</span></p>
+<span></span>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img alt="" src="images/android04502.jpg"><br></p>
+<span></span>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; b.<span style='font-family: "宋体";'>运行</span><span style="font-family: Calibri;">aapt</span><span style='font-family: "宋体";'>命令生成</span><span style="font-family: Calibri;">R.java</span><span style='font-family: "宋体";'>文件</span></p>
+<span></span>
+<p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt;aapt package -f -m -J gen -S res -I E:\sdk\platforms\android-19\android.jar -M AndroidManifest.xml</span></p>
+<p>&nbsp;<img width="686" height="105" alt="" src="images/android04503.jpg"><br></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.将<span style="font-family: Calibri;">java</span><span style='font-family: "宋体";'>文件编译成</span><span style="font-family: Calibri;">class</span><span style='font-family: "宋体";'>文件</span></p>
+<p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt;javac -encoding UTF-8 -target 1.6 -bootclasspath E:\sdk\platforms\android-19\android.jar -d bin src\com\demo\www\*.java gen\com\demo\www\R.java</span></p>
+<p>&nbsp;<img width="675" height="96" alt="" src="images/android04504.jpg"><br></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 注：<span style="font-family: Calibri;">a.</span><span>-target 1.6 &nbsp;</span><span style="color: rgb(0, 0, 0);">是指<span style="font-family: Calibri;">jdk</span><span style='font-family: "宋体";'>的版本，经验是使用</span><span style="font-family: Calibri;">1.6</span><span style='font-family: "宋体";'>的编译</span><span style="font-family: Calibri;">dex</span><span style='font-family: "宋体";'>时不会出现问题，使用</span><span style="font-family: Calibri;">1.7</span><span style='font-family: "宋体";'>就不能编译成功</span></span></p>
+<p><span style="color: rgb(0, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; b.</span><span>-d bin src\com\demo\www\*.java &nbsp;&nbsp;</span><span style="color: rgb(0, 0, 0);">-d &nbsp;<span style='font-family: "宋体";'>表示指定存放生成的</span><span style="font-family: Calibri;">class</span><span style='font-family: "宋体";'>文件的位置，后面就是要编译的</span><span style="font-family: Calibri;">java</span><span style='font-family: "宋体";'>文件</span></span></p>
+<p><span style="color: rgb(0, 0, 0);">&nbsp;</span></p>
+<p><span style="color: rgb(0, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.</span><span style="color: rgb(0, 0, 0);">生成<span style="font-family: Calibri;">dex</span><span style='font-family: "宋体";'>文件（注意：使用绝对路径）</span></span></p>
+<p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt;dx --dex --output=D:\Z_test\Demo\bin\classes.dex D:\Z_test\Demo\bin</span></p>
+<p>&nbsp;<img width="729" height="220" alt="" src="images/android04505.jpg"><br></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 注：前面是<span style="font-family: Calibri;">dex</span><span style='font-family: "宋体";'>文件 ，后面是操作的目录，也就是存放到的目录</span></p>
+<p>&nbsp;</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.生成资源包文件</p>
+<p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt;aapt package -f -M AndroidManifest.xml -S res -A assets -I E:\sdk\platforms\android-19\android.jar -F bin\resources</span></p>
+<p>&nbsp;<img width="642" height="92" alt="" src="images/android04506.jpg"><br></p>
+<p>5.生成未签名的<span style="font-family: Calibri;">apk</span><span style='font-family: "宋体";'>包（</span><span style="font-family: Calibri;">sdk3.0</span><span style='font-family: "宋体";'>以后将</span><span style="font-family: Calibri;">apkbuilder</span><span style='font-family: "宋体";'>删除了）</span></p>
+<p><span>&gt;java -cp E:\sdk\tools\lib\sdklib.jar com.android.sdklib.build.ApkBuilderMain Demo.apk -v -u -z bin\resources -f bin\classes.dex -rf src</span></p>
+<p>&nbsp;</p>
+<p>&nbsp;<img width="752" height="194" alt="" src="images/android04507.jpg"><br></p>
+<p><br></p>
+<p><span>&nbsp; 效果：</span><br></p>
+<p>&nbsp;<img width="462" height="439" alt="" src="images/android04508.jpg"><br></p>
+<p><br></p>
+<p>第三部分：命令行生成签名文件</p>
+<p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt;keytool -genkey -alias key_demo.keystore -keyalg RSA -validity 20000 -keystore key_demo.keystore</span></p>
+<p>&nbsp;<img width="742" height="335" alt="" src="images/android04509.jpg"><br></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 注：文件夹下的<span style="font-family: Calibri;">key_demo.keystore</span><span style='font-family: "宋体";'>就是我们需要的签名文件 &nbsp;</span><span style="font-family: Calibri;">20000</span><span style='font-family: "宋体";'>表示证书的有效天数</span></p>
+<p>&nbsp;</p>
+<p>第四部分：用生成的签名文件对未签名的<span style="font-family: Calibri;">apk</span><span style='font-family: "宋体";'>进行签名</span>(jdk一定要是<span style="font-family: Calibri;">1.6</span><span style='font-family: "宋体";'>，</span>)</p>
+<p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt;jarsigner -verbose -keystore key_demo.keystore -signedjar demo_signed.apk D:\Z_test\Demo\demo.apk key_demo.keystore</span></p>
+<p>&nbsp;<img width="634" height="195" alt="" src="images/android04510.jpg"><br></p>
+<p>&nbsp;</p>
+<p>我在使用<span style="font-family: Calibri;">jdk</span><span style='font-family: "宋体";'>为</span><span style="font-family: Calibri;">1.7</span><span style='font-family: "宋体";'>时，签名后会出现以下警告：</span></p>
+<span></span>
+<p>警告:<br>
+未提供 -tsa 或 -tsacert, 此 jar 没有时间戳。如果没有时间戳, 则在签名者证书的到期<br>
+日期 (2063-07-18) 或以后的任何撤销日期之后, 用户可能无法验证此 jar。</p>
+<p>&nbsp;</p>
+<p>第五部：最后验证是否签名成功</p>
+<p><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt;jarsigner -verify demo_signed.apk</span></p>
+<p><span><img alt="" src="images/android04511.jpg"><br></span></p>
+<br>                                    </div>
+                                                <div class="more-toolbox">
+                <div class="left-toolbox">
+                    <ul class="toolbox-list">
+                        
+                        <li class="tool-item tool-active is-like "><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#csdnc-thumbsup" />
+                        </svg><span class="name">点赞</span>
+                        <span class="count">3</span>
+                        </a></li>
+                        <li class="tool-item tool-active is-collection "><a href="javascript:;" data-report-click='{"mod":"popu_824"}'><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-Collection-G" />
+                        </svg><span class="name">收藏</span></a></li>
+                        <li class="tool-item tool-active is-share"><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-fenxiang" />
+                        </svg>分享</a></li>
+                        <!--打赏开始-->
+                                                <!--打赏结束-->
+                                                <li class="tool-item tool-more">
+                            <a>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024" width="200" height="200" version="1.1" p-id="5717" t="1575545411852"><defs><style type="text/css" /></defs><path d="M 179.176 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5718" /><path d="M 509.684 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5719" /><path d="M 846.175 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5720" /></svg>
+                            </a>
+                            <ul class="more-box">
+                                <li class="item"><a class="article-report">文章举报</a></li>
+                            </ul>
+                        </li>
+                                            </ul>
+                </div>
+                            </div>
+            <div class="person-messagebox">
+                <div class="left-message"><a href="https://blog.csdn.net/xiaochuanding">
+                    <img class="avatar_pic" src="images/android04512.jpg" username="xiaochuanding">
+                                            <img class="user-years" src="images/android04513.png">
+                                    </a></div>
+                <div class="middle-message">
+                                        <div class="title"><span class="tit"><a href="https://blog.csdn.net/xiaochuanding" target="_blank" data-report-click='{"mod":"popu_379"}'>钉某人</a></span>
+                                            </div>
+                    <div class="text"><span>发布了33 篇原创文章</span> · <span>获赞 42</span> · <span>访问量 8万+</span></div>
+                </div>
+                                <div class="right-message">
+                                            <a class="btn btn-sm btn-red-hollow bt-button personal-letter" href="https://im.csdn.net/im/main.html?userName=xiaochuanding" target="_blank">私信
+                        </a>
+                                                            <a class="btn btn-sm  bt-button personal-watch" data-report-click='{"mod":"popu_379"}'>关注</a>
+                                    </div>
+                            </div>
+                    </div>
+
+</div>
+
+
+</body></html>

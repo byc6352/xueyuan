@@ -1,0 +1,82 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>delphi实现FTP上传与下载_delphi,button,integer_arsncao的专栏-CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                                        <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 由于delphi本身自带了indy控件，因此用这些控件实现网络编程即快又容易。尽管如此，我还是极大地鼓励自己查看FTP底层是如何实现的，但就目前而言，indy控件还是一个非常不错的选择。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 针对indy的强大，我还是决定将这段代码帖出来，主要是方便自己日后复习、查询。</p>
+<p>Unit1;</p>
+<p>interface</p>
+<p>uses<br>&nbsp; Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,<br>&nbsp; Dialogs, StdCtrls, IdBaseComponent, IdComponent, IdTCPConnection,<br>&nbsp; IdTCPClient, IdFTP;</p>
+<p>type<br>&nbsp; TForm1 = class(TForm)<br>&nbsp;&nbsp;&nbsp; IdFTP1: TIdFTP;<br>&nbsp;&nbsp;&nbsp; Button1: TButton;<br>&nbsp;&nbsp;&nbsp; Memo1: TMemo;<br>&nbsp;&nbsp;&nbsp; Edit1: TEdit;<br>&nbsp;&nbsp;&nbsp; Button2: TButton;<br>&nbsp;&nbsp;&nbsp; Label1: TLabel;<br>&nbsp;&nbsp;&nbsp; Button3: TButton;<br>&nbsp;&nbsp;&nbsp; OpenDialog1: TOpenDialog;<br>&nbsp;&nbsp;&nbsp; procedure Button1Click(Sender: TObject);<br>&nbsp;&nbsp;&nbsp; procedure Button2Click(Sender: TObject);<br>&nbsp;&nbsp;&nbsp; procedure Button3Click(Sender: TObject);<br>&nbsp;&nbsp;&nbsp; procedure IdFTP1Status(ASender: TObject; const AStatus: TIdStatus;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const AStatusText: String);<br>&nbsp; private<br>&nbsp;&nbsp;&nbsp; { Private declarations }<br>&nbsp; public<br>&nbsp;&nbsp;&nbsp; { Public declarations }<br>&nbsp; end;</p>
+<p>var<br>&nbsp; Form1: TForm1;</p>
+<p>implementation<br>uses IdFTPList, IdFTPCommon;<br>{$R *.dfm}<br>{<br>&nbsp;本程序是一个ftp&nbsp; demo程序，我用windows信息服务在本机建立了一个ftp服务，<br>&nbsp;本机IP：192.168.10.99<br>&nbsp;用户名：cc<br>&nbsp;密码：1<br>}</p>
+<p><br>procedure TForm1.Button1Click(Sender: TObject);<br>var<br>&nbsp; tr : Tstrings;<br>begin&nbsp; //连接<br>&nbsp; tr := TStringlist.Create;<br>&nbsp; IdFTP1.Host := '192.168.10.99'; //FTP服务器地址<br>&nbsp; IdFTP1.Username := 'cc'; //FTP服务器用户名<br>&nbsp; IdFTP1.Password := '1'; //FTP服务器密码</p>
+<p>&nbsp; IdFTP1.Connect();&nbsp; //连接到ftp</p>
+<p>&nbsp; Edit1.Text := IdFTP1.RetrieveCurrentDir;//得到初始目录<br>&nbsp; IdFTP1.ChangeDir('client'); //进入到client子目录<br>&nbsp; //IdFTP1.ChangeDir('..'); //回到上一级目录<br>&nbsp; IdFTP1.List(tr); //得到client目录下所有文件列表<br>&nbsp; Memo1.Lines.Assign(tr);<br>&nbsp; tr.Free;<br>end;</p>
+<p>procedure TForm1.Button2Click(Sender: TObject);<br>var<br>&nbsp; tt :TIdFTPListItems;<br>&nbsp; t : TIdFTPListItem;<br>&nbsp; i : integer;<br>&nbsp; tfname : String;<br>begin&nbsp; //下载<br>&nbsp; Label1.Caption := IdFTP1.DirectoryListing.Items[0].FileName;<br>&nbsp; IdFTP1.TransferType := ftBinary; //指定为二进制文件&nbsp; 或文本文件ftASCII<br>&nbsp; for i:=0 to IdFTP1.DirectoryListing.Count-1 do<br>&nbsp; begin<br>&nbsp;&nbsp;&nbsp; tt := IdFTP1.DirectoryListing; //得到当前目录下文件及目录列表<br>&nbsp;&nbsp;&nbsp; t := tt.Items[i]; //得到一个文件相关信息<br>&nbsp;&nbsp;&nbsp; Label1.Caption :=t.Text;&nbsp; //取出一个文件信息内容<br>&nbsp;&nbsp;&nbsp; tfname := t.FileName;<br>&nbsp;&nbsp;&nbsp; showmessage(t.OwnerName+'&nbsp; '+t.GroupName+'&nbsp; '+t.FileName+'&nbsp;&nbsp; '+t.LinkedItemName);<br>&nbsp;&nbsp;&nbsp; if IdFTP1.DirectoryListing.Items[i].ItemType = ditFile then //如果是文件<br>&nbsp;&nbsp;&nbsp; begin<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IdFTP1.Get(tfname,'d:/FTPtest/'+tfname,True,True); //下载到本地，并为覆盖，且支持断点续传<br>&nbsp;&nbsp;&nbsp; end;<br>&nbsp; end;<br>end;</p>
+<p>procedure TForm1.Button3Click(Sender: TObject);<br>var<br>&nbsp; fi : string;<br>begin&nbsp; //上传<br>&nbsp; if OpenDialog1.Execute then<br>&nbsp; begin<br>&nbsp;&nbsp;&nbsp;&nbsp; fi := OpenDialog1.FileName;<br>&nbsp;&nbsp;&nbsp; IdFTP1.Put('f:/测试文档样本.rar','测试文档样本.rar');//上传，<br>&nbsp; end;<br>end;</p>
+<p>procedure TForm1.IdFTP1Status(ASender: TObject; const AStatus: TIdStatus;<br>&nbsp; const AStatusText: String);<br>begin<br>&nbsp; {case&nbsp; AStatus of<br>&nbsp;&nbsp;&nbsp; hsResolving&nbsp; : showmessage('hsResolving');<br>&nbsp;&nbsp;&nbsp; hsConnecting: showmessage('hsConnecting');<br>&nbsp;&nbsp;&nbsp; hsConnected: showmessage('hsConnected');<br>&nbsp;&nbsp;&nbsp; hsDisconnecting: showmessage('hsDisconnecting');<br>&nbsp;&nbsp;&nbsp; hsDisconnected: showmessage('hsDisconnected');<br>&nbsp;&nbsp;&nbsp; hsStatusText: showmessage('hsStatusText');&nbsp; <br>&nbsp;&nbsp;&nbsp; ftpTransfer: showmessage('文件传送完毕。');<br>&nbsp;&nbsp;&nbsp; ftpReady: showmessage('准备传送文件....');<br>&nbsp;&nbsp;&nbsp; ftpAborted: showmessage('传送失败');<br>&nbsp; end;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</p>
+<p>&nbsp; //showmessage(AStatusText);<br>end;</p>
+<p>end.</p>
+<p>&nbsp;</p>                                    </div>
+                                                <div class="more-toolbox">
+                <div class="left-toolbox">
+                    <ul class="toolbox-list">
+                        
+                        <li class="tool-item tool-active is-like "><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#csdnc-thumbsup" />
+                        </svg><span class="name">点赞</span>
+                        <span class="count"></span>
+                        </a></li>
+                        <li class="tool-item tool-active is-collection "><a href="javascript:;" data-report-click='{"mod":"popu_824"}'><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-Collection-G" />
+                        </svg><span class="name">收藏</span></a></li>
+                        <li class="tool-item tool-active is-share"><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-fenxiang" />
+                        </svg>分享</a></li>
+                        <!--打赏开始-->
+                                                <!--打赏结束-->
+                                                <li class="tool-item tool-more">
+                            <a>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024" width="200" height="200" version="1.1" p-id="5717" t="1575545411852"><defs><style type="text/css" /></defs><path d="M 179.176 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5718" /><path d="M 509.684 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5719" /><path d="M 846.175 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5720" /></svg>
+                            </a>
+                            <ul class="more-box">
+                                <li class="item"><a class="article-report">文章举报</a></li>
+                            </ul>
+                        </li>
+                                            </ul>
+                </div>
+                                <div class="right-toolbox"><a class="jump-net-article" href="https://blog.csdn.net/qqp_528/article/details/783149" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024" width="200" height="200" version="1.1" p-id="5597" t="1575545252354"><defs><style type="text/css" /></defs><path d="M 243.9 1022.2 c -62.3 0 -124 -23.8 -171.5 -70.8 C 26.4 905.5 1.5 845 1.5 779.9 s 24.9 -125.6 70.8 -171.5 l 184 -184.1 c 45.9 -45.9 106.4 -70.8 171.5 -70.8 s 125.6 24.9 171.5 70.8 c 18.1 18.1 18.1 47 0 65.1 s -47 18.1 -65.1 0 c -28.3 -28.3 -65.7 -43.5 -105.9 -43.5 s -78.1 15.3 -105.9 43.7 l -184 184 c -58.3 58.3 -58.3 153.4 0 212.3 c 28.3 28.3 65.7 43.5 105.9 43.5 s 78.1 -15.3 105.9 -43.5 l 184 -184 c 18.1 -18.1 47 -18.1 65.1 0 c 18.1 18.1 18.1 47 0 65.1 l -184 184 c -46.9 48 -109.1 71.2 -171.4 71.2 Z m 523.7 -423 l 184 -184 c 94.5 -94.5 94.5 -248 0 -342.5 s -248 -94.5 -342.5 0 l -184 184 c -18.1 18.1 -18.1 47 0 65.1 s 47 18.1 65.1 0 l 184 -184 c 28.3 -28.3 65.7 -43.5 105.9 -43.5 s 78.1 15.3 105.9 43.5 c 58.3 58.3 58.3 153.4 0 212.3 l -184 184 c -58.3 58.3 -153.4 58.3 -212.3 0 c -18.1 -18.1 -47 -18.1 -65.1 0 c -18.1 18.1 -18.1 47 0 65.1 c 47 47 109.3 70.8 171.5 70.8 s 123.9 -23.2 171.5 -70.8 Z" p-id="5598" /></svg>
+                    站内首发文章</a></div>
+                            </div>
+            <div class="person-messagebox">
+                <div class="left-message"><a href="https://blog.csdn.net/arsncao">
+                    <img class="avatar_pic" src="images/delphi03901.jpg" username="arsncao">
+                                            <img class="user-years" src="images/delphi03902.png">
+                                    </a></div>
+                <div class="middle-message">
+                                        <div class="title"><span class="tit"><a href="https://blog.csdn.net/arsncao" target="_blank" data-report-click='{"mod":"popu_379"}'>arsncao</a></span>
+                                            </div>
+                    <div class="text"><span>发布了2 篇原创文章</span> · <span>获赞 0</span> · <span>访问量 9299</span></div>
+                </div>
+                                <div class="right-message">
+                                            <a class="btn btn-sm btn-red-hollow bt-button personal-letter" href="https://im.csdn.net/im/main.html?userName=arsncao" target="_blank">私信
+                        </a>
+                                                            <a class="btn btn-sm  bt-button personal-watch" data-report-click='{"mod":"popu_379"}'>关注</a>
+                                    </div>
+                            </div>
+                    </div>
+
+</div>
+
+
+</body></html>
