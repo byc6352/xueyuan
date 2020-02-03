@@ -1,0 +1,142 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VirtualHook: 基于VirtualApp的Java代码hook工具</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="card-body">
+				<div class=" d-none d-lg-block">
+					<dl class="row">
+						<dt class="vtop pr-3" style="width: 70px; text-align: center;">
+							<div class="avatar_info">
+								<a tabindex="-1" class="d-inline-block position-relative photo_frame photo_frame_image1" aria-hidden="true" href="user-655847.htm">
+									<img class="avatar-3" src="images/android06201.jpg">
+								</a>
+								<div class="mt-1" style="height: 15px;">
+									<span title="二级" class="group group-102" onmouseover="show_level(event)" data-gid="102"></span>
+									
+								</div>
+								
+								<div class="mt-1" style="height: 16px; position: relative;">
+									<img style="left: 6px; position: absolute;" alt="" src="images/android06202.gif"> 
+								</div>
+								
+							</div>
+						</dt>
+						
+						<dd class="vtop">
+							<dl class="row small" style="height: 34px; line-height: 34px;">
+								<dt style="padding: 0px;">
+									
+									<h3 class="break-all subject m-0">
+																						
+																[原创]VirtualHook: 基于VirtualApp的Java代码hook工具																				
+																		
+									<i title="关注" class="icon-digest-1" aria-hidden="true"></i>
+							
+									</h3>
+									
+								</dt>
+								<dd class="text-right">
+									<span class="date text-grey ml-1">2017-4-1 10:16</span>
+									<span class="text-grey ml-3 hidden-md-down"><i class="icon-eye" aria-hidden="true"></i> 28352</span>
+								</dd>
+							</dl>
+							<dl class="row small mt-0">
+								<dt style="padding: 0px;">
+									
+									<div>
+										<span class="username font-weight-bold">
+											<a href="user-655847.htm">nabla</a>
+										</span>
+										
+																				
+										<span class="post_online_time" style="vertical-align: text-bottom;" onmouseenter="show_online_level(event)" data-desc="在线时长: 96 小时 ( 5 级)<br/> 升级还需要 23 小时" data-online_time="346812"><img width="13" height="13" style="margin-right: 2px; opacity: 0.65;" src="images/android06203.gif"><img width="13" height="13" style="margin-right: 2px; opacity: 0.65;" src="images/android06204.gif"></span>
+									</div>
+									
+								</dt>
+								<dd class="text-right">
+																																				
+																		
+																	</dd>
+							</dl>
+							
+													</dd>
+					</dl>
+				</div>
+				<!-- choadi 手机端适配 开始-->
+				<div class="px-3 pt-3 d-block d-lg-none">
+					
+					<h3 class="break-all subject m-0">
+																		
+												[原创]VirtualHook: 基于VirtualApp的Java代码hook工具												
+																		
+									<i title="关注" class="icon-digest-1" aria-hidden="true"></i>
+							
+					</h3>
+					
+					<div class="row mx-0 mt-2">
+						<div class="col px-0">
+							<a tabindex="-1" aria-hidden="true" href="user-655847.htm">
+								<img style="border-radius: 6rem; width: 18px; height: 18px;" src="images/android06205.jpg">
+							</a>
+							
+							<a class="small" href="user-655847.htm">nabla</a>
+														
+							<span title="二级" class="group group-102" style="vertical-align: text-bottom; transform: scale(0.8); -webkit-transform: scale(.8);" onmouseover="show_level(event)" data-gid="102"></span>
+								
+													</div>
+						<div class="col px-0 text-right">
+															
+																
+																
+														</div>
+						<!-- <img style="" src="//bbs.pediy.com/view/img/stars01.gif" alt="">  -->
+						
+						
+					</div>
+					<div class="small row mx-0 mt-2">
+						<div class="col px-0">
+							<span class="post_online_time" style="vertical-align: text-bottom;" onmouseenter="show_online_level(event)" data-desc="在线时长: 96 小时 ( 5 级)<br/> 升级还需要 23 小时" data-online_time="346812"><img width="13" height="13" style="margin-right: 2px; opacity: 0.65;" src="images/android06206.gif"><img width="13" height="13" style="margin-right: 2px; opacity: 0.65;" src="images/android06207.gif"></span>
+						</div>
+						<div class="col px-0 text-right">
+																					
+													</div>
+					</div>
+					<div class="small row mx-0 mt-2">
+						<div class="col px-0"><span class="date text-grey">2017-4-1 10:16</span></div>
+						<div class="col px-0 text-right"><span class="text-grey hidden-md-down"><i class="icon-eye" aria-hidden="true"></i> 28352</span></div>
+					</div>
+					
+									</div>
+				<!-- choadi 手机端适配 结束-->
+
+
+				<hr aria-hidden="true">
+				
+				<div class="message break-all" isfirst="1">
+								
+					
+					<p>对于Android应用安全研究人员来说，Xposed想必一定不陌生。作为一款流行的应用hook框架，Xposed允许对应用进行无感知的hook。许多实用工具，例如早期的脱壳工具Zjdroid，关闭证书强校验的JustTrustMe，Android恶意应用分析沙盒Cuckoo-Droid等，均是通过Xposed完成。</p><p><br></p><p>然而，从Android 5.0时代起，DVM模式被ART模式取代，代码执行的机制进行了大量的变动。在ART模式下安装Xposed，不仅要求root权限，而且需要替换大量的系统库，因此其使用门槛大幅提高。</p><p><br></p><p>为此，我们研究并实现了一套ART模式下的hook工具：VirtualHook。通过这套工具，我们无需root权限，便可对应用进行无感知的hook。本文便对这套工具进行基本的介绍。</p><p><br></p><p><span style="font-size: 24px;"><strong>基本原理</strong></span></p><p><br></p><p>VirtualHook是基于以下两个框架实现的：</p><p>1. <a title="VirtualApp" href="https://github.com/asLody/VirtualApp" target="_blank">VirtualApp</a>，这是一套插件框架，允许应用以插件的方式运行在其构造的虚拟空间中，而无需实际安装应用</p><p>2. <a title="YAHFA" href="https://github.com/rk700/YAHFA" target="_blank">YAHFA</a>，这是一套hook框架，实现了ART环境下的Java方法hook</p><p><br></p><p>下面将对其分别进行介绍。</p><p><br></p><p><span style="font-size: 18px;"><strong>VirtualApp</strong></span><em><br></em></p><p><br></p><p>首先，hook是什么？hook就是在应用运行过程中，注入外部的代码，从而改变原有的执行流程。因此，应用中必须存在注入代码的窗口。<br><br>例如，使用了热修复技术的应用，就是在启动时加载并应用外部的补丁代码，这类应用便是本身自带了注入代码的窗口。但是，对于逆向分析或安全研究而言，所面对的通常是一个黑盒App，我们并不知道其<br>是否存在注入代码的窗口，或者存在但无法被利用。为此，我们必须要额外地为应用添加注入代码的窗口。Xposed便是这样做的：它修改了系统库，对所有应用在启动时添加了注入窗口。但是，这就需要具有root权限。<br><br>那么，如何在不具有root权限的情况下实现呢？这就需要用到VirtualApp了。VirtualApp的工作原理介绍可见<a title="这篇文章" href="http://rk700.github.io/2017/03/15/virtualapp-basic/" target="_blank">这篇文章</a>，简而言之，它通过代理常用系统服务的方式，在系统服务层与应用层之间添加了一层虚拟空间，从而允许在不安装应用的情况下运行应用。特别地，VirtualApp本身并不需要root权限。<br><br>利用VirtualApp提供的虚拟空间，我们就可以实现很多事情了。应用启动时，会初始化Application，此时会在应用所在的进程中调用bindApplication()。而VirtualApp重写了相关代码，那么我们就可以在把注入代码的窗口放在这里，从而实现应用启动时，加载外部的hook代码。</p><p><br></p><p>其具体实现也非常简单，在类VClientImpl的方法bindApplicationNoCheck()中，完成了对应用Application的创建：</p><table class="syntaxhighlighter  java" border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div><div class="line number11 index10 alt2">11</div><div class="line number12 index11 alt1">12</div><div class="line number13 index12 alt2">13</div><div class="line number14 index13 alt1">14</div><div class="line number15 index14 alt2">15</div><div class="line number16 index15 alt1">16</div><div class="line number17 index16 alt2">17</div><div class="line number18 index17 alt1">18</div><div class="line number19 index18 alt2">19</div><div class="line number20 index19 alt1">20</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="java plain">...</code></div><div class="line number2 index1 alt1"><code class="java spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="java keyword">try</code>&nbsp;<code class="java plain">{</code></div><div class="line number3 index2 alt2"><code class="java spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="java plain">mInstrumentation.callApplicationOnCreate(mInitialApplication);</code></div><div class="line number4 index3 alt1"><code class="java spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="java plain">PatchManager.getInstance().checkEnv(HCallbackHook.</code><code class="java keyword">class</code><code class="java plain">);</code></div><div class="line number5 index4 alt2"><code class="java spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="java keyword">if</code>&nbsp;<code class="java plain">(conflict)&nbsp;{</code></div><div class="line number6 index5 alt1"><code class="java spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="java plain">PatchManager.getInstance().checkEnv(AppInstrumentation.</code><code class="java keyword">class</code><code class="java plain">);</code></div><div class="line number7 index6 alt2"><code class="java spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="java plain">}</code></div><div class="line number8 index7 alt1"><code class="java spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="java plain">Application&nbsp;createdApp&nbsp;=&nbsp;ActivityThread.mInitialApplication.get(mainThread);</code></div><div class="line number9 index8 alt2"><code class="java spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="java keyword">if</code>&nbsp;<code class="java plain">(createdApp&nbsp;!=&nbsp;</code><code class="java keyword">null</code><code class="java plain">)&nbsp;{</code></div><div class="line number10 index9 alt1"><code class="java spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="java plain">mInitialApplication&nbsp;=&nbsp;createdApp;</code></div><div class="line number11 index10 alt2"><code class="java spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="java plain">}</code></div><div class="line number12 index11 alt1"><code class="java spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="java plain">}&nbsp;</code><code class="java keyword">catch</code>&nbsp;<code class="java plain">(Exception&nbsp;e)&nbsp;{</code></div><div class="line number13 index12 alt2"><code class="java spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="java keyword">if</code>&nbsp;<code class="java plain">(!mInstrumentation.onException(mInitialApplication,&nbsp;e))&nbsp;{</code></div><div class="line number14 index13 alt1"><code class="java spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="java keyword">throw</code>&nbsp;<code class="java keyword">new</code>&nbsp;<code class="java plain">RuntimeException(</code></div><div class="line number15 index14 alt2"><code class="java spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="java string">"Unable&nbsp;to&nbsp;create&nbsp;application&nbsp;"</code>&nbsp;<code class="java plain">+&nbsp;mInitialApplication.getClass().getName()</code></div><div class="line number16 index15 alt1"><code class="java spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="java plain">+&nbsp;</code><code class="java string">":&nbsp;"</code>&nbsp;<code class="java plain">+&nbsp;e.toString(),&nbsp;e);</code></div><div class="line number17 index16 alt2"><code class="java spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="java plain">}</code></div><div class="line number18 index17 alt1"><code class="java spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="java plain">}</code></div><div class="line number19 index18 alt2"><code class="java spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="java plain">VActivityManager.get().appDoneExecuting();</code></div><div class="line number20 index19 alt1"><code class="java plain">}</code></div></div></td></tr></tbody></table><p><br></p><p>我们只需要在这个方法的末尾处，添加注入窗口即可。从而，所有在VirtualApp中运行的应用，都会被附加上注入窗口。所以，本文所说的非root权限hook应用，更准确来说，hook的是在VirtualApp中运行的应用。</p><p><br></p><p><strong><span style="font-size: 18px;">YAHFA</span></strong></p><p><br></p><p>通过上述介绍，我们大致明白了如何通过VirtualApp实现非root环境下注入窗口的添加。那么接下来就需要考虑注入窗口的实现，以及如何完成目标方法的替换了，而这便是hook框架的工作。</p><p><br></p><p>我们调研了几款hook框架，包括Xposed, AndFix和Legend，但发现如果在这里使用的话，多少都存在一定的问题：<br><br>1. Xposed需要进行大量的代码变更，过于复杂，而且方法执行的额外开销会增多<br>2. AndFix的代码量相对较小，但其进行了方法的全部替换，不支持原方法的调用；对于热修复来说也许影响不大，但对于逆向分析来说，很多时候我们是通过hook来插桩，所以原方法必须要备份以执行<br>3. Legend与AndFix的实现方式基本一致，但试用后发现存在某些方法解析失败的问题<br><br>于是，我们重新设计实现了一套hook框架，即YAHFA(Yet Another Hook Framework for ART)，专门用于这里的代码hook。关于YAHFA的具体工作原理，可见<a title="这篇介绍" href="http://rk700.github.io/2017/03/30/YAHFA-introduction/" target="_blank">这篇介绍</a>。<br><br>至此，我们有了插件框架和hook框架，将其简单地集成，便得到了最终的hook工具，VirtualHook。其具有如下优点：<br><br>1. 支持ART模式，事实上也只支持ART，因为这就是其设计的出发点，DVM模式下用Xposed就OK了。<br>2. 无需root权限。由于我们是通过VirtualApp为应用添加代码注入窗口，所以不需要修改系统本身的库，因此不需要root权限，安装难度降低。<br>3. 轻量。YAHFA的工作目标，就是高效地运行hook。hook方法执行所带来的额外开销仅有2、3条机器指令，执行原方法时甚至没有额外的开销。<br>4. 方便。由于是在VirtualApp中完成hook，因此添加或删除hook插件后，不需要像Xposed那样重启设备，只需要退出目标应用再重新进入即可。<br>5. 精细。理论上来说，可以加载多个hook插件，甚至对不同应用使用不同hook插件。配合VirtualApp应用多开，能够更精细地控制hook的行为。</p><p><br></p><p><span style="font-size: 24px;"><strong>示例</strong></span></p><p><br></p><p>在VirtualHook的repo中，已经包含了一个示例用的hook插件demoHookPlugin，这个插件对以下方法进行了插桩：</p><table class="syntaxhighlighter  java" border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="java plain">AssetManager.open()</code></div><div class="line number2 index1 alt1"><code class="java plain">File()</code></div><div class="line number3 index2 alt2"><code class="java plain">URL.openConnection()</code></div></div></td></tr></tbody></table><p>编译这个hook插件，会得到一个apk，将其保存到设备SD卡的指定位置以待加载。随后启动VirutalHook，添加并运行应用。在应用的日志中，便能看到插桩打印的日志，将上述方法调用时传入的参数打印出来。</p><p><br></p><p>由于VirtualHook使用的是YAHFA作为hook框架，因此hook插件的编写需要参考YAHFA的规则，具体可见YAHFA的<a title="demoPlugin" href="https://github.com/rk700/YAHFA/tree/master/demoPlugin" target="_blank">demoPlugin</a>。</p><p><br></p><p><span style="font-size: 24px;"><strong>其他说明</strong></span><br></p><p><br></p><p>由于VirtualHook是VirtualApp与YAHFA的集成，因此其适用范围就是两者的交集：目前支持的系统是Android 5.1和6.0，支持的架构是armeabi和x86。由于VirtualHook的出发点是便于安全研究，因此适配度不是其考虑的主要问题。</p><p><br></p><p>特别地，对于加固应用的hook，目前使用上述的demoHookPlugin试验了360，腾讯，梆梆和爱加密。除了梆梆之外，其他加固的应用均可被hook（爱加密把非错误的日志打印全部重定向了，所以必须通过Log.e()打印日志）。梆梆加固的应用，在VirtualApp上无法运行，因此作为其下游的VirtualHook，目前对梆梆加固的应用也无法使用。希望能够有人研究解决这一问题。<br></p><p><br></p><p>另一方面，目前VirtualHook只是对Java方法进行hook。实际上，VirtualApp中自带了对native方法进行hook的功能，看雪上已经有利用该功能进行应用脱壳的实践了。后续可以将native hook一并整合起来，使VirtualHook的功能更强大。</p><p><br></p><p>最后放上<a title="代码地址" href="https://github.com/rk700/VirtualHook" target="_blank">代码地址</a>。目前主要是作为思路验证和PoC的形式，所以其易用性和稳定度还有待提高。希望大家在试用中能够发现问题共同解决，以期将VirtualHook打造成为更加实用的工具。</p><p><br></p><p><span style="font-size: 24px;"><strong>参考资料</strong></span></p><p><br></p><p>https://github.com/asLody/VirtualApp</p><p>https://github.com/rk700/VirtualHook</p><p>https://github.com/asLody/legend</p><p>https://github.com/alibaba/AndFix</p><p>https://github.com/rovo89/android_art</p>					<br><br>
+<p><a href="https://bbs.pediy.com/thread-257007.htm">[2020元旦礼物]《看雪论坛精华17》发布！（补齐之前所有遗漏版本）！</a></p>
+
+
+										
+										
+					
+								</div>
+				
+				<div>
+								</div>
+				
+				<div style="height: 33px; line-height: 33px; border-top-color: rgb(221, 221, 221); border-top-width: 1px; border-top-style: solid;">
+														</div>
+			</div>
+
+</div>
+
+
+</body></html>

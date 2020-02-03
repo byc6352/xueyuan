@@ -1,0 +1,301 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android 源码编译及真机刷机实录_weixin_35016347的博客-CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                                        <div class="markdown_views prism-atom-one-dark" id="content_views">
+                    <!-- flowchart 箭头图标 勿删 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-linecap="round" d="M 5 0 L 0 2.5 L 5 5 Z" />
+                    </svg>
+                                            <p>最近接到一个项目，需要接触 Android 源码，所以走了一遍源码编译和刷机的过程，从开始到成功花了差不多一周的时间，踩了很多坑，在此记录一下。</p>
+<p>整体分为四个部分：<br>
+</p><div class="toc"><h3><a name="t0"></a><a name="t0"></a>文章目录</h3><ul><ul><li><a href="#1_5" target="_self" rel="nofollow">1、环境配置</a></li><ul><ul><ul><li><a href="#11__13" target="_self" rel="nofollow">1.1 创建区分大小写的磁盘映像</a></li><li><a href="#12__45" target="_self" rel="nofollow">1.2 配置编译环境</a></li></ul></ul></ul><li><a href="#2_93" target="_self" rel="nofollow">2、下载源码</a></li><ul><ul><ul><li><a href="#21__repo__95" target="_self" rel="nofollow">2.1 安装 repo 工具</a></li><li><a href="#22__117" target="_self" rel="nofollow">2.2 开始下载源码</a></li></ul></ul></ul><li><a href="#3_163" target="_self" rel="nofollow">3、编译源码</a></li><ul><ul><ul><li><a href="#31__166" target="_self" rel="nofollow">3.1 下载设备驱动</a></li><li><a href="#32__182" target="_self" rel="nofollow">3.2 开始编译源码</a></li><li><a href="#_216" target="_self" rel="nofollow">整理下我编译过程中遇到的错误：</a></li></ul></ul></ul><li><a href="#4_299" target="_self" rel="nofollow">4、源码刷机</a></li></ul></ul></div><p></p>
+<h2><a name="t1"></a><a name="t1"></a><a id="1_5"></a>1、环境配置</h2>
+<p>参考：<a href="https://source.android.com/source/initializing.html" rel="nofollow">https://source.android.com/source/initializing.html</a><br>
+Android 源码需要在 Linux 或 Mac OS 上编译，我需要编译的源码版本是 8.1.0，Google 官方推荐的编译环境是 Ubuntu LTS (14.04)，如果是 Windows 平台搭个虚拟机就好了。</p>
+<p>我的电脑是 MBP，系统版本是 10.14.3，处理器是 i5 的双核，磁盘大小只有 256GB，内存是 8GB，配置一般，编起来还是稍微有点吃力的。我本来是图方便同时也担心损坏本机环境，用的 docker 创建的镜像编译，无奈电脑带不动，速度慢不说还经常报 OOM，索性最后就直接使用本机环境了。</p>
+<p>好，开始了 …</p>
+<h5><a id="11__13"></a>1.1 创建区分大小写的磁盘映像</h5>
+<blockquote>
+<p>在默认安装过程中，Mac OS 会在一个保留大小写但不区分大小写的文件系统中运行。Git 并不支持此类文件系统，而且此类文件系统会导致某些 Git 命令（例如 git status）的行为出现异常。</p>
+</blockquote>
+<p>因此我们需要在现有的 Mac OS 环境中创建一个区分大小写的文件系统，有两种方式：<br>
+<strong>直接使用磁盘工具</strong><br>
+启动磁盘工具，“文件 - 新建映像 - 空白映像” 或者 “Command + N”创建一个映像，设置存储名称、存储位置、文件系统的名称、大小和格式，点击存储即可。<br>
+<img alt="创建磁盘镜像" src="images/android05901.jpg"><br>
+“存储为”处设置的名称为镜像的名称，如 AOSP.dmg，“名称”处设置的名称为文件系统的名称，装载后可以到 /Volumes/Android 路径下访问，大小我设置的是 100GB（事实证明是不够的，磁盘空间足够的话最好一开始就给到 150 GB），格式为 “Mac OS 扩展（区分大小写，日志式）”。<br>
+磁盘镜像创建完之后还可以修改，在磁盘工具左侧退出镜像，然后到磁盘工具，选择“映像 - 调整大小”，然后选定需要调整的映像，输入调整后的大小即可。<br>
+<img alt="修改磁盘映像大小" src="images/android05902.jpg"><br>
+<strong>通过命令行</strong><br>
+当然，这些也可以通过命令行来实现，创建和调整大小的命令分别为：</p>
+<pre class="prettyprint"><code class="has-numbering">hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 100g ~/AOSP.dmg
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<pre class="prettyprint"><code class="has-numbering">hdiutil resize -size 159g ~/AOSP.dmg
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>注意：如果系统创建的镜像是 .dmg.sparseimage 文件，相应的 AOSP.dmg 换成 AOSP.dmg.sparseimage 也是没有影响的。</p>
+<p>装载和卸载也有相应的命令，分别为：</p>
+<pre class="prettyprint"><code class="has-numbering">hdiutil attach ~/AOSP.dmg -mountpoint /Volumes/Android
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<pre class="prettyprint"><code class="has-numbering">hdiutil detach /Volumes/Android
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>有了磁盘映像后，就可以往这个目录下放源码了，如何下载在下一节说，继续配置编译环境。</p>
+<h5><a id="12__45"></a>1.2 配置编译环境</h5>
+<p>首先是安装 JDK，编译 8.1.0 的源码需要的 JDK 版本为 1.8.0，其他对应的版本信息为</p>
+<blockquote>
+<p>Android 7.0 (Nougat) - Android 8.0 (O)：Ubuntu - OpenJDK 8；Mac OS - jdk 8u45 或更高版本<br>
+Android 5.x (Lollipop) - Android 6.0 (Marshmallow)：Ubuntu - OpenJDK 7；Mac OS - jdk-7u71-macosx-x64.dmg<br>
+Android 2.3.x (Gingerbread) - Android 4.4.x (KitKat)：Ubuntu - Java JDK 6；Mac OS - Java JDK 6<br>
+Android 1.5 (Cupcake) - Android 2.2.x (Froyo)：Ubuntu - Java JDK 5</p>
+</blockquote>
+<p>我本机有三个 JDK 版本：</p>
+<pre class="prettyprint"><code class="has-numbering">$ /usr/libexec/java_home -V
+Matching Java Virtual Machines (3):
+    10.0.2, x86_64:	"Java SE 10.0.2"	/Library/Java/JavaVirtualMachines/jdk-10.0.2.jdk/Contents/Home
+    1.8.0_201, x86_64:	"Java SE 8"	/Library/Java/JavaVirtualMachines/jdk1.8.0_201.jdk/Contents/Home
+    1.7.0_80, x86_64:	"Java SE 7"	/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home
+
+/Library/Java/JavaVirtualMachines/jdk-10.0.2.jdk/Contents/Home
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li><li style="color: rgb(153, 153, 153);">6</li><li style="color: rgb(153, 153, 153);">7</li></ul></pre>
+<p>通过 alias 命令实现动态切换：</p>
+<pre class="prettyprint"><code class="has-numbering">alias jdk7="export JAVA_HOME=$JAVA7_HOME"
+alias jdk8="export JAVA_HOME=$JAVA8_HOME"
+alias jdk10="export JAVA_HOME=$JAVA10_HOME"
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li></ul></pre>
+<p>然后是安装 Xcode（一般都有吧），或者使用命令安装 Xcode 命令行工具</p>
+<pre class="prettyprint"><code class="has-numbering">xcode-select --install
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>然后是各种依赖包，官方推荐是使用 <a href="https://www.macports.org/install.php" rel="nofollow">MacPorts</a> 工具安装各种程序包,下载安装完后需要配置环境变量，确保可以访问命令</p>
+<pre class="prettyprint"><code class="has-numbering">export PATH=/opt/local/bin:$PATH
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>然后通过 MacPorts 安装 Make、Git 和 GPG 程序包，执行命令为</p>
+<pre class="prettyprint"><code class="has-numbering">POSIXLY_CORRECT=1 sudo port install gmake libsdl git gnupg
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>环境变量可以配置到 .bash_profile （或其他同类型配置文件）中，这样每次打开终端都得到执行；另外，Mac OS 中可同时打开的文件描述符的默认数量上限太低，为了确保高度并行的编译流程，可以提高此上限，将下面这句命令也加到 .bash_profile 中。</p>
+<pre class="prettyprint"><code class="has-numbering">ulimit -S -n 1024
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>官方还给出了一些优化选项，如设置 ccache，这个工具主要是适用于 C/C++ 的编译器缓存，有助于提高编译速度。而对于增量编译则不要设置，否则会减慢编译速度，详情可以查看官方文档说明。</p>
+<h2><a name="t2"></a><a name="t2"></a><a id="2_93"></a>2、下载源码</h2>
+<p>源码下载使用的是一个类似 Git 的工具，叫做 repo，是 Google 提供的一个专门用于下载管理 Android 项目仓库的工具，底层实现是 Git。</p>
+<h5><a id="21__repo__95"></a>2.1 安装 repo 工具</h5>
+<p>确保主目录下有 /bin 目录，且该目录包含在路径中</p>
+<pre class="prettyprint"><code class="has-numbering">mkdir ~/bin
+PATH=~/bin:$PATH
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li></ul></pre>
+<p>下载 repo 工具，确保该工具可执行</p>
+<pre class="prettyprint"><code class="has-numbering">curl https://storage.googleapis.com/git-repo-downloads/repo &gt; ~/bin/repo
+chmod a+x ~/bin/repo
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li></ul></pre>
+<p>安装时如果提示 GnuPG 不可用，brew install 安装即可</p>
+<pre class="prettyprint"><code class="has-numbering">brew install GnuPG
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>下载时如果提示 “gerrit.googlesource.com 无法链接”，是因为被墙的缘故，修改 repo 文件中的 REPO_URL 为清华镜像，再次下载即可</p>
+<p><s>REPO_URL = ‘https://gerrit.googlesource.com/git-repo’</s><br>
+REPO_URL = ‘https://gerrit-googlesource.lug.ustc.edu.cn/git-repo’</p>
+<h5><a id="22__117"></a>2.2 开始下载源码</h5>
+<p>下载完后进入前面创建的那个磁盘映像目录</p>
+<pre class="prettyprint"><code class="has-numbering">cd /Volumes/Android
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>创建一个工作目录，随便叫什么名字都行</p>
+<pre class="prettyprint"><code class="has-numbering">mkdir android-8.1.0_r1
+cd android-8.1.0_r1
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li></ul></pre>
+<p>配置 git，如果是使用 VPN 从 Google 仓库下载，最好使用 gmail 账号</p>
+<pre class="prettyprint"><code class="has-numbering">git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li></ul></pre>
+<p>接着就是初始化 repo 客户端，使用 -b 指定分支</p>
+<pre class="prettyprint"><code class="has-numbering">repo init -u https://android.googlesource.com/platform/manifest -b android-8.1.0_r1
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>我编译的版本 android-8.1.0_r1，前面的 8.1.0 是我们熟知的代码版本，后面的 r1 是细分分支。需要注意的是，不同的细分分支可能对应不同的设备，如果想要将源码刷入特定手机，需要找到支持对应设备的细分版本，详细的分支列表可以看<a href="https://source.android.com/source/build-numbers.html#source-code-tags-and-builds" rel="nofollow">这里</a>。</p>
+<p>初始化完了之后就可以运行命令将源码同步到本地，因为源码数据非常大因此这个过程比较长。</p>
+<pre class="prettyprint"><code class="has-numbering">repo sync
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>当然，如果你不强求某个特定的源码版本，只是想体验一下源码编译的过程，也可以使用清华每个月提供的<a href="https://mirrors.tuna.tsinghua.edu.cn/aosp-monthly/" rel="nofollow">最新包</a>，然后在这个包的基础上进行同步。<br>
+下载最新包，下载完成后可以校验下 checksum</p>
+<pre class="prettyprint"><code class="has-numbering">wget -c https://mirrors.tuna.tsinghua.edu.cn/aosp-monthly/aosp-latest.tar
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>解压得到 AOSP 目录，在此目录下有一个隐藏的 .repo 目录，同步后即可以得到完整目录</p>
+<pre class="prettyprint"><code class="has-numbering">tar -xf aosp-latest.tar
+repo sync
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li></ul></pre>
+<p>附录：<a href="https://mirrors.tuna.tsinghua.edu.cn/help/AOSP/" rel="nofollow">清华镜像</a>、<a href="https://lug.ustc.edu.cn/wiki/mirrors/help/aosp" rel="nofollow">科大镜像</a></p>
+<p>源码整个下载完成后大概有 50+ GB，如果磁盘紧张（比如说我）且不需要再同步代码可以删掉 .repo 目录，最后纯源码大概 33GB 左右，接下来就可以开始编译了。</p>
+<h2><a name="t3"></a><a name="t3"></a><a id="3_163"></a>3、编译源码</h2>
+<p>编译源码其实很简单，只有几条命令，执行完就可以等着了，编译时间视你开的线程数和机器性能决定，开始编译——</p>
+<h5><a id="31__166"></a>3.1 下载设备驱动</h5>
+<p>因为我需要将源码编译完跑在真实设备上，因此除了使用 AOSP 源码编译出可以在特定设备中运行的系统镜像，还需要在<a href="https://developers.google.com/android/drivers" rel="nofollow">驱动程序</a>下载对应设备的「硬件相关专有库」。<br>
+注意这里的驱动程序也有特定的版本要求，可以通过  <code>printconfig</code> 命令查看本地源码的配置，然后下载对应版本的硬件设备驱动。<br>
+<img alt="查看源码配置信息" src="images/android05903.jpg"><br>
+比如说，对于 Pixel 2 的 OPM1.171019.011 的源码，下载如下对应的驱动<br>
+<img alt="下载硬件设备驱动" src="images/android05904.jpg"><br>
+下载完成后，将文件解压得到两个脚本，放到源码根目录下，运行脚本，会有很长的协议，在命令模式下输入 q 即可跳到最后，输入 “I ACCEPT” 确认协议， 二进制文件将会在源码根目录下新建 /vender 文件存放二进制文件及其对应的 Makefile<br>
+<img alt="设备驱动文件" src="images/android05905.jpg"><br>
+说明下，如果在执行了一些编译操作后再下载的二进制文件，需要清理原编译操作的输出，确保新安装的二进制文件被包含，执行完下面的命令后再重新走一遍编译流程即可</p>
+<pre class="prettyprint"><code class="has-numbering">make clobber
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<h5><a id="32__182"></a>3.2 开始编译源码</h5>
+<p>进入源码目录，执行初始化脚本，这里会配置各种环境变量的信息，比如我们上面用到的  <code>printconfig</code> 命令就需要在这个之后执行</p>
+<pre class="prettyprint"><code class="has-numbering">source build/envsetup.sh
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>或者是</p>
+<pre class="prettyprint"><code class="has-numbering">. build/envsetup.sh
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>然后设置编译目标</p>
+<pre class="prettyprint"><code class="has-numbering">lunch XXX
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>也可以只输入 <code>lunch</code> 命令，然后在弹出的菜单中选择需要编译的版本<br>
+<img alt="选择编译目标" src="images/android05906.jpg"><br>
+编译目标格式为 “BUILD-BUILDTYPE” 形式，BUILD 表示特定功能组合的代号，如 aosp 加上设备代号，BUILDTYPE 有以下三种：</p>
+<ul>
+<li>user：权限受限，适用于生产环境</li>
+<li>userdebug：与 user 类似，有 root 权限和可调试性</li>
+<li>eng：具有额外调试工具的开发配置</li>
+</ul>
+<p>Pixel 2 的设备代号是“walleye”，所以我选择的编译目标是 <code>25. aosp_walleye-userdebug</code></p>
+<p>最后执行编译，通过 -j 指定并行任务数</p>
+<pre class="prettyprint"><code class="has-numbering">make -jX
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>我的机器是双核四线程，所以我开了四个线程来编译，导致的结果就是，风扇呼呼响发热厉害且编的特别慢，最后大概花了十个多小时才编译完成吧。</p>
+<h5><a id="_216"></a>整理下我编译过程中遇到的错误：</h5>
+<p><strong>错误一</strong>：找不到 JDK 的 tools.jar 包</p>
+<blockquote>
+<p>build/core/config.mk:663: error: Error: could not find jdk tools.jar at /System/Library/Frameworks/JavaVM.framework/Versions/Current/Commands/…/lib/tools.jar, please check if your JDK was installed correctly.</p>
+</blockquote>
+<p>我首先 <code>Java -v</code> 看了下 JDK 确实是安装了的，且包含在系统路径下，后来发现编译时使用的环境变量并不是 “JAVA_HOME” 而是 “ANDROID_JAVA_HOME”，解决方法很简单，就是在~/.bash_profile 中添加<br>
+<code>export ANDROID_JAVA_HOME=$JAVA_HOME</code></p>
+<p><strong>错误二</strong>：找不到对应的 sdk 版本</p>
+<blockquote>
+<p>FAILED: out/soong/build.ninja<br>
+out/soong/.bootstrap/bin/soong_build -t -l out/.module_paths/Android.bp.list -b out/soong -n out -d out/soong/build.ninja.d -o out/soong/build.ninja Android.bp<br>
+internal error: Could not find a supported mac sdk: [“10.10” “10.11” “10.12” “10.13”]<br>
+ninja: build stopped: subcommand failed.</p>
+</blockquote>
+<p>运行命令查看本机安装的 sdk 版本</p>
+<pre class="prettyprint"><code class="has-numbering">find /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs -iname "*.sdk"
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>发现我本机安装的版本是 10.14，确实不在配置文件的要求中，最简单粗暴的方法就是修改配置文件，在 <code>/build/soong/cc/config/x86_darwin_host.go</code> 的 <code>darwinSupportedSdkVersions</code> 变量中添加对应的版本。</p>
+<p>事实证明，这样子做是不行的，编译之后出现了新的问题，就是 MacOSX10.14.sdk 版本导致的</p>
+<blockquote>
+<p>/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUUID.h:26:49: error: nullability specifier ‘_Nullable’ cannot be applied to non-pointer type ‘uuid_t’ (aka ‘unsigned char [16]’)<br>
+(instancetype)initWithUUIDBytes:(const uuid_t _Nullable)bytes;<br>
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUUID.h:29:30: error: nullability specifier ‘_Nonnull’ cannot be applied to non-pointer type ‘uuid_t’ (aka ‘unsigned char [16]’)<br>
+(void)getUUIDBytes:(uuid_t _Nonnull)uuid;</p>
+</blockquote>
+<p>（所以，这个故事告诉我们，不要随便乱改配置文件，别人没有写新的版本肯定是有原因的）<br>
+于是下载了一个低版本的 <a href="https://github.com/phracker/MacOSX-SDKs/releases">MacOSX.sdk</a>，解压复制到 <code>/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/</code> 目录下<br>
+注意下载文件是 <code>.tar.xz</code> 格式的，需要先用 <code>xz -d</code> 将 XXX.tar.xz 文件解压成 XXX.tar 格式，然后用<code>tar -xvf</code> 解压</p>
+<p><strong>错误三</strong>：Mac OS 版本过高导致 bison 有什么问题（我也不太清楚）</p>
+<blockquote>
+<p>FAILED: out/soong/.intermediates/system/tools/aidl/libaidl-common/darwin_x86_64_static/gen/yacc/system/tools/aidl/aidl_language_y.cpp<br>
+out/soong/.intermediates/system/tools/aidl/libaidl-common/darwin_x86_64_static/gen/yacc/system/tools/aidl/aidl_language_y.h<br>
+BISON_PKGDATADIR=external/bison/data prebuilts/misc/darwin-x86/bison/bison -d  --defines=out/soong/.intermediates/system/tools/aidl/libaidl-common/darwin_x86_64_static/gen/yacc/system/tools/aidl/aidl_language_y.h -o out/soong/.intermediates/system/tools/aidl/libaidl-common/darwin_x86_64_static/gen/yacc/system/tools/aidl/aidl_language_y.cpp system/tools/aidl/aidl_language_y.yy<br>
+[  2% 1270/59686] cc out/soong/.intermediates/system/core/adf/libadf/libadf/android_arm_armv7-a_static_core/obj/system/core/adf/libadf/adf.o<br>
+ninja: build stopped: subcommand failed.<br>
+11:47:11 ninja failed with: exit status 1<br>
+make: *** [run_soong_ui] Error 1</p>
+</blockquote>
+<p>解决办法是安装 bison 的补丁并重新编译<br>
+首先进入 bison 的目录，并安装补丁</p>
+<pre class="prettyprint"><code class="has-numbering">cd /external/bison
+git cherry-pick c0c852bd6fe462b148475476d9124fd740eba160
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li></ul></pre>
+<p>重新编译</p>
+<pre class="prettyprint"><code class="has-numbering">mm
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>这里 <code>mm</code> 命令如果执行失效，则需退回根目录重新执行 <code>source build/envsetup.sh</code> 和 <code>lunch XXX</code>，然后再回来执行 <code>mm</code></p>
+<p>编译成功后，替换 bison 目录，然后重新编译即可</p>
+<pre class="prettyprint"><code class="has-numbering">cp /Volumes/Android/android-8.1.0_r1/out/host/darwin-x86/bin/bison /Volumes/Android/android-8.1.0_r1/prebuilts/misc/darwin-x86/bison/
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p><strong>错误四</strong>：内存不够了</p>
+<blockquote>
+<p>GC overhead limit exceeded.<br>
+Try increasing heap size with java option ‘-Xmx’.</p>
+</blockquote>
+<p>怎么操作都提示了，就是增加虚拟机的堆栈</p>
+<pre class="prettyprint"><code class="has-numbering">export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4g"
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>修改后注意重启下服务</p>
+<pre class="prettyprint"><code class="has-numbering">./prebuilts/sdk/tools/jack-admin kill-server 
+./prebuilts/sdk/tools/jack-admin start-server
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li></ul></pre>
+<p>我最后一次编译了七万多个文件，花了五个多小时，正常情况下开始编译大概是十万多个文件。中间断了也没事，已经编好的还在，程序会继续编译。<br>
+编译完了之后，屏幕会出现这样的画面，就表示成功了（顺便吐槽一句编译完整个源码目录大概占了 128 GB 左右的磁盘空间，阔怕）<br>
+<img alt="成功编译" src="images/android05907.jpg"></p>
+<h2><a name="t4"></a><a name="t4"></a><a id="4_299"></a>4、源码刷机</h2>
+<p>源码编译成功后，所有输出都在 out 目录，刷机的镜像文件在 <code>/out/target/product/walleye/</code> 路径下，大概有这么些东西，其中用到的也就是几个镜像了</p>
+<p><img alt="输出目录" src="images/android05908.jpg"><br>
+开始刷机，刷机前检查 <code>ANDROID_PRODUCT_OUT</code> 环境变量的值，若为空则设置为镜像文件的路径</p>
+<pre class="prettyprint"><code class="has-numbering">export ANDROID_PRODUCT_OUT=/Volumes/Android/android-8.1.0_r1/out/target/product/walleye/
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>然后连接手机，打开 USB 调试模式，以 bootloader 模式进入手机并解锁</p>
+<pre class="prettyprint"><code class="has-numbering">adb reboot bootloader
+fastboot oem unlock
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li></ul></pre>
+<p>刷入镜像</p>
+<pre class="prettyprint"><code class="has-numbering">fastboot -w flashall
+</code><ul class="pre-numbering"><li style="color: rgb(153, 153, 153);">1</li></ul></pre>
+<p>输出大概是这样子的：<br>
+<img alt="刷入镜像" src="images/android05909.jpg"><br>
+手机重启后，就是我们自己编译的源码的系统了，非常干净简洁</p>
+<p><img alt="首页" src="images/android05910.jpg"></p>
+<p><img alt="应用页" src="images/android05911.jpg"></p>
+
+                                    </div>
+                <link href="https://csdnimg.cn/release/phoenix/mdeditor/markdown_views-b6c3c6d139.css" rel="stylesheet">
+                                                <div class="more-toolbox">
+                <div class="left-toolbox">
+                    <ul class="toolbox-list">
+                        
+                        <li class="tool-item tool-active is-like "><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#csdnc-thumbsup" />
+                        </svg><span class="name">点赞</span>
+                        <span class="count"></span>
+                        </a></li>
+                        <li class="tool-item tool-active is-collection "><a href="javascript:;" data-report-click='{"mod":"popu_824"}'><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-Collection-G" />
+                        </svg><span class="name">收藏</span></a></li>
+                        <li class="tool-item tool-active is-share"><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-fenxiang" />
+                        </svg>分享</a></li>
+                        <!--打赏开始-->
+                                                <!--打赏结束-->
+                                                <li class="tool-item tool-more">
+                            <a>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024" width="200" height="200" version="1.1" p-id="5717" t="1575545411852"><defs><style type="text/css" /></defs><path d="M 179.176 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5718" /><path d="M 509.684 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5719" /><path d="M 846.175 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5720" /></svg>
+                            </a>
+                            <ul class="more-box">
+                                <li class="item"><a class="article-report">文章举报</a></li>
+                            </ul>
+                        </li>
+                                            </ul>
+                </div>
+                            </div>
+            <div class="person-messagebox">
+                <div class="left-message"><a href="https://blog.csdn.net/weixin_35016347">
+                    <img class="avatar_pic" src="images/android05912.jpg" username="weixin_35016347">
+                                            <img class="user-years" src="images/android05913.png">
+                                    </a></div>
+                <div class="middle-message">
+                                        <div class="title"><span class="tit"><a href="https://blog.csdn.net/weixin_35016347" target="_blank" data-report-click='{"mod":"popu_379"}'>喵吉诃德</a></span>
+                                            </div>
+                    <div class="text"><span>发布了27 篇原创文章</span> · <span>获赞 5</span> · <span>访问量 1万+</span></div>
+                </div>
+                                <div class="right-message">
+                                            <a class="btn btn-sm btn-red-hollow bt-button personal-letter" href="https://im.csdn.net/im/main.html?userName=weixin_35016347" target="_blank">私信
+                        </a>
+                                                            <a class="btn btn-sm  bt-button personal-watch" data-report-click='{"mod":"popu_379"}'>关注</a>
+                                    </div>
+                            </div>
+                    </div>
+
+</div>
+
+
+</body></html>

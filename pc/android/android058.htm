@@ -1,0 +1,251 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AccessibilityService使用入门</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<article class="_2rhmJa"><blockquote>
+<p>AccessibilityService设计初衷在于帮助残障用户使用android设备和应用，在后台运行，可以监听用户界面的一些状态转换，例如页面切换、焦点改变、通知、Toast等，并在触发AccessibilityEvents时由系统接收回调。后来被开发者另辟蹊径，用于一些插件开发，比如微信红包助手，还有一些需要监听第三方应用的插件。</p>
+</blockquote>
+<p>最好的资料：<a href="https://developer.android.com/reference/android/accessibilityservice/AccessibilityService#developer-guides" target="_blank" rel="nofollow">官方文档</a></p>
+<h1>生命周期</h1>
+<p>AccessbilityService的生命周期由系统专门管理，并遵循Service的基本生命周期，它只能由用户自己在设置中手动启动，系统绑定到服务后，会调用它的onServiceConnected()方法。<br>
+当用户手动在设置中关闭服务，或者开发者调用disableSelf()方法时，该服务会被关闭销毁。</p>
+<h1>基本配置</h1>
+<ol>
+<li>继承AccessbilityService</li>
+</ol>
+<div class="_2Uzcx_"><button class="VJbwyy" aria-label="复制代码" type="button"><i class="anticon anticon-copy" aria-label="icon: copy"><svg xmlns="http://www.w3.org/2000/svg" class="" aria-hidden="true" fill="currentColor" viewBox="64 64 896 896" focusable="false" width="1em" height="1em" data-icon="copy"><path d="M 832 64 H 296 c -4.4 0 -8 3.6 -8 8 v 56 c 0 4.4 3.6 8 8 8 h 496 v 688 c 0 4.4 3.6 8 8 8 h 56 c 4.4 0 8 -3.6 8 -8 V 96 c 0 -17.7 -14.3 -32 -32 -32 Z M 704 192 H 192 c -17.7 0 -32 14.3 -32 32 v 530.7 c 0 8.5 3.4 16.6 9.4 22.6 l 173.3 173.3 c 2.2 2.2 4.7 4 7.4 5.5 v 1.9 h 4.2 c 3.5 1.3 7.2 2 11 2 H 704 c 17.7 0 32 -14.3 32 -32 V 224 c 0 -17.7 -14.3 -32 -32 -32 Z M 350 856.2 L 263.9 770 H 350 v 86.2 Z M 664 888 H 414 V 746 c 0 -22.1 -17.9 -40 -40 -40 H 232 V 264 h 432 v 624 Z" /></svg></i></button><pre class="line-numbers  language-kotlin"><code class="kotlin  language-kotlin"><span class="token keyword">class</span> AliAccessibilityService <span class="token operator">:</span> <span class="token function">AccessibilityService</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">private</span> <span class="token keyword">val</span> TAG <span class="token operator">=</span> <span class="token string">"AliAccessibilityService"</span>
+
+    <span class="token comment">//服务中断时的回调</span>
+    <span class="token keyword">override</span> <span class="token keyword">fun</span> <span class="token function">onInterrupt</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Log<span class="token punctuation">.</span><span class="token function">d</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"onInterrupt"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">//接收到系统发送AccessibilityEvent时的回调</span>
+    <span class="token keyword">override</span> <span class="token keyword">fun</span> <span class="token function">onAccessibilityEvent</span><span class="token punctuation">(</span>event<span class="token operator">:</span> AccessibilityEvent<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Log<span class="token punctuation">.</span><span class="token function">d</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"onAccessibilityEvent:event:<span class="token interpolation variable">$event</span>"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="line-numbers-rows" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div>
+<ol start="2">
+<li>AccessbilityService本质上还是一个Service，所以要在AndroidManifest中注册该服务</li>
+</ol>
+<div class="_2Uzcx_"><button class="VJbwyy" aria-label="复制代码" type="button"><i class="anticon anticon-copy" aria-label="icon: copy"><svg xmlns="http://www.w3.org/2000/svg" class="" aria-hidden="true" fill="currentColor" viewBox="64 64 896 896" focusable="false" width="1em" height="1em" data-icon="copy"><path d="M 832 64 H 296 c -4.4 0 -8 3.6 -8 8 v 56 c 0 4.4 3.6 8 8 8 h 496 v 688 c 0 4.4 3.6 8 8 8 h 56 c 4.4 0 8 -3.6 8 -8 V 96 c 0 -17.7 -14.3 -32 -32 -32 Z M 704 192 H 192 c -17.7 0 -32 14.3 -32 32 v 530.7 c 0 8.5 3.4 16.6 9.4 22.6 l 173.3 173.3 c 2.2 2.2 4.7 4 7.4 5.5 v 1.9 h 4.2 c 3.5 1.3 7.2 2 11 2 H 704 c 17.7 0 32 -14.3 32 -32 V 224 c 0 -17.7 -14.3 -32 -32 -32 Z M 350 856.2 L 263.9 770 H 350 v 86.2 Z M 664 888 H 414 V 746 c 0 -22.1 -17.9 -40 -40 -40 H 232 V 264 h 432 v 624 Z" /></svg></i></button><pre class="line-numbers  language-xml"><code class="xml  language-xml">        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>service</span>
+            <span class="token attr-name"><span class="token namespace">android:</span>name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>.AliAccessibilityService<span class="token punctuation">"</span></span>
+            <span class="token attr-name"><span class="token namespace">android:</span>label</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>支付测试<span class="token punctuation">"</span></span>
+            <span class="token attr-name"><span class="token namespace">android:</span>permission</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>android.permission.BIND_ACCESSIBILITY_SERVICE<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>intent-filter</span><span class="token punctuation">&gt;</span></span>
+                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>action</span> <span class="token attr-name"><span class="token namespace">android:</span>name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>android.accessibilityservice.AccessibilityService<span class="token punctuation">"</span></span> <span class="token punctuation">/&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>intent-filter</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>service</span><span class="token punctuation">&gt;</span></span>
+<span class="line-numbers-rows" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div>
+<p>android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"是为了确保只有系统可以绑定该服务。</p>
+<ol start="3">
+<li>配置你需要监听的事件类型、要监听哪个程序，最小监听间隔等属性。这里有两种方式可以进行配置，一种是在manifest中通过meta-data配置，一种是在代码中通过setServiceInfo(AccessibilityServiceInfo)设置。<br>
+<strong>方式一：通过meta-data设置</strong>
+</li>
+</ol>
+<div class="_2Uzcx_"><button class="VJbwyy" aria-label="复制代码" type="button"><i class="anticon anticon-copy" aria-label="icon: copy"><svg xmlns="http://www.w3.org/2000/svg" class="" aria-hidden="true" fill="currentColor" viewBox="64 64 896 896" focusable="false" width="1em" height="1em" data-icon="copy"><path d="M 832 64 H 296 c -4.4 0 -8 3.6 -8 8 v 56 c 0 4.4 3.6 8 8 8 h 496 v 688 c 0 4.4 3.6 8 8 8 h 56 c 4.4 0 8 -3.6 8 -8 V 96 c 0 -17.7 -14.3 -32 -32 -32 Z M 704 192 H 192 c -17.7 0 -32 14.3 -32 32 v 530.7 c 0 8.5 3.4 16.6 9.4 22.6 l 173.3 173.3 c 2.2 2.2 4.7 4 7.4 5.5 v 1.9 h 4.2 c 3.5 1.3 7.2 2 11 2 H 704 c 17.7 0 32 -14.3 32 -32 V 224 c 0 -17.7 -14.3 -32 -32 -32 Z M 350 856.2 L 263.9 770 H 350 v 86.2 Z M 664 888 H 414 V 746 c 0 -22.1 -17.9 -40 -40 -40 H 232 V 264 h 432 v 624 Z" /></svg></i></button><pre class="line-numbers  language-xml"><code class="xml  language-xml">        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>service</span>
+            <span class="token attr-name"><span class="token namespace">android:</span>name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>.AliAccessibilityService<span class="token punctuation">"</span></span>
+            <span class="token attr-name"><span class="token namespace">android:</span>label</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>支付测试<span class="token punctuation">"</span></span>
+            <span class="token attr-name"><span class="token namespace">android:</span>permission</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>android.permission.BIND_ACCESSIBILITY_SERVICE<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>intent-filter</span><span class="token punctuation">&gt;</span></span>
+                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>action</span> <span class="token attr-name"><span class="token namespace">android:</span>name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>android.accessibilityservice.AccessibilityService<span class="token punctuation">"</span></span> <span class="token punctuation">/&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>intent-filter</span><span class="token punctuation">&gt;</span></span>
+
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta-data</span>
+                <span class="token attr-name"><span class="token namespace">android:</span>name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>android.accessibilityservice<span class="token punctuation">"</span></span>
+                <span class="token attr-name"><span class="token namespace">android:</span>resource</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>@xml/accessible_service_config_ali<span class="token punctuation">"</span></span> <span class="token punctuation">/&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>service</span><span class="token punctuation">&gt;</span></span>
+<span class="line-numbers-rows" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div>
+<p>accessible_service_config_ali.xml</p>
+<div class="_2Uzcx_"><button class="VJbwyy" aria-label="复制代码" type="button"><i class="anticon anticon-copy" aria-label="icon: copy"><svg xmlns="http://www.w3.org/2000/svg" class="" aria-hidden="true" fill="currentColor" viewBox="64 64 896 896" focusable="false" width="1em" height="1em" data-icon="copy"><path d="M 832 64 H 296 c -4.4 0 -8 3.6 -8 8 v 56 c 0 4.4 3.6 8 8 8 h 496 v 688 c 0 4.4 3.6 8 8 8 h 56 c 4.4 0 8 -3.6 8 -8 V 96 c 0 -17.7 -14.3 -32 -32 -32 Z M 704 192 H 192 c -17.7 0 -32 14.3 -32 32 v 530.7 c 0 8.5 3.4 16.6 9.4 22.6 l 173.3 173.3 c 2.2 2.2 4.7 4 7.4 5.5 v 1.9 h 4.2 c 3.5 1.3 7.2 2 11 2 H 704 c 17.7 0 32 -14.3 32 -32 V 224 c 0 -17.7 -14.3 -32 -32 -32 Z M 350 856.2 L 263.9 770 H 350 v 86.2 Z M 664 888 H 414 V 746 c 0 -22.1 -17.9 -40 -40 -40 H 232 V 264 h 432 v 624 Z" /></svg></i></button><pre class="line-numbers  language-xml"><code class="xml  language-xml"><span class="token prolog">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>accessibility-service</span> <span class="token attr-name"><span class="token namespace">xmlns:</span>android</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>http://schemas.android.com/apk/res/android<span class="token punctuation">"</span></span>
+    <span class="token attr-name"><span class="token namespace">android:</span>accessibilityEventTypes</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>typeWindowStateChanged|typeWindowContentChanged|typeNotificationStateChanged<span class="token punctuation">"</span></span>
+    <span class="token attr-name"><span class="token namespace">android:</span>accessibilityFeedbackType</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>feedbackGeneric<span class="token punctuation">"</span></span>
+    <span class="token attr-name"><span class="token namespace">android:</span>accessibilityFlags</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>flagReportViewIds<span class="token punctuation">"</span></span>
+    <span class="token attr-name"><span class="token namespace">android:</span>canRetrieveWindowContent</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>true<span class="token punctuation">"</span></span>
+    <span class="token attr-name"><span class="token namespace">android:</span>description</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>@string/pay_test<span class="token punctuation">"</span></span>
+    <span class="token attr-name"><span class="token namespace">android:</span>notificationTimeout</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>10<span class="token punctuation">"</span></span>
+    <span class="token attr-name"><span class="token namespace">android:</span>canPerformGestures</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>true<span class="token punctuation">"</span></span>
+    <span class="token attr-name"><span class="token namespace">android:</span>packageNames</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>com.eg.android.AlipayGphone<span class="token punctuation">"</span></span> <span class="token punctuation">/&gt;</span></span>
+<span class="line-numbers-rows" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div>
+<p>配置的具体含义我们下面再讲。<br>
+<strong>方式二：在代码中通过setServiceInfo设置</strong></p>
+<div class="_2Uzcx_"><button class="VJbwyy" aria-label="复制代码" type="button"><i class="anticon anticon-copy" aria-label="icon: copy"><svg xmlns="http://www.w3.org/2000/svg" class="" aria-hidden="true" fill="currentColor" viewBox="64 64 896 896" focusable="false" width="1em" height="1em" data-icon="copy"><path d="M 832 64 H 296 c -4.4 0 -8 3.6 -8 8 v 56 c 0 4.4 3.6 8 8 8 h 496 v 688 c 0 4.4 3.6 8 8 8 h 56 c 4.4 0 8 -3.6 8 -8 V 96 c 0 -17.7 -14.3 -32 -32 -32 Z M 704 192 H 192 c -17.7 0 -32 14.3 -32 32 v 530.7 c 0 8.5 3.4 16.6 9.4 22.6 l 173.3 173.3 c 2.2 2.2 4.7 4 7.4 5.5 v 1.9 h 4.2 c 3.5 1.3 7.2 2 11 2 H 704 c 17.7 0 32 -14.3 32 -32 V 224 c 0 -17.7 -14.3 -32 -32 -32 Z M 350 856.2 L 263.9 770 H 350 v 86.2 Z M 664 888 H 414 V 746 c 0 -22.1 -17.9 -40 -40 -40 H 232 V 264 h 432 v 624 Z" /></svg></i></button><pre class="line-numbers  language-kotlin"><code class="kotlin  language-kotlin">    <span class="token keyword">override</span> <span class="token keyword">fun</span> <span class="token function">onServiceConnected</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">val</span> serviceInfo <span class="token operator">=</span> <span class="token function">AccessibilityServiceInfo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">apply</span> <span class="token punctuation">{</span>
+            eventTypes <span class="token operator">=</span> AccessibilityEvent<span class="token punctuation">.</span>TYPES_ALL_MASK
+            feedbackType <span class="token operator">=</span> AccessibilityServiceInfo<span class="token punctuation">.</span>FEEDBACK_ALL_MASK
+            packageNames <span class="token operator">=</span> <span class="token function">arrayOf</span><span class="token punctuation">(</span><span class="token string">"com.eg.android.AlipayGphone"</span><span class="token punctuation">)</span><span class="token comment">//支付宝包名，可以多个</span>
+            notificationTimeout <span class="token operator">=</span> <span class="token number">10</span>
+        <span class="token punctuation">}</span>
+        <span class="token function">setServiceInfo</span><span class="token punctuation">(</span>serviceInfo<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="line-numbers-rows" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div>
+<p>这里我建议使用meta-data的方式进行配置，因为我实践过程中发现有的属性不能通过代码配置。</p>
+<ol start="4">
+<li>指引用户去手动打开该服务<br>
+首先判断该服务是否为开启状态：</li>
+</ol>
+<div class="_2Uzcx_"><button class="VJbwyy" aria-label="复制代码" type="button"><i class="anticon anticon-copy" aria-label="icon: copy"><svg xmlns="http://www.w3.org/2000/svg" class="" aria-hidden="true" fill="currentColor" viewBox="64 64 896 896" focusable="false" width="1em" height="1em" data-icon="copy"><path d="M 832 64 H 296 c -4.4 0 -8 3.6 -8 8 v 56 c 0 4.4 3.6 8 8 8 h 496 v 688 c 0 4.4 3.6 8 8 8 h 56 c 4.4 0 8 -3.6 8 -8 V 96 c 0 -17.7 -14.3 -32 -32 -32 Z M 704 192 H 192 c -17.7 0 -32 14.3 -32 32 v 530.7 c 0 8.5 3.4 16.6 9.4 22.6 l 173.3 173.3 c 2.2 2.2 4.7 4 7.4 5.5 v 1.9 h 4.2 c 3.5 1.3 7.2 2 11 2 H 704 c 17.7 0 32 -14.3 32 -32 V 224 c 0 -17.7 -14.3 -32 -32 -32 Z M 350 856.2 L 263.9 770 H 350 v 86.2 Z M 664 888 H 414 V 746 c 0 -22.1 -17.9 -40 -40 -40 H 232 V 264 h 432 v 624 Z" /></svg></i></button><pre class="line-numbers  language-java"><code class="java  language-java">    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">boolean</span> <span class="token function">isAccessibilitySettingsOn</span><span class="token punctuation">(</span><span class="token class-name">Context</span> mContext<span class="token punctuation">,</span> <span class="token class-name">Class</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span> <span class="token keyword">extends</span> <span class="token class-name">AccessibilityService</span><span class="token punctuation">&gt;</span></span> clazz<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">int</span> accessibilityEnabled <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> <span class="token class-name">String</span> service <span class="token operator">=</span> mContext<span class="token punctuation">.</span><span class="token function">getPackageName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"/"</span> <span class="token operator">+</span> clazz<span class="token punctuation">.</span><span class="token function">getCanonicalName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            accessibilityEnabled <span class="token operator">=</span> <span class="token class-name">Settings</span><span class="token punctuation">.</span><span class="token class-name">Secure</span><span class="token punctuation">.</span><span class="token function">getInt</span><span class="token punctuation">(</span>mContext<span class="token punctuation">.</span><span class="token function">getApplicationContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getContentResolver</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                    <span class="token class-name">Settings</span><span class="token punctuation">.</span><span class="token class-name">Secure</span><span class="token punctuation">.</span>ACCESSIBILITY_ENABLED<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Settings</span><span class="token punctuation">.</span><span class="token class-name">SettingNotFoundException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token class-name">TextUtils</span><span class="token punctuation">.</span><span class="token class-name">SimpleStringSplitter</span> mStringColonSplitter <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">TextUtils</span><span class="token punctuation">.</span><span class="token class-name">SimpleStringSplitter</span><span class="token punctuation">(</span><span class="token string">':'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>accessibilityEnabled <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token class-name">String</span> settingValue <span class="token operator">=</span> <span class="token class-name">Settings</span><span class="token punctuation">.</span><span class="token class-name">Secure</span><span class="token punctuation">.</span><span class="token function">getString</span><span class="token punctuation">(</span>mContext<span class="token punctuation">.</span><span class="token function">getApplicationContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getContentResolver</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                    <span class="token class-name">Settings</span><span class="token punctuation">.</span><span class="token class-name">Secure</span><span class="token punctuation">.</span>ENABLED_ACCESSIBILITY_SERVICES<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>settingValue <span class="token operator">!=</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                mStringColonSplitter<span class="token punctuation">.</span><span class="token function">setString</span><span class="token punctuation">(</span>settingValue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">while</span> <span class="token punctuation">(</span>mStringColonSplitter<span class="token punctuation">.</span><span class="token function">hasNext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token class-name">String</span> accessibilityService <span class="token operator">=</span> mStringColonSplitter<span class="token punctuation">.</span><span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>accessibilityService<span class="token punctuation">.</span><span class="token function">equalsIgnoreCase</span><span class="token punctuation">(</span>service<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="line-numbers-rows" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div>
+<p>没有开启的话则跳转到该服务的开启页面，由用户手动开启</p>
+<div class="_2Uzcx_"><button class="VJbwyy" aria-label="复制代码" type="button"><i class="anticon anticon-copy" aria-label="icon: copy"><svg xmlns="http://www.w3.org/2000/svg" class="" aria-hidden="true" fill="currentColor" viewBox="64 64 896 896" focusable="false" width="1em" height="1em" data-icon="copy"><path d="M 832 64 H 296 c -4.4 0 -8 3.6 -8 8 v 56 c 0 4.4 3.6 8 8 8 h 496 v 688 c 0 4.4 3.6 8 8 8 h 56 c 4.4 0 8 -3.6 8 -8 V 96 c 0 -17.7 -14.3 -32 -32 -32 Z M 704 192 H 192 c -17.7 0 -32 14.3 -32 32 v 530.7 c 0 8.5 3.4 16.6 9.4 22.6 l 173.3 173.3 c 2.2 2.2 4.7 4 7.4 5.5 v 1.9 h 4.2 c 3.5 1.3 7.2 2 11 2 H 704 c 17.7 0 32 -14.3 32 -32 V 224 c 0 -17.7 -14.3 -32 -32 -32 Z M 350 856.2 L 263.9 770 H 350 v 86.2 Z M 664 888 H 414 V 746 c 0 -22.1 -17.9 -40 -40 -40 H 232 V 264 h 432 v 624 Z" /></svg></i></button><pre class="line-numbers  language-kotlin"><code class="kotlin  language-kotlin"><span class="token function">startActivity</span><span class="token punctuation">(</span><span class="token function">Intent</span><span class="token punctuation">(</span>Settings<span class="token punctuation">.</span>ACTION_ACCESSIBILITY_SETTINGS<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="line-numbers-rows" aria-hidden="true"><span></span></span></code></pre></div>
+<p>到这里，我们的准备工作就已经完成了，打开支付宝，我们可以看到这样一条日志：</p>
+<blockquote>
+<p>onAccessibilityEvent:event:EventType: TYPE_WINDOW_STATE_CHANGED; EventTime: 639278268; PackageName: com.eg.android.AlipayGphone; MovementGranularity: 0; Action: 0 [ ClassName: com.eg.android.AlipayGphone.AlipayLogin; Text: [支付宝]; ContentDescription: null; ItemCount: -1; CurrentItemIndex: -1; IsEnabled: true; IsPassword: false; IsChecked: false; IsFullScreen: true; Scrollable: false; BeforeText: null; FromIndex: -1; ToIndex: -1; ScrollX: -1; ScrollY: -1; MaxScrollX: -1; MaxScrollY: -1; AddedCount: -1; RemovedCount: -1; ParcelableData: null ]; recordCount: 0</p>
+</blockquote>
+<p>其中包括了这个event的类别，当前页面的包名、类名、一些文本信息等，具体有哪些属性可以查看AccessibilityEvent的toString方法。</p>
+<h1>检索窗口内容</h1>
+<p>除了监听界面变化之外，我们还可以对界面中的内容进行一些操作，前提是我们配置了以下属性，允许服务检索窗口内容：</p>
+<blockquote>
+<p>android:canRetrieveWindowContent="true"</p>
+</blockquote>
+<p>我们可以通过getWindows获取屏幕上的<strong>可以看见的</strong>窗口，它返回一个列表，按降序的方式，排在第一个的就是最顶层的窗口。<br>
+当然了，一般情况下我们关心的只是最新的那个活动窗口，称为<strong>当前活动窗口</strong>。我们可以通过以下方法来检索其中的控件：</p>
+<blockquote>
+<p>val root = rootInActiveWindow //获取当前活动窗口的根节点<br>
+val node = root.findAccessibilityNodeInfosByViewId("com.alipay.mobile.payee:id/payee_NextBtn") //通过控件id来获取某个控件<br>
+val node = root.findAccessibilityNodeInfosByText("确定") //通过text来获取某个控件<br>
+val node = root.findFoucs(int falg) //寻找拥有特殊焦点的控件（FOCUS_INPUT 或 FOCUS_ACCESSIBILITY）</p>
+</blockquote>
+<p>至于viewId的获取，我们可以通过android Device Monitor工具来查看，对于3.0之后的android studio，可以通过命令行工具进入sdk的tools目录，运行下面命令：</p>
+<blockquote>
+<p>monitor</p>
+</blockquote>
+<h1>交互</h1>
+<h2>事件交互</h2>
+<p>拿到AccessibilityNodeInfo对象后，我们可以进行一些列的操作，包括getChild()、getParent()、getBoundsInScreen()、isClickable等等一些列获取属性的操作，当然也可以进行交互性的操作，比如点击（当然前提是这个控件的clickable为true）：</p>
+<blockquote>
+<p>node[0].performAction(AccessibilityNodeInfo.ACTION_CLICK)</p>
+</blockquote>
+<p>除了操作界面内控件之外，我们还可以通过performGlobalAction(int action)执行一些全局操作，比如点击back键、home键等等。</p>
+<blockquote>
+<p>performGlobalAction(GLOBAL_ACTION_BACK)<br>
+performGlobalAction(GLOBAL_ACTION_HOME)<br>
+performGlobalAction(GLOBAL_ACTION_NOTIFICATIONS)<br>
+performGlobalAction(GLOBAL_ACTION_RECENTS)</p>
+</blockquote>
+<h2>手势交互</h2>
+<p>除了Action交互之外，我们还可以模拟人的手势进行操作，这是在<strong>Android 24</strong>中新加的一个api：</p>
+<blockquote>
+<p>dispatchGesture(gesture, callback, handler)</p>
+</blockquote>
+<p>它接收一个GestureDescription（手势描述）、一个GestureResultCallback（结果回调）和一个Handler。简单封装一下大概是这样的：</p>
+<div class="_2Uzcx_"><button class="VJbwyy" aria-label="复制代码" type="button"><i class="anticon anticon-copy" aria-label="icon: copy"><svg xmlns="http://www.w3.org/2000/svg" class="" aria-hidden="true" fill="currentColor" viewBox="64 64 896 896" focusable="false" width="1em" height="1em" data-icon="copy"><path d="M 832 64 H 296 c -4.4 0 -8 3.6 -8 8 v 56 c 0 4.4 3.6 8 8 8 h 496 v 688 c 0 4.4 3.6 8 8 8 h 56 c 4.4 0 8 -3.6 8 -8 V 96 c 0 -17.7 -14.3 -32 -32 -32 Z M 704 192 H 192 c -17.7 0 -32 14.3 -32 32 v 530.7 c 0 8.5 3.4 16.6 9.4 22.6 l 173.3 173.3 c 2.2 2.2 4.7 4 7.4 5.5 v 1.9 h 4.2 c 3.5 1.3 7.2 2 11 2 H 704 c 17.7 0 32 -14.3 32 -32 V 224 c 0 -17.7 -14.3 -32 -32 -32 Z M 350 856.2 L 263.9 770 H 350 v 86.2 Z M 664 888 H 414 V 746 c 0 -22.1 -17.9 -40 -40 -40 H 232 V 264 h 432 v 624 Z" /></svg></i></button><pre class="line-numbers  language-kotlin"><code class="kotlin  language-kotlin"><span class="token comment">/**
+ * 通过AccessibilityService在屏幕上模拟手势
+ * @param path 手势路径
+ */</span>
+<span class="token annotation builtin">@RequiresApi</span><span class="token punctuation">(</span>Build<span class="token punctuation">.</span>VERSION_CODES<span class="token punctuation">.</span>N<span class="token punctuation">)</span>
+<span class="token keyword">fun</span> AccessibilityService<span class="token punctuation">.</span><span class="token function">gestureOnScreen</span><span class="token punctuation">(</span>
+        path<span class="token operator">:</span> Path<span class="token punctuation">,</span>
+        startTime<span class="token operator">:</span>Long <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span>
+        duration<span class="token operator">:</span>Long <span class="token operator">=</span> <span class="token number">100</span><span class="token punctuation">,</span>
+        callback<span class="token operator">:</span>AccessibilityService<span class="token punctuation">.</span>GestureResultCallback<span class="token punctuation">,</span>
+        handler<span class="token operator">:</span> Handler<span class="token operator">?</span> <span class="token operator">=</span> <span class="token keyword">null</span>
+<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">val</span> builder <span class="token operator">=</span> GestureDescription<span class="token punctuation">.</span><span class="token function">Builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    builder<span class="token punctuation">.</span><span class="token function">addStroke</span><span class="token punctuation">(</span>GestureDescription<span class="token punctuation">.</span><span class="token function">StrokeDescription</span><span class="token punctuation">(</span>path<span class="token punctuation">,</span> startTime<span class="token punctuation">,</span> duration<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">val</span> gesture <span class="token operator">=</span> builder<span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token function">dispatchGesture</span><span class="token punctuation">(</span>gesture<span class="token punctuation">,</span> callback<span class="token punctuation">,</span> handler<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">/**
+ * 通过AccessibilityService在屏幕上某个位置单击
+ */</span>
+<span class="token annotation builtin">@RequiresApi</span><span class="token punctuation">(</span>Build<span class="token punctuation">.</span>VERSION_CODES<span class="token punctuation">.</span>N<span class="token punctuation">)</span>
+<span class="token keyword">fun</span> AccessibilityService<span class="token punctuation">.</span><span class="token function">clickOnScreen</span><span class="token punctuation">(</span>
+        x<span class="token operator">:</span>Float<span class="token punctuation">,</span>
+        y<span class="token operator">:</span>Float<span class="token punctuation">,</span>
+        callback<span class="token operator">:</span>AccessibilityService<span class="token punctuation">.</span>GestureResultCallback<span class="token punctuation">,</span>
+        handler<span class="token operator">:</span> Handler<span class="token operator">?</span> <span class="token operator">=</span> <span class="token keyword">null</span>
+<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">val</span> p <span class="token operator">=</span> <span class="token function">Path</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    p<span class="token punctuation">.</span><span class="token function">moveTo</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span>y<span class="token punctuation">)</span>
+    <span class="token function">gestureOnScreen</span><span class="token punctuation">(</span>p<span class="token punctuation">,</span>callback <span class="token operator">=</span> callback<span class="token punctuation">,</span>handler <span class="token operator">=</span> handler<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+<span class="line-numbers-rows" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div>
+<p>到这里，AccessibilityService的基本使用方法已经介绍的差不多了，接下来就是根据自己的项目需求进行组装，八仙过海各显神通了。</p>
+<h1>附录（重要属性介绍）</h1>
+<table>
+<thead>
+<tr>
+<th>xml属性</th>
+<th>说明</th>
+<th>类别</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>accessibilityEventTypes</td>
+<td>指定要监听的事件类型</td>
+<td>typeAllMask：接收所有事件。<br>-------窗口事件相关（常用）---------<br>typeWindowStateChanged：监听窗口状态变化，比如打开一个popupWindow，dialog，Activity切换等等。<br>typeWindowContentChanged：监听窗口内容改变，比如根布局子view的变化。<br>typeWindowsChanged：监听屏幕上显示的系统窗口中的事件更改。 此事件类型只应由系统分派。<br>typeNotificationStateChanged：监听通知变化，比如notifacation和toast。<br>-----------View事件相关--------------<br>typeViewClicked：监听view点击事件。<br>typeViewLongClicked：监听view长按事件。<br>typeViewFocused：监听view焦点事件。<br>typeViewSelected：监听AdapterView中的上下文选择事件。<br>typeViewTextChanged：监听EditText的文本改变事件。<br>typeViewHoverEnter、typeViewHoverExit：监听view的视图悬停进入和退出事件。<br>typeViewScrolled：监听view滚动，此类事件通常不直接发送。<br>typeViewTextSelectionChanged：监听EditText选择改变事件。<br>typeViewAccessibilityFocused：监听view获得可访问性焦点事件。<br>typeViewAccessibilityFocusCleared：监听view清除可访问性焦点事件。<br>------------手势事件相关---------------<br>typeGestureDetectionStart、typeGestureDetectionEnd：监听手势开始和结束事件。<br>typeTouchInteractionStart、typeTouchInteractionEnd：监听用户触摸屏幕事件的开始和结束。<br>typeTouchExplorationGestureStart、typeTouchExplorationGestureEnd：监听触摸探索手势的开始和结束。</td>
+</tr>
+<tr>
+<td>accessibilityFeedbackType</td>
+<td>指定反馈方式</td>
+<td>feedbackAllMask、feedbackGeneric、feedbackAudible、feedbackSpoken、feedbackHaptic、feedbackVisual</td>
+</tr>
+<tr>
+<td>canRetrieveWindowContent</td>
+<td>是否希望能够检索活动窗口内容。此设置无法在运行时更改。</td>
+<td>true or false</td>
+</tr>
+<tr>
+<td>description</td>
+<td>该服务的简要说明</td>
+<td>@StringRes</td>
+</tr>
+<tr>
+<td>notificationTimeout</td>
+<td>两个相同类型的可访问性事件之间的最短间隔时间（以毫秒为单位）</td>
+<td>number</td>
+</tr>
+<tr>
+<td>packageNames</td>
+<td>要监听的应用的包名</td>
+<td>string</td>
+</tr>
+<tr>
+<td>canPerformGestures</td>
+<td>是否可以执行手势（api 24新增）</td>
+<td>true or false</td>
+</tr>
+</tbody>
+</table>
+</article>
+
+</div>
+
+
+</body></html>

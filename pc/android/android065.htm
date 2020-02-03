@@ -1,0 +1,146 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VirtualHook使用</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<article class="_2rhmJa"><h3>背景</h3>
+<blockquote>
+<p>想要逆向分析其他应用，除了需要有smali语法功底外，一套好用的良好的逆向装备也是必不可少的，并且当我们想要更加深入去了解一款app的实现的时候，可能还需要用到调试、替换(修改原有的逻辑)，解决方案有很多种，这里推荐使用apktool + jadx + virtualhook，apktool解决资源文件的问题，jadx解决反编译查看代码的问题，virtualhook解决热替换的要求。</p>
+</blockquote>
+<h3>环境搭建</h3>
+<ul>
+<li>apktool: <a href="https://github.com/iBotPeaches/Apktool" target="_blank" rel="nofollow">https://github.com/iBotPeaches/Apktool</a>
+</li>
+</ul>
+<blockquote>
+<p>可以从github上拉取源码按照提示进行编译，<br>
+</p>
+<div class="image-package">
+<div class="image-container" style="max-height: 256px; max-width: 700px; background-color: transparent;">
+<div class="image-container-fill" style="padding-bottom: 27.41%;"></div>
+<div class="image-view" data-height="256" data-width="934"><img src="images/android06501.jpg" data-image-index="0" data-original-filesize="239049" data-original-format="image/png" data-original-height="256" data-original-width="934" data-original-src="//upload-images.jianshu.io/upload_images/2998242-5f189a6bef72c7f9.png"></div>
+</div>
+<div class="image-caption">image.png</div>
+</div>
+<br>
+或者直接下载编译好的工具包：<br>
+1.下载<a href="https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/osx/apktool" target="_blank" rel="nofollow">脚本代码</a>，保存为apktool；<br>
+2.下载最新的<a href="https://bitbucket.org/iBotPeaches/apktool/downloads/" target="_blank" rel="nofollow">apktool_x.jar</a>；<br>
+3.将下载的jar包重命名为apktool.jar；<br>
+4.将下载的apktool和apktool.jar移到/usr/local/bin目录<br>
+sudo mv apktool.jar /usr/local/bin<br>
+sudo mv apktool /usr/local/bin<br>
+sudo chmod a+x apktool<br>
+sudo chmod a+x apktool.jar<br>
+在配置的时候需要加上上面两行，要不然执行的时候会报permission denied错误。之后可以配置路径到环境变量里面，方便在其他文件夹直接使用。<p></p>
+</blockquote>
+<ul>
+<li>jadx: <a href="https://github.com/skylot/jadx" target="_blank" rel="nofollow">https://github.com/skylot/jadx</a>
+</li>
+</ul>
+<blockquote>
+<p>将下面两行添加到环境变量文件.bash_profile 方便使用。<br>
+export JADX=/Users/你用电脑名称/Programs/jadx-0.7.1<br>
+export PATH=${PATH}:${JADX}/bin<br>
+有时候jadx在编译大文件的时候回遇到卡死现象，可以增加jvm的最大内存来避免这种情况发生。<br>
+export JVM_ARGS="-Xmx4096m -XX:MaxPermSize=1024m"</p>
+</blockquote>
+<ul>
+<li>virtualhook: <a href="https://github.com/asLody/VirtualApp/blob/master/CHINESE.md" target="_blank" rel="nofollow">https://github.com/asLody/VirtualApp/blob/master/CHINESE.md</a>
+</li>
+</ul>
+<blockquote>
+<p>1、命令行拉取代码：git clone <a href="https://github.com/rk700/VirtualHook.git" target="_blank" rel="nofollow">https://github.com/rk700/VirtualHook.git</a><br>
+2、ndk 环境变量配置。virtualhook的使用需要用到ndk，所以需要你的电脑先配置安装好。具体可以参考：<a href="https://www.jianshu.com/p/c9bd4f88336f" target="_blank">https://www.jianshu.com/p/c9bd4f88336f</a><br>
+3、导入Android Studio直接使用。</p>
+</blockquote>
+<h3>适用场景</h3>
+<p>这套工具能适用的场景是：ART机器下、加壳或者未加壳应用都可以，并且，手机不要求Root！不要求Root！</p>
+<br>
+<div class="image-package">
+<div class="image-container" style="max-height: 1177px; max-width: 416px; background-color: transparent;">
+<div class="image-container-fill" style="padding-bottom: 168.27%;"></div>
+<div class="image-view" data-height="700" data-width="416"><img src="images/android06502.jpg" data-image-index="1" data-original-filesize="66308" data-original-format="image/png" data-original-height="700" data-original-width="416" data-original-src="//upload-images.jianshu.io/upload_images/2998242-45c624e4f79514e9.png"></div>
+</div>
+<div class="image-caption">image.png</div>
+</div>
+<h3>实践</h3>
+<ul>
+<li>1、AS导入刚才checkout下来的工程，熟悉相关代码。</li>
+<li>2、运行virtualhook工程，安装待分析的应用</li>
+</ul>
+<blockquote>
+<p></p>
+<p></p>
+直接点击run 按钮，将virtualapp安装到你的手机上，点击“添加app”安装要分析的应用程序，virtual提供了两种安装待分析应用的方式，一种是扫描sd卡进行安装，另外一种是从已有的安装列表中选择安装。<div class="image-package">
+<div class="image-container" style="max-height: 1244px; max-width: 700px; background-color: transparent;">
+<div class="image-container-fill" style="padding-bottom: 177.78%;"></div>
+<div class="image-view" data-height="2560" data-width="1440"><img src="images/android06503.jpg" data-image-index="2" data-original-filesize="178896" data-original-format="image/png" data-original-height="2560" data-original-width="1440" data-original-src="//upload-images.jianshu.io/upload_images/2998242-f0e71ebc500dd05c.png"></div>
+</div>
+<div class="image-caption">device-2018-06-10-212404.png</div>
+</div>
+</blockquote>
+<ul>
+<li>3、编写自己的插件</li>
+</ul>
+<blockquote>
+<p>Virtual的Hook实现跟Xposed一样，也是使用插件的方式，不用交互界面，在开发完成之后生成一个没有界面的app,通过刚才说的SD卡安装的方式进行安装，并且插件在安装列表上都会有一个特殊的角标，至于hook的方式可以参考demoHookPlugin的编写，demoHookPlugin工程是一个很好的示例，可以让我们快速上手。<br>
+</p>
+<p></p>
+在编写好插件之后，切换到demoHookPlugin，<div class="image-package">
+<div class="image-container" style="max-height: 52px; max-width: 380px; background-color: transparent;">
+<div class="image-container-fill" style="padding-bottom: 13.68%;"></div>
+<div class="image-view" data-height="52" data-width="380"><img src="images/android06504.jpg" data-image-index="3" data-original-filesize="8498" data-original-format="image/png" data-original-height="52" data-original-width="380" data-original-src="//upload-images.jianshu.io/upload_images/2998242-539ac3f8ffb81906.png"></div>
+</div>
+<div class="image-caption">image.png</div>
+</div> 点击“锤子”按钮生成对应的app,并将生成的app导入我们的手机sdcard中，通过sd的方式进行安装。
+</blockquote>
+<ul>
+<li>4、运行我们要分析的app。</li>
+</ul>
+<blockquote>
+<p>这个时候可以看到，在logcat已经打印出了相关的hook信息。</p>
+<br>
+<div class="image-package">
+<div class="image-container" style="max-height: 250px; max-width: 700px; background-color: transparent;">
+<div class="image-container-fill" style="padding-bottom: 10.94%;"></div>
+<div class="image-view" data-height="250" data-width="2286"><img src="images/android06505.jpg" data-image-index="4" data-original-filesize="143801" data-original-format="image/png" data-original-height="250" data-original-width="2286" data-original-src="//upload-images.jianshu.io/upload_images/2998242-8f154adbe1cad11c.png"></div>
+</div>
+<div class="image-caption">qidian.png</div>
+</div>
+<br>
+<p>另外，我们还可以通过在我们所写的插件里面下断点的方式，来debug我们想要分析的应用程序！！！任何安装在容器内运行的app都可以进行调试！！！</p>
+
+</blockquote>
+<h3>插件编写技巧</h3>
+<p>在编写自己的插件的时候，可以参考demo工程的例子进行编写，最后需要在HookInfo类里面进行配置：</p>
+<br>
+<div class="image-package">
+<div class="image-container" style="max-height: 656px; max-width: 700px; background-color: transparent;">
+<div class="image-container-fill" style="padding-bottom: 23.7%;"></div>
+<div class="image-view" data-height="656" data-width="2768"><img src="images/android06506.jpg" data-image-index="5" data-original-filesize="332614" data-original-format="image/png" data-original-height="656" data-original-width="2768" data-original-src="//upload-images.jianshu.io/upload_images/2998242-fe3be2ffec4ca6b9.png"></div>
+</div>
+<div class="image-caption">image.png</div>
+</div><br>
+<p>在编写的过程，要hook的类名直接使用jadx反编译之后的结果即可，反编译之后类名是什么就写什么。方法名也是，即使你知道源码里面的方法名，也需要使用反编译之后的。对于hook的方法，参数和返回值方向需要对JNI字段描述符有一些认识，例如"Ljava/lang/String;"就是表示类型String； "[I"就是表示int[];<br>
+"[Ljava/lang/Object;"就是表示Object[]</p>
+
+<h3>附录</h3>
+<ul>
+<li>1、原理分析：<a href="http://rk700.github.io/2017/03/15/virtualapp-basic/" target="_blank" rel="nofollow">http://rk700.github.io/2017/03/15/virtualapp-basic/</a>
+</li>
+<li>2、其他例子：<a href="http://weishu.me/2017/12/02/non-root-xposed/" target="_blank" rel="nofollow">http://weishu.me/2017/12/02/non-root-xposed/</a>
+</li>
+<li>3、JNI字段描述符：<a href="https://blog.csdn.net/jintiaozhuang/article/details/9016889" target="_blank" rel="nofollow">https://blog.csdn.net/jintiaozhuang/article/details/9016889</a>
+</li>
+</ul>
+</article>
+
+</div>
+
+
+</body></html>
