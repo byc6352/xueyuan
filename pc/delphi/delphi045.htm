@@ -1,0 +1,5133 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delphi笔记大全_运维_毛毛的学习笔记-CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            
+<strong>1. Record &nbsp; ：</strong><br>
+&nbsp;<br>
+<pre><code class="language-delphi hljs"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">   TX     =     <span class="hljs-keyword">Record</span>   </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">          A     :     Char;   </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">          B     :     Integer;   </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    <span class="hljs-keyword">End</span>;   </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">type</span> TIntSet = <span class="hljs-keyword">set</span> <span class="hljs-keyword">of</span> <span class="hljs-number">1</span>..<span class="hljs-number">250</span>;     </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">Set1 := [<span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">5</span>, <span class="hljs-number">7</span>, <span class="hljs-number">9</span>];           <span class="hljs-comment">//集合用[]来赋值</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">var</span> MyArray: <span class="hljs-keyword">array</span>[<span class="hljs-number">1</span>..<span class="hljs-number">100</span>] <span class="hljs-keyword">of</span> Char;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">type</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">TDateRec = <span class="hljs-keyword">record</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">      Year: Integer;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">      Month: (Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">      Day: <span class="hljs-number">1</span>..<span class="hljs-number">31</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="15"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">end</span>;</div></div></li></ol></code></pre><br>
+<strong>2. 执行exe:</strong><br>
+<p>ShellExecute()：</p>
+<pre><code class="language-delphi hljs"><ol class="hljs-ln" style="width: 736px;"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">uses</span>   ShellApi</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">ShellExecute(handle,<span class="hljs-keyword">nil</span>,pchar(<span class="hljs-string">'http://blog.csdn.net/cadenza7'</span>),<span class="hljs-keyword">nil</span>,<span class="hljs-keyword">nil</span>,SW_SHOWNORMAL);</div></div></li></ol></code></pre>
+<p>WinExec()：&nbsp;</p>
+<p></p>
+<pre><code class="language-delphi hljs"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> <span class="hljs-keyword">uses</span>  WINlApi </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">&lt;<span class="hljs-number">1</span>&gt;WinExec(’Notepad.exe Readme.txt’, SW_SHOW);  </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">&lt;<span class="hljs-number">2</span>&gt; ShellExecute(handle, ‘open’, ‘  www.neu.edu.cn’, <span class="hljs-keyword">nil</span>, <span class="hljs-keyword">nil</span>, SW_SHOWNORMAL); </div></div></li></ol></code></pre>
+<p></p>
+&nbsp;&nbsp;<br>
+<strong>3. 指针：</strong><br>
+&lt;1&gt;类型指针的定义。<br>
+var<br>
+ptr : ^Integer;<br>
+ptr : ^char;<br>
+其实也就是符号的差别而已。<br>
+&lt;2&gt;无类型指针的定义。<br>
+ptr : Pointer;<br>
+&nbsp;<br>
+<p><strong>4 ：测试一个过程变量是否被赋值</strong></p>
+<p>使用标准函数</p>
+Assigned：<br>
+if Assigned(OnClick) then OnClick(X);<br>
+&nbsp;<br>
+<strong>5. DLL 的使用：</strong><br>
+&nbsp;<br>
+Function SetStationTime(Station:Byte):Integer;stdcall;External DllName;<br>
+&nbsp;<br>
+<strong>7. 九九乘法表：</strong><br>
+<pre><code class="language-delphi hljs"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">program</span> ex414b;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">   <span class="hljs-meta">{$APPTYPE CONSOLE}</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">   <span class="hljs-keyword">var</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">     i,j:integer;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">   <span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">     <span class="hljs-keyword">for</span> i:=<span class="hljs-number">1</span> <span class="hljs-keyword">to</span> <span class="hljs-number">9</span> <span class="hljs-keyword">do</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">       <span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">       <span class="hljs-keyword">for</span> j:=<span class="hljs-number">1</span> <span class="hljs-keyword">to</span> i <span class="hljs-keyword">do</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">         <span class="hljs-keyword">write</span>(j:<span class="hljs-number">1</span>,<span class="hljs-string">'*'</span>,i:<span class="hljs-number">1</span>,<span class="hljs-string">'='</span>,i*j:<span class="hljs-number">2</span>,<span class="hljs-string">' '</span>:<span class="hljs-number">2</span>);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">         writeln;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">       <span class="hljs-keyword">end</span>;  </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">         readln</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">   <span class="hljs-keyword">end</span>.</div></div></li></ol></code></pre>&nbsp;<br>
+<strong>8 ：enter转到下一个控件：</strong><br>
+&nbsp; &nbsp;if key = #13 then<br>
+&nbsp; &nbsp; Perform(WM_NEXTDLGCTL, 0, 0);<br>
+&nbsp;<br>
+<strong>9. string Tstrings,Tstringlist区别：</strong><br>
+&nbsp; &nbsp; String就是一个果子 &nbsp;&nbsp;<br>
+&nbsp; TStrings一串果子（多个果子串起来） &nbsp;&nbsp;<br>
+&nbsp; TStringList一串糖葫芦（将一串果子外面涂了糖） &nbsp;&nbsp;<br>
+&nbsp; &nbsp;&nbsp;<br>
+&nbsp; 而TList虽然也是一个链，但它是指针链，不只字符串链！<br>
+&nbsp;<br>
+<strong>10．保存图片到数据库：</strong><br>
+<pre><code class="language-delphi hljs"><ol class="hljs-ln" style="width: 738px;"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  <span class="hljs-function"><span class="hljs-keyword">procedure</span> <span class="hljs-title">TABWholeEmployeeForm</span>.<span class="hljs-title">SaveImage</span><span class="hljs-params">(field: TField; image: Timage)</span>;</span>    <span class="hljs-comment">//保存图片</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment"><span class="hljs-comment">{var</span></span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">  stream : TMemoryStream;</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">        //if image.Picture.Height &gt; 0 then</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">        if openpic.FileName&lt;&gt;'' then</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">        begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">          stream:=TMemoryStream.create;</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">          image.Picture.Graphic.SaveToStream(stream);</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">          stream.Position := 0;</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">          TBlobField(field).LoadFromStream(stream);</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">          stream.Free;</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">        end</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">        else</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="15"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">        begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="16"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">         //field.Clear;</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="17"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">        end;</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="18"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">end; }</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="19"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">var</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="20"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  pjpg:tjpegimage;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="21"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  pic:TMemoryStream;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="22"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  <span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="23"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  <span class="hljs-comment">//adoquery1.Edit;</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="24"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  <span class="hljs-comment">//picdiag.Filter:='jpg';</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="25"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  <span class="hljs-keyword">if</span> openpic.FileName&lt;&gt;<span class="hljs-string">''</span> <span class="hljs-keyword">then</span>                  <span class="hljs-comment">//如果更换了图片，则载入</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="26"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  <span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="27"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">   <span class="hljs-keyword">try</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="28"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    pjpg:=tjpegimage.Create;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="29"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    pjpg.LoadFromFile(openpic.FileName);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="30"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    pic:=TMemoryStream.Create;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="31"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    pjpg.SaveToStream(pic);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="32"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    pic.Position:=<span class="hljs-number">0</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="33"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    TBlobField(field).LoadFromStream(pic);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="34"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">   <span class="hljs-keyword">except</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="35"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    showmessage(<span class="hljs-string">'图片格式不对，请选择jpg格式图片！'</span>);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="36"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">   <span class="hljs-keyword">end</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="37"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  <span class="hljs-keyword">end</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="38"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  <span class="hljs-keyword">if</span>  image.Picture.Height=<span class="hljs-number">0</span> <span class="hljs-keyword">then</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="39"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">   <span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="40"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    <span class="hljs-comment">//field.Clear;</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="41"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    TBlobField(field).AsVariant:=null;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="42"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">   <span class="hljs-keyword">end</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="43"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> <span class="hljs-comment">// adoquery1.post;</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="44"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  openpic.FileName:=<span class="hljs-string">''</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="45"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  <span class="hljs-keyword">try</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="46"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  pic.Free;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="47"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  pjpg.free;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="48"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  <span class="hljs-keyword">except</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="49"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  <span class="hljs-keyword">end</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="50"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  <span class="hljs-keyword">end</span>;</div></div></li></ol></code></pre>&nbsp;<br>
+<strong>5.ini文件：</strong><br>
+Delphi提供了读写INI文件的方法，Delphi操作INI文件最为简洁，这是因为Delphi提供了一个TInifile类，使我们可以非常灵活的处理INI文件。 &nbsp;&nbsp;<br>
+<span style="color: rgb(255, 0, 0);">一、INI文件的结构：</span><br>
+;注释<br>
+[小节名]<br>
+关键字=值<br>
+...<br>
+INI文件允许有多个小节，每个小节又允许有多个关键字，“=”后面是该关键字的值。&nbsp;<br>
+值的类型有三种：字符串、整型数值和布尔值。其中字符串存贮在INI文件中时没有引号，布尔真值用1表示，布尔假值用0表示。&nbsp;<br>
+注释以分号“;”开头。&nbsp;<br>
+<span style="color: rgb(255, 0, 0);">二、定义</span><br>
+1、在Interface的Uses节增加IniFiles；&nbsp;<br>
+2、在Var变量定义部分增加一行：&nbsp;<br>
+myinifile:Tinifile;<br>
+然后，就可以对变量myinifile进行创建、打开、读取、写入等操作了。&nbsp;<br>
+<span style="color: rgb(255, 0, 0);">三、打开INI文件</span><br>
+myinifile:=Tinifile.create(program.ini);<br>
+上面这一行语句将会为变量myinifile与具体的文件program.ini建立联系，然后，就可以通过变量myinifile，来读写program.ini文件中的关键字的值了。&nbsp;<br>
+值得注意的是，如果括号中的文件名没有指明路径的话，那么这个Program.ini文件会存储在Windows目录中,把Program.ini文件存储在应用程序当前目录中的方法是：为其指定完整的路径及文件名。下面的两条语句可以完成这个功能：&nbsp;<br>
+Filename:=ExtractFilePath(application.exename)+program.ini;<br>
+myinifile:=Tinifile.Create(filename);<br>
+<span style="color: rgb(255, 0, 0);">四、读取关键字的值</span><br>
+针对INI文件支持的字符串、整型数值、布尔值三种数据类型，TINIfiles类提供了三种不同的对象方法来读取INI文件中关键字的值。&nbsp;<br>
+假设已定义变量vs、vi、vb分别为string、integer、boolean类型。&nbsp;<br>
+vs:=myinifile.Readstring(小节名,关键字,缺省值);<br>
+vi:=myinifile.Readinteger(小节名,关键字,缺省值);<br>
+vb:=myinifile.Readbool(小节名,关键字,缺省值);<br>
+其中缺省值为该INI文件不存在该关键字时返回的缺省值。&nbsp;<br>
+<span style="color: rgb(255, 0, 0);">五、写入INI文件</span><br>
+同样的，TInifile类也提供了三种不同的对象方法，向INI文件写入字符串、整型数及布尔类型的关键字。&nbsp;<br>
+myinifile.writestring(小节名,关键字,变量或字符串值);<br>
+myinifile.writeinteger(小节名,关键字,变量或整型数值);<br>
+myinifile.writebool(小节名,关键字,变量或True或False);<br>
+当这个INI文件不存在时，上面的语句还会自动创建该INI文件。&nbsp;<br>
+<span style="color: rgb(255, 0, 0);">六、删除关键字</span><br>
+除了可用写入方法增加一个关键字，Tinifile类还提供了一个删除关键字的对象方法：&nbsp;<br>
+myinifile.DeleteKey(小节名,关键字);<br>
+<span style="color: rgb(255, 0, 0);">七、小节操作</span><br>
+增加一个小节可用写入的方法来完成，删除一个小节可用下面的对象方法：&nbsp;<br>
+myinifile.EraseSection(小节名);<br>
+另外Tinifile类还提供了三种对象方法来对小节进行操作：&nbsp;<br>
+myinifile.readsection(小节名,TStrings变量);可将指定小节中的所有关键字名读取至一个字符串列表变量中；&nbsp;<br>
+myinifile.readsections(TStrings变量);可将INI文件中所有小节名读取至一个字符串列表变量中去。&nbsp;<br>
+myinifile.readsectionvalues(小节名,TStrings变量);可将INI文件中指定小节的所有行（包括关键字、=、值）读取至一个字符串列表变量中去。&nbsp;<br>
+<span style="color: rgb(255, 0, 0);">八、释放</span><br>
+在适当的位置用下面的语句释放myinifile：<br>
+myinifile.free;<br>
+&nbsp;&nbsp;<br>
+-------------------------------------------------------------------------------------------------------------------------<br>
+&nbsp;<br>
+<p><strong>11．数据类型：</strong></p>
+<p>一、数据类型：</p>
+(1) 基本数据类型：<br>
+a、 整数类型： (通用类型&lt;32位&gt;：Integer－有符号；Cardinal－无符号)<br>
+具体：<br>
+有符号：Shortint&lt;8位&gt;，Smallint&lt;16位&gt;，Longint&lt;32位 &gt;<br>
+无符号：Byte&lt;8位&gt;，Word&lt;16位&gt;，LongiWord&lt;32位 &gt;<br>
+<br>
+b、字符类型： (通用类型&lt;8位&gt;：Char －与AnsiChar等同)<br>
+具体：<br>
+AnsiChar&lt;8位&gt; ：主要存放Ansi字符<br>
+WideChar&lt;16位&gt;：主要存放Unicode字符<br>
+<br>
+c、布尔类型： (通用类型&lt;8位&gt;：Boolean－与ByteBool等同)<br>
+具体：<br>
+ByteBool&lt;8位&gt;，WordBool&lt;16位&gt;，LongBool&lt;32位&gt;<br>
+不同的布尔类型主要用于鱼其它编程语言及不同windows系统兼容。<br>
+<br>
+d、枚举类型：<br>
+定义：type 枚举类型标识符＝(key1[=val1],.。。。，keyn[=valn]) ：n&lt;=255<br>
+如果给某些key指定了值，则未指定值的key是前一个key值加1；<br>
+如果全部默认不指定值，则key1值为0，往后逐个加1。<br>
+<br>
+e、子界类型：<br>
+定义：type 子界类型标识符＝下界 ．．下界<br>
+如：type SubInt＝1．．3 0；表示 1～30的整数<br>
+type SubChar＝''''a''''．．''''z''''；表示字符<br>
+※注：1、以上四种类型称为有序类型，即除第一个数为都有先行数、除最后一个数外都有后继数。在这里&nbsp;<br>
+(计算机里)，整数是有限的。有序类型的数都有一个序号，称为序数。整数的序数为其本身，其他类型第一<br>
+<p>个数序数为0，依次递增。</p>
+<p><br>
+</p>
+2、子界类型上、下界必须是有同一有序类型，且上界序数大于下界序数。<br>
+<br>
+f、浮点类型： (通用类型&lt;8字节&gt;：Real－与Double等同)<br>
+具体：<br>
+Double&lt;8字节&gt;，Real48&lt;6字节&gt;Single&lt;4字节&gt;,<br>
+Extended&lt;10字节&gt;，Comp&lt;8字节&gt;，Currency&lt;8字节&gt;<br>
+g、字符串类型： (通用类型：String－与AnsiString等同)<br>
+具体：<br>
+ShortString ：最多存放255个字符，第一个自己存放字符个数，不以NULL结尾<br>
+AnsiString ：存放Ansi字符，以NULL结尾<br>
+WideString：存放Unicode字符，以NULL结尾<br>
+h、时间、日期类型：TDateTime －实际是浮点类型的别称<br>
+<br>
+(2)复杂数据类型：<br>
+a、指针类型：<br>
+定义：type 指针类型标识符＝^基本类型；<br>
+内在分配：New() 内存释放：Destroy()( 类型指针)<br>
+对于Pointer 和PChar 用GetMem()或AllocMem()分配内存(无类型指针)，用FreeMem()释放内存<br>
+分配内存后，就可以当成基本类型一样使用：指针类型标识符^<br>
+实际上常如下运用指针：&nbsp;<br>
+var 变量标识符：^基本类型；<br>
+为变量分配内存后就可以将(变量标识符^)当成普通变量使用。<br>
+b、记录类型：<br>
+定义：type 记录类型标识符＝Record<br>
+字段1：类型；<br>
+．．．<br>
+字段n：类型；<br>
+end；<br>
+c、集合类型：<br>
+定义： type 集合类型标识符＝Set of 基本类型的子集或子界类型；(&lt;=255个元素)<br>
+d、变体(通用)类型： Variant；<br>
+Delphi &nbsp; 2.0引进了一个功能强大的数据类型，称为变体类型(Variant)，主要是为了支持Ole自动化 &nbsp;&nbsp;<br>
+&nbsp; 操作。实际上， &nbsp; Delphi的Variant封装了OLE使用的Variant，但Delphi &nbsp;的Variant在Delphi &nbsp;程序的其他领域 &nbsp;&nbsp;<br>
+&nbsp; 也很有用。正如不久就要学到的， &nbsp; Object &nbsp; Pascal是唯一能在运行期间和编译期间识别Variant的语言。 &nbsp;&nbsp;<br>
+&nbsp; Delphi &nbsp; 3引进了一个新的被称为OLeVariant类型，它跟Variant基本一致，但是它只能表达与OLE &nbsp; 自 &nbsp;&nbsp;<br>
+&nbsp; 动化操作相兼容的数据类型。本节介绍Variant,然后介绍OLEVariant，并对两者进行比较。 &nbsp;&nbsp;<br>
+&nbsp; 1. &nbsp; Variant能动态改变类型 &nbsp;&nbsp;<br>
+&nbsp; 有时候变量的类型在编译期间是不确定的，而Variant能够在运行期间动态地改变类型饩褪且? &nbsp;<br>
+&nbsp; 入Variant &nbsp; 类型目的。例如，下面的代码在编译期间和运行期间都是正确的： &nbsp;&nbsp;<br>
+<pre><code class="language-delphi hljs"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  <span class="hljs-keyword">var</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  V:   Variant;   </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> <span class="hljs-keyword">begin</span> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  V:=<span class="hljs-string">'Delphi   is   Great!'</span>;   <span class="hljs-comment">//Variant   此时是一个字符串   </span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  V:   =   <span class="hljs-number">1</span>   ;   <span class="hljs-comment">//   Variant   此时是一个整数   </span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  V:   =   <span class="hljs-number">123.34</span>   ;   <span class="hljs-comment">//   Variant   此时是一个浮点数   </span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  V:   =   True   ;   <span class="hljs-comment">//   Variant   此时是一个布尔值   </span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  V:=CreateOleObject(<span class="hljs-string">'word.Basic'</span>);   <span class="hljs-comment">//Variant此时是一个OLE   对象   </span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> <span class="hljs-keyword">end</span>  ;   </div></div></li></ol></code></pre><br>
+<br>
+&nbsp;Variant能支持所有简单的数据类型，例如整型、浮点型、字符串、布尔型、日期和时间、货币以 &nbsp;&nbsp;<br>
+&nbsp; 及OLE自动化对象等。注意Variant不能表达Object &nbsp; Pascal对象。Variant可以表达不均匀的数组(数组的 &nbsp;&nbsp;<br>
+&nbsp; 长度是可变的，它的数据元素能表达前面介绍过的任何一种类型，也可包括另一个Variant数组)。 &nbsp;<br>
+(3)数组类型：<br>
+a、一维数组：<br>
+定义：<span style="color: rgb(51, 51, 255);">type 数组标识符＝Array[下标下限．．下标上限] of 基本类型；</span><br>
+b、多位数组：<br>
+定义：<span style="color: rgb(51, 51, 255);"> type 数组标识符＝Array[下限1．．上限１，．．．，下限n．．上限n] of 基本类型；</span><br>
+c、动态数组(变量)：<br>
+<span style="color: rgb(51, 51, 255);">var 标识符：array of 基本类型；<br>
+SetLength(标识符，个数）；//分配空间<br>
+标识符:=nil；//释放</span><br>
+DELPHI基础数组类型<br>
+数组类型<br>
+数组是相同类型的元素按一定顺序组成的序列.数组中的每一个数据元素都可以通过数组变量名和一个惟一的索引号来存取,它们被顺序地安排在内存中的一段连续的存储区域.<br>
+数组可以分为一维数组和多维数组,从DELPHI5开始又引入了动态数组,因此,在DELPHI语言中,数据又可分为表态数组和动态数组两种类型.<br>
+数据类型的声明,数组也是高级数据类型,因此,在使用数组类型之前,应当首先使用保留字ARRAY进行类型声明.下面,我们以一维和二维,表态和动态数组为例,说明数组类型的声明格式.<br>
+<pre><code class="language-delphi hljs"><ol class="hljs-ln" style="width: 791px;"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">一维静态数组的声明</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">type</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">数组标识符=<span class="hljs-keyword">array</span>[下标类型] <span class="hljs-keyword">of</span> 基类型:</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">二维静态数组的声明</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">type</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">数组标识符=<span class="hljs-keyword">array</span>[下标类型] <span class="hljs-keyword">of</span> <span class="hljs-keyword">array</span>[下标类型] <span class="hljs-keyword">of</span> 基类型;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">一维动态数组的声明</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">type</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">数组标识符=<span class="hljs-keyword">array</span> <span class="hljs-keyword">of</span> 基类型;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">二维动态数组的声明;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">type</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">数组标识符=<span class="hljs-keyword">array</span> <span class="hljs-keyword">of</span> <span class="hljs-keyword">array</span> <span class="hljs-keyword">of</span> 基类型;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">在上述声明语句中,下标类型必须是以子界形式给出的有序类型,基类型可以是除文件类型之外的任意数据类型.例如:</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">type</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="15"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">myarray1=<span class="hljs-keyword">array</span> [<span class="hljs-number">1</span>..<span class="hljs-number">10</span>] <span class="hljs-keyword">of</span> integer;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="16"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">//一维静态数组,可以容纳10个整形数据</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="17"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">myarray2=<span class="hljs-keyword">array</span> [<span class="hljs-number">1</span>..<span class="hljs-number">10</span>,’a’..’z’] <span class="hljs-keyword">of</span> integer;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="18"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">//二维表态数组,可以容纳20个字符串数据</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="19"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">myarray3=<span class="hljs-keyword">array</span> <span class="hljs-keyword">of</span> real;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="20"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">//一维动态数组,可以容纳实型整数</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="21"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">myarray4=<span class="hljs-keyword">array</span> <span class="hljs-keyword">of</span> <span class="hljs-keyword">array</span> <span class="hljs-keyword">of</span> real;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="22"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">//二维动态数组,可以容纳实型数据</span></div></div></li></ol></code></pre><br>
+数组变量及其使用,在声明了数组类型之后,就可以在程序中定义变量并在程序中使用,数组变量的定义仍然是使用保留字VAR,但对于表态数组变量和动态数组变量来说,它们的存储分配是不同的,静态数组在声明时通过下标给定了存储基类型数据的容量,因而,其变量所需的存储可以通过静态分配完成.而动态数据在声明时,没有使用下标指定存储基类型数据的容量,所以,其变量所需的存储只能通过标准例程SETLENGTH来动态进行分配.<br>
+数组变量在声明之后,对数组元素的访问是通过数组变量标识符和方括号界定的’’ 下标值”来进行的,对于静态数组变量,其下标值范围已经在类型声明时给出,而对于动态数组变量来说,动态分配存储之后,其下标值范围为0到容量-1.如果要释放一个不再用到的动态数组,可以将NIL赋值给该动态数组变量.<br>
+下面新建一个控制台应用程序,在代码编辑器中编写下列程序:<br>
+<pre><code class="language-delphi hljs"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">type</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">myarray1=<span class="hljs-keyword">array</span>[<span class="hljs-number">1</span>..<span class="hljs-number">10</span>] <span class="hljs-keyword">of</span> integer;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">myarray2=<span class="hljs-keyword">array</span>[<span class="hljs-number">2</span>..<span class="hljs-number">11</span>,<span class="hljs-string">'a'</span>..<span class="hljs-string">'c'</span>] <span class="hljs-keyword">of</span> <span class="hljs-keyword">string</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">myarray3=<span class="hljs-keyword">array</span> <span class="hljs-keyword">of</span> real;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">myarray4=<span class="hljs-keyword">array</span> <span class="hljs-keyword">of</span> <span class="hljs-keyword">array</span> <span class="hljs-keyword">of</span> real;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">var</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">a1:myarray1;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">a2:myarray2;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">a3:myarray3;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">a4:myarray4;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'sizeof(a1):'</span>,sizeof(a1));<span class="hljs-comment">//10</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'sizeof(a2):'</span>,sizeof(a2));<span class="hljs-comment">//120</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'sizeof(a3):'</span>,sizeof(a3));<span class="hljs-comment">//4</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="15"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'sizeof(a4):'</span>,sizeof(a4));<span class="hljs-comment">//4</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="16"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">(*通过下标写静态数组变量*)</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="17"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">a1[<span class="hljs-number">2</span>]:=<span class="hljs-number">200</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="18"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">a2[<span class="hljs-number">2</span>,<span class="hljs-string">'a'</span>]:=<span class="hljs-string">'string'</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="19"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">(*通过下标写动态数组变量*)</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="20"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">setlength(a3,<span class="hljs-number">1</span>);  <span class="hljs-comment">//为A3赋值8个字节存储</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="21"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">a3[<span class="hljs-number">0</span>]:=<span class="hljs-number">2000.05</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="22"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">setlength(a4,<span class="hljs-number">2</span>,<span class="hljs-number">2</span>);  <span class="hljs-comment">//为A4分配另外32字节存储</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="23"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">a4[<span class="hljs-number">1</span>,<span class="hljs-number">1</span>]:=-<span class="hljs-number">19.32</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="24"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">(*读数组变量*)</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="25"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'a1[2]的值:'</span>,a1[<span class="hljs-number">2</span>]); <span class="hljs-comment">//200</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="26"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'a2[2,''a'']的值'</span>,a2[<span class="hljs-number">2</span>,<span class="hljs-string">'a'</span>]);<span class="hljs-comment">//string</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="27"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'a3[0]的值:'</span>,a3[<span class="hljs-number">0</span>]:<span class="hljs-number">10</span>:<span class="hljs-number">3</span>); <span class="hljs-comment">//2000.050</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="28"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'a4[1,1]的值:'</span>,a4[<span class="hljs-number">1</span>,<span class="hljs-number">1</span>]:<span class="hljs-number">10</span>:<span class="hljs-number">3</span>); <span class="hljs-comment">//-19.320</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="29"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">(*各个数组变的长度和下标值范围*)</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="30"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'a1的长度:'</span>,length(a1));<span class="hljs-comment">//10</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="31"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">write</span>(<span class="hljs-string">'a1的最小下标值:'</span>,low(a1),<span class="hljs-string">'  '</span>);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="32"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'a1的最大下标值:'</span>,high(a1));</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="33"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'a2的第一维的长度:'</span>,length(a2));<span class="hljs-comment">//10</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="34"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">write</span>(<span class="hljs-string">'a2第一维的最小下标值:'</span>,low(a2),<span class="hljs-string">'  '</span>); <span class="hljs-comment">//2</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="35"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'a2第一维的最大下标值:'</span>,high(a2)); <span class="hljs-comment">//11</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="36"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'a2第二维的长度:'</span>,length(a2[<span class="hljs-number">2</span>])); <span class="hljs-comment">//3</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="37"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">write</span>(<span class="hljs-string">'a2第二维的最小下标值:'</span>,low(a2[<span class="hljs-number">2</span>]),<span class="hljs-string">'  '</span>); <span class="hljs-comment">//a</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="38"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'a2的第二维最大下标值:'</span>, high(a2[<span class="hljs-number">2</span>])); <span class="hljs-comment">//c</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="39"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'a3的长度:'</span>,length(a3)); <span class="hljs-comment">//1</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="40"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">write</span>(<span class="hljs-string">'a3的最小下标值:'</span>,low(a3),<span class="hljs-string">'  '</span>);<span class="hljs-comment">//0</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="41"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'a3的最大下标值:'</span>,high(a3)); <span class="hljs-comment">//0即1-1</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="42"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'a4的第一维长度:'</span>,length(a4));<span class="hljs-comment">//2</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="43"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">write</span>(<span class="hljs-string">'a4第一维最小下标值:'</span>,low(a4),<span class="hljs-string">'  '</span>);<span class="hljs-comment">//0</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="44"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'a4第一维最大下标值:'</span>,high(a4));<span class="hljs-comment">//1</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="45"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'a4的第二维长度:'</span>,length(a4[<span class="hljs-number">0</span>])); <span class="hljs-comment">//2</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="46"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">write</span>(<span class="hljs-string">'a4第二维最小下标值:'</span>,low(a4[<span class="hljs-number">0</span>]),<span class="hljs-string">'  '</span>);<span class="hljs-comment">//0</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="47"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'a4第二维最大下标值:'</span>,high(a4[<span class="hljs-number">0</span>]));<span class="hljs-comment">//1</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="48"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">setlength(a3,<span class="hljs-number">0</span>);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="49"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'a3的长度:'</span>,length(a3));<span class="hljs-comment">//0</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="50"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">write</span>(<span class="hljs-string">'a3的最小下标值:'</span>,low(a3),<span class="hljs-string">'  '</span>);<span class="hljs-comment">//0</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="51"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">writeln(<span class="hljs-string">'a3的最大下标值:'</span>,high(a3));<span class="hljs-comment">//-1</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="52"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">readln;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="53"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">end</span>.</div></div></li></ol></code></pre>说明,通过前四前语句的输出,我们可以看到静态数组变量和动态数组变量的存储分配情况.a1可以保存10个integer类型整型数据的静态数组,而每个integer需要4个字节的存储,因此编译器为其分配了40个字节的存储.a2为二维静态数组,可以保存10×3即30个STRING类型字符串数据的静态数组,而每个string需要4个字节存储实际字符串存储的引用,因此编译器为其分配120个字节的存储,但对于a3和a4来说,编译器仅为其分配4个字节存储,以保存对动态分配空间的引用值.<br>
+<p>在程序的后半部分,用了若干条语句反映了各个数组每一维的长度及其最小,最大下标值,数组的长度可以由标准函数例程length得到,最小,最大下标值则可以分别由标准函数例程low和high得到,需要指出的是,在尚未通过setlength为其分配存储或者使用setlength(动态数组变量标识符,0)为其分配存储,使得某动态数组变量的长度为0时,由low返回的最小下标值为0,最大下标值为-1.</p>
+<p><br>
+</p>
+对于数组变量来说,我们可以先声明数组类型,再根据类型来定义变量,如上例所示,也可以采用简化的办法,直接通过变量定义来完成.如:<br>
+<pre><code class="language-delphi hljs"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">var</span>    </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">a1:<span class="hljs-keyword">array</span>[<span class="hljs-number">1</span>..<span class="hljs-number">10</span>] <span class="hljs-keyword">of</span> integer;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">a2:<span class="hljs-keyword">array</span>[<span class="hljs-number">1</span>..<span class="hljs-number">10</span>,’a’..’z’] <span class="hljs-keyword">of</span> <span class="hljs-keyword">string</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">a3:<span class="hljs-keyword">array</span> <span class="hljs-keyword">of</span> real;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">a4:<span class="hljs-keyword">array</span> <span class="hljs-keyword">of</span> <span class="hljs-keyword">array</span> <span class="hljs-keyword">of</span> real;</div></div></li></ol></code></pre>尽管如此,但对于高级数据类型,先声明类型后定义变量的概念是不能混淆的.<br>
+另外,在上面的范例中,我们使用setlength(a4,2,2)语句创建了一个”矩形”的动态数组,即a4第一维的长度2,第二维的长度2,实际上,对于多维动态数组来说,其各维的长度可以是不同的,在下面的范围中,我们就建立一个三角形的动态数组.<br>
+编写控制台应用程序,建立各维长度不同的动态数组.在代码编辑器中写下程序;<br>
+<pre><code class="language-delphi hljs"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">var</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">a:<span class="hljs-keyword">array</span> <span class="hljs-keyword">of</span> <span class="hljs-keyword">array</span> <span class="hljs-keyword">of</span> <span class="hljs-keyword">string</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">i,j:integer;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">setlength(a,<span class="hljs-number">10</span>); <span class="hljs-comment">//第一维的长度为10</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">for</span> i:=low(a) <span class="hljs-keyword">to</span> high(a) <span class="hljs-keyword">do</span> <span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">setlength(a,i); <span class="hljs-comment">//第二维的长度随第一维的长度变化而变化</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  <span class="hljs-keyword">for</span> j:=low(a) <span class="hljs-keyword">to</span> high(a) <span class="hljs-keyword">do</span> <span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  a[i,j]:=inttostr(i)+<span class="hljs-string">'/'</span>+inttostr(j)+<span class="hljs-string">'  '</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  <span class="hljs-keyword">write</span>(a[i,j]);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  <span class="hljs-keyword">end</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  writeln;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  <span class="hljs-keyword">end</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">  readln;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="15"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">end</span>.  </div></div></li></ol></code></pre>&nbsp;<br>
+<strong>13： 注册表的使用：</strong><br>
+32位Delphi程序中可利用TRegistry对象来存取注册表文件中的信息。&nbsp;<br>
+一、创建和释放TRegistry对象<br>
+　　1.创建TRegistry对象。为了操作注册表，要创建一个TRegistry对象：<br>
+ARegistry := TRegistry.Create；&nbsp;<br>
+　　2.释放TRegistry对象。对注册表操作结束后，应释放TRegistry对象所占内存：ARegistry.Destroy。&nbsp;<br>
+<br>
+二、指定要操作的键&nbsp;<br>
+<br>
+　　操作注册表时，首先应指定操作的主键：先给属性RootKey赋值以指定根键，然后用方法OpenKey来指定要操作的主键名。&nbsp;<br>
+<br>
+　　1.指定根键(RootKey)。&nbsp;<br>
+　　根键是注册表的入口，也注册表信息的分类，其值可为：&nbsp;<br>
+　　HKEY—CLASSES—ROOT：存储整个系统对象类信息，如ActiveX对象注册、文件关联等信息。&nbsp;<br>
+　　HKEY—CURRENT—USER：存储当前用户的配置信息。为属性RootKey的默认值。&nbsp;<br>
+　　HKEY—LOCAL—MACHINE：存储当前系统的软硬件配置信息。应用程序自己的信息可以存储在该根键下。&nbsp;<br>
+　HKEY—USERS：存储所有用户通用的配置信息。&nbsp;<br>
+　　还可以是HKEY—CURRENT—CONFIG、HKEY—DYN—DATA。&nbsp;<br>
+<br>
+　　2.指定要操作的主键。&nbsp;<br>
+　　Function OpenKey(const Key: string; CanCreate: Boolean): Boolean;&nbsp;<br>
+　　Key：主键名，是键名全名中除去根键的部分，如Software/Borland/Delphi。&nbsp;<br>
+　　CanCreate：在指定的主键名不存在时，是否允许创建该主键，True表示允许。&nbsp;<br>
+　　返回值True表示操作成功。&nbsp;<br>
+<br>
+　　3.关闭当前主键。&nbsp;<br>
+　　在读取或存储信息之后，应及时将关闭当前主键：procedure CloseKey。&nbsp;<br>
+<br>
+三、从注册表中读取信息&nbsp;<br>
+　　Read系列方法从注册表读取指定的信息（字符串、二进制和十六进制），并转换为指定的类型。&nbsp;<br>
+<br>
+　　1.Read系列方法。&nbsp;<br>
+　　<span style="color: rgb(51, 51, 255);">function ReadString(const Name: string): string;&nbsp;</span><br>
+　　读取一个字符串值，Name为字符串名称。&nbsp;<br>
+　　<span style="color: rgb(51, 51, 255);">function ReadInteger(const Name: string): Integer;&nbsp;</span><br>
+　　读取一个整数值，Name为整数名称。&nbsp;<br>
+　　<span style="color: rgb(51, 51, 255);">function ReadBinaryData(const Name: string; var Buffer; BufSize: Integer):Integer;&nbsp;</span><br>
+　　读取二进制值，Name为二进制值名称，Buffer为接收缓冲区，BufSize为缓冲区大小，返回为实际读取的字节数。&nbsp;<br>
+　　其它方法还有：<span style="color: rgb(51, 51, 255);">ReadBool、ReadCurrency、ReadDate、ReadDateTime、ReadFloat、ReadTime。</span>&nbsp;<br>
+<br>
+　　2.读取信息一例（显示Windows的版本）。&nbsp;<br>
+　在HKEY—LOCAL—MACHINE/Software/Microsoft/Windows/CurrentVersion下，有三个字符串值Version、VersionNumber和SubVersionNumber，用于记录当前Windows的版本号。&nbsp;<br>
+<pre><code class="language-delphi hljs"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　<span class="hljs-comment">{请在Uses中包含Registry单元}</span> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　<span class="hljs-function"><span class="hljs-keyword">procedure</span> <span class="hljs-title">TForm1</span>.<span class="hljs-title">Button1Click</span><span class="hljs-params">(Sender:TObject)</span>;</span> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　<span class="hljs-keyword">var</span> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 ARegistry : TRegistry; </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　<span class="hljs-keyword">begin</span> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 ARegistry := TRegistry.Create; </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　<span class="hljs-comment">//建立一个TRegistry实例 </span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 <span class="hljs-keyword">with</span> ARegistry <span class="hljs-keyword">do</span> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　 　 <span class="hljs-keyword">begin</span> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 RootKey := HKEY—<span class="hljs-keyword">LOCAL</span>—MACHINE;<span class="hljs-comment">//指定根键为HKEY—LOCAL—MACHINE </span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 <span class="hljs-comment">//打开主键Software/Microsoft/Windows/CurrentVersion </span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 <span class="hljs-keyword">if</span> OpenKey( ′Software/Microsoft/Windows/CurrentVersion′,false ) <span class="hljs-keyword">then</span> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 <span class="hljs-keyword">begin</span> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 memo1.lines.add(<span class="hljs-string"><span class="hljs-string">'Windows版本：′＋ ReadString(′Version′)); </span></span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="15"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-string">　　 memo1.lines.add('</span>Windows版本号：′＋ ReadString(′VersionNumber′)); </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="16"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 memo1.lines.add(′Windows子版本号：′＋ ReadString(′SubVersionNumber′)); </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="17"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 <span class="hljs-keyword">end</span>; </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="18"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 CloseKey;<span class="hljs-comment">//关闭主键 </span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="19"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 Destroy;<span class="hljs-comment">//释放内存 </span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="20"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 <span class="hljs-keyword">end</span>; </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="21"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　<span class="hljs-keyword">end</span>; </div></div></li></ol></code></pre><br>
+四、向注册表中写入信息&nbsp;<br>
+　　Write系列方法将信息转化为指定的类型，并写入注册表。&nbsp;<br>
+<br>
+　　1.Write系列方法。&nbsp;<br>
+　　<span style="color: rgb(51, 51, 255);">procedure WriteString(const Name, Value: string);&nbsp;</span><br>
+　　写入一个字符串值，Name为字符串的名称，Value为字符串值。&nbsp;<br>
+　　<span style="color: rgb(51, 51, 255);">procedure WriteInteger(const Name: string; Value: Integer);&nbsp;</span><br>
+　　写入一个整数值。&nbsp;<br>
+　　<span style="color: rgb(51, 51, 255);">procedure WriteBinaryData(const Name: string; var Buffer; BufSize: Integer);&nbsp;</span><br>
+　　写入二进制值，Name为二进制值的名称，Buffer为包含二进制值的缓冲区，BufSize为缓冲区大小。&nbsp;<br>
+　　其它方法还有：WriteBool、WriteCurrency、WriteDate、WriteDateTime、WriteFloat、WriteTime。&nbsp;<br>
+<br>
+　　2.写入信息一例。&nbsp;<br>
+　　下面程序使Delphi随Windows启动而自动运行。&nbsp;<br>
+<pre><code class="language-delphi hljs"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　<span class="hljs-keyword">var</span> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 ARegistry : TRegistry; </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　<span class="hljs-keyword">begin</span> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 ARegistry := TRegistry.Create; </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　<span class="hljs-comment">//建立一个TRegistry实例 </span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 <span class="hljs-keyword">with</span> ARegistry <span class="hljs-keyword">do</span> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 <span class="hljs-keyword">begin</span> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 RootKey:=HKEY—<span class="hljs-keyword">LOCAL</span>—MACHINE; </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　 　 <span class="hljs-keyword">if</span> OpenKey(′Software/Microsoft/Windows/CurrentVersion/Run′,True) <span class="hljs-keyword">then</span> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 WriteString(′delphi′,′C:/<span class="hljs-keyword">Program</span> Files/borland/delphi3/bin/delphi32.exe′); </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 CloseKey; </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 Destroy; </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　 <span class="hljs-keyword">end</span>; </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　<span class="hljs-keyword">end</span>; </div></div></li></ol></code></pre><br>
+五、键值维护&nbsp;<br>
+　　除了在注册表中读取、存储外，程序可能还需要增加主键、删除主键、主键改名、数据值改名等。&nbsp;<br>
+<br>
+　　1.创建新主键：<span style="color: rgb(51, 51, 255);">function CreateKey(const Key: string): Boolean。&nbsp;</span><br>
+　　Key即为主键名，返回值True表示操作成功。&nbsp;<br>
+<br>
+　　2.删除主键：<span style="color: rgb(51, 51, 255);">function DeleteKey(const Key: string): Boolean。</span>&nbsp;<br>
+　　Key即为主键名，返回值True表示操作成功。&nbsp;<br>
+<br>
+　　3.复制或移动主键：<span style="color: rgb(51, 51, 255);">procedure MoveKey(const OldName, NewName: string; Delete: Boolean)</span>。&nbsp;<br>
+　　OldName、NewName分别表示源主键名和目标主键名；Delete表示是否删除源主键，True表示删除，False表示保留。&nbsp;<br>
+　　复制或移动一个主键将复制或移动该子键下的所有数据值和子键内容。&nbsp;<br>
+<br>
+　　4.判断指定主键是否存在，其下是否有主键，并获取主键名称。&nbsp;<br>
+　　KeyExists用于判断指定主键是否存在：&nbsp;　　<pre><code class="language-delphi hljs"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">KeyExists</span><span class="hljs-params">(<span class="hljs-keyword">const</span> Key: <span class="hljs-keyword">string</span>)</span>:</span> Boolean;<span class="hljs-comment">//返回值为True表示主键存在。 </span></code></pre>　　HasSubKeys用于判断指定主键下是否有子键：<span style="color: rgb(51, 51, 255);">function HasSubKeys: Boolean</span>;&nbsp;<br>
+　　返回值为True表示主键下有子键。&nbsp;<br>
+　GetKeyNames用于获取子键名称：<span style="color: rgb(51, 51, 255);">procedure GetKeyNames(Strings: TStrings)</span>;&nbsp;<br>
+　Strings用于返回当前主键下各子键的名称。&nbsp;<br>
+<br>
+　　5.获取主键下的数据值名称：<span style="color: rgb(51, 51, 255);">procedure GetValueNames(Strings: TStrings)</span>。&nbsp;<br>
+　　Strings用于返回当前主键下各数值名称。&nbsp;<br>
+　　如要获取当前系统中的拨号连接名称，可利用获取主键HKEY—USERS /.DEFAULT/RemoteAccess/Addresses下的数值名称的方法来进行。&nbsp;<br>
+<br>
+　　6.判断数值名称存在、数值名称改名。&nbsp;<br>
+　　ValueExists用于判断数值名称是否存在：&nbsp;　　<pre><code class="language-delphi hljs"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">ValueExists</span><span class="hljs-params">(<span class="hljs-keyword">const</span> <span class="hljs-keyword">Name</span>: <span class="hljs-keyword">string</span>)</span>:</span> Boolean; </code></pre>　　返回值为True表示数值名称存在。&nbsp;<br>
+　　RenameValue用于数值名称改名：&nbsp;<br>
+<pre><code class="language-delphi hljs">　　<span class="hljs-function"><span class="hljs-keyword">procedure</span> <span class="hljs-title">RenameValue</span><span class="hljs-params">(<span class="hljs-keyword">const</span> OldName, NewName: <span class="hljs-keyword">string</span>)</span>;</span> </code></pre><br>
+　以上是注册表常用操作所对应的TRegistry的方法和属性，其它方法和属性请参见Delphi联机帮助文件。&nbsp;<br>
+以上程序在PWIN 98＋Delphi 3.0下调试通过。 &nbsp;<br>
+&nbsp;&nbsp;<br>
+&nbsp;<br>
+<strong>14.Delphi文件操作</strong><br>
+&nbsp;<br>
+&nbsp;文件是同一类型元素的有序集合，是内存与外设间传输数据的渠道。一些外设如显示器、键盘、打印机等都可以看作文件，但最常用的还是磁盘文件，这也是本章我们主要讨论的对象。<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Delphi继承了Object Pascal的文件管理功能，并有很大的发展，其中最主要的是提供了用于文件管理的标准控件，同时也提供了更多的文件管理函数。利用Delphi的强大功能，开发一个自己的文件管理系统就成为很容易的事。<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;本章首先介绍Delphi文件管理的基本概念和标准过程/函数，并提供了一个记录文件的应用实例，这是从我们实际课题开发中提取出来的。而后介绍Delphi提供的文件控件的使用方法。最后提供的一个综合例程MDI文件管理器则是对Delphi文件管理功能的综合应用。<br>
+<br>
+6.1 文件类型和标准过程　<br>
+&nbsp; &nbsp; &nbsp; &nbsp; Delphi同Object Pascal一样支持三种文件类型，即：文本文件、记录文件、无类型文件。　<br>
+6.1.1文本文件　<br>
+&nbsp; &nbsp; &nbsp; 文本文件类型的变量用如下方法声明：<br>
+<pre><code class="language-delphi hljs"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">var</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">TextFileVar: Text ;　</div></div></li></ol></code></pre><br>
+&nbsp; &nbsp; &nbsp; &nbsp;文本文件是以行为单位进行读、写操作的。由于每一行长度不一定相同，不能计算出给定行在文件中的确切位置，因而只能顺序地读写。而且文本文件只能单独为读或写而打开，在一个打开的文本文件上同时进行读、写操作是不允许的。　<br>
+<br>
+6.1.1.1 文本文件的打开、关闭　<br>
+&nbsp; &nbsp; &nbsp; 文本文件的打开需要两个步骤：(1). 文件变量与文件名关联；(2). 初始化读写。<br>
+<p>&nbsp; &nbsp; &nbsp; 联文件变量与文件名调用AssignFile标准过程：　</p>
+<p></p>
+<pre><code class="language-delphi hljs">     AssignFile ( TextFileVar , FileName ) ;</code></pre>
+<p>&nbsp; &nbsp; &nbsp;FileName 既可以是全路径名，也可以仅是文件名。对于后者系统将在当前目录下查找。</p>
+&nbsp; &nbsp; &nbsp;AssignFile是Delphi新提供的一个函数，其功能等价于Object Pascal中的Assign。而Assign在Delphi中更多地被用作一个方法名。<br>
+<br>
+初始化读写有三种方式：<br>
+<br>
+1. Reset : 为读打开文件并把文件指针移动到文件首；<br>
+2. Rewrite : 为写创建一个新文件；<br>
+3. Append : 为写打开存在的文件并把文件指针定位在文件尾。<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp; 当使用Reset或Append过程而文件不存在时将会引发一个I/O异常。有关I/O异常的处理请参看本章例程和第十二章中的介绍。<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp;文件的关闭很简单，只须调用CloseFile过程即可。<br>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;虽然Delphi应用程序在退出时会自动关闭所有打开的文件，但自己动手关闭文件可以确保释放文件句柄，并使程序的可移植性增强。</p>
+&nbsp; &nbsp; &nbsp; &nbsp;为保持兼容，Delphi也允许用户用Assign建立关联，Close关闭文件。　<br>
+<br>
+<br>
+6.1.1.2 文本文件的读写　<br>
+&nbsp; &nbsp; &nbsp; &nbsp; 从文本文件中读取信息用Read、Readln两个标准过程。<br>
+&nbsp; &nbsp; &nbsp; &nbsp; 当读入数值时，Read、Readln假定数值是用一个或多个空格分开的，而不是逗号、分号或其它字符。对如下一条语句：　<br>
+<pre><code class="language-delphi hljs"><span class="hljs-keyword">Read</span> ( TextFileVar , Num1 , Num2 , Num3 ) ;</code></pre>&nbsp; &nbsp; &nbsp; 如果文件中的数值是：<br>
+100 200 300<br>
+&nbsp; &nbsp; &nbsp; 则能够成功读入，而若文件中的数值是<br>
+100 200， 300<br>
+<p>&nbsp; &nbsp; &nbsp; 则Read读入“200，”并试图把它转化成一个数值时会引发一个异常。</p>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp;当读入字符是字符串时，Read、Readln过程总是读取尽可能多的字符填充到字符串变量中或一直读到行结束符为止。因此从文本文件中读取格式化的字符串数据，必须声明与其长度相匹配的字符串变量。如果要从文件中读取单词，必须先把文件中的每一行读入字符串，然后再从字符串中逐个分析出单词。或者一次只从文本文件中读入一个字符并测试每个字符后是否是单词断开处。<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp; 格式化字符串之间的分隔符应读入到一个临时变量中，而字符串与数值、数值与数值间的分隔符读入时会自动识别剔除。对如下一行数据：<br>
+Mon 12:10 40 50<br>
+定义　<br>
+<pre><code class="language-delphi hljs"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">var</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">Day: <span class="hljs-keyword">string</span>[<span class="hljs-number">3</span>] ;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">Time: <span class="hljs-keyword">string</span>[<span class="hljs-number">5</span>] ;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">Num1, Num2: Integer ;</div></div></li></ol></code></pre>则须用如下的read 语句读入：　<br>
+<pre><code class="language-delphi hljs"><span class="hljs-keyword">read</span> ( TextFileVar , Day , c , Time , Num1 , Num2 ) ;　</code></pre>C为一个临时字符变量。　<br>
+<br>
+<br>
+6.1.1.3 文本文件的编辑　<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp; 在Delphi中实现对一个文本文件的编辑，只须让其与一个Tmemo控件建立关联即可：　<br>
+<pre><code class="language-delphi hljs">Memo1.Lines.LoadFromFile ( TextFileName ) ;　</code></pre>这样在TMemo上所做的一切修改当调用Memo部件的SaveToFile方法后都会反映到文件中去。　<br>
+<br>
+<br>
+6.1.2 记录文件　<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp;记录文件是一种操作更为灵活的文件类型。它允许同时为读和写打开，而且由于记录文件中每条记录的长度固定，所以可随机存取。<br>
+记录文件的类型变量可如下声明：　<br>
+<pre><code class="language-delphi hljs"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">var</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">RecordFileVar: <span class="hljs-keyword">file</span> <span class="hljs-keyword">of</span> RecordType;　</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">RecordType是一个自定义的记录类型。</div></div></li></ol></code></pre>&nbsp; &nbsp; &nbsp; 有关记录文件的操作我们将在下一节中结合例程进行讨论。　<br>
+<br>
+<br>
+6.1.3 无类型文件　<br>
+<br>
+&nbsp; &nbsp; &nbsp; 无类型文件提供了底层的I/O通道，可用于存取可变长度记录的文件。经常用于文件的复制操作中。由于Delphi提供了更好的方法(见第四节)，所以无类型文件很少使用。有兴趣的读者可参看BlockRead、BlockWrite两个联机帮助主题。　<br>
+<br>
+<br>
+6.1.4 Delphi的文件管理标准过程　<br>
+&nbsp; &nbsp; &nbsp; 根据功能我们把标准过程划分为十一类进行介绍。　<br>
+<br>
+6.1.4.1 文件的打开与关闭　<br>
+<br>
+AssignFile ：把一个外部文件名和一个文件变量相关联<br>
+Reset ：打开一个存在的文件<br>
+Rewrite ：创建并打开一个新文件（或覆盖原有文件）<br>
+Append ：以添加方式打开一个文件（只适用于文本文件）<br>
+CloseFile ： 关闭一个打开的文件<br>
+FileOpen ：打开一个特定的文件并返回文件句柄<br>
+FileCreate ：创建一个给定文件名的文件并返回文件句柄<br>
+FileClose ：关闭一个特定句柄的文件　<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp;后边三个文件主要供系统内部使用，在文件复制的编程中也往往会用到。它们操作的对象是文件句柄而不是文件变量。　<br>
+<br>
+<br>
+6.1.4.2 文件定位　<br>
+<br>
+Seek ：把文件当前位置移到指定部分<br>
+FilePos ： 返回文件的当前位置<br>
+Eoln ： 返回行结束标志<br>
+EOF ： 返回文件结束标志<br>
+FileSeek ： 改变当前文件指针的位置<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp;Seek与FileSeek的区别是：1. Seek仅用于记录文件；2. FileSeek的参数是文件句柄、偏移量、起始位置。其中起始位置有文件首、当前位置、文件尾三种选择。Seek的参数是文件变量、偏移量，偏移量是从文件首开始定位的。3. FileSeek的偏移量以字节数来计算，而Seek是根据记录号进行移动。<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp;Seek、FilePos仅用于记录文件。但任何文件都可以看作是基于字节的记录文件。下面一段程序表示了它们的用法。<br>
+<pre><code class="language-delphi hljs"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">{ 该例子的设计界面为一个包含TOpenDialog部件的窗体。}</span>　</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">uses</span> Dialogs;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">var</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">f: <span class="hljs-keyword">file</span> <span class="hljs-keyword">of</span> Byte;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">size: Longint;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">S: <span class="hljs-keyword">String</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">y: Integer;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">if</span> OpenDialog1.Execute <span class="hljs-keyword">then</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">AssignFile(f, OpenDialog1.FileName);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">Reset(f);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">size := FileSize(f);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="15"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">S := <span class="hljs-string">'File size in bytes: '</span> + IntToStr(size);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="16"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">y := <span class="hljs-number">10</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="17"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">Canvas.TextOut(<span class="hljs-number">5</span>, y, S);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="18"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">y := y + Canvas.TextHeight(S) + <span class="hljs-number">5</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="19"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">S := <span class="hljs-string">'Seeking halfway into file...'</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="20"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">Canvas.TextOut(<span class="hljs-number">5</span>, y, S);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="21"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">y := y + Canvas.TextHeight(S) + <span class="hljs-number">5</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="22"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">Seek(f,size <span class="hljs-keyword">div</span> <span class="hljs-number">2</span>);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="23"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">S := <span class="hljs-string">'Position is now '</span> + IntToStr(FilePos(f));</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="24"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">Canvas.TextOut(<span class="hljs-number">5</span>, y, S);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="25"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">CloseFile(f);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="26"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">end</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="27"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="28"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">end</span>.　</div></div></li></ol></code></pre><br>
+<br>
+6.1.4.3 文件删除与截断　<br>
+<br>
+Erase ： 删除一个存在的文件<br>
+DeleteFile ： 删除一个文件<br>
+Truncate ：从文件当前位置将文件截断　<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Erase与DeleteFile的区别是：Erase以文件变量为参数，当文件不能删除时引起一个异常；DeleteFile以文件名为参数，当文件不存在或不能删除时返回False，而并不引起一个异常。　<br>
+<br>
+<br>
+6.1.4.4 文件名操作　<br>
+<br>
+Rename ：文件更名，以文件变量为操作对象<br>
+RenameFile ：文件更名，参数为文件的原名和新名<br>
+ChangeFileExt ：改变文件扩展名<br>
+ExpandFileName ：返回文件全路径名<br>
+ExtractFileExt ：返回文件扩展名<br>
+ExtractFileName ：从全路径名中返回文件名<br>
+ExtractFilePath ：返回特定文件的路径　<br>
+<br>
+6.1.4.5 文件属性　<br>
+<br>
+FileGetAttr ：返回文件属性<br>
+FileSetAttr ：设置文件属性　<br>
+<br>
+6.1.4.6 文件状态　<br>
+<br>
+FileSize ：返回文件对象大小<br>
+IOResult ：返回上一次I/O操作的状态<br>
+FileExists ：检测文件是否存在　<br>
+<br>
+6.1.4.7 文件日期　<br>
+DateTimeToFileDate ：把Delphi日期格式转换为DOS日期格式<br>
+FileDateToDateTime ：把DOS日期格式转换为Delphi日期格式<br>
+FileGetDate ：返回文件的DOS日期时间戳<br>
+FileSetDate ：设置文件的DOS日期时间戳　<br>
+<br>
+6.1.4.8 文件读写　<br>
+<br>
+Read，Readln ：从文本或记录文件中读取变量<br>
+Write ：将指定变量写入文本或记录文件<br>
+Writeln ：将指定变量写入文本文件并写入一个行结束标志<br>
+FileRead ：从一个指定文件中读取变量<br>
+FileWrite ：向指定文件写入数据　<br>
+FileRead和FileWrite都是以文件句柄为操作对象，主要供系统内部使用。　<br>
+<br>
+6.1.4.9 目录操作　<br>
+<br>
+MkDir ：创建当前目录的子目录<br>
+ChDir ：改变当前目录<br>
+GetDir ：返回特定磁盘的当前目录<br>
+RmDir ：删除一个空子目录　<br>
+<br>
+6.1.4.10 磁盘操作　<br>
+<br>
+DiskFree ：返回磁盘自由空间<br>
+DiskSize ：返回特定磁盘的大小　<br>
+<br>
+6.1.4.11 文件查找<br>
+<br>
+FileSearch ：查找目录中是否存在某一特定文件<br>
+FindFirst ：在目录中查找与给定文件名（可以包含匹配符）及属性集相匹配的第一个文件<br>
+FindNext ：返回符合条件的下一个文件<br>
+FindClose ：中止一个FindFirst / FindNext序列　<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp; 有关文件管理标准过程/函数的更详细资料，请查阅Delphi相关的Help主题。以上的大部分过程在后面都有应用实例，读者可以从中体会其用法。<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp; 在Delphi的联机帮助Help系统中把有关文件的过程/函数分为两个主题：I/O Routine和File_Management Routine。前者大部分以文件变量为操作对象，而后者大部分以文件名或文件句柄为操作对象。这里为了方便读者的使用，我们按功能重新进行了分类。在下一节中主要应用I/O Routine主题下的过程，而在第四节的综合举例中主要应用File_Management Routine主题下的过程。<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp;另外，Windows提供了许多有关文件管理的API函数。虽然在一般情况下，利用Delphi提供的函数已足够解决问题，但有时候仍然需要使用Windows API。在(6.4.4.2)中我们就用到了Windows API函数GetDriveType。有关Windows API函数的情况，请读者参阅相关的资料，这里不再进行介绍。<br>
+<br>
+<br>
+6.2 记录文件的应用　<br>
+<br>
+6.2.1 任务介绍　<br>
+　　在这一节，我们开发一个系统安全性综合评估方法管理系统。系统安全性在复杂项目开发中十分重要，但由于牵涉面广因而很难获得客观、全面的评估值。鉴于此我们提出多角度、多侧面评估而后定量集成的思路，并在此基础上提出了多种安全性综合评估方法。每种方法由不同部门进行评估而后把结果汇总、综合。<br>
+　　为此我们定义如下的记录类型：　<br>
+<pre><code class="language-delphi hljs"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">type</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">TNature = (Micro,Macro);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">{方法性质，分为微观和宏观两类}</span>　</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">　　　TMethod = <span class="hljs-keyword">Record</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">Name</span>: <span class="hljs-keyword">string</span>[<span class="hljs-number">20</span>]; <span class="hljs-comment">{方法名}</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">Condition: <span class="hljs-keyword">string</span>[<span class="hljs-number">40</span>]; <span class="hljs-comment">{方法适用条件}</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">Nature: TNature; <span class="hljs-comment">{方法性质}</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">Result: Real; <span class="hljs-comment">{方法评估值}</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">end</span>;　</div></div></li></ol></code></pre>用来记录不同方法的信息。<br>
+　　由于不同方法的条件、性质不同，因而对工程开发的不同阶段适用方法集也不同。因此需要根据实际情况对方法集进行管理。我们把每一方法作为一条记录，每一方法集作为一个记录文件。下面讨论系统的实现方法。　<br>
+<br>
+6.2.2 设计基本思路　<br>
+　　本系统要实现的基本功能是文件的打开、创建、关闭、显示，记录的增加、修改、删除以及结果的综合和显示。为此我们使用了两组按钮分别用于文件和记录的操作，使用一个StringGrid控件来显示文件内容，使用一个只读编辑框显示结果的综合。<br>
+其中各部件的名称、功能如下表所示：　<br>
+表6.1 主窗口部件的设计<br>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━<br>
+部件名称 主要属性 备注<br>
+──────────────────────────────────────<br>
+RecFileForm BorderStyle=bsDialog 文件打开后把文件名附到窗口标题后<br>
+Position=poScreenCenter<br>
+StringGrid1 大小行数动态确定<br>
+HazAttr(编辑框) ReadOnly=True 显示综合结果<br>
+OpenButton TabOrder=0 打开一个记录文件,若文件不存在则创建<br>
+NewButton Caption='打开' 创建一个记录文件,若文件存在则打开<br>
+CloseButton Caption='关闭' 关闭一个已打开的文件<br>
+AddButton Caption='增加' 增加一条记录<br>
+ModifyButton Caption='修改' 修改一条记录<br>
+DeleteButton Caption='删除' 删除一条记录<br>
+CalcuButton Caption='计算' 计算最终结果并显示<br>
+ExitButton Caption='退出' 系统终止。若当前有打开的文件则先关闭<br>
+OpenDialog1 Filter= 选择或输入欲打开的文件<br>
+'Record File(*.Rec)|.Rec<br>
+|Any File(*.*)|*.*'<br>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━　<br>
+<br>
+　　另外，StringGrid1、HazAttr的标题用两个标签框(Label)来显示。<br>
+　　另外我们还需要一个编辑对话框。其中四个编辑框Name、Condition、Nature、 Result分别对应TMethod记录的四个域。<br>
+为协调程序运行，我们定义了一组全局变量。各变量的类型、作用如下表。　<br>
+<br>
+　　 表6.2　全局变量及其作用<br>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━<br>
+　　 变量名 类型 作用<br>
+─────────────────────────────────<br>
+MethodFile MethodFileType 与当前打开文件相关联的文件变量<br>
+FileName string[70] 当前打开文件的文件名<br>
+Count Count 当前打开文件的记录总数<br>
+CurrentRec Integer 当前处理记录号<br>
+FileOpened Boolean 当前是否有文件打开<br>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━　<br>
+<br>
+记录文件类型MethodFileType的定义为　<br>
+　　type<br>
+MethodFileType = file of TMethod;　<br>
+&nbsp; &nbsp; &nbsp; &nbsp; 布尔变量FileOpened用于控制文件按钮的使能、变灰，记录按钮的反应以及系统结束时是否需要首先关闭文件。　<br>
+<br>
+<br>
+6.2.3 记录文件的打开和创建　<br>
+　　记录文件的打开和创建同文本文件一样也需要关联和初始化两个步骤。同文本文件唯一的不同是不能使用Append过程。<br>
+　　记录文件缺省情况下以读写方式打开，如果想以只读或只写方式打开，则需要修改System单元中定义的变量FileMode的值。<br>
+　　FileMode的取值和意义如下表。　<br>
+　　 表6.3 FileMode的取值和意义<br>
+━━━━━━━━━━━━━━<br>
+取值 意义<br>
+──────────────<br>
+0 只读<br>
+1 只写<br>
+2 读写<br>
+━━━━━━━━━━━━━━　<br>
+　　FileMode是一个全局变量，对它的每次修改都将影响所有Reset的操作，因此在打开自己的文件后应还原它的值。<br>
+　　在本系统中，当用户按下“打开”按钮时，首先弹出一个标准文件打开对话框，要求用户输入或选择文件名。确认后如果该文件名的文件存在，则用Reset打开，若不存在则创建。程序清单如下。　<br>
+<pre><code class="language-delphi hljs"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-function"><span class="hljs-keyword">procedure</span> <span class="hljs-title">TRecFileForm</span>.<span class="hljs-title">OpenButtonClick</span><span class="hljs-params">(Sender: TObject)</span>;</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">if</span> OpenDialog1.Execute <span class="hljs-keyword">then</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">FileName := OpenDialog1.FileName</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">else</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">exit</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">AssignFile(MethodFile,Filename);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">try</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">Reset(MethodFile);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">FileOpened := True;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">except</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">On</span> EInOutError <span class="hljs-keyword">do</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">try</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="15"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">if</span> FileExists(FileName) = False <span class="hljs-keyword">then</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="16"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="17"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">ReWrite(MethodFile);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="18"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">FileOpened := True;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="19"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">end</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="20"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">else</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="21"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="22"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">FileOpened := False;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="23"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">MessageDlg(<span class="hljs-string">'文件不能打开'</span>,mtWarning,[mbOK],<span class="hljs-number">0</span>);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="24"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">end</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="25"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">except</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="26"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">On</span> EInOutError <span class="hljs-keyword">do</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="27"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="28"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">FileOpened := False;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="29"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">MessageDlg(<span class="hljs-string">'文件不能创建'</span>,mtWarning,[mbOK],<span class="hljs-number">0</span>);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="30"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">end</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="31"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">end</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="32"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">end</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="33"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">end</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="34"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">if</span> FileOpened = False <span class="hljs-keyword">then</span> <span class="hljs-keyword">exit</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="35"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">Count := FileSize(MethodFile);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="36"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">if</span> Count&gt;<span class="hljs-number">0</span> <span class="hljs-keyword">then</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="37"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">ChangeGrid;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="38"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">RecFileForm.Caption := FormCaption+<span class="hljs-string">' -- '</span>+FileName;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="39"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">NewButton.Enabled := False;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="40"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">OpenButton.Enabled := False;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="41"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">CloseButton.Enabled := True;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="42"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">end</span>;</div></div></li></ol></code></pre>　　首先系统试图用Reset打开一个文件，并置FileOpened为True。如果文件不能打开，则引发一个I/O异常。在异常处理过程中，首先检测文件是否存在。若不存在则创建这个文件。否则是其它原因引发的异常，则把FileOpend重置为False， 并显示信息“文件不能打开”。在文件创建过程中仍可能引发异常，因而在一个嵌套的异常处理中把FileOpened重置为False，并提示信息“文件不能创建”。<br>
+　　有关异常处理的内容请读者参看第十二章。这段程序说明：异常处理机制不仅能使我们的程序更健壮，而且为编程提供了灵活性。<br>
+　　当用户按下“创建”按钮时，系统首先弹出一个标准输入框，要求用户输入文件名，确认后系统首先检测文件是否存在。若存在则直接打开，否则创建一个新文件。打开或创建过程导致异常，则重置FileName和FileOpened两个全局变量。　<br>
+<pre><code class="language-delphi hljs"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-function"><span class="hljs-keyword">procedure</span> <span class="hljs-title">TRecFileForm</span>.<span class="hljs-title">NewButtonClick</span><span class="hljs-params">(Sender: TObject)</span>;</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">FileName := InputBox(<span class="hljs-string">'输入框'</span>,<span class="hljs-string">'请输入文件名'</span>,<span class="hljs-string">''</span>);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">if</span> FileName = <span class="hljs-string">''</span> <span class="hljs-keyword">then</span> <span class="hljs-keyword">Exit</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">try</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">AssignFile(MethodFile,FileName);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">if</span> FileExists(FileName) <span class="hljs-keyword">then</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">Reset(MethodFile);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">Count := FileSize(MethodFile);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">if</span> Count&gt;<span class="hljs-number">0</span> <span class="hljs-keyword">then</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">ChangeGrid;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">end</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">else</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="15"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="16"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">Rewrite(MethodFile);</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="17"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">count := <span class="hljs-number">0</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="18"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">end</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="19"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">FileOpened := true;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="20"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">Except</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="21"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">on</span> EInOutError <span class="hljs-keyword">do</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="22"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="23"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">FileName := <span class="hljs-string">''</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="24"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">FileOpened := False;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="25"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">end</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="26"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">end</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="27"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="28"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">if</span> FileOpened <span class="hljs-keyword">then</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="29"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">begin</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="30"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">NewButton.Enabled := False;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="31"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">OpenButton.Enabled := False;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="32"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">CloseButton.Enabled := True;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="33"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">RecFileForm.Caption := FormCaption+<span class="hljs-string">' -- '</span>+FileName;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="34"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">end</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="35"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">end</span>;</div></div></li></ol></code></pre><br>
+　　当文件打开或创建后，所要做的工作有：<br>
+<br>
+<br>
+　　● 若文件非空，则计算文件长度，并用文件内容填充StringGrid1<br>
+<br>
+<br>
+　　● “创建”、“打开”按钮变灰，“关闭”按钮使能<br>
+<br>
+<br>
+　　● 把文件名附到窗口标题后<br>
+<br>
+<br>
+6.2.4 记录文件的读入和显示　<br>
+<br>
+<br>
+　　定义一个全局变量Count用来保存文件中的记录个数。当文件装入时：　<br>
+<br>
+<br>
+　　Count := FileSize(MethodFile)；　<br>
+<br>
+<br>
+　　如果Count &gt; 0，则首先确定StringGrid1的高度、行数。为保证StringGrid1不会覆盖窗口下面的编辑框，定义一个常量MaxShow。当Count &lt; MaxShow时，记录可全部显示；当Count &gt;= MaxShow时，StringGrid1自动添加一个滚动棒。为保证滚动棒不覆盖掉显示内容，StringGrid1的宽度应留有余地。<br>
+<br>
+<br>
+　　确定StringGrid1高度、行数的代码如下：　<br>
+<br>
+<br>
+　　With StringGrid do<br>
+<br>
+<br>
+if count &lt; MaxShow then<br>
+<br>
+<br>
+Height := DefaultRowHeight * (Count+1)+10<br>
+<br>
+<br>
+else<br>
+<br>
+<br>
+Height := DefaultRowHeight * MaxShow+10;<br>
+<br>
+<br>
+RowCount := Count+1;<br>
+<br>
+<br>
+end;　<br>
+<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp; 而后从文件中逐个读入记录并显示在StringGrid1的相应位置：　<br>
+<br>
+<br>
+　　for i := 1 to Count do<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+Read(MethodFile,MethodRec);<br>
+<br>
+<br>
+ShowMethod(MethodRec,i);<br>
+<br>
+<br>
+end;　<br>
+<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;ShowMehtod是一个过程，用来把一条记录填入StringGrid1的一行中。对于Name、Condition域而言，只须直接赋值即可；而对Nature 域需要把枚举类型值转化为对应意义的字符串(0：“微观”，1：“宏观”)；而对Result域则需要把数值转化为一定格式的字符串：　<br>
+<br>
+<br>
+Str (MethodRec.Result:6:4,ResultStr)；<br>
+<br>
+<br>
+　 StringGrid1.Cells[3,Pos] := ResultStr;　<br>
+<br>
+<br>
+即Result显示域宽为6，其中小数点后位数为4。　<br>
+<br>
+<br>
+6.2.5 增加一条记录　<br>
+<br>
+<br>
+　　当用户单击“增加”按钮时屏幕将会弹出一个记录编辑模式对话框EditForm。在编辑框中填入合适的内容并按OK键关闭后，相应值写入一个TMethod类型的变量MethodRec中。其中Nature和Result 域需要进行转换。之后增加的记录添加到StringGrid1的显示中。<br>
+<br>
+<br>
+　　最后文件定位于尾部，写入当前记录，总记录数加1。　<br>
+<br>
+<br>
+　 Seek(MethodFile,Count);<br>
+<br>
+<br>
+Write(MethodFile,MethodRec);<br>
+<br>
+<br>
+Count := Count+1;　<br>
+<br>
+<br>
+完整的程序清单如下：　<br>
+<br>
+<br>
+procedure TRecFileForm.AddButtonClick(Sender: TObject);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+MethodRec: TMethod;<br>
+<br>
+<br>
+Rl: Real;<br>
+<br>
+<br>
+k: Integer;<br>
+<br>
+<br>
+EditForm: TEditForm;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+if FileOpenEd = False then Exit;<br>
+<br>
+<br>
+EditForm := TEditForm.Create(self);<br>
+<br>
+<br>
+if EditForm.ShowModal &lt;&gt; idCancel then<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+HazAttr.text := '';<br>
+<br>
+<br>
+MethodRec.Name := EditForm.MethodName.text;<br>
+<br>
+<br>
+MethodRec.Condition := EditForm.Condition.text;<br>
+<br>
+<br>
+case EditForm.NatureCombo.ItemIndex of<br>
+<br>
+<br>
+0:<br>
+<br>
+<br>
+MethodRec.Nature := Micro;<br>
+<br>
+<br>
+1:<br>
+<br>
+<br>
+MethodRec.Nature := Macro ;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+Val(EditForm.Result.text,Rl,k);<br>
+<br>
+<br>
+MethodRec.Result := Rl;<br>
+<br>
+<br>
+with StringGrid1 do<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+if Count &lt; MaxShow then<br>
+<br>
+<br>
+Height := Height+DefaultRowHeight;<br>
+<br>
+<br>
+RowCount := RowCount+1;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+ShowMethod(MethodRec,Count+1);<br>
+<br>
+<br>
+seek(MethodFile,Count);<br>
+<br>
+<br>
+write(MethodFile,MethodRec);<br>
+<br>
+<br>
+Count := Count+1;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;　<br>
+<br>
+<br>
+6.2.6 修改记录　<br>
+<br>
+<br>
+　　首先获取当前记录位置：　<br>
+<br>
+<br>
+　　CurrentRec := StringGrid1.Row - 1;　<br>
+<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp; 而后打开编辑对话框并显示当前值。修改完毕后，修改结果保存在一个记录中并在StringGrid1中重新显示。<br>
+<br>
+<br>
+　　最后修改结果写入文件：　<br>
+<br>
+<br>
+Seek(MethodFile,CurrentRec);<br>
+<br>
+<br>
+Write(MethodFile,MethodRec);　<br>
+<br>
+<br>
+完整程序如下：　<br>
+<br>
+<br>
+procedure TRecFileForm.ModifyButtonClick(Sender: TObject);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+MethodRec: TMethod;<br>
+<br>
+<br>
+Rl: Real;<br>
+<br>
+<br>
+k: Integer;<br>
+<br>
+<br>
+EditForm: TEditForm;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+if FileOpened = False then Exit;<br>
+<br>
+<br>
+EditForm := TEditForm.Create(self);<br>
+<br>
+<br>
+CurrentRec := StringGrid1.Row-1;<br>
+<br>
+<br>
+with EditForm do<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+MethodName.text := StringGrid1.Cells[0,CurrentRec+1];<br>
+<br>
+<br>
+Condition.text := StringGrid1.Cells[1,CurrentRec+1];<br>
+<br>
+<br>
+if StringGrid1.Cells[2,CurrentRec+1] = '微 观' then<br>
+<br>
+<br>
+NatureCombo.ItemIndex := 0<br>
+<br>
+<br>
+else<br>
+<br>
+<br>
+NatureCombo.ItemIndex := 1;<br>
+<br>
+<br>
+Result.text := StringGrid1.Cells[3,CurrentRec+1];<br>
+<br>
+<br>
+if ShowModal &lt;&gt; idCancel then<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+HazAttr.text := '';<br>
+<br>
+<br>
+MethodRec.Name := MethodName.text;<br>
+<br>
+<br>
+MethodRec.Condition := Condition.text;<br>
+<br>
+<br>
+case NatureCombo.ItemIndex of<br>
+<br>
+<br>
+0:<br>
+<br>
+<br>
+MethodRec.Nature := Micro;<br>
+<br>
+<br>
+1:<br>
+<br>
+<br>
+MethodRec.Nature := Macro ;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+Val(Result.text,Rl,k);<br>
+<br>
+<br>
+MethodRec.Result := Rl;<br>
+<br>
+<br>
+ShowMethod(MethodRec,CurrentRec+1);<br>
+<br>
+<br>
+seek(MethodFile,CurrentRec);<br>
+<br>
+<br>
+write(MethodFile,MethodRec);<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;　　<br>
+<br>
+<br>
+6.2.7 记录的删除、插入、排序　<br>
+<br>
+<br>
+　　删除一条记录的基本思路是：获取当前记录的位置并把该位置后的记录逐个向前移动。 文件在最后一条记录前截断。　<br>
+<br>
+<br>
+　　for i:=CurrentRec+1 to Count-1 do<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+seek(MethodFile,i);<br>
+<br>
+<br>
+read(MethodFile,MethodRec);<br>
+<br>
+<br>
+seek(MethodFile,i-1);<br>
+<br>
+<br>
+Write(MethodFile,MethodRec);<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+Truncate(MethodFile);　<br>
+<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 为避免误删除，在进行删除操作前弹出一个消息框进行确认。删除后要更新全局变量的值和显示内容：　<br>
+<br>
+<br>
+Count := Count - 1;<br>
+<br>
+<br>
+ChangeGrid;　<br>
+<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;完整的程序如下：　<br>
+<br>
+<br>
+procedure TRecFileForm.DeleteButtonClick(Sender: TObject);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+NewFile: MethodFileType;<br>
+<br>
+<br>
+MethodRec: TMethod;<br>
+<br>
+<br>
+NewFileName: String;<br>
+<br>
+<br>
+i: Integer;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+if FileOpened = False then Exit;<br>
+<br>
+<br>
+CurrentRec := StringGrid1.Row-1;<br>
+<br>
+<br>
+if CurrentRec &lt; 0 then Exit;<br>
+<br>
+<br>
+if MessageDlg('Delete Current Record ?', mtConfirmation,<br>
+<br>
+<br>
+[mbYes, mbNo], 0) = idYes then<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+HazAttr.text := '';<br>
+<br>
+<br>
+for I := CurrentRec+1 to Count-1 do<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+seek(MethodFile,i);<br>
+<br>
+<br>
+read(MethodFile,MethodRec);<br>
+<br>
+<br>
+seek(MethodFile,i-1);<br>
+<br>
+<br>
+Write(MethodFile,MethodRec);<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+Truncate(MethodFile);<br>
+<br>
+<br>
+Count := Count-1;<br>
+<br>
+<br>
+ChangeGrid;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+　　这里所显示的删除操作简单明了。但在程序开始设计时我却走了一条弯路，后来发现虽然这种方法用于记录的删除操作显得笨拙、可笑，但却恰恰是记录插入、排序的思想。<br>
+<br>
+<br>
+　　这种思想的核心是创建一个新文件保存更新后的内容。若新文件顺利创建，则删除原文件，否则恢复原来的文件。程序清单如下：　<br>
+<br>
+<br>
+procedure TRecFileForm.DeleteButtonClick(Sender: TObject);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+NewFile: MethodFileType;<br>
+<br>
+<br>
+MethodRec: TMethod;<br>
+<br>
+<br>
+NewFileName: String;<br>
+<br>
+<br>
+i: Integer;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+if FileOpened = False then Exit;<br>
+<br>
+<br>
+CurrentRec := StringGrid1.Row-1;<br>
+<br>
+<br>
+if CurrentRec &lt; 0 then Exit;<br>
+<br>
+<br>
+if MessageDlg('Delete Current Record ?', mtConfirmation,<br>
+<br>
+<br>
+[mbYes, mbNo], 0) = idYes then<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+HazAttr.text := '';<br>
+<br>
+<br>
+NewFileName := ChangeFileExt(FileName,'.sav');<br>
+<br>
+<br>
+try<br>
+<br>
+<br>
+AssignFile(NewFile,FileName);<br>
+<br>
+<br>
+ReWrite(NewFile);<br>
+<br>
+<br>
+Except<br>
+<br>
+<br>
+On EInOutError do<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+Rename(MethodFile,FileName);<br>
+<br>
+<br>
+Exit;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+for i := 1 to Count do<br>
+<br>
+<br>
+if I &lt;&gt; CurrentRec+1 then<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+MethodRec := GridToRec(i);<br>
+<br>
+<br>
+Write(NewFile,MethodRec);<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+closeFile(MethodFile);<br>
+<br>
+<br>
+try<br>
+<br>
+<br>
+AssignFile(MethodFile,Filename);<br>
+<br>
+<br>
+Reset(MethodFile);<br>
+<br>
+<br>
+except<br>
+<br>
+<br>
+on EInOutError do<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+DeleteFile(FileName);<br>
+<br>
+<br>
+AssignFile(MethodFile,NewFileName);<br>
+<br>
+<br>
+Reset(MethodFile);<br>
+<br>
+<br>
+Rename(MethodFile,FileName);<br>
+<br>
+<br>
+Exit;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+DeleteFile(NewFileName);<br>
+<br>
+<br>
+Count:=Count-1;<br>
+<br>
+<br>
+ChangeGrid;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+　　对于记录插入，方法基本同上。对于排序，可先将关键域读入排序，而后再按排序结果对应的记录号顺序重写文件。　<br>
+<br>
+<br>
+6.2.8 结果综合　<br>
+<br>
+<br>
+　　对不同方法的评估结果，可按一定的公式进行综合。当用户按下“计算”按钮时，系统进行计算并把综合结果写入HazAttr只读编辑框中。<br>
+<br>
+<br>
+　　为保证结果显示的正确性，每次增加、修改、删除操作确认后HazAttr编辑框清空。　<br>
+<br>
+<br>
+6.2.9 编辑对话框的输入检查　<br>
+<br>
+<br>
+　　当用户单击“增加”或“修改”按钮时系统将弹出一个编辑对话框，让用户输入或修改记录内容。其中的三个编辑框，一个组合列表框分别对应TMethod 的四个域。由于TMethod的Result域必须是[0,1]间的小数，因此当用户按OK键关闭对话框时应进行类型和范围检查。<br>
+<br>
+<br>
+　　在VB中我做过同样的工作，那时需要对用户输入的键码逐个进行判断。但这种方法很繁琐、很难做圆满(如不能很好地支持编辑键)。而Object Pascal提供了更好的方法。这种方法的关键就在于它的类型转换函数Val：　<br>
+<br>
+<br>
+procedure Val(Str: String;var V; var Code: Integer)；　<br>
+<br>
+<br>
+　　V是由Str转换成的整型或实型数。若字符串非法，则出错位置返至Code;否则置Code为0。字符串非法并不会引发一个转换异常。<br>
+<br>
+<br>
+　　如果转换后的数超出了我们的范围，则显式把Code置为-1。最后统一通过检测Code是否为0来判断输入是否合法。<br>
+<br>
+<br>
+　　我们把输入检查放在对话框的OnCloseQuery事件处理过程中。如输入非法，则禁止对话框关闭，并将输入焦点置于Result编辑框中。但假如用户按了Cancel按钮，则这种检查是多余的。为此定义一个布尔变量IsCancel，对话框生成时置为False。假如用户按下Cancel，则置为True，此时OnCloseQuery事件不进行输入检查。<br>
+<br>
+<br>
+　　对话框的OnCloseQuery事件处理过程的程序清单如下：　<br>
+<br>
+<br>
+procedure TEditForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+Res: Real;<br>
+<br>
+<br>
+k: Integer;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+if IsCancel = False then<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+val(Result.text,Res,k);<br>
+<br>
+<br>
+if (Res &gt; 1) or (Res &lt; 0) then k := -1;<br>
+<br>
+<br>
+if k &lt;&gt; 0 then<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+MessageDlg('非法输入 ！',mtWarning,[mbOK],0);<br>
+<br>
+<br>
+Result.text := '';<br>
+<br>
+<br>
+CanClose := False;<br>
+<br>
+<br>
+Result.SetFocus;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;　<br>
+<br>
+<br>
+6.2.10 文件和系统的关闭　<br>
+<br>
+<br>
+　　文件关闭须调用CloseFile过程：　<br>
+<br>
+<br>
+　　 CloseFile(MethodFile);　<br>
+<br>
+<br>
+并对系统的状态重新进行设置。<br>
+<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 系统关闭时首先检测当前是否有打开的文件。若有则先关闭文件。这在主窗口的OnCloseQuery事件中实现。<br>
+<br>
+<br>
+实现文件关闭的程序清单如下：　<br>
+<br>
+<br>
+procedure TRecFileForm.CloseButtonClick(Sender: TObject);<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+if FileOpened then<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+CloseFile(MethodFile);<br>
+<br>
+<br>
+FileOpened := False;<br>
+<br>
+<br>
+ClearGrid;<br>
+<br>
+<br>
+OpenButton.Enabled := True;<br>
+<br>
+<br>
+NewButton.Enabled := True;<br>
+<br>
+<br>
+CloseButton.Enabled := False;<br>
+<br>
+<br>
+RecFileForm.Caption := FormCaption;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;　<br>
+<br>
+<br>
+实现系统关闭前检查的程序清单如下：<br>
+<br>
+<br>
+procedure TRecFileForm.FormCloseQuery(Sender: TObject;<br>
+<br>
+<br>
+var CanClose: Boolean);<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+if FileOpened then<br>
+<br>
+<br>
+closeFile(MethodFile);<br>
+<br>
+<br>
+end;　<br>
+<br>
+<br>
+6.2.11 记录文件小结　<br>
+<br>
+<br>
+　　我们所举的例子虽然简单，但基本覆盖了记录文件操作的主要方面。这里关键问题在于灵活应用Delphi提供的文件管理函数。同时，为了保证程序的健壮性应对异常进行捕获并处理。在数据库应用技术发展的今天，记录文件的重要性也许有所下降，但对象我们这里所处理的简单问题它仍有用武之地。<br>
+<br>
+<br>
+　　这里所举的例子一次只能处理一个文件。但读者可以很容易把它改为一个MDI程序。虽然对于这里的实际情况来说，似乎并无必要。　<br>
+<br>
+<br>
+6.3 文件控件的应用　<br>
+<br>
+<br>
+　　Delphi文件管理的最大特色是提供了一组文件操作控件。利用这些控件我们可以快速开发一个文件名浏览系统。其功能强大与其所需书写代码之少所形成的强烈反差，正是Dephi生命力的体现。　<br>
+<br>
+<br>
+6.3.1 文件控件及其相互关系　<br>
+<br>
+<br>
+　　Delphi提供的专用文件控件如下表所示。　<br>
+<br>
+<br>
+　　 表6.4 Delphi专用文件控件━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━<br>
+<br>
+<br>
+控件名 功能<br>
+<br>
+<br>
+─────────────────────────────────────<br>
+<br>
+<br>
+DriveComboBox 驱动器组合列表框。用于选择当前驱动器<br>
+<br>
+<br>
+FileListBox 文件列表框。用于显示当前目录中的文件和选中当前文件<br>
+<br>
+<br>
+FilterComboBox 文件类型组合列表框。用于选择显示文件的类型<br>
+<br>
+<br>
+DirectoryOutline 目录树(6.4节专门介绍)<br>
+<br>
+<br>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━<br>
+<br>
+<br>
+　　以上控件前四个在Component Palette(部件选择板)的System页中，DirectoryOutline在Component Palette的Samples页中。<br>
+<br>
+<br>
+　　以上文件控件再加上文件编辑框、目录标签框(事实上是一般的编辑框、标签框)就可以构成一个完整的文件操作系统。它们之间的联系几乎不用代码支持，只要设置好相应的属性就可以了。<br>
+<br>
+<br>
+　 FileEdit、DirLabel、FileListBox、FileFilterComloList、 DirectoryListBox、DriveComboList六个控件间的属性联系如下：　<br>
+<br>
+<br>
+　　DriveComboList .DirList := DirectoryListBox;<br>
+<br>
+<br>
+　　DirectoryListBox.DirLabel := DirLabel;<br>
+<br>
+<br>
+DirectoryListBox.FileList := FileListBox;<br>
+<br>
+<br>
+FileFilterComboList.FileList := FileListBox;<br>
+<br>
+<br>
+FileListBox.FileEdit := FileEdit;　<br>
+<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;以上联系可以在设计时完成。只要打开相应属性的选择列表框进行选择即可。也可以在运行时利用如上的赋值语句建立联系。<br>
+<br>
+<br>
+　　文件控件的关键属性基本上都在以上联系中反映出来了。除此之外，FileFilterComboList有一个Filter属性，用来设置组合列表框的选择项；FileListBox 有一个Mask属性，用于设置显示文件的类型，这就允许FileListBox在脱离FileFilterComboList单独应用时仍能根据需要显示特定的文件。在6.4节中我们将应用这一功能。<br>
+<br>
+<br>
+　　文件控件的方法、事件基本是从ListBox和ComboBox中继承的。但FileListBox 中有一个ApplyFilePath方法很有用，我们将在后边给出其用法。　<br>
+<br>
+<br>
+6.3.2 文件名浏览查找系统的设计思路　<br>
+<br>
+<br>
+　　作为文件控件的应用实例，我们开发了一个简单的文件名浏览查找系统。这个系统可用于文件名的显示，把选中的文件写入列表框，并能按文件编辑框中输入的通配符对文件进行查找。<br>
+<br>
+<br>
+表6.5 部件的设计<br>
+<br>
+<br>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━<br>
+<br>
+<br>
+部件 属性 功能<br>
+<br>
+<br>
+─────────────────────────────────────<br>
+<br>
+<br>
+FileCtrForm Position=poDefault 主窗口<br>
+<br>
+<br>
+DirLabel 显示当前目录<br>
+<br>
+<br>
+FileEdit TabOrder=0 显示当前文件/输入文件显示匹配符<br>
+<br>
+<br>
+FileListBox1 FileEdit=FileEdit 显示当前目录文件<br>
+<br>
+<br>
+DirectoryListBox1 DirLabel=DirLabel 显示当前驱动器目录<br>
+<br>
+<br>
+FileList= FileListBox1<br>
+<br>
+<br>
+DriveComboBox1 DirList= DirectoryListBox1 选择当前驱动器<br>
+<br>
+<br>
+FilterComboBox1 FileList=FileListBox1 选择文件显示类型<br>
+<br>
+<br>
+Filter='All Files(*.*)|*.*|<br>
+<br>
+<br>
+Source Files(*.pas)|*.pas|<br>
+<br>
+<br>
+Form Files(*.dfm)|*.dfm|<br>
+<br>
+<br>
+Project Files(*.dpr)|*.dpr'<br>
+<br>
+<br>
+ListBox1 显示选中或查找的文件<br>
+<br>
+<br>
+Button1 Caption='查找' 按 FileEdit 中的内容进行查找<br>
+<br>
+<br>
+Button2 Caption='退出' 退出系统<br>
+<br>
+<br>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━　<br>
+<br>
+<br>
+6.3.3 文件名浏览查找系统的功能和实现　<br>
+<br>
+<br>
+6.3.3.1 按指定后缀名显示当前目录中的文件　<br>
+<br>
+<br>
+　　实现这一功能只需要在控件间建立正确的联系即可，不需要代码支持。建立联系的方法如(6.3.1)中的介绍。　<br>
+<br>
+<br>
+6.3.3.2 把选中的文件添加到列表框中　<br>
+<br>
+<br>
+　　在FileListBox1的OnClick事件中：　<br>
+<br>
+<br>
+procedure TFileCtrForm.FileListBox1Click(Sender: TObject);<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+if Searched then<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+Searched := False;<br>
+<br>
+<br>
+ListBox1.Items.Clear;<br>
+<br>
+<br>
+Label5.Caption := 'Selected Files';<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+if NotInList(ExtractFileName(FileListBox1.FileName),ListBox1.Items) then<br>
+<br>
+<br>
+ListBox1.Items.Add(ExtractFileName(FileListBox1.FileName));<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+　　Searched是一个全局变量，用于标明ListBox1当前显示内容是查找的结果还是从FileListBox1中选定的文件。<br>
+<br>
+<br>
+函数NotInList用于判断待添加的字符串是否已存在于一个TStrings对象中。函数返回一个布尔型变量。<br>
+<br>
+<br>
+　　NotInList的具体实现如下。　<br>
+<br>
+<br>
+Function TFileCtrForm.NotInList(FileName: String;Items: TStrings): Boolean;<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+i: Integer;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+for I := 0 to Items.Count-1 do<br>
+<br>
+<br>
+if Items[i] = FileName then<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+NotInList := False;<br>
+<br>
+<br>
+Exit;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+NotInList := True;<br>
+<br>
+<br>
+end;　<br>
+<br>
+<br>
+6.3.3.3 按指定匹配字符串显示当前目录中的文件　<br>
+<br>
+<br>
+　　当在FileEdit中输入一个匹配字符串，并回车，文件列表框将显示匹配结果。这一功能在FileEdit的OnKeyPress事件中实现。　<br>
+<br>
+<br>
+procedure TFileCtrForm.FileEditKeyPress(Sender: TObject; var Key: Char);<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+if Key = #13 then<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+FileListBox1.ApplyFilePath(FileEdit.Text);<br>
+<br>
+<br>
+Key := #0;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+　　文件列表框提供的ApplyFilePath方法是解决这一问题的关键所在。　<br>
+<br>
+<br>
+6.3.3.4 按指定匹配字符串查找当前目录中的文件　<br>
+<br>
+<br>
+　　为了进行比较，我们用另一种方法来实现文件的查找功能，即利用标准过程FindFirst、FindNext。FileList1与ListBox1 中的内容完全一致。<br>
+<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp; 当用户单击“查找”按钮时，与FileEdit 中字符串相匹配的文件将显示在ListBox1中。下面是实现代码。　<br>
+<br>
+<br>
+procedure TFileCtrForm.Button1Click(Sender: TObject);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+i: Integer;<br>
+<br>
+<br>
+SearchRec: TSearchRec;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+Searched := True;<br>
+<br>
+<br>
+Label5.Caption := 'Search Result';<br>
+<br>
+<br>
+ListBox1.Items.Clear;<br>
+<br>
+<br>
+FindFirst(FileEdit.text,faAnyFile,SearchRec);<br>
+<br>
+<br>
+ListBox1.Items.Add(SearchRec.Name);<br>
+<br>
+<br>
+Repeat<br>
+<br>
+<br>
+i := FindNext(SearchRec);<br>
+<br>
+<br>
+If i = 0 then<br>
+<br>
+<br>
+ListBox1.Items.Add(SearchRec.Name);<br>
+<br>
+<br>
+until i &lt;&gt; 0;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+　　SearchRec是一个TSearchRec类型的记录。TSearchRec的定义如下：　<br>
+<br>
+<br>
+TSearchRec = record<br>
+<br>
+<br>
+Fill: array[1..21] of Byte;<br>
+<br>
+<br>
+Attr: Byte;<br>
+<br>
+<br>
+Time: Longint;<br>
+<br>
+<br>
+Size: Longint;<br>
+<br>
+<br>
+Name: string[12];<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+　 在这一结构中提供了很多信息，灵活应用将给编程带来很大方便。下面我们举几个例子。<br>
+<br>
+<br>
+　　1. 检测给定文件的大小。　<br>
+<br>
+<br>
+function GetFileSize(const FileName: String): LongInt;<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+SearchRec: TSearchRec;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+if FindFirst(ExpandFileName(FileName), faAnyFile, SearchRec) = 0 then<br>
+<br>
+<br>
+Result := SearchRec.Size<br>
+<br>
+<br>
+else<br>
+<br>
+<br>
+Result := -1;<br>
+<br>
+<br>
+end;　<br>
+<br>
+<br>
+这一程序将在下一节中应用。<br>
+<br>
+<br>
+　　2. 获取给定文件的时间戳，事实上等价于FileAge函数。　<br>
+<br>
+<br>
+　　function GetFileTime(const FileName: String): Longint;<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+SearchRec: TSearchRec;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+if FindFirst(ExpandFileName(FileName),faAnyFile, SearchRec) = 0 then<br>
+<br>
+<br>
+Result := SearchRec.Time<br>
+<br>
+<br>
+else<br>
+<br>
+<br>
+Result := -1;<br>
+<br>
+<br>
+end;　<br>
+<br>
+<br>
+3. 检测文件的属性。如果文件具有某种属性，则　<br>
+<br>
+<br>
+SearchRec.Attr And GivenAttr &gt; 0　<br>
+<br>
+<br>
+属性常量对应的值与意义如下表：　<br>
+<br>
+<br>
+　　 表6.6 属性常量对应的值与意义<br>
+<br>
+<br>
+━━━━━━━━━━━━━━━━━━━━<br>
+<br>
+<br>
+常量 值 描述<br>
+<br>
+<br>
+─────────────────────<br>
+<br>
+<br>
+faReadOnly $01 只读文件<br>
+<br>
+<br>
+faHidden $02 隐藏文件<br>
+<br>
+<br>
+faSysFile $04 系统文件<br>
+<br>
+<br>
+faVolumeID $08 卷标文件<br>
+<br>
+<br>
+faDirectory $10 目录文件<br>
+<br>
+<br>
+faArchive $20 档案文件<br>
+<br>
+<br>
+faAnyFile $3F 任何文件<br>
+<br>
+<br>
+━━━━━━━━━━━━━━━━━━━━　<br>
+<br>
+<br>
+6.4 文件管理综合举例：文件管理器的实现　<br>
+<br>
+<br>
+　　在本章的最后，我们利用Delphi提供的文件控件和文件管理函数开发一个简单的文件管理器。虽然这一文件管理器还无法和Windows提供的文件管理器相比拟，但它也为一般的文件操作提供了足够多的功能，而且如果读者感兴趣，还可以对它做进一步的扩充。在后边的拖放操作一章中，我们就为它提供了拖放支持，使它看起来更象一个“文件管理器”。<br>
+<br>
+<br>
+6.4.1 设计基本思路　<br>
+<br>
+<br>
+6.4.1.1 窗口设计　<br>
+<br>
+<br>
+　　文件管理器的主窗口是一个多文档界面(MDI)。有关文件、目录的显示和文件管理功能的实现都放在子窗口中。在程序执行过程中将根据需要弹出一些完成不同操作的对话框。这些对话框都是在需要时动态生成的。表6.7给出了本程序所设计窗体的清单。　<br>
+<br>
+<br>
+　　 表6.7 FileManger窗体清单<br>
+<br>
+<br>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━<br>
+<br>
+<br>
+窗体类 功能 用于创建该类窗体的菜单项<br>
+<br>
+<br>
+──────────────────────────────────────<br>
+<br>
+<br>
+TFileManager 主窗口<br>
+<br>
+<br>
+TFMForm 子窗口 Windows|New Window<br>
+<br>
+<br>
+TFileAttrForm 显示文件属性 File|Properties;Function|Search<br>
+<br>
+<br>
+TChangeForm 文件移动、拷贝、改名、改变 File|Move.Cope.Rename 当前目录等操作的输入对话框 Directory|change Directory<br>
+<br>
+<br>
+TSearchForm 输入待查找文件的名称和路径 Function|Search<br>
+<br>
+<br>
+TDiskViewForm 显示磁盘信息 Function|Disk View<br>
+<br>
+<br>
+TViewDir 输入待创建的子目录 Directory|CreateDirectory<br>
+<br>
+<br>
+TAboutBox 显示版权信息 Help|About<br>
+<br>
+<br>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━　<br>
+<br>
+<br>
+6.4.1.2 界面设计　<br>
+<br>
+<br>
+　　主窗口界面主要是主菜单和用于表示当前目录、当前文件的状态条。　<br>
+<br>
+<br>
+　　 表6.8 主窗口界面设计<br>
+<br>
+<br>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━<br>
+<br>
+<br>
+部件 属性 功能<br>
+<br>
+<br>
+　─────────────────────────────<br>
+<br>
+<br>
+FileManager Style=fsMDI 主窗口<br>
+<br>
+<br>
+WindowMenu=Windows<br>
+<br>
+<br>
+Position=poDefault<br>
+<br>
+<br>
+MainMenu1 主菜单<br>
+<br>
+<br>
+FilePanel Align=alBottom 显示当前选中文件<br>
+<br>
+<br>
+BevelInner=bvLowered<br>
+<br>
+<br>
+BevelWidth=2<br>
+<br>
+<br>
+DirectoryPanel Align=alBottom 显示当前选中目录<br>
+<br>
+<br>
+Alignment=taLeftJustify<br>
+<br>
+<br>
+BevelInner=bvLowered<br>
+<br>
+<br>
+BevelWidth=2<br>
+<br>
+<br>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+主窗口主菜单包括File、WIndows、Help三项。File菜单项在子窗口生成时被子窗口同名菜单项所取代。设置Windows、Help的GroupIndex = 9，可以使子窗口生成时这两个菜单项仍存在。<br>
+<br>
+<br>
+　　子窗口界面包括主菜单、目录树(DirectoryOutline)、文件列表框、 用于显示驱动器的标签集(TabSet)以及三个用于显示驱动器类型的TImage部件。　<br>
+<br>
+<br>
+　 表6.9 子窗口界面设计<br>
+<br>
+<br>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━<br>
+<br>
+<br>
+部件 属性 功能<br>
+<br>
+<br>
+───────────────────────────────────────<br>
+<br>
+<br>
+FMForm ActiveControl=DirectoryOutline 子窗口<br>
+<br>
+<br>
+Position=poDefault<br>
+<br>
+<br>
+Style=fsMDIChild<br>
+<br>
+<br>
+MainMenu1 主菜单<br>
+<br>
+<br>
+DriveTabSet Align=alTop 显示驱动器<br>
+<br>
+<br>
+style=tsOwnerDraw<br>
+<br>
+<br>
+DirectoryOutline Align=alLeft 显示当前驱动器的目录树<br>
+<br>
+<br>
+options=[ooDrawTreeRoot,<br>
+<br>
+<br>
+ooDrawFocusRect,ooStretchBitmaps]<br>
+<br>
+<br>
+FileList Align=alClient 显示当前目录中的文件<br>
+<br>
+<br>
+FileType=[ftReadOnly,<br>
+<br>
+<br>
+ftHidden,ftSystem,ftArchive,ftNormal]<br>
+<br>
+<br>
+ShowGlyphs=True<br>
+<br>
+<br>
+Network(Image) Picture(Network.bmp) 标志网络驱动器<br>
+<br>
+<br>
+Vsible=False<br>
+<br>
+<br>
+Floppy(Image) Picture(Floppy.bmp) 标志软驱<br>
+<br>
+<br>
+Visible=False<br>
+<br>
+<br>
+Fixed(Image) Picture(Fixed.bmp) 标志硬驱<br>
+<br>
+<br>
+Visible=False<br>
+<br>
+<br>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+子窗口主菜单包括File、Function、Directory三个菜单项， 分别用于完成文件的基本管理功能、其它管理功能和目录管理功能。<br>
+<br>
+<br>
+　　由于对话框界面设计很简单，这里不再进行赘述。 读者可直接参考后面将给出的对话框界面图(图6.8---6.13)进行设计。<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+6.4.2 子窗口的创建、布置和关闭<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+　　子窗口的创建、布置由父窗口的Windows菜单控制，其菜单项如下：<br>
+<br>
+<br>
+　　● New Windows : 创建新的子窗口<br>
+<br>
+<br>
+● Tile : 平铺<br>
+<br>
+<br>
+　　● Cascade : 层叠<br>
+<br>
+<br>
+　　● ArrangeIcon : 排列图标<br>
+<br>
+<br>
+　 ● Minimized All : 极小化所有子窗口<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+　　子窗口的创建只需要简单调用窗体的Create方法：<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+　　FileMan := TFMForm.Create(Application);<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+子窗口的标准排列方式直接调用MDI窗口的标准方法Tile、Cascade和ArrangeIcons。<br>
+<br>
+<br>
+　　极小化所有子窗口的实现利用MDI窗口的两个属性：MDIChildCount和MDIChildren：<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+　　for i := 0 to MDICount - 1 do<br>
+<br>
+<br>
+MDIChildren[i].Windowstate := wsMinimized;<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+　　子窗口关闭时释放内存空间，为此在子窗口TFMForm的OnClose事件中令<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+Action := OnFree；<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+　　为了保持和Windows的File Manager的一致性，我们也禁止关闭最后一个子窗口，这需要在子窗口的OnCloseQuery事件处理过程中实现：<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+If FileManager.MDIChildCount &lt;= 1 then<br>
+<br>
+<br>
+CanClose := False;<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+CanClose是OnCloseQuery事件过程返回的一个参数，用于判定窗口是否可以关闭。<br>
+<br>
+<br>
+　　由于这一过程归子窗口所有，因而MDIChildCount前必须加上其对象名FileManager。<br>
+<br>
+<br>
+　　但不幸的是：这样一来我们的程序无法终止了！原来MDI窗口关闭前首先关闭其所有的子窗口。如果子窗口不能关闭，MDI窗口也不能关闭。<br>
+<br>
+<br>
+为此我们需要判断发出关闭消息的是子窗口的系统菜单还是菜单的Exit项。<br>
+<br>
+<br>
+　　定义一个全局变量<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+　　var<br>
+<br>
+<br>
+ExitClick: Boolean;<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+在子窗口的Exit1Click事件处理过程中：<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+ExitClick := True;<br>
+<br>
+<br>
+FileManager.Exit1Click(Sender);<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+　　子窗口关闭前可以利用这一全局变量检测是否应关闭：<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+　　If (FileManager.MDIChildCount &lt;= 1) and (Not ExitClick) then<br>
+<br>
+<br>
+CanClose := False;<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+6.4.3 文件控件的联系<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+　　在本例中我们使用了一组新的控件：TabSet、DirectoryOutline、FileListBox，用于显示和选择驱动器、目录和文件。与(6.3)中所用方法相比，使用这一组控件需要少量的代码支持。<br>
+<br>
+<br>
+　　TabSet与DirectoryOutline的联系在TabSet的Click事件处理过程中建立：<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+　　With DriveTabSet do<br>
+<br>
+<br>
+DirectoryOutline.Drive := Tabs[TabIndex][1];<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+DirectoryOutline与FileListBox的联系在DirectoryOutline的Change事件处理过程中建立：<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+FileList.Directory := DirectoryOutline.Directory;<br>
+<br>
+<br>
+FileList.Update;<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+6.4.4 DriveTabSet的自画风格显示　<br>
+<br>
+<br>
+　　Dephi为一些控件提供了自画风格的显示，如ListBox、ComboBox、TabSet等。 在缺省情况下，这些控件自动显示文本。而在自画风格下，拥有控件的窗体在运行时间内自己画出控件的每一项目。<br>
+<br>
+<br>
+自画风格显示通常的应用是为项目除文本外再添加图形显示。能以自画风格显示的控件有一个共同特点：都拥有一个TStrings类型的项目链。由于TStrings类的特点(参第三章)，它们都可以加入一个和对应文本相联系的对象。 而这正是自画风格显示的关键。<br>
+<br>
+<br>
+　　通常情况下产生一个自画风格需要三个步骤：<br>
+<br>
+<br>
+　　1.设置自画风格；<br>
+<br>
+<br>
+　　2.向字符串链表添加图形对象；<br>
+<br>
+<br>
+　　3.画出自画项目。　<br>
+<br>
+<br>
+6.4.4.1 设置自画风格　<br>
+<br>
+<br>
+　　控件属性Style 用于设置自画风格。对于DriveTabSet，我们把Style 属性设置为tsOwnerDraw。<br>
+<br>
+<br>
+　　对于ListBox、ComboBox等控件的设置与TabSet略有差异，读者可参阅联机帮助文档。　<br>
+<br>
+<br>
+6.4.4.2 向字符串链表添加图形对象　<br>
+<br>
+<br>
+　　1.在应用程序中添加图片部件<br>
+<br>
+<br>
+　　在本程序中我们设置了三个图片部件NetWork、Floppy、Fixed，并分别与三个位图文件NetWork.bmp、Floppy.bmp、Fixed.bmp相关联。<br>
+<br>
+<br>
+　　2.把图片添加到字符串链表中<br>
+<br>
+<br>
+　　根据字符串链表的性质，我们可以把对象与已存在的字符串建立联系，也可以同时添加字符串和对象。这里我们采用后一种方法。<br>
+<br>
+<br>
+　　在子窗口的OnCreate事件处理过程中，我们利用一个循环依次检测从a到z的驱动器是否存在以及驱动器的类型。这利用了Windwos API函数GetDrivetype, 如果驱动器不存在则返回0，否则返回驱动器的类型(DRIVE_REMOVABLE、DRIVE_FIXED、DRIVE_REMOTE)。根据驱动器类型我们可以判断与文本(驱动器名)同时添加到Tabs中的不同图形对象。在添加过程中，DriveTabSet的TabIndex被设置为当前驱动器。<br>
+<br>
+<br>
+程序清单如下：　<br>
+<br>
+<br>
+procedure TFMForm.FormCreate(Sender: TObject);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+Drive, AddedIndex: Integer;<br>
+<br>
+<br>
+DriveLetter: Char;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+for Drive := 0 to 25 do<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+DriveLetter := Chr(Drive + ord('a'));<br>
+<br>
+<br>
+case GetDrivetype(Drive) of<br>
+<br>
+<br>
+DRIVE_REMOVABLE:<br>
+<br>
+<br>
+AddedIndex := DriveTabSet.Tabs.AddObject(DriveLetter, Floppy.Picture.Graphic);<br>
+<br>
+<br>
+DRIVE_FIXED:<br>
+<br>
+<br>
+AddedIndex := DriveTabSet.Tabs.AddObject(DriveLetter, Fixed.Picture.Graphic);<br>
+<br>
+<br>
+DRIVE_REMOTE:<br>
+<br>
+<br>
+AddedIndex := DriveTabSet.Tabs.AddObject(DriveLetter, Network.Picture.Graphic);<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+if UpCase(DriveLetter) = UpCase(FileList.Drive) then<br>
+<br>
+<br>
+DriveTabSet.TAbIndex := AddedIndex;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+6.4.4.3 画出自画项目　<br>
+<br>
+<br>
+　　当把一个控件的风格设置为自画时，Windows不再负责往屏幕上画出控件的项目，而是为每个可见项目产生自画事件。应用程序可以通过处理自画事件画出控件的项目。　<br>
+<br>
+<br>
+1.确定自画项目的大小　<br>
+<br>
+<br>
+　　对于TabSet而言，这在OnMeasureTab事件处理过程中完成。我们需要把DriveTabSet每个标签的宽度增大到足以同时放下文本和位图。　<br>
+<br>
+<br>
+procedure TFMForm.DriveTabSetMeasureTab(Sender: TObject; Index: Integer;<br>
+<br>
+<br>
+var TabWidth: Integer);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+BitmapWidth: Integer;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+BitmapWidth := TBitmap(DriveTabSet.Tabs.Objects[Index]).Width;<br>
+<br>
+<br>
+Inc(TabWidth, 2 + BitmapWidth);<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+　　由于TStrings的Objects属性中存放的对象都是TObject类型，并没有Width属性，因而需要再把它转化为TBitmap类型的对象：　<br>
+<br>
+<br>
+　 BitmapWidth := TBitmap(DriveTabSet.Tabs.Objects[Index]).Width;<br>
+<br>
+<br>
+2.画出每个自画项目　<br>
+<br>
+<br>
+　　这在TabSet的OnDrawTab事件处理过程中完成。这一事件处理过程的参数中包含了待画项目索引、画板、待画区域、是否被选中等。这里我们只利用了前三个参数。事实上利用最后一个参数，我们可以对被选中的标签进行一些特殊的视觉效果处理。这一工作就留给读者自己去完成。　<br>
+<br>
+<br>
+procedure TFMForm.DriveTabSetDrawTab(Sender: TObject; TabCanvas: TCanvas;<br>
+<br>
+<br>
+R: TRect; Index: Integer; Selected: Boolean);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+Bitmap: TBitmap;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+Bitmap := TBitmap(DriveTabSet.Tabs.Objects[Index]);<br>
+<br>
+<br>
+with TabCanvas do<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+Draw(R.Left, R.Top + 4, Bitmap);<br>
+<br>
+<br>
+TextOut(R.Left + 2 + Bitmap.Width, R.Top + 2, DriveTabSet.Tabs[Index]);<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;　<br>
+<br>
+<br>
+6.4.5 文件管理基本功能的实现　<br>
+<br>
+<br>
+　　在子窗口的File菜单中，定义了文件管理的基本功能，它们是：<br>
+<br>
+<br>
+　　● Open ：打开或运行一个文件(从文件列表框双击该文件可实现同样效果)<br>
+<br>
+<br>
+● Move ：文件在不同目录间的移动<br>
+<br>
+<br>
+　　● Copy ：文件拷贝<br>
+<br>
+<br>
+　　● Delete ：文件删除<br>
+<br>
+<br>
+　　● Rename ：文件更名<br>
+<br>
+<br>
+　　● Properties ：显示文件属性　<br>
+<br>
+<br>
+6.4.5.1 文件打开　<br>
+<br>
+<br>
+　　文件打开功能可以运行一个可执行文件，或把文件在与之相关联的应用程序中打开。文件总是与创建它的应用程序相关联，这种关联可以在Windows的文件管理器中修改。要注意的是：文件的关联是以后缀名为标志的，因而对一个文件关联方式的修改将影响所有相同后缀名的文件。<br>
+<br>
+<br>
+　　文件打开功能实现的关键是利用了Windows API函数ShellExecute 。由于Windows API函数的参数要求字符串类型是PChar，而Delphi中一般用的是有结束标志的String类型，因此为调用方便我们把这一函数进行了重新定义如下。　<br>
+<br>
+<br>
+function ExecuteFile(const FileName, Params, DefaultDir: String;<br>
+<br>
+<br>
+ShowCmd: Integer): THandle;<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+zFileName, zParams, zDir: array[0..79] of Char;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+Result := ShellExecute(Application.MainForm.Handle, nil,<br>
+<br>
+<br>
+StrPCopy(zFileName, FileName), StrPCopy(zParams, Params),<br>
+<br>
+<br>
+StrPCopy(zDir, DefaultDir), ShowCmd);<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+　　以上函数在fmxutils单元中定义。fmxutils是一个自定义代码单元。<br>
+<br>
+<br>
+　　有关ShellExecute中各参数的具体含义读者可查阅联机Help文件。<br>
+<br>
+<br>
+　　StrPCopy把一个Pascal类型的字符串拷贝到一个无结束符的PChar类型字符串中。<br>
+<br>
+<br>
+　　在子窗口的Open1Click事件处理过程中：　<br>
+<br>
+<br>
+procedure TFMForm.Open1Click(Sender: TObject);<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+with FileList do<br>
+<br>
+<br>
+ExecuteFile(FileName, '', Directory, SW_SHOW) ;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+　　如果FileList允许显示目录的话(即FileType属性再增加一项ftDirectory)，那么对于一个目录而言，打开的含义应该是显示它下边的子目录和文件。程序修改如下。　<br>
+<br>
+<br>
+　 procefure TFMForm.Open1Click(Sender: Tobject);<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+With FileList do<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+if HasAttr(FileName,faDirectory) then<br>
+<br>
+<br>
+DirectoryOutline.Directory := FileName<br>
+<br>
+<br>
+else<br>
+<br>
+<br>
+ExecuteFile(FileName,' ' ,Directory,SW_SHOW);<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;　<br>
+<br>
+<br>
+其中HasAttr是一个fmxutils单元中的自定义函数，用于检测指定文件是否具有某种属性。　<br>
+<br>
+<br>
+function HasAttr(const FileName: String; Attr: Word): Boolean;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+Result := (FileGetAttr(FileName) and Attr) = Attr;<br>
+<br>
+<br>
+end;　<br>
+<br>
+<br>
+6.4.5.2 文件拷贝、移动、删除、更名　<br>
+<br>
+<br>
+　　文件拷贝的关键是使用了以文件句柄为操作对象的文件管理函数，因而提供了一种底层的I/O通道。在Object Pascal中这一点是利用无类型文件实现的。<br>
+<br>
+<br>
+　　在文件拷贝中首先检查目标文件名是否是一个目录。如是则把原文件的文件名添加到目标路径后，生成目标文件全路径名。而后提取源文件的时间戳，以备拷贝完成后设置目标文件。拷贝过程中使用了返回文件句柄或以文件句柄为参数的文件管理函数FileOpen、FileCreate、FileRead、FileWrite、FileClose。为保证文件的正常关闭和内存的释放，在拷贝过程中进行异常保护。<br>
+<br>
+<br>
+过程CopyFile实现上述功能，它定义在fmxutils单元中。　<br>
+<br>
+<br>
+procedure CopyFile(const FileName, DestName: TFileName);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+CopyBuffer: Pointer;<br>
+<br>
+<br>
+TimeStamp, BytesCopied: Longint;<br>
+<br>
+<br>
+Source, Dest: Integer;<br>
+<br>
+<br>
+Destination: TFileName;<br>
+<br>
+<br>
+const<br>
+<br>
+<br>
+ChunkSize: Longint = 8192;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+Destination := ExpandFileName(DestName);<br>
+<br>
+<br>
+if HasAttr(Destination, faDirectory) then<br>
+<br>
+<br>
+Destination := Destination + '/' + ExtractFileName(FileName);<br>
+<br>
+<br>
+TimeStamp := FileAge(FileName);<br>
+<br>
+<br>
+GetMem(CopyBuffer, ChunkSize);<br>
+<br>
+<br>
+try<br>
+<br>
+<br>
+Source := FileOpen(FileName, fmShareDenyWrite);<br>
+<br>
+<br>
+if Source &lt; 0 then<br>
+<br>
+<br>
+raise EFOpenError.Create(FmtLoadStr(SFOpenError, [FileName]));<br>
+<br>
+<br>
+try<br>
+<br>
+<br>
+Dest := FileCreate(Destination);<br>
+<br>
+<br>
+if Dest &lt; 0 then<br>
+<br>
+<br>
+raise EFCreateError.Create(FmtLoadStr(SFCreateError,[Destination]));<br>
+<br>
+<br>
+try<br>
+<br>
+<br>
+repeat<br>
+<br>
+<br>
+BytesCopied := FileRead(Source, CopyBuffer^, ChunkSize);<br>
+<br>
+<br>
+if BytesCopied &gt; 0 then<br>
+<br>
+<br>
+FileWrite(Dest, CopyBuffer^, BytesCopied);<br>
+<br>
+<br>
+until BytesCopied &lt; ChunkSize;<br>
+<br>
+<br>
+finally<br>
+<br>
+<br>
+FileSetDate(Dest,TimeStamp);<br>
+<br>
+<br>
+FileClose(Dest);<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+finally<br>
+<br>
+<br>
+FileClose(Source);<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+finally<br>
+<br>
+<br>
+FreeMem(CopyBuffer, ChunkSize);<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+　　如果我们不使用FileSetDate过程，Windows自动把当前时间作为时间戳写入文件。<br>
+<br>
+<br>
+　　文件移动事实上是文件拷贝与文件删除的结合。fmxutils单元中的MoveFile过程实现了这一功能。　<br>
+<br>
+<br>
+procedure MoveFile(const FileName, DestName: TFileName);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+Destination: TFileName;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+Destination := ExpandFileName(DestName);<br>
+<br>
+<br>
+if not RenameFile(FileName, Destination) then<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+if HasAttr(FileName, faReadOnly) then<br>
+<br>
+<br>
+raise EFCantMove.Create(Format(SFCantMove, [FileName]));<br>
+<br>
+<br>
+CopyFile(FileName, Destination);<br>
+<br>
+<br>
+DeleteFile(FileName);<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;　<br>
+<br>
+<br>
+EFCanMove是一个自定义异常类：　<br>
+<br>
+<br>
+　　type<br>
+<br>
+<br>
+EFCanMove := Class(EStreamError);<br>
+<br>
+<br>
+　　有关自定义异常类请参阅第十二章。<br>
+<br>
+<br>
+　　文件删除、文件更名直接调用Delphi文件管理过程DeleteFile、RenameFile。它们都以文件名为参数。操作执行前应弹出一个对话框进行确认，执行完毕后应调用Update方法更新FileList的显示。　<br>
+<br>
+<br>
+6.4.5.3 一致的界面　<br>
+<br>
+<br>
+　　文件拷贝、文件移动、 文件更名以及后边的改变当前目录在形式上都表现为从一个源文件到一个目标文件。因而可以采用统一的用户界面，即ChangeForm对话框<br>
+<br>
+<br>
+这四个菜单项共用一个Click事件处理过程，通过对Sender参数的检测，决定将要打开对话框的标题和显示内容。当用户按OK键关闭且目标文件(目录)非空时，程序弹出一个消息对话框要求用户进一步确认，而后执行相应的动作。<br>
+<br>
+<br>
+　　共用的事件处理过程FileChange的程序清单如下：　<br>
+<br>
+<br>
+procedure TFMForm.FileChange(Sender: TObject);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+ChangeForm: TChangeForm;<br>
+<br>
+<br>
+IsFile: Boolean;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+ChangeForm := TchangeForm.Create(Self);<br>
+<br>
+<br>
+IsFile := True;<br>
+<br>
+<br>
+with ChangeForm do<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+if Sender = Move1 then Caption := 'Move'<br>
+<br>
+<br>
+else if Sender = Copy1 then Caption := 'Copy'<br>
+<br>
+<br>
+else if Sender = Rename1 then Caption := 'Rename'<br>
+<br>
+<br>
+else if Sender = ChangeDirectory1 then<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+Caption:='Change Directory';<br>
+<br>
+<br>
+IsFile:=False;<br>
+<br>
+<br>
+end<br>
+<br>
+<br>
+else Exit;<br>
+<br>
+<br>
+if IsFile then<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+CurrentDir.Caption := FileList.Directory;<br>
+<br>
+<br>
+FromFileName.Text := FileList.FileName;<br>
+<br>
+<br>
+ToFileName.Text := '';<br>
+<br>
+<br>
+end<br>
+<br>
+<br>
+else<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+CurrentDir.Caption := DriveTabSet.Tabs[DriveTabSet.TabIndex];<br>
+<br>
+<br>
+FromFileName.Text := DirectoryOutline.Directory;<br>
+<br>
+<br>
+ToFileName.Text := '';<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+if (ShowModal &lt;&gt; idCancel) and (ToFileName.Text &lt;&gt; '') then<br>
+<br>
+<br>
+ConfirmChange(Caption, FromFileName.Text, ToFileName.Text);<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;　<br>
+<br>
+<br>
+其中用到的自定义私有过程ConfirmChange用于执行相应的动作：　<br>
+<br>
+<br>
+procedure TFMForm.ConfirmChange(const ACaption, FromFile, ToFile: String);<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+if MessageDlg(Format('%s %s to %s', [ACaption, FromFile, ToFile]),<br>
+<br>
+<br>
+mtConfirmation, [mbYes, mbNo], 0) = idYes then<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+if ACaption = 'Move' then<br>
+<br>
+<br>
+MoveFile(FromFile, ToFile)<br>
+<br>
+<br>
+else if ACaption = 'Copy' then<br>
+<br>
+<br>
+CopyFile(FromFile, ToFile)<br>
+<br>
+<br>
+else if ACaption = 'Rename' then<br>
+<br>
+<br>
+RenameFile(FromFile, ToFile)<br>
+<br>
+<br>
+else if ACaption = 'Change Directory' then<br>
+<br>
+<br>
+changeDirectory(ToFile);<br>
+<br>
+<br>
+FileList.Update;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;　<br>
+<br>
+<br>
+6.4.5.4 显示文件属性　<br>
+<br>
+<br>
+　　当程序执行Properties 菜单项的Click 事件处理过程时，首先弹出一个TFileAttrForm类型的对话框，显示文件的属性<br>
+<br>
+<br>
+当用户修改并确认后程序重新设置文件属性。<br>
+<br>
+<br>
+　　Properties菜单项的Click事件处理过程如下：　<br>
+<br>
+<br>
+procedure TFMForm.Properties1Click(Sender: TObject);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+Attributes, NewAttributes: Word;<br>
+<br>
+<br>
+FileAttrForm: TFileAttrForm;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+FileAttrForm := TFileAttrForm.Create(self);<br>
+<br>
+<br>
+ShowFileAttr(FileAttrForm,FileList.FileName,FileList.Directory);<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+　　其中过程ShowFileAttr的实现如下：　<br>
+<br>
+<br>
+procedure TFMForm.ShowFileAttr(FileAttrForm:TFileAttrForm;<br>
+<br>
+<br>
+AFileName,Directory:String);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+Attributes,NewAttributes: Word;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+with FileAttrForm do<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+FileName.Caption := AFileName;<br>
+<br>
+<br>
+FilePath.Caption := Directory;<br>
+<br>
+<br>
+ChangeDate.Caption := DateTimeToStr(FileDateTime(AFileName));<br>
+<br>
+<br>
+Attributes := FileGetAttr(AFileName);<br>
+<br>
+<br>
+ReadOnly.Checked := (Attributes and faReadOnly) = faReadOnly;<br>
+<br>
+<br>
+Archive.Checked := (Attributes and faArchive) = faArchive;<br>
+<br>
+<br>
+System.Checked := (Attributes and faSysFile) = faSysFile;<br>
+<br>
+<br>
+Hidden.Checked := (Attributes and faHidden) = faHidden;<br>
+<br>
+<br>
+if ShowModal &lt;&gt; idCancel then<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+NewAttributes := Attributes;<br>
+<br>
+<br>
+if ReadOnly.Checked then NewAttributes := NewAttributes or faReadOnly<br>
+<br>
+<br>
+else NewAttributes := NewAttributes and not faReadOnly;<br>
+<br>
+<br>
+if Archive.Checked then NewAttributes := NewAttributes or faArchive<br>
+<br>
+<br>
+else NewAttributes := NewAttributes and not faArchive;<br>
+<br>
+<br>
+if System.Checked then NewAttributes := NewAttributes or faSysFile<br>
+<br>
+<br>
+else NewAttributes := NewAttributes and not faSysFile;<br>
+<br>
+<br>
+if Hidden.Checked then NewAttributes := NewAttributes or faHidden<br>
+<br>
+<br>
+else NewAttributes := NewAttributes and not faHidden;<br>
+<br>
+<br>
+if NewAttributes &lt;&gt; Attributes then<br>
+<br>
+<br>
+FileSetAttr(AFileName, NewAttributes);<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;　<br>
+<br>
+<br>
+以上过程中用到的函数FileDataTime在fmxutils单元中定义，返回一个TDatatime类型的变量。　<br>
+<br>
+<br>
+function FileDateTime(const FileName: String): System.TDateTime;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+Result := FileDateToDateTime(FileAge(FileName));<br>
+<br>
+<br>
+end;　<br>
+<br>
+<br>
+6.4.6 其它文件管理功能的实现　<br>
+<br>
+<br>
+　　在子窗口的Function菜单中，定义了一些其它的文件管理功能：<br>
+<br>
+<br>
+　　● Search ：查找一个给定名字的文件，若存在则显示该文件属性<br>
+<br>
+<br>
+　　● Disk View ：显示当前驱动器的大小和剩余空间<br>
+<br>
+<br>
+　　● View type ：确定显示文件的类型　<br>
+<br>
+<br>
+6.4.6.1 文件查找　<br>
+<br>
+<br>
+　　当用户单击Search菜单项时，程序弹出一个对话框(如图6.10)，要求输入待查找的文件名和查找路径。文件名可以是通配符。当用户确认后程序显示第一个匹配文件的属性(如图6.9)。查找不到匹配文件则给出相应的信息。<br>
+<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp;在实现这一功能的最初设计中，我试图使用FileSearch函数，这个函数允许在多个不同路径中查找。但可惜的是：也许由于系统设计者的失误，这个函数并没有返回它应该返回的东西(第一个匹配文件的全路径名)，而是仍把输入的匹配符返回。<br>
+<br>
+<br>
+　　没有办法我只能再次使用FindFirst，这个函数的特性在6.3节中已进行了介绍。下面是这一功能的实现代码。　<br>
+<br>
+<br>
+procedure TFMForm.search1Click(Sender: TObject);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+SearchForm: TSearchForm;<br>
+<br>
+<br>
+FileAttrForm: TFileAttrForm;<br>
+<br>
+<br>
+FindIt,path: String;<br>
+<br>
+<br>
+SearchRec: TSearchRec;<br>
+<br>
+<br>
+Return: Integer;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+SearchForm := TSearchForm.Create(self);<br>
+<br>
+<br>
+with SearchForm do<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+SearchFile.text := '';<br>
+<br>
+<br>
+SearchPath.text := DirectoryOutline.Directory;<br>
+<br>
+<br>
+if (ShowModal &lt;&gt; idCancel) and<br>
+<br>
+<br>
+(SearchFile.Text &lt;&gt; '') and (SearchPath.text &lt;&gt; '') then<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+FindIt := SearchPath.text+'/'+SearchFile.text;<br>
+<br>
+<br>
+Return := FindFirst(FindIt,faAnyFile,SearchRec);<br>
+<br>
+<br>
+if Return &lt;&gt; 0 then<br>
+<br>
+<br>
+FindIt := ''<br>
+<br>
+<br>
+else<br>
+<br>
+<br>
+FindIt := ExpandFileName(SearchRec.Name);<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+if FindIt = '' then<br>
+<br>
+<br>
+MessageDlg('Cannot find the file in current directory.',<br>
+<br>
+<br>
+mtWarning, [mbOk], 0)<br>
+<br>
+<br>
+else<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+Path := ExtractFilePath(FindIt);<br>
+<br>
+<br>
+FindIt := ExtractFileName(FindIt);<br>
+<br>
+<br>
+FileAttrForm := TFileAttrForm.Create(self);<br>
+<br>
+<br>
+ShowFileAttr(FileAttrForm,FindIt,Path);<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;　<br>
+<br>
+<br>
+6.4.6.2 显示磁盘信息<br>
+<br>
+<br>
+　　当用户单击Disk View菜单项时，将弹出一个TDiskViewForm类型的对话框，用来显示当前磁盘的信息<br>
+<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;磁盘信息的获取是在DiskViewForm中DriveEdit编辑框的OnChange事件处理过程中实现的。　<br>
+<br>
+<br>
+procedure TDiskViewForm.driveEditChange(Sender: TObject);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+dr: Byte;<br>
+<br>
+<br>
+Free,Total: LongInt;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+Free := DiskFree(0);<br>
+<br>
+<br>
+Total := DiskSize(0);<br>
+<br>
+<br>
+FreeSpace.text := IntToStr(Free)+ ' bytes.';<br>
+<br>
+<br>
+TotalSpace.text := IntToStr(Total) + ' bytes.';<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+　　DiskFree、DiskSize带参数为0表示当前驱动器。读者可以很容易把它改成按用户输入显示磁盘信息的情况。<br>
+<br>
+<br>
+　　DiskViewForm中的三个编辑框设计时都令ReadOnly为True。　<br>
+<br>
+<br>
+6.4.6.3 改变显示文件的类型　<br>
+<br>
+<br>
+　　改变显示文件的类型事实上是设置FileList的Mask属性。我们利用一个标准的InputBox输入文件的匹配字符串。而后利用Update方法更新FileList。　<br>
+<br>
+<br>
+procedure TFMForm.Viewtype1Click(Sender: TObject);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+FileMask: String;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+FileMask := InputBox('File type','Input File type For View :',FileList.Mask);<br>
+<br>
+<br>
+If FileMask = '' then FileMask := '*.*';<br>
+<br>
+<br>
+FileList.Mask := FileMask;<br>
+<br>
+<br>
+FileList.Update;<br>
+<br>
+<br>
+CreateCaption;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+　　其中的CreateCaption私有过程将在(6.4.8)中进行介绍。　<br>
+<br>
+<br>
+6.4.7 目录管理功能的实现　<br>
+<br>
+<br>
+　　在子窗口的Directory菜单中，提供了目录管理功能：<br>
+<br>
+<br>
+　　● Create Directory ：创建一个子目录<br>
+<br>
+<br>
+　　● Delete Directory ：删除一个空的子目录<br>
+<br>
+<br>
+　　● Change Directory ：改变当前目录　<br>
+<br>
+<br>
+6.4.7.1 创建目录　<br>
+<br>
+<br>
+　　创建目录时首先弹出一个TNewDir类型的对话框<br>
+<br>
+<br>
+对话框中要求用户输入目录名。如果用户不输入路径，则缺省认定为当前目录的子目录：　<br>
+<br>
+<br>
+　　Dir := ExpandFileName(DirName.Text)；　<br>
+<br>
+<br>
+　　而后调用MkDir函数。在目录创建过程中关闭了I/O错误检测，出错不产生异常而是把IOResult设置为非零值。通过检查IOResult是否为0可以确定创建是否成功。<br>
+<br>
+<br>
+程序清单如下：　<br>
+<br>
+<br>
+procedure TFMForm.CreateDirectory1Click(Sender: TObject);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+NewDir: TNewDir;<br>
+<br>
+<br>
+Dir: String;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+{$I-}<br>
+<br>
+<br>
+NewDir := TNewDir.Create(self);<br>
+<br>
+<br>
+with NewDir do<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+CurrentDir.Caption := DirectoryOutline.Directory;<br>
+<br>
+<br>
+if (ShowModal &lt;&gt; idCancel) and (DirName.Text &lt;&gt; '') then<br>
+<br>
+<br>
+Dir := ExpandFileName(DirName.text);<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+MkDir(Dir);<br>
+<br>
+<br>
+if IOResult &lt;&gt; 0 then<br>
+<br>
+<br>
+MessageDlg('Cannot Create directory', mtWarning, [mbOk], 0);<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+　　但不幸的是目录创建后我们却无法从当前目录树中看到。必须移到另一个驱动器而后再返回，创建的目录才是可见的。在后边我们将提供一种解决方法。　<br>
+<br>
+<br>
+6.4.7.2 删除目录　<br>
+<br>
+<br>
+　　在实现目录删除过程中，远不如创建目录那么顺利。碰到的问题是:<br>
+<br>
+<br>
+　　1.RmDir不允许删除当前目录。但为了操作方便，我们要求删除的恰恰是当前目录；<br>
+<br>
+<br>
+　　2.目录删除后调用Refresh方法或Update方法并不能使该目录从屏幕显示中去除。因而当用户试图进入该目录时会导致系统崩溃。<br>
+<br>
+<br>
+　　对第一个问题，我们的解决办法是把当前目录转换到其父目录。假如读者记得目录也被操作系统作为一种特殊的文件对待的话，那么就不会对下面的语句感到奇怪了：　<br>
+<br>
+<br>
+　　path := DirectoryOutline.Directory;<br>
+<br>
+<br>
+　　Directoryoutlin.Directory := ExpandFilePath(Path);<br>
+<br>
+<br>
+　　而后调用RmDir过程：　<br>
+<br>
+<br>
+RmDir(Path)；<br>
+<br>
+<br>
+　<br>
+<br>
+<br>
+　　第二个问题的解决却颇为费神。因为DirectoryOutline是Delphi提供的示例部件，没有Help文件支持。通过试验发现：只有当DirectoryOutline的Drive属性改变时，才重新从相应驱动器读取目录。而且它基本上是只读的，除非清除( Clear) 它，象Add、Delete这些方法对它都是无效的。<br>
+<br>
+<br>
+　　我曾经考虑过一个笨拙的方法，那就是先改变当前驱动器而后再改回来。但这种方法一方面速度无法忍受，另一方面当只存在一个驱动器可用时会导致系统崩溃。<br>
+<br>
+<br>
+　　正当我一筹莫展时，突然想到：DirectoryOutline是一个Sample部件，Delphi 提供了它的源代码。而当我分析了它的源代码后，我知道应该做什么了，那就是为DirectoryOutline增添一个Reset方法!　<br>
+<br>
+<br>
+6.7.3 为部件增添一个方法　<br>
+<br>
+<br>
+　　严格地说，我们所做的工作属于创建一个新部件。但因为我们有源代码，所以不必从DirectoryOutline继承而是直接修改它。这样我们可以省去与创建部件有关的许多繁琐工作。对创建新部件感兴趣的读者可阅读本书第三编的有关章节。<br>
+<br>
+<br>
+　　在Delphi IDE中打开DirectoryOutline的源文件后：<br>
+<br>
+<br>
+1.把库单元名改为DirPlus，类名改为TDirectoryOutlinePlus，表明这是DirectoryOutline的增强版。而后存入另一个目录中；<br>
+<br>
+<br>
+　 2.添加一个公有方法Reset。这一方法的作用是重新读取当前驱动器的目录。程序清单如下。　<br>
+<br>
+<br>
+procedure TDirectoryOutlinePlus.Reset;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+ChDir(FDrive + ':');<br>
+<br>
+<br>
+GetDir(0, FDirectory);<br>
+<br>
+<br>
+FDirectory := ForceCase(FDirectory);<br>
+<br>
+<br>
+if not (csLoading in ComponentState) then BuildTree;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+　　读者也许被这段代码弄糊涂了。由于篇幅所限，而且涉及到许多自定义部件开发的内容，我们也不准备去详细解释它。假如读者想彻底搞懂它，我建议先看一下本书第三编有关自定义部件开发的内容，而后再对照原DirectoryOutline的源代码进行分析。<br>
+<br>
+<br>
+　　3.编译成一个库文件DirPlus.tpu;<br>
+<br>
+<br>
+4.把DirPlus加入部件的Samples页中。<br>
+<br>
+<br>
+　　如何添加一个部件见第三编有关章节的介绍。<br>
+<br>
+<br>
+　　当增强的目录树准备好以后，必须修改我们的子窗口设计，但却不必亲自修改源代码。<br>
+<br>
+<br>
+　　1.删除子窗口中的TDirectoryOutline类部件DirectoryOutline。此时FileList占据了整个客户区；<br>
+<br>
+<br>
+　　2.把FileList的Align属改为None，并留出左边的空白供放部件用；<br>
+<br>
+<br>
+　　3.在窗口左部加入TDirectoryOutlinPlus类的部件DirectoryOutline；<br>
+<br>
+<br>
+4.把DirectoryOutline的Align属性改为Left，FileList的Align属性还原为Client；<br>
+<br>
+<br>
+5.在DirectoryOutline的事件OnChange列表中选取DirectoryOutlineChange，即原DirectoryOutline的处理过程。<br>
+<br>
+<br>
+　　以上工作的最终目标是实现目录创建、删除后屏幕的正确显示。这只需要调用DirectoryOutline的Reset方法即可。<br>
+<br>
+<br>
+目录删除过程的实现代码如下。　<br>
+<br>
+<br>
+procedure TFMForm.DeleteDirectory1Click(Sender: TObject);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+path: String;<br>
+<br>
+<br>
+k: Integer;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+{$I-}<br>
+<br>
+<br>
+path := DirectoryOutline.Directory;<br>
+<br>
+<br>
+DirectoryOutline.Directory := ExtractFilePath(Path);<br>
+<br>
+<br>
+if MessageDlg('Delete ' + path + '?', mtConfirmation,[mbYes, mbNo], 0) = idYes then<br>
+<br>
+<br>
+RmDir(path);<br>
+<br>
+<br>
+if IOResult &lt;&gt; 0 then<br>
+<br>
+<br>
+MessageDlg(' Cannot remove directory! The path might not'+<br>
+<br>
+<br>
+'exist,non-empty or is the current logged directory.',mtWarning,[mbOk], 0)<br>
+<br>
+<br>
+else<br>
+<br>
+<br>
+DirectoryOutline.Reset;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+修改后的目录创建过程如下。　<br>
+<br>
+<br>
+procedure TFMForm.CreateDirectory1Click(Sender: TObject);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+NewDir: TNewDir;<br>
+<br>
+<br>
+Dir: String;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+{$I-}<br>
+<br>
+<br>
+NewDir := TNewDir.Create(self);<br>
+<br>
+<br>
+with NewDir do<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+CurrentDir.Caption := DirectoryOutline.Directory;<br>
+<br>
+<br>
+if (ShowModal &lt;&gt; idCancel) and (DirName.Text &lt;&gt; '') then<br>
+<br>
+<br>
+Dir := ExpandFileName(DirName.text);<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+MkDir(Dir);<br>
+<br>
+<br>
+if IOResult &lt;&gt; 0 then<br>
+<br>
+<br>
+MessageDlg('Cannot Create directory', mtWarning, [mbOk], 0)<br>
+<br>
+<br>
+else<br>
+<br>
+<br>
+DirectoryOutline.Reset;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+　　当完成了这些工作，把程序重新编译、运行后，可以发现我们所希望实现的功能完全实现了！同时，我们有了一个更好的目录树部件。　<br>
+<br>
+<br>
+6.4.7.4 改变当前目录　<br>
+<br>
+<br>
+　　改变当前目录的实现非常简单，只要修改DirectoryOutline的Directory属性。但需注意的是：当改变后目录所在驱动器也发生变化时应相应修改DriveTabSet的当前值。由于驱动器名与DriveTabSet的索引属性TabIndex之间并没有确定的对应关系，因而需要通过一个循环进行查找匹配。<br>
+<br>
+<br>
+Change Directory的菜单事件处理过程是FileChange，即与文件的移动、拷贝、更名共用一个事件处理过程。详细情况请读者参看(6.4.5.3)中的介绍。<br>
+<br>
+<br>
+改变当前目录的实现如下。　<br>
+<br>
+<br>
+procedure TFMForm.ChangeDirectory(Todir: String);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+i: Integer;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+{$I-}<br>
+<br>
+<br>
+ChDir(ToDir);<br>
+<br>
+<br>
+if IOResult &lt;&gt; 0 then<br>
+<br>
+<br>
+MessageDlg('Cannot find directory', mtWarning, [mbOk], 0)<br>
+<br>
+<br>
+else<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+with DirectoryOutline do<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+Directory := ToDir;<br>
+<br>
+<br>
+Refresh;<br>
+<br>
+<br>
+if DriveTabSet.Tabs[DriveTabSet.TabIndex][1]&lt;&gt;drive then<br>
+<br>
+<br>
+for I := 1 to 25 do<br>
+<br>
+<br>
+if DriveTabSet.Tabs[i][1] = drive then<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+DriveTabSet.TabIndex := i;<br>
+<br>
+<br>
+Exit;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+6.4.8 一些问题的处理　<br>
+<br>
+<br>
+6.4.8.1 子窗口的标题　<br>
+<br>
+<br>
+　　Windows的文件管理器是我们设计的楷模，在子窗口显示标题上也不例外。我们把当前目录加上文件的类型作为子窗口的标题。<br>
+<br>
+<br>
+过程CreateCaption用于生成子窗口的标题。　<br>
+<br>
+<br>
+procedure TFMForm.CreateCaption;<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+Cap: String;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+Cap := DirectoryOutline.Directory;<br>
+<br>
+<br>
+Cap := cap+'/'+FileList.mask;<br>
+<br>
+<br>
+Caption := Cap;<br>
+<br>
+<br>
+end;　<br>
+<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;当前目录或文件显示类型发生变化时改变子窗口的标题。如DirectoryOutline的Change事件处理过程和ViewType菜单项的Click事件处理过程就调用了该过程。　<br>
+<br>
+<br>
+6.4.8.2 状态条的显示　<br>
+<br>
+<br>
+　　状态条用于显示当前目录和当前选中文件。它们的值在DirectoryOutline 和FileList的Change事件处理过程中修改。<br>
+<br>
+<br>
+　　DirectoryOutline和FileList最终的Change事件处理过程如下：　<br>
+<br>
+<br>
+procedure TFMForm.DirectoryOutlineChange(Sender: TObject);<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+CreateCaption;<br>
+<br>
+<br>
+FileList.clear;<br>
+<br>
+<br>
+FileList.Directory := DirectoryOutline.Directory;<br>
+<br>
+<br>
+FileList.Update;<br>
+<br>
+<br>
+FileManager.DirectoryPanel.Caption := DirectoryOutline.Directory;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+procedure TFMForm.FileListChange(Sender: TObject);<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+with FileList do<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+if (ItemIndex &gt;= 0) and (Not HasAttr(FileName,faDirectory)) then<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+TheFileName := FileName;<br>
+<br>
+<br>
+FileManager.FilePanel.Caption :=<br>
+<br>
+<br>
+Format('%s, %d bytes', [TheFileName, GetFileSize(TheFileName)]);<br>
+<br>
+<br>
+end<br>
+<br>
+<br>
+else<br>
+<br>
+<br>
+FileManager.FilePanel.Caption := '';<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+end;　<br>
+<br>
+<br>
+6.4.8.3 版本信息　<br>
+<br>
+<br>
+　　当用户单击主窗口的Help|About菜单项时将弹出一个About对话框，用于显示版本信息（如图6.13）。<br>
+<br>
+<br>
+　　这一对话框是用Delphi提供的模板做的。<br>
+<br>
+<br>
+6.4.8.4 菜单项的变灰与使能　<br>
+<br>
+<br>
+　　File菜单中定义的文件管理功能只有当活动焦点在FileList(即有当前选中文件)时才起作用。否则所有菜单项应变灰，以免导致系统崩溃。<br>
+<br>
+<br>
+　　这一功能在File菜单的Click事件处理过程中实现。这一点并不很容易被人想到，希望读者能从中受到启发。　<br>
+<br>
+<br>
+procedure TFMForm.File1Click(Sender: TObject);<br>
+<br>
+<br>
+var<br>
+<br>
+<br>
+FileSelected: Boolean;<br>
+<br>
+<br>
+begin<br>
+<br>
+<br>
+FileSelected := FileList.ItemIndex &gt;= 0;<br>
+<br>
+<br>
+Open1.Enabled := FileSelected;<br>
+<br>
+<br>
+Delete1.Enabled := FileSelected;<br>
+<br>
+<br>
+Copy1.Enabled := FileSelected;<br>
+<br>
+<br>
+Move1.Enabled := FileSelected;<br>
+<br>
+<br>
+Rename1.Enabled := FileSelected;<br>
+<br>
+<br>
+Properties1.Enabled := FileSelected;<br>
+<br>
+<br>
+end;<br>
+<br>
+<br>
+　　判断是否有文件被选中是通过检测ItemIndex属性是否大于等于0来实现的。<br>
+<br>
+<br>
+　　 FileSelected := FileList.ItemIndex &gt;= 0；　<br>
+<br>
+<br>
+6.4.8.5 可重用的文件处理模块　<br>
+<br>
+<br>
+　　库单元fmxutils是一个代码库，提供了若干文件处理模块。这些模块除在本程序中使用外，读者可以在其它应用程序中直接调用，而且不必重新编译，只要在Uses子句中包含即可。从中我们可以体会到，Delphi 以库单元为中心的程序组织方式提供了一种较完善的代码重用机制。　<br>
+<br>
+<br>
+6.4.9 小结　<br>
+<br>
+<br>
+　　文件管理器是一个较为综合的例程，使用到了绝大部分以文件名、文件句柄以及其它参数(除文件变量)为操作对象的文件管理过程/函数，同时也提供了一些程序设计开发的思想。我们的介绍是以程序功能模块来组织的，我建议读者在学习并试图自己建立这一程序时采用同样的方法。(6.4.8)中的内容或许是一开始就应了解的，但其它完全可以按顺序逐步地扩充，最后得到一个完整的程序。这一例程在后边的拖放操作和异常处理等章节中还要用到。读者可以以此为基础进一步完善它，使它真正成为一个完全实用的程序。<br>
+<br>
+<br>
+　　文件管理是在开发一个高级的Windows程序中不可避免的要涉及到的问题。本章介绍的思路和方法将为读者成为一个熟练的程序员奠定基础。<br>
+<br>
+<br>
+&nbsp;<br>
+<br>
+<br>
+&nbsp;<br>
+<br>
+<br>
+&nbsp;<br>
+<br>
+<br>
+二．一些文件操作函数<br>
+<br>
+<br>
+//判断文件是否存在 FileExists<br>
+//判断文件夹是否存在 DirectoryExists<br>
+//删除文件 DeleteFile; Windows.DeleteFile<br>
+//删除文件夹 RemoveDir; RemoveDirectory<br>
+//获取当前文件夹 GetCurrentDir<br>
+//设置当前文件夹 SetCurrentDir; ChDir; SetCurrentDirectory<br>
+//获取指定驱动器的当前路径名 GetDir<br>
+//文件改名 RenameFile<br>
+//建立文件夹 CreateDir; CreateDirectory; ForceDirectories<br>
+//删除空文件夹 RemoveDir; RemoveDirectory<br>
+//建立新文件 FileCreate<br>
+//获取当前文件的版本号 GetFileVersion<br>
+//获取磁盘空间 DiskSize; DiskFree<br>
+//搜索文件 FindFirst; FindNext; FindClose<br>
+//读取与设置文件属性 FileGetAttr; FileSetAttr<br>
+//获取文件的创建时间 FileAge; FileDateToDateTime<br>
+<br>
+<br>
+Delphi代码<br>
+<br>
+<br>
+//判断文件是否存在 FileExists &nbsp;&nbsp;<br>
+<br>
+<br>
+var &nbsp;<br>
+<br>
+<br>
+&nbsp; f: string; &nbsp;&nbsp;<br>
+<br>
+<br>
+begin &nbsp;<br>
+<br>
+<br>
+&nbsp; f := 'c:"temp"test.txt'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; if not FileExists(f) then &nbsp;<br>
+<br>
+<br>
+&nbsp; begin &nbsp;<br>
+<br>
+<br>
+&nbsp; &nbsp;//如果文件不存在 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; end; &nbsp;&nbsp;<br>
+<br>
+<br>
+end; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+-------------------------------------------------------------------------------- &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//判断文件夹是否存在 DirectoryExists &nbsp;&nbsp;<br>
+<br>
+<br>
+var &nbsp;<br>
+<br>
+<br>
+&nbsp; dir: string; &nbsp;&nbsp;<br>
+<br>
+<br>
+begin &nbsp;<br>
+<br>
+<br>
+&nbsp; dir := 'c:"temp'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; if not DirectoryExists(dir) then &nbsp;<br>
+<br>
+<br>
+&nbsp; begin &nbsp;<br>
+<br>
+<br>
+&nbsp; &nbsp;//如果文件夹不存在 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; end; &nbsp;&nbsp;<br>
+<br>
+<br>
+end; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+-------------------------------------------------------------------------------- &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//删除文件 DeleteFile; Windows.DeleteFile &nbsp;&nbsp;<br>
+<br>
+<br>
+var &nbsp;<br>
+<br>
+<br>
+&nbsp; f: string; &nbsp;&nbsp;<br>
+<br>
+<br>
+begin &nbsp;<br>
+<br>
+<br>
+&nbsp; f := 'c:"temp"test.txt'; &nbsp;&nbsp;<br>
+<br>
+<br>
+//DeleteFile(f); &nbsp;//返回 Boolean &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//或者用系统API: &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; Windows.DeleteFile(PChar(f)); //返回 Boolean &nbsp;&nbsp;<br>
+<br>
+<br>
+end; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+-------------------------------------------------------------------------------- &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//删除文件夹 RemoveDir; RemoveDirectory &nbsp;&nbsp;<br>
+<br>
+<br>
+var &nbsp;<br>
+<br>
+<br>
+&nbsp; dir: string; &nbsp;&nbsp;<br>
+<br>
+<br>
+begin &nbsp;<br>
+<br>
+<br>
+&nbsp; dir := 'c:"temp'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; RemoveDir(dir); //返回 Boolean &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//或者用系统 API: &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; RemoveDirectory(PChar(dir)); //返回 Boolean &nbsp;&nbsp;<br>
+<br>
+<br>
+end; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+-------------------------------------------------------------------------------- &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//获取当前文件夹 GetCurrentDir &nbsp;&nbsp;<br>
+<br>
+<br>
+var &nbsp;<br>
+<br>
+<br>
+&nbsp; dir: string; &nbsp;&nbsp;<br>
+<br>
+<br>
+begin &nbsp;<br>
+<br>
+<br>
+&nbsp; dir := GetCurrentDir; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; ShowMessage(dir); //C:"Projects &nbsp;&nbsp;<br>
+<br>
+<br>
+end; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+-------------------------------------------------------------------------------- &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//设置当前文件夹 SetCurrentDir; ChDir; SetCurrentDirectory &nbsp;&nbsp;<br>
+<br>
+<br>
+var &nbsp;<br>
+<br>
+<br>
+&nbsp; dir: string; &nbsp;&nbsp;<br>
+<br>
+<br>
+begin &nbsp;<br>
+<br>
+<br>
+&nbsp; dir := 'c:"temp'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; if SetCurrentDir(dir) then &nbsp;<br>
+<br>
+<br>
+&nbsp; &nbsp; ShowMessage(GetCurrentDir); //c:"temp &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//或者 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; ChDir(dir); //无返回值 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//也可以使用API: &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; SetCurrentDirectory(PChar(Dir)); //返回 Boolean &nbsp;&nbsp;<br>
+<br>
+<br>
+end; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+-------------------------------------------------------------------------------- &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//获取指定驱动器的当前路径名 GetDir &nbsp;&nbsp;<br>
+<br>
+<br>
+var &nbsp;<br>
+<br>
+<br>
+&nbsp; dir: string; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; b: Byte; &nbsp;&nbsp;<br>
+<br>
+<br>
+begin &nbsp;<br>
+<br>
+<br>
+&nbsp; b := 0; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; GetDir(b,dir); &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; ShowMessage(dir); // &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//第一个参数: 1、2、3、4...分别对应: A、B、C、D... &nbsp;&nbsp;<br>
+<br>
+<br>
+//0 是缺省驱动器 &nbsp;&nbsp;<br>
+<br>
+<br>
+end; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+-------------------------------------------------------------------------------- &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//文件改名 RenameFile &nbsp;&nbsp;<br>
+<br>
+<br>
+var &nbsp;<br>
+<br>
+<br>
+&nbsp; OldName,NewName: string; &nbsp;&nbsp;<br>
+<br>
+<br>
+begin &nbsp;<br>
+<br>
+<br>
+&nbsp; OldName := 'c:"temp"Old.txt'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; NewName := 'c:"temp"New.txt'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; if RenameFile(OldName,NewName) then &nbsp;<br>
+<br>
+<br>
+&nbsp; &nbsp; ShowMessage('改名成功!'); &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//也可以: &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; SetCurrentDir('c:"temp'); &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; OldName := 'Old.txt'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; NewName := 'New.txt'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;<br>
+<br>
+<br>
+&nbsp; if RenameFile(OldName,NewName) then &nbsp;<br>
+<br>
+<br>
+&nbsp; &nbsp; ShowMessage('改名成功!'); &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//也可以: &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; SetCurrentDir('c:"temp'); &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; OldName := 'Old.txt'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; NewName := 'New.txt'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; if RenameFile(OldName,NewName) then &nbsp;<br>
+<br>
+<br>
+&nbsp; &nbsp; ShowMessage('改名成功!'); &nbsp;&nbsp;<br>
+<br>
+<br>
+end; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+-------------------------------------------------------------------------------- &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//建立文件夹 CreateDir; CreateDirectory; ForceDirectories &nbsp;&nbsp;<br>
+<br>
+<br>
+var &nbsp;<br>
+<br>
+<br>
+&nbsp; dir: string; &nbsp;&nbsp;<br>
+<br>
+<br>
+begin &nbsp;<br>
+<br>
+<br>
+&nbsp; dir := 'c:"temp"delphi'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; if not DirectoryExists(dir) then &nbsp;<br>
+<br>
+<br>
+&nbsp; &nbsp; CreateDir(dir); //返回 Boolean &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//也可以直接用API: &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; CreateDirectory(PChar(dir),nil); //返回 Boolean &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//如果缺少上层目录将自动补齐: &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; dir := 'c:"temp"CodeGear"Delphi"2007"万一'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; ForceDirectories(dir); //返回 Boolean &nbsp;&nbsp;<br>
+<br>
+<br>
+end; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+-------------------------------------------------------------------------------- &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//删除空文件夹 RemoveDir; RemoveDirectory &nbsp;&nbsp;<br>
+<br>
+<br>
+var &nbsp;<br>
+<br>
+<br>
+&nbsp; dir: string; &nbsp;&nbsp;<br>
+<br>
+<br>
+begin &nbsp;<br>
+<br>
+<br>
+&nbsp; dir := 'c:"temp"delphi'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; RemoveDir(dir); //返回 Boolean &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//也可以直接用API: &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; RemoveDirectory(PChar(dir)); //返回 Boolean &nbsp;&nbsp;<br>
+<br>
+<br>
+end; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+-------------------------------------------------------------------------------- &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//建立新文件 FileCreate &nbsp;&nbsp;<br>
+<br>
+<br>
+var &nbsp;<br>
+<br>
+<br>
+&nbsp; FileName: string; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; i: Integer; &nbsp;&nbsp;<br>
+<br>
+<br>
+begin &nbsp;<br>
+<br>
+<br>
+&nbsp; FileName := 'c:"temp"test.dat'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; i := FileCreate(FileName); &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; if i&gt;0 then &nbsp;<br>
+<br>
+<br>
+&nbsp; &nbsp; ShowMessage('新文件的句柄是: ' + IntToStr(i)) &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; else &nbsp;<br>
+<br>
+<br>
+&nbsp; &nbsp; ShowMessage('创建失败!'); &nbsp;&nbsp;<br>
+<br>
+<br>
+end; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+-------------------------------------------------------------------------------- &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//获取当前文件的版本号 GetFileVersion &nbsp;&nbsp;<br>
+<br>
+<br>
+var &nbsp;<br>
+<br>
+<br>
+&nbsp; s: string; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; i: Integer; &nbsp;&nbsp;<br>
+<br>
+<br>
+begin &nbsp;<br>
+<br>
+<br>
+&nbsp; s := 'C:"WINDOWS"notepad.exe'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; i := GetFileVersion(s); //如果没有版本号返回 -1 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; ShowMessage(IntToStr(i)); //327681 这是当前记事本的版本号(还应该再转换一下) &nbsp;&nbsp;<br>
+<br>
+<br>
+end; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+-------------------------------------------------------------------------------- &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//获取磁盘空间 DiskSize; DiskFree &nbsp;&nbsp;<br>
+<br>
+<br>
+var &nbsp;<br>
+<br>
+<br>
+&nbsp; r: Real; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; s: string; &nbsp;&nbsp;<br>
+<br>
+<br>
+begin &nbsp;<br>
+<br>
+<br>
+&nbsp; r := DiskSize(3); //获取C:总空间, 单位是字节 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; r := r/1024/1024/1024; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; Str(r:0:2,s); //格式为保留两位小数的字符串 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; s := 'C盘总空间是: ' + s + ' GB'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; ShowMessage(s); //xx.xx GB &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; r := DiskFree(3); //获取C:可用空间 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; r := r/1024/1024/1024; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; Str(r:0:2,s); &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; s := 'C盘可用空间是: ' + s + ' GB'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; ShowMessage(s); //xx.xx GB &nbsp;&nbsp;<br>
+<br>
+<br>
+end; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//查找一个文件 FileSearch &nbsp;&nbsp;<br>
+<br>
+<br>
+var &nbsp;<br>
+<br>
+<br>
+&nbsp; FileName,Dir,s: string; &nbsp;&nbsp;<br>
+<br>
+<br>
+begin &nbsp;<br>
+<br>
+<br>
+&nbsp; FileName := 'notepad.exe'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; Dir := 'c:"windows'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; s := FileSearch(FileName,Dir); &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; if s&lt;&gt;'' then &nbsp;<br>
+<br>
+<br>
+&nbsp; &nbsp; ShowMessage(s) //c:"windows"notepad.exe &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; else &nbsp;<br>
+<br>
+<br>
+&nbsp; &nbsp; ShowMessage('没找到'); &nbsp;&nbsp;<br>
+<br>
+<br>
+end; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+-------------------------------------------------------------------------------- &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//搜索文件 FindFirst; FindNext; FindClose &nbsp;&nbsp;<br>
+<br>
+<br>
+var &nbsp;<br>
+<br>
+<br>
+&nbsp; sr: TSearchRec; &nbsp; &nbsp;//定义 TSearchRec 结构变量 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; Attr: Integer; &nbsp; &nbsp; //文件属性 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; s: string; &nbsp; &nbsp; &nbsp; &nbsp; //要搜索的内容 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; List: TStringList; //存放搜索结果 &nbsp;&nbsp;<br>
+<br>
+<br>
+begin &nbsp;<br>
+<br>
+<br>
+&nbsp; s := 'c:"windows"*.txt'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; Attr := faAnyFile; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; //文件属性值faAnyFile表示是所有文件 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; List := TStringList.Create; &nbsp; &nbsp;//List建立 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; if FindFirst(s,Attr,sr)=0 then //开始搜索,并给 sr 赋予信息, 返回0表示找到第一个 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; begin &nbsp;<br>
+<br>
+<br>
+&nbsp; &nbsp; repeat &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; //如果有第一个就继续找 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; &nbsp; &nbsp; List.Add(sr.Name); &nbsp; &nbsp; &nbsp; &nbsp; //用List记下结果 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; &nbsp; until(FindNext(sr)&lt;&gt;0); &nbsp; &nbsp; &nbsp;//因为sr已经有了搜索信息, FindNext只要这一个参数, 返回0表示找到 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; end; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; FindClose(sr); &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; //需要结束搜索, 搜索是内含句柄的 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; ShowMessage(List.Text); &nbsp; &nbsp; &nbsp; &nbsp;//显示搜索结果 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; List.Free; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; //释放List &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//更多注释: &nbsp;&nbsp;<br>
+<br>
+<br>
+//TSearchRec 结构是内涵文件大小、名称、属性与时间等信息 &nbsp;&nbsp;<br>
+<br>
+<br>
+//TSearchRec 中的属性是一个整数值, 可能的值有: &nbsp;&nbsp;<br>
+<br>
+<br>
+//faReadOnly &nbsp;1 &nbsp; 只读文件 &nbsp;&nbsp;<br>
+<br>
+<br>
+//faHidden &nbsp; &nbsp;2 &nbsp; 隐藏文件 &nbsp;&nbsp;<br>
+<br>
+<br>
+//faSysFile &nbsp; 4 &nbsp; 系统文件 &nbsp;&nbsp;<br>
+<br>
+<br>
+//faVolumeID &nbsp;8 &nbsp; 卷标文件 &nbsp;&nbsp;<br>
+<br>
+<br>
+//faDirectory 16 &nbsp;目录文件 &nbsp;&nbsp;<br>
+<br>
+<br>
+//faArchive &nbsp; 32 &nbsp;归档文件 &nbsp;&nbsp;<br>
+<br>
+<br>
+//faSymLink &nbsp; 64 &nbsp;链接文件 &nbsp;&nbsp;<br>
+<br>
+<br>
+//faAnyFile &nbsp; 63 &nbsp;任意文件 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//s 的值也可以使用?通配符,好像只支持7个?, 如果没有条件就是*, 譬如: C:"* &nbsp;&nbsp;<br>
+<br>
+<br>
+//实际使用中还应该在 repeat 中提些条件, 譬如判断如果是文件夹就递归搜索等等 &nbsp;&nbsp;<br>
+<br>
+<br>
+end; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+-------------------------------------------------------------------------------- &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//读取与设置文件属性 FileGetAttr; FileSetAttr &nbsp;&nbsp;<br>
+<br>
+<br>
+var &nbsp;<br>
+<br>
+<br>
+&nbsp; FileName: string; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; Attr: Integer; //属性值是一个整数 &nbsp;&nbsp;<br>
+<br>
+<br>
+begin &nbsp;<br>
+<br>
+<br>
+&nbsp; FileName := 'c:"temp"Test.txt'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; Attr := FileGetAttr(FileName); &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; ShowMessage(IntToStr(Attr)); //32, 存档文件 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//设置为隐藏和只读文件: &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; Attr := FILE_ATTRIBUTE_READONLY or FILE_ATTRIBUTE_HIDDEN; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; if FileSetAttr(FileName,Attr)=0 then //返回0表示成功 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; &nbsp; ShowMessage('设置成功!'); &nbsp; &nbsp; &nbsp;<br>
+<br>
+<br>
+//属性可选值(有些用不着): &nbsp;&nbsp;<br>
+<br>
+<br>
+//FILE_ATTRIBUTE_READONLY = 1; 只读 &nbsp;&nbsp;<br>
+<br>
+<br>
+//FILE_ATTRIBUTE_HIDDEN = 2; 隐藏 &nbsp;&nbsp;<br>
+<br>
+<br>
+//FILE_ATTRIBUTE_SYSTEM = 4; 系统 &nbsp;&nbsp;<br>
+<br>
+<br>
+//FILE_ATTRIBUTE_DIRECTORY = 16 &nbsp;&nbsp;<br>
+<br>
+<br>
+//FILE_ATTRIBUTE_ARCHIVE = 32; 存档 &nbsp;&nbsp;<br>
+<br>
+<br>
+//FILE_ATTRIBUTE_DEVICE = 64 &nbsp;&nbsp;<br>
+<br>
+<br>
+//FILE_ATTRIBUTE_NORMAL = 128; 一般 &nbsp;&nbsp;<br>
+<br>
+<br>
+//FILE_ATTRIBUTE_TEMPORARY = 256 &nbsp;&nbsp;<br>
+<br>
+<br>
+//FILE_ATTRIBUTE_SPARSE_FILE = 512 &nbsp;&nbsp;<br>
+<br>
+<br>
+//FILE_ATTRIBUTE_REPARSE_POINT = 1204 &nbsp;&nbsp;<br>
+<br>
+<br>
+//FILE_ATTRIBUTE_COMPRESSED = 2048; 压缩 &nbsp;&nbsp;<br>
+<br>
+<br>
+//FILE_ATTRIBUTE_OFFLINE = 4096 &nbsp;&nbsp;<br>
+<br>
+<br>
+//FILE_ATTRIBUTE_NOT_CONTENT_INDEXED = 8192; 不被索引 &nbsp;&nbsp;<br>
+<br>
+<br>
+//FILE_ATTRIBUTE_ENCRYPTED = 16384 &nbsp;&nbsp;<br>
+<br>
+<br>
+end; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+-------------------------------------------------------------------------------- &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+//获取文件的创建时间 FileAge; FileDateToDateTime &nbsp;&nbsp;<br>
+<br>
+<br>
+var &nbsp;<br>
+<br>
+<br>
+&nbsp; FileName: string; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; ti: Integer; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; dt: TDateTime; &nbsp;&nbsp;<br>
+<br>
+<br>
+begin &nbsp;<br>
+<br>
+<br>
+&nbsp; FileName := 'c:"temp"Test.txt'; &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; ti := FileAge(FileName); &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; ShowMessage(IntToStr(ti)); //返回: 931951472, 需要转换 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; dt := FileDateToDateTime(ti); //转换 &nbsp;&nbsp;<br>
+<br>
+<br>
+&nbsp; ShowMessage(DateTimeToStr(dt)); //2007-12-12 14:27:32 &nbsp;&nbsp;<br>
+<br>
+<br>
+end; &nbsp;<br>
+<br>
+<br>
+&nbsp;<br>
+<br>
+<br>
+&nbsp;<br>
+二． 数据库<br>
+1.跨服务器查询：<br>
+SELECT &nbsp; *<br>
+FROM &nbsp; &nbsp; &nbsp;OPENDATASOURCE(<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;'SQLOLEDB',<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;'Data Source=192.168.1.7;User ID=pp;Password=zxp2006.'<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;).ERP_MTDTEST.dbo.PURTB<br>
+WHERE &nbsp;TB001+TB002 &nbsp;IN&nbsp;<br>
+(<br>
+<br>
+<br>
+SELECT &nbsp;TA001+TA002 &nbsp;FROM &nbsp;PURTA &nbsp; WHERE &nbsp;TA001+TA002 &nbsp; &nbsp;NOT &nbsp;IN<br>
+(SELECT TB001+TB002 &nbsp; FROM &nbsp;PURTB) &nbsp;<br>
+&nbsp;&nbsp;<br>
+)<br>
+&nbsp;<br>
+6.交差表：<br>
+　declare @sql varchar(8000)<br>
+　　<br>
+　　set @sql = 'select name,'<br>
+　　<br>
+　　select @sql = @sql + 'sum(case subject when '''+subject+'''<br>
+　　<br>
+　　then source else 0 end) as '''+subject+''','<br>
+　　<br>
+　　from (select distinct subject from test) as a<br>
+　　<br>
+　　select @sql = left(@sql,len(@sql)-1) + ' from test group by name'<br>
+　　<br>
+　　exec(@sql)<br>
+&nbsp;<br>
+&nbsp;<br>
+7. 取出给定部门的所有下属部门：<br>
+&nbsp;alter &nbsp; procedure GetAllDomn<br>
+@DepId varchar(10)<br>
+as<br>
+&nbsp;<br>
+&nbsp;<br>
+create table #temp(<br>
+DepId varchar(10),<br>
+PDepId &nbsp;varchar(10)<br>
+)<br>
+&nbsp;<br>
+select &nbsp;depid ,pdeptid &nbsp;into #temp from dept where pdeptid= @deptid<br>
+&nbsp;<br>
+declare @i int<br>
+&nbsp;<br>
+set @i=1<br>
+&nbsp;<br>
+while @i&lt;=5<br>
+begin<br>
+&nbsp;<br>
+select b.deptid,b.pdeptid<br>
+into #temp1<br>
+from #temp a<br>
+inner join dept b on a.deptid= b.pdeptid<br>
+where b.delptid not in (select deptid from &nbsp;#dept)<br>
+&nbsp;<br>
+select #temp1.* &nbsp; into #temp from &nbsp;#temp1<br>
+delete from #temp1<br>
+&nbsp;<br>
+set @i=@i+1<br>
+&nbsp;<br>
+end<br>
+&nbsp;<br>
+&nbsp;<br>
+select * from #temp<br>
+&nbsp;<br>
+&nbsp;<br>
+drop table #dept<br>
+drop table #temp1<br>
+&nbsp;<br>
+go<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+5. BOM表(原创)<br>
+-- &nbsp; sp_GetDetailMaterial 'MHWJ00026C','*','1'<br>
+CREATE &nbsp;proc sp_GetDetailMaterial<br>
+@PRONO &nbsp;VARCHAR(30),<br>
+@CK varchar(10),<br>
+@SH &nbsp;VARCHAR(1) --是否计损耗<br>
+as<br>
+&nbsp;<br>
+&nbsp;<br>
+CREATE TABLE #BOMTEMP<br>
+(<br>
+MD001 VARCHAR(30),<br>
+MD003 &nbsp;VARCHAR(30)<br>
+)<br>
+&nbsp;<br>
+/*<br>
+CREATE TABLE #BOMT1<br>
+(<br>
+MD001 VARCHAR(30),<br>
+MD003 &nbsp;VARCHAR(30)<br>
+)<br>
+*/<br>
+declare<br>
+@LEVEL int<br>
+&nbsp;<br>
+&nbsp;<br>
+insert INTO #BOMTEMP &nbsp;select MD001,MD003 FROM BOMMD<br>
+WHERE MD001=@PRONO<br>
+&nbsp;<br>
+--SELECT * INTO #BOMTEMP FROM @BOM1<br>
+&nbsp;<br>
+set @LEVEL=1<br>
+WHILE @LEVEL&lt;10<br>
+BEGIN<br>
+SELECT A.MD001,A.MD003<br>
+INTO #BOM1<br>
+FROM BOMMD A<br>
+INNER JOIN #BOMTEMP B ON A.MD001=B.MD003<br>
+WHERE A.MD003 NOT IN (SELECT MD003 FROM #BOMTEMP)<br>
+&nbsp; &nbsp;<br>
+&nbsp;IF @@ROWCOUNT&lt;1&nbsp;<br>
+&nbsp;BREAK<br>
+&nbsp;<br>
+insert INTO #BOMTEMP SELECT * &nbsp;FROM #BOM1<br>
+&nbsp;<br>
+&nbsp;DELETE FROM #BOM1&nbsp;<br>
+&nbsp;DROP TABLE #BOM1<br>
+SET @LEVEL= @LEVEL+1<br>
+END<br>
+&nbsp;<br>
+PRINT(@LEVEL)<br>
+&nbsp;<br>
+IF @CK='*'<br>
+SELECT &nbsp;B.MB001,MB002,MB003,MB004,MB017,C.MD009,<br>
+(case &nbsp;when @SH='1' THEN &nbsp;C.MD006/C.MD007*(1+C.MD008)<br>
+ELSE C.MD006/C.MD007*(1+0) END&nbsp;<br>
+) AS AQTY<br>
+FROM #BOMTEMP A<br>
+INNER JOIN INVMB B ON A.MD003=MB001<br>
+INNER JOIN &nbsp;BOMMD C ON C.MD001=A.MD001 AND A.MD003=C.MD003<br>
+WHERE &nbsp;B.MB109='Y'<br>
+&nbsp;<br>
+ELSE<br>
+&nbsp;<br>
+SELECT &nbsp;B.MB001,MB002,MB003,MB004,@CK AS MB017 ,C.MD009,<br>
+(case &nbsp;when @SH='1' THEN &nbsp;C.MD006/C.MD007*(1+C.MD008)<br>
+ELSE C.MD006/C.MD007*(1+0) END&nbsp;<br>
+) AS AQTY<br>
+FROM #BOMTEMP A<br>
+INNER JOIN INVMB B ON A.MD003=MB001<br>
+INNER JOIN &nbsp;BOMMD C ON C.MD001=A.MD001 AND A.MD003=C.MD003<br>
+WHERE &nbsp;B.MB109='Y'<br>
+DROP TABLE #BOMTEMP<br>
+&nbsp;<br>
+GO<br>
+&nbsp;<br>
+&nbsp;<br>
+8 Delphi三层架构的一种方法<br>
+2008年09月13日 星期六 23:08<br>
+Delphi三层架构的一种方法<br>
+理解：把服务端数据取回客户端，在客户端操作（如添加）完毕后，传到服务器端统一更新。<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;需在客户端选取回表信息（结构，内容）。<br>
+前题：<br>
+&nbsp; &nbsp; &nbsp; &nbsp;scktsrvr.exe（delphi安装的程序目录里有， 需启动）<br>
+&nbsp; &nbsp; &nbsp; &nbsp;midas.dll（windows系统目录里有此文件，从新注册方法调用：regsvr32.exe）<br>
+过程：<br>
+&nbsp; &nbsp; &nbsp; &nbsp;服务器端：新建立 New-&gt;other-&gt;Multitier-&gt;Remote Data Module<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;做数据链接。例如：用控件TADoConnection<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;建立函数 View-&gt;Type Library<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;在生成的 Interface 里建立 Method；<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;例如：<br>
+--------------------------------------------------------------------------------------------------------------------------<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;名称：ExecSQL<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Parameter：Name &nbsp; &nbsp; &nbsp; &nbsp; Type &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Modifier<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;SQL &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; BSTR &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [in] &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 输入类型字符型<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;result &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; VARIANT* &nbsp; [out,retval] &nbsp; &nbsp; 输出类型，结果<br>
+--------------------------------------------------------------------------------------------------------------------------<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;方法举例：<br>
+Code<br>
+--------------------------------------------------------------------------------------<br>
+function TRDM.ExecSQL(const SQL: WideString): OleVariant;<br>
+var<br>
+&nbsp; &nbsp;adoqrytem:TAdoQuery;<br>
+&nbsp; &nbsp;prvtem:TDataSetProvider;<br>
+begin<br>
+&nbsp; &nbsp;adoqrytem:=TAdoQuery.create(self); &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; //创建临时adoquery<br>
+&nbsp; &nbsp;adoqrytem.connection:=conn;<br>
+&nbsp; &nbsp;&nbsp;<br>
+&nbsp; &nbsp;prvtem:=TDataSetProvider.create(self); &nbsp; &nbsp; &nbsp; //创建临时datasetprovider<br>
+&nbsp; &nbsp;prvtem.DataSet:=adoqrytem;<br>
+&nbsp; &nbsp;adoqrytem.Close; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; //执行sql<br>
+&nbsp; &nbsp;adoqrytem.sql.clear;<br>
+&nbsp; &nbsp;adoqrytem.sql.text:= SQL;<br>
+&nbsp; &nbsp;adoqrytem.open;<br>
+&nbsp; &nbsp;result:=prvtem.data;<br>
+&nbsp; &nbsp;adoqrytem.free;<br>
+&nbsp; &nbsp;prvtem.free;<br>
+end;<br>
+-----------------------------------------------------------------------------------------<br>
+&nbsp; &nbsp; &nbsp;客户端：<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;建立链接 用控件DataSnap-&gt;SocketConnection<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;调用方法：<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;例 &nbsp; SocketConnection1.AppServer.方法名称<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;ClienTDataSet1.Data := SocketConnection1.AppServer.ExecSQL('select …… ');<br>
+------------------------------------------------------------------------------------------<br>
+补充说明：<br>
+客户端ClientDataSet控件取回表的内容，在客户端本机操作（添加、修改、删除），在保存时，传递整个ClientDataSet表，例如：<br>
+cdsTemp:TClientDataSet;<br>
+……<br>
+if<br>
+&nbsp; &nbsp;ClientDM.scktconn.AppServer.UpdatePub_Depart(username,cdsTemp.Delta,Msg) = 0 then<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+在使用DataModel窗体存放数据库控件的程序中,应注意：<br>
+1、如果在其他窗体中调用DataModel中的控件必须在先引用Datemodel的单元，在implementation下面加入以下语句<br>
+<br>
+<br>
+uses&nbsp;<br>
+<br>
+<br>
+&nbsp; &nbsp; &nbsp;DataModel的单元名称;<br>
+<br>
+<br>
+2、必须改变窗体的创建顺序，datamodel窗体必须先于引用该窗体控件的窗体创建<br>
+三层结构<br>
+<br>
+<br>
+应用层：<br>
+一、需要三个数据控件：<br>
+Adoconnect &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<br>
+AdoQuery<br>
+DataSetProvider<br>
+<br>
+<br>
+二、联接顺序：<br>
+SQL数据库&lt;--Adoconnect&lt;--Adoquery&lt;--DataSetProvider<br>
+<br>
+<br>
+三、属性设置：<br>
+Adoconnect： &nbsp; &nbsp; 1、ConnectionString<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;2、Connected<br>
+Adoquery: &nbsp; &nbsp; &nbsp; &nbsp; 1、connection<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;//2、Active<br>
+DataSetProvider: 1、DataSet<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;2、option.poAllowCommand:=true<br>
+四、其他<br>
+1、运行SocketServer并开端口<br>
+2、数据模块使用远程数据模块<br>
+<br>
+<br>
+客户端：<br>
+一、基本控件<br>
+SocketConnection<br>
+ClientDataSet<br>
+DataSoure<br>
+DBGrid<br>
+<br>
+<br>
+二、联接顺序：<br>
+应用层&lt;--SocketConnection&lt;--ClientDataSet&lt;--DataSoure&lt;--DBGrid<br>
+<br>
+<br>
+三、属性设置：<br>
+SocketConnection: 1、Adrress<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;2、ServerName<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;3、Port<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;4、connected<br>
+ClientDataSet： &nbsp; 1、RemoteServer<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;2、CommandText<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;3、ProviderName<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;4、Active<br>
+DataSoure： &nbsp; &nbsp; &nbsp; 1、DataSet<br>
+DBGrid： &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 1、DataSoure<br>
+<br>
+<br>
+四、其他<br>
+<br>
+<br>
+<br>
+<br>
+一、先关闭记录集后执数据库操作语句<br>
+&nbsp; &nbsp;rs.close<br>
+&nbsp; &nbsp;sqlstr="insert into abc(a,b,c) values("a","b","c")"<br>
+&nbsp; &nbsp;rs.open sqlstr,conn<br>
+&nbsp; &nbsp;rs.update<br>
+&nbsp; &nbsp;rs.colose<br>
+二、在可能发生出错的数据库操作做错误捕捉，如：open,update,delete等<br>
+&nbsp; &nbsp;rs.close<br>
+&nbsp; &nbsp;sqlstr="insert into abc(a,b,c) values("a","b","c")"<br>
+&nbsp; &nbsp;on error resume next &nbsp;<br>
+&nbsp; &nbsp;rs.open sqlstr,conn<br>
+&nbsp; &nbsp;if err then<br>
+&nbsp; &nbsp;msgbox(err.Description)<br>
+&nbsp; &nbsp;msgbox(cstr(err.number))<br>
+&nbsp; &nbsp;rs.update<br>
+&nbsp; &nbsp;rs.colose&nbsp;
+                                    </div>
+                                                <div class="more-toolbox">
+                <div class="left-toolbox">
+                    <ul class="toolbox-list">
+                        
+                        <li class="tool-item tool-active is-like "><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#csdnc-thumbsup" />
+                        </svg><span class="name">点赞</span>
+                        <span class="count"></span>
+                        </a></li>
+                        <li class="tool-item tool-active is-collection "><a href="javascript:;" data-report-click='{"mod":"popu_824"}'><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-Collection-G" />
+                        </svg><span class="name">收藏</span></a></li>
+                        <li class="tool-item tool-active is-share"><a href="javascript:;" data-report-click='{"mod":"1582594662_002"}'><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-fenxiang" />
+                        </svg>分享</a></li>
+                        <!--打赏开始-->
+                                                <!--打赏结束-->
+                                                <li class="tool-item tool-more">
+                            <a>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024" width="200" height="200" version="1.1" p-id="5717" t="1575545411852"><defs><style type="text/css" /></defs><path d="M 179.176 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5718" /><path d="M 509.684 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5719" /><path d="M 846.175 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5720" /></svg>
+                            </a>
+                            <ul class="more-box">
+                                <li class="item"><a class="article-report">文章举报</a></li>
+                            </ul>
+                        </li>
+                                            </ul>
+                </div>
+                            </div>
+            <div class="person-messagebox">
+                <div class="left-message"><a href="https://blog.csdn.net/yt_maomao">
+                    <img class="avatar_pic" src="images/delphi04501.jpg" username="yt_maomao">
+                                            <img class="user-years" src="images/delphi04502.png">
+                                    </a></div>
+                <div class="middle-message">
+                                        <div class="title"><span class="tit"><a href="https://blog.csdn.net/yt_maomao" target="_blank" data-report-click='{"mod":"popu_379"}'>_毛毛_</a></span>
+                                            </div>
+                    <div class="text"><span>发布了4 篇原创文章</span> · <span>获赞 0</span> · <span>访问量 1万+</span></div>
+                </div>
+                                <div class="right-message">
+                                            <a class="btn btn-sm btn-red-hollow bt-button personal-letter" href="https://im.csdn.net/im/main.html?userName=yt_maomao" target="_blank">私信
+                        </a>
+                                                            <a class="btn btn-sm  bt-button personal-watch" data-report-click='{"mod":"popu_379"}'>关注</a>
+                                    </div>
+                            </div>
+                    </div>
+
+</div>
+
+
+</body></html>

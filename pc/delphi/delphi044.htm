@@ -1,0 +1,138 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>解决Delphi WebBrowser 无法调用当前浏览器的版本 复制代码_运维_蓝色的雨-CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            <div class="article-title-box" style='color: rgb(51, 51, 51); font-family: "SF Pro Display", Roboto, Noto, Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; font-size: 14px;'><h1 class="title-article" style="font-size: 24px;"><a name="t0"></a>【转】解决Delphi WebBrowser 无法调用当前浏览器的版本 复制代码</h1></div><div class="article_content clearfix csdn-tracking-statistics" id="article_content" style="height: 1084px; overflow: hidden;"><div class="htmledit_views" style='font-family: "-apple-system", "SF UI Text", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif, SimHei, SimSun;'><div class="cnblogs_code"><pre style="line-height: 22px; font-size: 14px;"><span style="color: rgb(0, 0, 255);">delphi 下调用WEBBROWSER，很多时候会提示JS出错，导致页面无法正常打开。而在电脑上直接用IE是可以正常打开的。这可能是因为DELPHI的WEBBROWSER版本与系统的IE版本不同。用下面代码可解决，但需要使用管理员运行软件。另外，程序里WEBBROWSER无法正常打开网页而IE能打开时，还可搜索跨域浏览查找相关资料。</span></pre><pre style="line-height: 22px; font-size: 14px;"><span style="color: rgb(0, 0, 255);">procedure</span><span>&nbsp;TregedtIE.FormCreate(Sender:&nbsp;TObject);&nbsp;&nbsp;
+</span><span style="color: rgb(0, 0, 255);">begin</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;WriteAppNameToReg;&nbsp;&nbsp;
+&nbsp;&nbsp;WebBrowser1.Navigate(</span><span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">C:\a.html</span><span style="color: rgb(128, 0, 0);">'</span><span>);&nbsp;&nbsp;
+</span><span style="color: rgb(0, 0, 255);">end</span><span>;&nbsp;&nbsp;
+</span><span style="color: rgb(0, 128, 0);">{</span><span style="color: rgb(0, 128, 0);">--</span><span style="color: rgb(0, 128, 0);">}</span><span>&nbsp;&nbsp;
+</span><span style="color: rgb(0, 128, 0);">{</span><span style="color: rgb(0, 128, 0);">需要注意是GetNativeSystemInfo&nbsp;函数从Windows&nbsp;XP&nbsp;开始才有，&nbsp;
+&nbsp;而&nbsp;IsWow64Process&nbsp;函数从&nbsp;Windows&nbsp;XP&nbsp;with&nbsp;SP2&nbsp;以及&nbsp;Windows&nbsp;Server&nbsp;2003&nbsp;with&nbsp;SP1&nbsp;开始才有。&nbsp;
+&nbsp;所以使用该函数的时候最好用GetProcAddress&nbsp;。&nbsp;
+</span><span style="color: rgb(0, 128, 0);">}</span><span>&nbsp;&nbsp;
+</span><span style="color: rgb(0, 0, 255);">function</span><span>&nbsp;TregedtIE.IsWin64:&nbsp;Boolean;&nbsp;&nbsp;
+</span><span style="color: rgb(0, 0, 255);">var</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;Kernel32Handle:&nbsp;THandle;&nbsp;&nbsp;
+&nbsp;&nbsp;IsWow64Process:&nbsp;</span><span style="color: rgb(0, 0, 255);">function</span>(Handle:&nbsp;Windows.THandle;&nbsp;<span style="color: rgb(0, 0, 255);">var</span>&nbsp;Res:&nbsp;Windows.BOOL):&nbsp;Windows.BOOL;&nbsp;<span style="color: rgb(0, 0, 255);">stdcall</span><span>;&nbsp;&nbsp;
+&nbsp;&nbsp;GetNativeSystemInfo:&nbsp;</span><span style="color: rgb(0, 0, 255);">procedure</span>(<span style="color: rgb(0, 0, 255);">var</span>&nbsp;lpSystemInfo:&nbsp;TSystemInfo);&nbsp;<span style="color: rgb(0, 0, 255);">stdcall</span><span>;&nbsp;&nbsp;
+&nbsp;&nbsp;isWoW64:&nbsp;Bool;&nbsp;&nbsp;
+&nbsp;&nbsp;SystemInfo:&nbsp;TSystemInfo;&nbsp;&nbsp;
+</span><span style="color: rgb(0, 0, 255);">const</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;PROCESSOR_ARCHITECTURE_AMD64&nbsp;</span>=&nbsp;<span style="color: rgb(128, 0, 128);">9</span><span>;&nbsp;&nbsp;
+&nbsp;&nbsp;PROCESSOR_ARCHITECTURE_IA64&nbsp;</span>=&nbsp;<span style="color: rgb(128, 0, 128);">6</span><span>;&nbsp;&nbsp;
+</span><span style="color: rgb(0, 0, 255);">begin</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;Kernel32Handle&nbsp;:</span>=&nbsp;GetModuleHandle(<span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">KERNEL32.DLL</span><span style="color: rgb(128, 0, 0);">'</span><span>);&nbsp;&nbsp;
+&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">if</span>&nbsp;Kernel32Handle&nbsp;=&nbsp;<span style="color: rgb(128, 0, 128);">0</span>&nbsp;<span style="color: rgb(0, 0, 255);">then</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;Kernel32Handle&nbsp;:</span>=&nbsp;LoadLibrary(<span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">KERNEL32.DLL</span><span style="color: rgb(128, 0, 0);">'</span><span>);&nbsp;&nbsp;
+&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">if</span>&nbsp;Kernel32Handle&nbsp;&lt;&gt;&nbsp;<span style="color: rgb(128, 0, 128);">0</span>&nbsp;<span style="color: rgb(0, 0, 255);">then</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">begin</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;IsWOW64Process&nbsp;:</span>=&nbsp;GetProcAddress(Kernel32Handle,<span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">IsWow64Process</span><span style="color: rgb(128, 0, 0);">'</span><span>);&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;GetNativeSystemInfo&nbsp;:</span>=&nbsp;GetProcAddress(Kernel32Handle,<span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">GetNativeSystemInfo</span><span style="color: rgb(128, 0, 0);">'</span><span>);&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">if</span>&nbsp;Assigned(IsWow64Process)&nbsp;<span style="color: rgb(0, 0, 255);">then</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">begin</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IsWow64Process(GetCurrentProcess,isWoW64);&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Result&nbsp;:</span>=&nbsp;isWoW64&nbsp;<span style="color: rgb(0, 0, 255);">and</span><span>&nbsp;Assigned(GetNativeSystemInfo);&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">if</span>&nbsp;Result&nbsp;<span style="color: rgb(0, 0, 255);">then</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">begin</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GetNativeSystemInfo(SystemInfo);&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Result&nbsp;:</span>=&nbsp;(SystemInfo.wProcessorArchitecture&nbsp;=&nbsp;PROCESSOR_ARCHITECTURE_AMD64)&nbsp;<span style="color: rgb(0, 0, 255);">or</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(SystemInfo.wProcessorArchitecture&nbsp;</span>=<span>&nbsp;PROCESSOR_ARCHITECTURE_IA64);&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">end</span><span>;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">end</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">else</span>&nbsp;Result&nbsp;:=<span>&nbsp;False;&nbsp;&nbsp;
+&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">end</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">else</span>&nbsp;Result&nbsp;:=<span>&nbsp;False;&nbsp;&nbsp;
+</span><span style="color: rgb(0, 0, 255);">end</span><span>;&nbsp;&nbsp;
+</span><span style="color: rgb(0, 128, 0);">{</span><span style="color: rgb(0, 128, 0);">--</span><span style="color: rgb(0, 128, 0);">}</span><span>&nbsp;&nbsp;
+</span><span style="color: rgb(0, 0, 255);">function</span><span>&nbsp;TregedtIE.WriteAppNameToReg:&nbsp;Boolean;&nbsp;&nbsp;
+</span><span style="color: rgb(0, 0, 255);">var</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;reg&nbsp;:TRegistry;&nbsp;&nbsp;
+&nbsp;&nbsp;sPath,sAppName:String;&nbsp;&nbsp;
+</span><span style="color: rgb(0, 0, 255);">begin</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;Result&nbsp;:</span>=<span>&nbsp;True;&nbsp;&nbsp;
+&nbsp;&nbsp;reg&nbsp;:</span>=&nbsp;TRegistry.<span style="color: rgb(0, 0, 255);">Create</span><span>;&nbsp;&nbsp;
+&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">try</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;reg.RootKey&nbsp;:</span>=<span>&nbsp;HKEY_LOCAL_MACHINE;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;sPath&nbsp;:</span>=&nbsp;<span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">SOFTWARE\Microsoft\Internet&nbsp;Explorer\MAIN\FeatureControl\FEATURE_BROWSER_EMULATION</span><span style="color: rgb(128, 0, 0);">'</span><span>;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">if</span>&nbsp;isWin64&nbsp;<span style="color: rgb(0, 0, 255);">then</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sPath&nbsp;:</span>=&nbsp;<span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">SOFTWARE\Wow6432Node\Microsoft\Internet&nbsp;Explorer\MAIN\FeatureControl\FEATURE_BROWSER_EMULATION</span><span style="color: rgb(128, 0, 0);">'</span><span>;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">if</span>&nbsp;reg.OpenKey(sPath,True)&nbsp;<span style="color: rgb(0, 0, 255);">then</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">begin</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sAppName&nbsp;:</span>=<span>&nbsp;ExtractFileName(Application.ExeName);&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">if</span>&nbsp;<span style="color: rgb(0, 0, 255);">not</span>&nbsp;reg.ValueExists(sAppName)&nbsp;<span style="color: rgb(0, 0, 255);">then</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reg.WriteInteger(sAppName,</span><span style="color: rgb(128, 0, 128);">0</span><span>);&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">end</span><span>;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;reg.CloseKey;&nbsp;&nbsp;
+&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">finally</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">FreeAndNil</span><span>(reg);&nbsp;&nbsp;
+&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">end</span><span>;&nbsp;&nbsp;
+</span><span style="color: rgb(0, 0, 255);">end</span><span>;&nbsp;&nbsp;
+</span><span style="color: rgb(0, 128, 0);">{</span><span style="color: rgb(0, 128, 0);">--</span><span style="color: rgb(0, 128, 0);">}</span><span>&nbsp;&nbsp;
+</span><span style="color: rgb(0, 0, 255);">procedure</span><span>&nbsp;TregedtIE.WebBrowser1DocumentComplete(ASender:&nbsp;TObject;&nbsp;&nbsp;
+&nbsp;&nbsp;</span><span style="color: rgb(0, 0, 255);">const</span>&nbsp;pDisp:&nbsp;IDispatch;&nbsp;<span style="color: rgb(0, 0, 255);">var</span><span>&nbsp;URL:&nbsp;OleVariant);&nbsp;&nbsp;
+</span><span style="color: rgb(0, 0, 255);">begin</span><span>&nbsp;&nbsp;
+&nbsp;&nbsp;WebBrowser1.OleObject.Document.Body.Scroll&nbsp;:</span>=&nbsp;<span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">no</span><span style="color: rgb(128, 0, 0);">'</span><span>;&nbsp;&nbsp;
+&nbsp;&nbsp;WebBrowser1.OleObject.Document.Body.style.border&nbsp;:</span>=&nbsp;<span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">none</span><span style="color: rgb(128, 0, 0);">'</span><span>;&nbsp;&nbsp;
+&nbsp;&nbsp;webbrowser1.OleObject.Document.Body.Style.margin&nbsp;:</span>=&nbsp;<span style="color: rgb(128, 0, 0);">'</span><span style="color: rgb(128, 0, 0);">0px</span><span style="color: rgb(128, 0, 0);">'</span><span>;&nbsp;&nbsp;
+</span><span style="color: rgb(0, 0, 255);">end</span>;&nbsp;&nbsp;</pre><pre style="line-height: 22px; font-size: 14px;"></pre></div></div></div><p></p><p><br></p><p></p>                                    </div>
+                                                <div class="more-toolbox">
+                <div class="left-toolbox">
+                    <ul class="toolbox-list">
+                        
+                        <li class="tool-item tool-active is-like "><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#csdnc-thumbsup" />
+                        </svg><span class="name">点赞</span>
+                        <span class="count"></span>
+                        </a></li>
+                        <li class="tool-item tool-active is-collection "><a href="javascript:;" data-report-click='{"mod":"popu_824"}'><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-Collection-G" />
+                        </svg><span class="name">收藏</span></a></li>
+                        <li class="tool-item tool-active is-share"><a href="javascript:;" data-report-click='{"mod":"1582594662_002"}'><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-fenxiang" />
+                        </svg>分享</a></li>
+                        <!--打赏开始-->
+                                                <!--打赏结束-->
+                                                <li class="tool-item tool-more">
+                            <a>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024" width="200" height="200" version="1.1" p-id="5717" t="1575545411852"><defs><style type="text/css" /></defs><path d="M 179.176 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5718" /><path d="M 509.684 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5719" /><path d="M 846.175 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5720" /></svg>
+                            </a>
+                            <ul class="more-box">
+                                <li class="item"><a class="article-report">文章举报</a></li>
+                            </ul>
+                        </li>
+                                            </ul>
+                </div>
+                            </div>
+            <div class="person-messagebox">
+                <div class="left-message"><a href="https://blog.csdn.net/lanyus">
+                    <img class="avatar_pic" src="images/delphi04401.jpg" username="lanyus">
+                                            <img class="user-years" src="images/delphi04402.png">
+                                    </a></div>
+                <div class="middle-message">
+                                        <div class="title"><span class="tit"><a href="https://blog.csdn.net/lanyus" target="_blank" data-report-click='{"mod":"popu_379"}'>lanyus</a></span>
+                                            </div>
+                    <div class="text"><span>发布了128 篇原创文章</span> · <span>获赞 2</span> · <span>访问量 30万+</span></div>
+                </div>
+                                <div class="right-message">
+                                            <a class="btn btn-sm btn-red-hollow bt-button personal-letter" href="https://im.csdn.net/im/main.html?userName=lanyus" target="_blank">私信
+                        </a>
+                                                            <a class="btn btn-sm  bt-button personal-watch" data-report-click='{"mod":"popu_379"}'>关注</a>
+                                    </div>
+                            </div>
+                    </div>
+
+</div>
+
+
+</body></html>

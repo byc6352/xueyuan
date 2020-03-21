@@ -1,0 +1,239 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android开发：EditText组件的基本使用_移动开发_iOS软贱攻城狮-CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            <p>&nbsp; &nbsp; &nbsp; 在Android开发过程中，EditText组件是一个常用控件，也是一个比较重要的组件，它的基本属性需要熟练使用才行，接下来就来讲一下在Android开发中EditText组件的基本使用。</p>
+
+<p>一、EditText简介<br>
+&nbsp; &nbsp; &nbsp; &nbsp;ED（EditText的简称）在开发中也是经常使用到而且比较重要的一个控件，它是用户跟应用进行数据传输的窗口，比如实现一个登陆界面， 需要用户输入账号和密码，然后我们开发者获取到用户输入的内容，提交给后台服务器进行判断再做相应的处理。</p>
+
+<p>二、EditText支持的XML属性以及基础的用法&nbsp;&nbsp; &nbsp;</p>
+
+<p>setText(CharSequence text) 设置文本内容</p>
+
+<p>setTextColor(int color) 设置字体颜色值</p>
+
+<p>setHint(int resid) 内容为空时候显示的文本</p>
+
+<p>void setHintTextColor(int color) 内容为空时候显示的文本颜色值</p>
+
+<p>setInputType(int type) &nbsp; &nbsp; &nbsp;限制输入类型</p>
+
+<p>number:整数类型</p>
+
+<p>numberDecimal:小数点类型</p>
+
+<p>date:日期类型</p>
+
+<p>text:文本类型(默认值)</p>
+
+<p>phone:拨号键盘</p>
+
+<p>textPassword:密码</p>
+
+<p>textVisiblePassword:可见密码</p>
+
+<p>textUri:网址</p>
+
+<p>setMaxLines(int maxlines) 设置文本的最小行数</p>
+
+<p>setGravity(int gravity) 设置文本位置，如设置成“center”，文本将居中显示。</p>
+
+<p>setLines(int lines) 设置文本的行数，设置两行就显示两行，即使第二行没有数据。</p>
+
+<p>setSingleLine() &nbsp; &nbsp; true:单行显示 false:可以多行</p>
+
+<p>&nbsp; &nbsp; &nbsp; &nbsp; EditText示例：开发中常用的登录界面<br>
+&nbsp; &nbsp; &nbsp; &nbsp; 首先我们来看布局文件:activity_login.xml</p>
+
+<p>&lt;?xml version="1.0" encoding="utf-8"?&gt;<br>
+&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"<br>
+&nbsp; &nbsp; xmlns:app="http://schemas.android.com/apk/res-auto"<br>
+&nbsp; &nbsp; xmlns:tools="http://schemas.android.com/tools"<br>
+&nbsp; &nbsp; android:layout_width="match_parent"<br>
+&nbsp; &nbsp; android:layout_height="match_parent"<br>
+&nbsp; &nbsp; android:orientation="vertical"<br>
+&nbsp; &nbsp; android:background="@drawable/main_background"<br>
+&nbsp; &nbsp; tools:context="com.teamosa.Teamosa.mvvm.activity.LoginActivity"&gt;</p>
+
+<p>&nbsp; &nbsp; &lt;EditText<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:id="@+id/login_accout"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_width="match_parent"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_height="40dp"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_marginTop="100dp"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_marginLeft="20dp"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_marginRight="20dp"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:drawablePadding="8dp"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:drawableLeft="@mipmap/user_account"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:hint="请输入手机号码/邮箱地址"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:background="@drawable/btn_shape" /&gt;</p>
+
+<p>&nbsp; &nbsp; &lt;EditText<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:id="@+id/login_password"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_width="match_parent"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_height="40dp"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_marginTop="20dp"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_marginLeft="20dp"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_marginRight="20dp"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:drawablePadding="8dp"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:drawableLeft="@mipmap/user_password"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:hint="请输入密码"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:background="@drawable/btn_shape" /&gt;</p>
+
+<p>&nbsp; &nbsp; &lt;Button<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:id="@+id/login_login"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_width="match_parent"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_height="40dp"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_marginTop="70dp"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_marginLeft="@dimen/dp20"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_marginRight="@dimen/dp20"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:text=“登录”<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:textColor="@color/white"<br>
+&nbsp; &nbsp; &nbsp; &nbsp; android:background="@drawable/btn_shape"/&gt;<br>
+&lt;/LinearLayout&gt;</p>
+
+<p style="text-align: center;"><img class="has" alt="" src="images/android06801.jpg"></p>
+
+<p style="text-align: center;"><img class="has" alt="" src="images/android06802.jpg"></p>
+
+<p style="text-align: center;"><img class="has" alt="" src="images/android06803.jpg"></p>
+
+<p>&nbsp; &nbsp; &nbsp; &nbsp;以上这两个输入框的使用了EditText的常用属性，值得借鉴的是EditText组件drawableLeft属性设置的图片和hint设置的文字之间的距离。有的时候，需要在文本框里放置icon图片，并且设置默认提示文字的时候，需要设置两者之间的间距，就是之前的手机icon和”请输入手机号“之间的距离。下面再说一下上面没有用到的属性：<br>
+&nbsp; &nbsp; &nbsp; &nbsp; 1、android:background=”@null” &nbsp; &nbsp; 输入框无背景&nbsp;<br>
+&nbsp; &nbsp; &nbsp; &nbsp;2、android:drawableBottom=”@drawable/shape_bottom_line” &nbsp; 底部引入一个shape布局文件，该布局文件就是输入框的下划线。shape_bottom_line.xml内容如下:<br>
+&lt;shape xmlns:android="http://schemas.android.com/apk/res/android"<br>
+&nbsp; &nbsp; android:shape="rectangle" &gt;<br>
+&nbsp; &nbsp; &lt;solid android:color="#1E7EE3" /&gt;<br>
+&nbsp; &nbsp; &lt;size android:height="1dp" android:width="500dp"/&gt;<br>
+&lt;/shape&gt;</p>
+
+<p>&nbsp;&nbsp; &nbsp;三、EditText的其他功能<br>
+&nbsp; &nbsp; &nbsp; &nbsp;1、监听用户输入的内容.&nbsp;<br>
+&nbsp; &nbsp; &nbsp; &nbsp;例如，一个搜索框，只要用户输入了内容就去请求服务器，于是就要在Activity里面监听EditeText文本改变事件，具体实现如下所示：<br>
+EditText etOne= (EditText) findViewById(R.id.phone);<br>
+etOne.addTextChangedListener(new TextWatcher() {<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; @Override<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; public void beforeTextChanged(CharSequence s, int start, int count, int after) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Log.i("And","内容改变之前调用:"+s);<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }</p>
+
+<p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; @Override<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; public void onTextChanged(CharSequence s, int start, int before, int count) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Log.i("And","内容改变，可以去告诉服务器:"+s);<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }</p>
+
+<p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; @Override<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; public void afterTextChanged(Editable s) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Log.i("And”,”内容改变之后调用:"+s);<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }</p>
+
+<p><br>
+&nbsp;&nbsp; &nbsp;2、EditText 在左边加入图片，代码如下：&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;Bitmap bitmap = mWebView.getFavicon();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;Drawable drawable = new BitmapDrawable(bitmap);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;drawable = this.getResources().getDrawable(R.drawable.history);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;edit.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;edit.setText(cur_url);<br>
+&nbsp;<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; setCompoundDrawablesWithIntrinsicBounds与setCompoundDrawables的区别:<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; setCompoundDrawables画的drawable的宽高是按drawable.setBound()设置的宽高，所以才有The Drawables must already have had setBounds(Rect) called.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;而setCompoundDrawablesWithIntrinsicBounds画的drawable的宽高是按drawable固定的宽高，即通过getIntrinsicWidth()与getIntrinsicHeight()获得，所以才有The Drawables' bounds will be set to their intrinsic bounds.<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 查看下面的方法：<br>
+public void setCompoundDrawablesWithIntrinsicBounds(Drawable left, Drawable top,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Drawable right, Drawable bottom) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (left != null) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;left.setBounds(0, 0, left.getIntrinsicWidth(), left.getIntrinsicHeight());<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (right != null) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;right.setBounds(0, 0, right.getIntrinsicWidth(), right.getIntrinsicHeight());<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (top != null) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;top.setBounds(0, 0, top.getIntrinsicWidth(), top.getIntrinsicHeight());<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (bottom != null) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bottom.setBounds(0, 0, bottom.getIntrinsicWidth(), bottom.getIntrinsicHeight());<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;setCompoundDrawables(left, top, right, bottom);</p>
+
+<p><br>
+&nbsp;&nbsp; &nbsp;3、获取、设置EditText的文本<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;在开发过程中，使用EditText的时候，需要获取到EditText的文本值，其实获得EditText控件的值方法也就是调用EditText的方法，获取文本值，具体步骤如下所示：<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;首先，在xml中定义EditText控件editText1；<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;然后在activity里面，声明生成一个EditText对象，然后获取文本值即可：<br>
+&nbsp;&nbsp; &nbsp;String str = ""; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;EditText&nbsp;editText1&nbsp;=(EditText)findViewById(R.id.editText1);&nbsp;&nbsp;<br>
+&nbsp;&nbsp; &nbsp;str = editText.getText().toString(); &nbsp; //str即为获取的String类型的文本值<br>
+&nbsp;&nbsp; &nbsp;或者用方法 &nbsp;Integer.parseInt(editText.getText().toString());</p>
+
+<p><br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; //将文本框1的文本赋给文本框2 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</p>
+
+<p>&nbsp; &nbsp; &nbsp;EditText editText2 =(EditText)findViewById(R.id.editText2); &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</p>
+
+<p>&nbsp; &nbsp; &nbsp;editText2.setText(str.toCharArray(), 0, str.length());&nbsp;</p>
+
+<p><br>
+&nbsp; &nbsp; &nbsp; &nbsp; 以上就是本节全部内容， 欢迎关注三掌柜的微信公众号，欢迎关注！</p>
+
+<p style="text-align: center;"><img class="has" alt="" src="images/android06804.jpg"></p>
+
+<p>&nbsp;</p>                                    </div>
+                                                <div class="more-toolbox">
+                <div class="left-toolbox">
+                    <ul class="toolbox-list">
+                        
+                        <li class="tool-item tool-active is-like "><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#csdnc-thumbsup" />
+                        </svg><span class="name">点赞</span>
+                        <span class="count">1</span>
+                        </a></li>
+                        <li class="tool-item tool-active is-collection "><a href="javascript:;" data-report-click='{"mod":"popu_824"}'><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-Collection-G" />
+                        </svg><span class="name">收藏</span></a></li>
+                        <li class="tool-item tool-active is-share"><a href="javascript:;" data-report-click='{"mod":"1582594662_002"}'><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-fenxiang" />
+                        </svg>分享</a></li>
+                        <!--打赏开始-->
+                                                <!--打赏结束-->
+                                                <li class="tool-item tool-more">
+                            <a>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024" width="200" height="200" version="1.1" p-id="5717" t="1575545411852"><defs><style type="text/css" /></defs><path d="M 179.176 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5718" /><path d="M 509.684 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5719" /><path d="M 846.175 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5720" /></svg>
+                            </a>
+                            <ul class="more-box">
+                                <li class="item"><a class="article-report">文章举报</a></li>
+                            </ul>
+                        </li>
+                                            </ul>
+                </div>
+                            </div>
+            <div class="person-messagebox">
+                <div class="left-message"><a href="https://blog.csdn.net/CC1991_">
+                    <img class="avatar_pic" src="images/android06805.jpg" username="CC1991_">
+                                            <img class="user-years" src="images/android06806.png">
+                                    </a></div>
+                <div class="middle-message">
+                                        <div class="title"><span class="tit"><a href="https://blog.csdn.net/CC1991_" target="_blank" data-report-click='{"mod":"popu_379"}'>三掌柜666</a></span>
+                                            </div>
+                    <div class="text"><span>发布了226 篇原创文章</span> · <span>获赞 345</span> · <span>访问量 122万+</span></div>
+                </div>
+                                <div class="right-message">
+                                            <a class="btn btn-sm btn-red-hollow bt-button personal-messageboard" href="https://bbs.csdn.net/topics/395532685" target="_blank">他的留言板
+                        </a>
+                                                            <a class="btn btn-sm  bt-button personal-watch" data-report-click='{"mod":"popu_379"}'>关注</a>
+                                    </div>
+                            </div>
+                    </div>
+
+</div>
+
+
+</body></html>
