@@ -1,0 +1,373 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APK反编译之一：基础知识_Java_mustime-CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            
+<h1 style='color: rgb(68, 68, 68); font-family: "Trebuchet MS", Verdana, sans-serif; font-size: 20px; border-bottom-color: rgb(187, 187, 187); border-bottom-width: 1px; border-bottom-style: solid;'><a name="t0"></a><a name="t0"></a>
+<span style="font-family: verdana, geneva, sans-serif;">APK反编译之一：基础知识</span></h1>
+<p style="text-align: center; font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;"><strong><span style="color: rgb(255, 255, 255);">本人接触不久，有错误望请各位神牛不吝赐教，仅仅希望把自己这段时间研究的东西分享一下，如果可以帮助到有需要的童鞋万感荣幸。欢迎评论转载，但请加上转载来源谢谢！请尊重开发者劳动成果！请勿用于非法用途！</span></strong></span></span></p>
+<p style="text-align: center; font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;"><strong><span style="color: rgb(255, 255, 255);"><span>作者：lpohvbe |&nbsp;</span></span><a href="http://blog.csdn.net/lpohvbe/article/details/7981386"><span style="color: rgb(255, 255, 255);">http://blog.csdn.net/lpohvbe/article/details/7981386</span></a></strong></span></span></p>
+<p style="text-align: center; color: rgb(72, 72, 72); font-family: Verdana, sans-serif;">
+<span style="font-family: verdana, geneva, sans-serif;"><span style="color: rgb(255, 255, 255);"><span style="font-size: 14px;"><strong><span><br></span></strong></span></span></span></p>
+<p style="text-align: left; font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;"><strong><span style="text-align: left; font-family: verdana, geneva, sans-serif; font-size: 14px;"><strong>&nbsp;
+ &nbsp; &nbsp;这部分涉及的内容比较多，我会尽量从最基础开始说起，但需要读者一定的android开发基础。但注意可能讲解详细得令人作呕，请根据个人理解程度斟酌。</strong></span><br></strong></span></span></p>
+<a name="APK、Dalvik字节码和smali文件" style="color: rgb(42, 86, 133); font-family: Verdana, sans-serif;"></a><span style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></span>
+<h2 style='color: rgb(68, 68, 68); font-family: "Trebuchet MS", Verdana, sans-serif; font-size: 16px; border-bottom-color: rgb(187, 187, 187); border-bottom-width: 1px; border-bottom-style: solid;'><a name="t1"></a><a name="t1"></a>
+<span style="font-family: verdana, geneva, sans-serif;">APK、Dalvik字节码和smali文件</span></h2>
+<a name="APK文件" style="color: rgb(42, 86, 133); font-family: Verdana, sans-serif;"></a><span style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></span>
+<h3 style='color: rgb(68, 68, 68); font-family: "Trebuchet MS", Verdana, sans-serif; font-size: 13px; border-bottom-color: rgb(187, 187, 187); border-bottom-width: 1px; border-bottom-style: dotted;'><a name="t2"></a><a name="t2"></a>
+<span style="font-family: verdana, geneva, sans-serif;">APK文件</span></h3>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;"><span style="color: rgb(68, 68, 68); line-height: 18px;">&nbsp; &nbsp; 大家都应该知道APK文件其实就是一个MIME为ZIP的压缩包，我们修改ZIP后缀名方式可以看到内部的文件结构，例如修改后缀后用RAR打开鳄鱼小顽皮APK能看到的是（Google
+ Play下载的完整版版本）：</span></span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp;Where's My Water.zip\</span></span></p>
+<ul style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><li><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">asset\ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&lt;资源目录1：asset和res都是资源目录但有所区别，见下面说明&gt;</span></span></li><li><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">lib\ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;so库存放位置，一般由NDK编译得到，常见于使用游戏引擎或JNI native调用的工程中&gt;</span></span></li><li><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">|---armeabi\ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|---&lt;so库文件分为不同的CPU架构&gt;</span></span></li><li><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">|---armeabi-v7a\</span></span></li><li><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">META-INF\ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&lt;存放工程一些属性文件，例如Manifest.MF&gt;</span></span></li><li><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">res\ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;资源目录2：asset和res都是资源目录但有所区别，见下面说明&gt;&nbsp;</span></span></li><li><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">|---drawable\ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |---&lt;图片和对应的xml资源&gt;</span></span></li><li><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">|---layout\ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |---&lt;定义布局的xml资源&gt;</span></span></li><li><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">|---...&nbsp;</span></span></li><li><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">AndroidManifest.xml &nbsp; &nbsp; &lt;Android工程的基础配置属性文件&gt;</span></span></li><li><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">classes.dex &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;Java代码编译得到的Dalvik VM能直接执行的文件，下面有介绍&gt;</span></span></li><li><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">resources.arsc &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;对res目录下的资源的一个索引文件，保存了原工程中strings.xml等文件内容&gt;</span></span></li></ul><p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp;&nbsp;<strong><span style="color: rgb(255, 0, 0);">&nbsp;无关紧要地注</span></strong>：asset和res资源目录的不同在于：</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp;1. res目录下的资源文件在编译时会自动生成索引文件（R.java），在Java代码中用R.xxx.yyy来引用；而asset目录下的资源文件不需要生成索引，在Java代码中需要用AssetManager来访问；</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp;2. 一般来说，除了音频和视频资源（需要放在raw或asset下），使用Java开发的Android工程使用到的资源文件都会放在res下；使用C++游戏引擎（或使用Lua binding等）的资源文件均需要放在asset下。</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp;因为Where's My Water是使用迪斯尼公司自家的DMO游戏引擎开发，所以游戏中用到的所有资源文件都存放在asset下，除了应用图标这些资源仍需要放在res下。</span></span></p>
+<a name="Dalvik字节码" style="color: rgb(42, 86, 133); font-family: Verdana, sans-serif;"></a><span style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></span>
+<h3 style='color: rgb(68, 68, 68); font-family: "Trebuchet MS", Verdana, sans-serif; font-size: 13px; border-bottom-color: rgb(187, 187, 187); border-bottom-width: 1px; border-bottom-style: dotted;'><a name="t3"></a><a name="t3"></a>
+<span style="font-family: verdana, geneva, sans-serif;">Dalvik字节码</span></h3>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; Dalvik是google专门为Android操作系统设计的一个虚拟机，经过深度的优化。虽然Android上的程序是使用java来开发的，但是Dalvik和标准的java虚拟机JVM还是两回事。Dalvik VM是基于寄存器的，而JVM是基于栈的；Dalvik有专属的文件执行格式dex（dalvik
+ executable），而JVM则执行的是java字节码。Dalvik VM比JVM速度更快，占用空间更少。</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 通过Dalvik的字节码我们不能直接看到原来的逻辑代码，这时需要借助如Apktool或dex2jar+jd-gui工具来帮助查看。但是，注意的是最终我们修改APK需要操作的文件是.smali文件，而不是导出来的Java文件重新编译（况且这基本上不可能）。</span></span></p>
+<a name="smali文件" style="color: rgb(42, 86, 133); font-family: Verdana, sans-serif;"></a><span style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></span>
+<h3 style='color: rgb(68, 68, 68); font-family: "Trebuchet MS", Verdana, sans-serif; font-size: 13px; border-bottom-color: rgb(187, 187, 187); border-bottom-width: 1px; border-bottom-style: dotted;'><a name="t4"></a><a name="t4"></a>
+<span style="font-family: verdana, geneva, sans-serif;">smali文件</span></h3>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 好了，对Dalvik有一定认识后，下面介绍重点：smali，及其语法。</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 简单的说，smali就是Dalvik VM内部执行的核心代码。它有自己的一套语法，下面即将介绍，如果有JNI开发经验的童鞋则能够很快明白。</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><strong><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 一、smali的数据类型</span></strong></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 在smali中，数据类型和Android中的一样，只是对应的符号有变化：</span></span></p>
+<ul style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><li><span style="font-family: verdana, geneva, sans-serif;"><strong><span style="font-size: 14px;">B---byte</span></strong></span></li><li><span style="font-family: verdana, geneva, sans-serif;"><strong><span style="font-size: 14px;">C---char</span></strong></span></li><li><span style="font-family: verdana, geneva, sans-serif;"><strong><span style="font-size: 14px;">D---double</span></strong></span></li><li><span style="font-family: verdana, geneva, sans-serif;"><strong><span style="font-size: 14px;">F---float</span></strong></span></li><li><span style="font-family: verdana, geneva, sans-serif;"><strong><span style="font-size: 14px;">I---int</span></strong></span></li><li><span style="font-family: verdana, geneva, sans-serif;"><strong><span style="font-size: 14px;">J---long</span></strong></span></li><li><span style="font-family: verdana, geneva, sans-serif;"><strong><span style="font-size: 14px;">S---short</span></strong></span></li><li><span style="font-family: verdana, geneva, sans-serif;"><strong><span style="font-size: 14px;">V---void</span></strong></span></li><li><span style="font-family: verdana, geneva, sans-serif;"><strong><span style="font-size: 14px;">Z---boolean</span></strong></span></li><li><span style="font-family: verdana, geneva, sans-serif;"><strong><span style="font-size: 14px;">[XXX---array</span></strong></span></li><li><span style="font-family: verdana, geneva, sans-serif;"><strong><span style="font-size: 14px;">Lxxx/yyy---object</span></strong></span></li></ul><p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp;这里解析下最后两项，数组的表示方式是：在基本类型前加上前中括号“[”，例如int数组和float数组分别表示为：[I、[F；对象的表示则以L作为开头，格式是LpackageName/objectName;（<strong>注意必须有个分号跟在最后</strong>），例如String对象在smali中为：Ljava/lang/String;，其中java/lang对应java.lang包，String就是定义在该包中的一个对象。</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;">&nbsp; &nbsp; &nbsp;&nbsp;<span style="font-size: 14px;">或许有人问，既然类是用</span><span style="font-size: 14px;">LpackageName/objectName;来表示，那类里面的内部类又如何在smali中引用呢？答案是：</span><span style="font-size: 14px;">LpackageName/objectName$subObjectName;。也就是在内部类前加“$”符号，关于“$”符号更多的规则将在后面谈到。</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><strong><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp;二、函数的定义</span></strong></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp;函数的定义一般为：</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp;<strong>Func-Name (Para-Type1Para-Type2Para-Type3...)Return-Type</strong></span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp;注意参数与参数之间没有任何分隔符，同样举几个例子就容易明白了：</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;"><strong>&nbsp; &nbsp; &nbsp;</strong>1. foo ()V</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;没错，这就是void foo()。</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp;2. foo (III)Z</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;这个则是boolean foo(int, int, int)。</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp;3.&nbsp;<span class="kwd" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">foo</span><span class="pln" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">&nbsp;</span><span class="pun" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">(</span><span class="pln" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">Z</span><span class="pun" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">[</span><span class="pln" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">I</span><span class="pun" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">[</span><span class="typ" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">ILjava</span><span class="pun" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">/</span><span class="pln" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">lang</span><span class="pun" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">/</span><span class="typ" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">String</span><span class="pun" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">;</span><span class="pln" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">J</span><span class="pun" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">)</span><span class="typ" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">Ljava</span><span class="pun" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">/</span><span class="pln" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">lang</span><span class="pun" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">/</span><span class="typ" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">String</span><span class="pun" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">;</span></span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;看出来这是<span class="typ" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">String</span><span class="pln" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">&nbsp;</span><span class="kwd" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">foo</span><span class="pln" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">&nbsp;</span><span class="pun" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">(</span><span class="kwd" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">boolean</span><span class="pun" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">,</span><span class="pln" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">&nbsp;</span><span class="kwd" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">int</span><span class="pun" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">[],</span><span class="pln" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">&nbsp;</span><span class="kwd" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">int</span><span class="pun" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">[],</span><span class="pln" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">&nbsp;</span><span class="typ" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">String</span><span class="pun" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">,</span><span class="pln" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">&nbsp;</span><span class="kwd" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">long</span><span class="pun" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">)&nbsp;</span><span class="pun" style="border-width: 0px; text-align: justify; line-height: 16px; vertical-align: baseline;">了吗？</span></span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp;</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;"><strong>&nbsp; &nbsp; &nbsp; 三、smali文件内容具体介绍</strong></span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 下面开始进一步分析smali中的具体例子，取鳄鱼小顽皮中的WMWActivity.smali来分析（怎么获得请参考下一节的<strong>APK反编译之二：工具介绍</strong>，暂时先介绍smali语法），它的内容大概是这样子的：</span></span></p>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><pre><code class="language-cs">.class <span class="hljs-keyword">public</span> Lcom/disney/WMW/WMWActivity; 
+.super Lcom/disney/common/BaseActivity;
+.source <span class="hljs-string">"WMWActivity.java"</span>
+ 
+<span class="hljs-meta"># interfaces</span>
+.implements Lcom/burstly/lib/ui/IBurstlyAdListener;
+ 
+<span class="hljs-meta"># annotations</span>
+.annotation system Ldalvik/annotation/MemberClasses;
+    <span class="hljs-keyword">value</span> = {
+        Lcom/disney/WMW/WMWActivity$MessageHandler;,
+        Lcom/disney/WMW/WMWActivity$FinishActivityArgs;
+    }
+.end annotation
+ 
+ 
+<span class="hljs-meta"># static fields</span>
+.field <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> final PREFS_INSTALLATION_ID:Ljava/lang/String; = <span class="hljs-string">"installationId"</span>
+<span class="hljs-comment">//...</span>
+ 
+ 
+<span class="hljs-meta"># instance fields</span>
+.field <span class="hljs-keyword">private</span> _activityPackageName:Ljava/lang/String;
+<span class="hljs-comment">//...</span>
+ 
+ 
+<span class="hljs-meta"># direct methods</span>
+.method <span class="hljs-keyword">static</span> constructor &lt;clinit&gt;()V
+    .locals <span class="hljs-number">3</span>
+ 
+    .prologue
+    <span class="hljs-comment">//...</span>
+ 
+    <span class="hljs-keyword">return</span>-<span class="hljs-keyword">void</span>
+.end method
+ 
+.method <span class="hljs-keyword">public</span> constructor &lt;init&gt;()V
+    .locals <span class="hljs-number">3</span>
+ 
+    .prologue
+    <span class="hljs-comment">//...</span>
+ 
+    <span class="hljs-keyword">return</span>-<span class="hljs-keyword">void</span>
+.end method
+ 
+.method <span class="hljs-keyword">static</span> synthetic access$<span class="hljs-number">100</span>(Lcom/disney/WMW/WMWActivity;)V
+    .locals <span class="hljs-number">0</span>
+    .parameter <span class="hljs-string">"x0"</span>
+ 
+    .prologue
+    .line <span class="hljs-number">37</span>
+    invoke-direct {p0}, Lcom/disney/WMW/WMWActivity;-&gt;initIap()V
+ 
+    <span class="hljs-keyword">return</span>-<span class="hljs-keyword">void</span>
+.end method
+ 
+.method <span class="hljs-keyword">static</span> synthetic access$<span class="hljs-number">200</span>(Lcom/disney/WMW/WMWActivity;)Lcom/disney/common/WMWView;
+    .locals <span class="hljs-number">1</span>
+    .parameter <span class="hljs-string">"x0"</span>
+ 
+    .prologue
+    .line <span class="hljs-number">37</span>
+    iget-<span class="hljs-keyword">object</span> v0, p0, Lcom/disney/WMW/WMWActivity;-&gt;_view:Lcom/disney/common/WMWView;
+ 
+    <span class="hljs-keyword">return</span>-<span class="hljs-keyword">object</span> v0
+.end method
+ 
+<span class="hljs-comment">//...</span>
+ 
+<span class="hljs-meta">#virtual methods</span>
+.<span class="hljs-function">method <span class="hljs-keyword">public</span> <span class="hljs-title">captureScreen</span>(<span class="hljs-params"></span>)V
+    .locals 4
+ 
+    .prologue
+    <span class="hljs-comment">//...</span>
+ 
+    <span class="hljs-keyword">goto</span> :goto_0
+.end method
+ 
+.method <span class="hljs-keyword">public</span> <span class="hljs-title">didScreenCaptured</span>(<span class="hljs-params"></span>)V
+    .locals 6
+ 
+    .prologue
+    <span class="hljs-comment">//...</span>
+ 
+    <span class="hljs-keyword">goto</span> :goto_0
+.end method</span></code></pre><br><br></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;">
+<div>
+<div>
+<div>&nbsp;</div>
+<div><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp;&nbsp;</span><span style="font-size: 14px;">看得一头雾水的话那是正常的。现在我将逐一解析，</span><span style="font-size: 14px;"><strong>理解这些符号的含义令你在后面注入代码的时候事半功倍</strong></span><span style="font-size: 14px;">。</span></span></div>
+<a name="nbsp-nbsp-nbsp-nbsp1、smali中的继承、接口、包信息" style="color: rgb(42, 86, 133);"></a>
+<h4 style='color: rgb(68, 68, 68); font-family: "Trebuchet MS", Verdana, sans-serif; font-size: 13px; border-bottom-color: rgb(187, 187, 187); border-bottom-width: 1px; border-bottom-style: dotted;'>
+&nbsp; &nbsp; &nbsp; &nbsp;1、smali中的继承、接口、包信息</h4>
+</div>
+</div>
+<div><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 首先看看开头的几行：</span></span></div>
+<div>
+<div><span style="font-family: verdana, geneva, sans-serif;">&nbsp; 1] .class public Lcom/disney/WMW/WMWActivity;&nbsp;</span></div>
+<div><span style="font-family: verdana, geneva, sans-serif;">&nbsp; 2] .super Lcom/disney/common/BaseActivity;</span></div>
+<div><span style="font-family: verdana, geneva, sans-serif;">&nbsp; 3] .source "WMWActivity.java"</span></div>
+<div><span style="font-family: verdana, geneva, sans-serif;">&nbsp; 4]</span></div>
+<div>
+<div><span style="font-family: verdana, geneva, sans-serif;">&nbsp; 5] # interfaces</span></div>
+<div><span style="font-family: verdana, geneva, sans-serif;">&nbsp; 6] .implements Lcom/burstly/lib/ui/IBurstlyAdListener;</span></div>
+</div>
+<div><span style="font-family: verdana, geneva, sans-serif;">&nbsp; 7]</span></div>
+<div><span style="font-family: verdana, geneva, sans-serif;">&nbsp; 8] # annotations</span></div>
+<div><span style="font-family: verdana, geneva, sans-serif;">&nbsp; 9] .annotation system Ldalvik/annotation/MemberClasses;</span></div>
+<div><span style="font-family: verdana, geneva, sans-serif;">10] &nbsp; &nbsp; value = {</span></div>
+<div><span style="font-family: verdana, geneva, sans-serif;">11] &nbsp; &nbsp; &nbsp; &nbsp;Lcom/disney/WMW/WMWActivity$MessageHandler;,</span></div>
+<div><span style="font-family: verdana, geneva, sans-serif;">12] &nbsp; &nbsp; &nbsp; &nbsp;Lcom/disney/WMW/WMWActivity$FinishActivityArgs;</span></div>
+<div><span style="font-family: verdana, geneva, sans-serif;">13] &nbsp; &nbsp;}</span></div>
+<div><span style="font-family: verdana, geneva, sans-serif;">14] .end annotation</span></div>
+<div>&nbsp;</div>
+<div><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp;&nbsp;<strong>1-3行</strong>定义的是<strong>基本信息</strong>：这是一个由WMWActivity.java编译得到的smali文件（第3行），它是com.disney.WMW这个package下的一个类（第1行），继承自com.disney.common.BaseActivity（第2行）。</span></span></div>
+<div><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp;&nbsp;<strong>5-6行</strong>定义的是<strong>接口信息</strong>：这个WMWActivity实现了一个com.burstly.lib.ui这个package下（一个广告SDK）的IBurstyAdListener接口。</span></span></div>
+<div><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp;&nbsp;<strong>8-14行</strong>定义的则是<strong>内部类</strong>：它有两个成员内部类——MessageHandler和FinishActivityArgs，内部类将在后面小节中会有提及。</span></span></div>
+<div>&nbsp;</div>
+<div><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 分析完smali文件开头的这些信息，我们已经能在大脑中构造出一个大概这样的Java文件：</span></span></div>
+<div>&nbsp;</div>
+<div><span style="font-family: verdana, geneva, sans-serif;"></span><pre><code class="language-java hljs"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">WMWActivity</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">BaseActivity</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">IBurstlyAdListener</span></span>{</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    <span class="hljs-comment">//...</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MessageHandler</span> </span>{</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        <span class="hljs-comment">//...</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    }</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FinishActivityArgs</span></span>{</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">        <span class="hljs-comment">//...</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    }</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">}</div></div></li></ol></code></pre></div>
+<div>&nbsp;</div>
+</div>
+</div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 没错，这就是本来WMWActivity.java的大概框架了，成员变量和函数信息？别急，下面正要分析。</span></span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;">&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;</span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;"><span style="font-family: verdana, geneva, sans-serif;">&nbsp; &nbsp; &nbsp; 在继续分析之前，有些东西需要先说明一下。前面说过，Dalvik VM与JVM的最大的区别之一就是Dalvik VM是基于寄存器的。基于寄存器是什么意思呢？也就是说，</span></span><span style="font-family: verdana, geneva, sans-serif; font-size: 14px;">在smali里的</span><span style="font-family: verdana, geneva, sans-serif; font-size: 14px;">所有操作都必须经过寄存器来进行：本地寄存器用v开头数字结尾的符号来表示，如v0、v1、v2、...参数寄存器则使用p开头数字结尾的符号来表示，如p0、p1、p2、...特别注意的是，p0<strong>不一定是</strong>函数中的第一个参数，在<strong>非static函数中，p0</strong></span><span style="font-family: verdana, geneva, sans-serif; font-size: 14px;"><strong>代指“this”</strong>，p1表示函数的第一个参数，p2代表函数中的第二个参数…而<strong>在static函数中p0才对应第一个参数（因为Java的static方法中没有this方法）</strong>。本地寄存器没有限制，理论上是可以任意使用的，下面是例子：</span><span style="font-size: 14px;">&nbsp;
+ &nbsp; &nbsp;&nbsp;</span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;"></span><pre><code class="language-java"><span class="hljs-keyword">const</span>/<span class="hljs-number">4</span> v0, <span class="hljs-number">0x0</span>
+iput-<span class="hljs-keyword">boolean</span> v0, p0, Lcom/disney/WMW/WMWActivity;-&gt;isRunning:Z</code></pre><br></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 在上面的两句中，使用了v0本地寄存器，并把值0x0存到v0中，然后第二句用iput-boolean这个指令把v0中的值存放到com.disney.WMW.WMWActivity.isRunning这个成员变量中。即相当于：this.isRunning = false;（上面说过，在非static函数中p0代表的是“this”，在这里就是com.disney.WMW.WMWActivity实例）。关于这两句话的具体指令和含义暂可不用理会，先把Dalvik
+ VM的机制弄明白就可以了，其实语法上和汇编语言非常相似，具体的指令会在后面逐一介绍。</span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;">&nbsp;</div>
+<a name="nbsp-nbsp-nbsp-nbsp-2、smali中的成员变量" style="color: rgb(42, 86, 133); font-family: Verdana, sans-serif;"></a>
+<h4 style='color: rgb(68, 68, 68); font-family: "Trebuchet MS", Verdana, sans-serif; font-size: 13px; border-bottom-color: rgb(187, 187, 187); border-bottom-width: 1px; border-bottom-style: dotted;'>
+&nbsp; &nbsp; &nbsp; &nbsp; 2、smali中的成员变量</h4>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 下面继续介绍有关成员变量的内容：</span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;">&nbsp;</div>
+<div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;">1 ] # static fields</span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;">2 ] .field private static final PREFS_INSTALLATION_ID:Ljava/lang/String; = "installationId"</span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;">3 ] //...</span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;">4 ]&nbsp;</div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;">5 ]</div>
+<div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;">6 ] # instance fields</span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;">7 ] .field private _activityPackageName:Ljava/lang/String;</span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-family: verdana, geneva, sans-serif;">8 ] //...</span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;">&nbsp;</div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 上面定义的static fields和instance fields均为成员变量，格式是：.field public/private [static] [final] varName:&lt;类型&gt;。然而static fields和instance fields还是有区别的，当然区别很明显，那就是static fields是static的，而instance则不是。根据这个区别来获取这些不同的成员变量时也有不同的指令。一般来说，获取的指令有：iget、sget、iget-boolean、sget-boolean、iget-object、sget-object等，操作的指令有：iput、sput、iput-boolean、sput-boolean、iput-object、sput-object等。没有“-object”后缀的表示操作的成员变量对象是基本数据类型，带“-object”表示操作的成员变量是对象类型，特别地，boolean类型则使用带“-boolean”的指令操作。</span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;">&nbsp;</div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; （1）、获取static fields的指令类似是：</span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;"></span><pre><code class="language-delphi">     sget-<span class="hljs-keyword">object</span> v0, Lcom/disney/WMW/WMWActivity;-&gt;PREFS_INSTALLATION_ID:Ljava/lang/<span class="hljs-keyword">String</span>;</code></pre></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;"><span style="font-family: verdana, geneva, sans-serif;">&nbsp; &nbsp; &nbsp; sget-object就是用来获取变量值并保存到紧接着的参数的寄存器中，在这里，把上面出现的</span><span style="font-family: verdana, geneva, sans-serif;">PREFS_INSTALLATION_ID这个String成员变量获取并放到v0这个寄存器中，<strong>注意：前面需要该变量所属的类的类型，后面需要加一个冒号和该成员变量的类型</strong>，中间是“-&gt;”表示所属关系<strong>。</strong></span></span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;">&nbsp;</div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; （2）、获取instance fields的指令与static fields的基本一样，只是由于不是static变量，<strong>不能仅仅指出该变量所在类的类型，还需要该变量所在类的实例</strong>。看例子：</span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><pre><code class="language-delphi">      iget-<span class="hljs-keyword">object</span> v0, p0, Lcom/disney/WMW/WMWActivity;-&gt;_view:Lcom/disney/common/WMWView;</code></pre></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 可以看到iget-object指令比sget-object多了一个参数，就是该变量所在类的实例，在这里就是p0即“this”。</span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;">&nbsp;</div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; （3）、获取array的还有aget和aget-object，指令使用和上述类似，不细述。</span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;">&nbsp;</div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; （4）、put指令的使用和get指令是统一的，直接看例子不解释：</span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><pre><code class="language-delphi">      <span class="hljs-keyword">const</span>/<span class="hljs-number">4</span> v3, <span class="hljs-number">0</span>x0
+      sput-<span class="hljs-keyword">object</span> v3, Lcom/disney/WMW/WMWActivity;-&gt;globalIapHandler:Lcom/disney/config/GlobalPurchaseHandler;</code></pre></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><strong><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 相当于：this.globalIapHandler = null;（null = 0x0）</span></strong></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;">&nbsp;</div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><pre><code class="language-delphi">      .<span class="hljs-keyword">local</span> v0, wait:Landroid/os/<span class="hljs-keyword">Message</span>;
+      <span class="hljs-keyword">const</span>/<span class="hljs-number">4</span> v1, <span class="hljs-number">0</span>x2
+      iput v1, v0, Landroid/os/<span class="hljs-keyword">Message</span>;-&gt;what:I</code></pre></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><strong><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp;&nbsp;</span></strong><span style="font-size: 14px;"><strong>相当于：wait.what = 0x2;（wait是Message的实例）</strong></span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;"><strong><br></strong></span></div>
+<a name="nbsp-nbsp-nbsp-nbsp3、smali中的函数调用" style="color: rgb(42, 86, 133); font-family: Verdana, sans-serif;"></a>
+<h4 style='color: rgb(68, 68, 68); font-family: "Trebuchet MS", Verdana, sans-serif; font-size: 13px; border-bottom-color: rgb(187, 187, 187); border-bottom-width: 1px; border-bottom-style: dotted;'>
+<strong>&nbsp; &nbsp; &nbsp; &nbsp; 3、smali中的函数调用</strong></h4>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; smali中的函数和成员变量一样也分为两种类型，但是不同成员变量中的static和instance之分，而是direct和virtual之分。那么direct method和virtual method有什么区别呢？直白地讲，direct method就是private函数，其余的public和protected函数都属于virtual
+ method。所以在调用函数时，有invoke-direct，invoke-virtual，另外还有</span><span style="font-size: 14px;">invoke-static、</span><span style="font-size: 14px;">invoke-super以及invoke-interface等几种</span><span style="font-size: 14px;">不同的指令。当然其实还有invoke-XXX/range 指令的，这是参数多于4个的时候调用的指令，比较少见，了解下即可。</span></p>
+<span style="font-weight: normal;"><span style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif; font-size: 14px;"></span></span>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; （1）、invoke-static：顾名思义就是调用static函数的，因为是static函数，所以比起其他调用少一个参数，例如：</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></p>
+<pre><code class="language-php">      invoke-<span class="hljs-keyword">static</span> {}, Lcom/disney/WMW/UnlockHelper;-&gt;unlockCrankypack()Z</code></pre>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 这里注意到invoke-static后面有一对大括号“{}”，其实是<strong>调用该方法的实例+参数列表</strong>，由于这个方法既不需参数也是static的，所以{}内为空，再看一个例子：</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></p>
+<pre><code class="language-javascript">      <span class="hljs-keyword">const</span>-string v0, <span class="hljs-string">"fmodex"</span>
+      invoke-<span class="hljs-keyword">static</span> {v0}, Ljava/lang/System;-&gt;loadLibrary(Ljava/lang/<span class="hljs-built_in">String</span>;)V&lt;span style=<span class="hljs-string">"font-family: Verdana, sans-serif;"</span>&gt;&nbsp;<span class="xml"><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></span></code></pre>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></p>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 这个是调用static void System.loadLibrary(String)来加载NDK编译的so库用的方法，同样也是这里v0就是参数"fmodex"了。</span></div>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; （2）、invoke-super：调用父类方法用的指令，在onCreate、onDestroy等方法都能看到，略。</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; （3）、invoke-direct：调用private函数的，例如：</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></p>
+<pre><code class="language-php">      invoke-direct {p0}, Lcom/disney/WMW/WMWActivity;-&gt;getGlobalIapHandler()Lcom/disney/config/GlobalPurchaseHandler;</code></pre>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 这里GlobalPurchaseHandler getGlobalIapHandler()就是定义在WMWActivity中的一个private函数，如果修改smali时错用invoke-virtual或invoke-static将在回编译后程序运行时引发一个常见的VerifyError（更多错误汇总可参照<strong>APK反编译之番外三：常见错误汇总</strong>）。</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; （4）、invoke-virtual：用于调用protected或public函数，同样注意修改smali时不要错用invoke-direct或invoke-static，例子：</span></p>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><pre><code class="language-delphi">      sget-<span class="hljs-keyword">object</span> v0, Lcom/disney/WMW/WMWActivity;-&gt;shareHandler:Landroid/os/Handler;
+      invoke-<span class="hljs-keyword">virtual</span> <span class="hljs-comment">{v0, v3}</span>, Landroid/os/Handler;-&gt;removeCallbacksAndMessages(Ljava/lang/<span class="hljs-keyword">Object</span>;)V</code></pre></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 这里相信大家都已经明白了，主要搞清楚v0是shareHandler:Landroid/os/Handler，v3是传递给removeCallbackAndMessage方法的Ljava/lang/Object参数就可以了。</span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;">&nbsp;</div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; （5）、invoke-xxxxx/range：当方法的参数多于5个时（含5个），不能直接使用以上的指令，而是在后面加上“/range”，使用方法也有所不同：</span>&nbsp;</div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><pre><code class="language-javascript">      invoke-<span class="hljs-keyword">static</span>/range {v0 .. v5}, Lcn/game189/sms/SMS;-&gt;checkFee(Ljava/lang/<span class="hljs-built_in">String</span>;Landroid/app/Activity;Lcn/game189/sms/SMSListener;Ljava/lang/<span class="hljs-built_in">String</span>;Ljava/lang/<span class="hljs-built_in">String</span>;Ljava/lang/<span class="hljs-built_in">String</span>;)Z
+</code></pre></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 这个是电信SDK中的付费接口，需要传递6个参数，这时候大括号内的参数需要用省略形式，且需要连续（未求证是否需要从v0开始）。</span></div>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;">&nbsp; &nbsp; &nbsp;&nbsp;</p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 有人也许注意到，刚才看到的例子都是“调用函数”这个操作而已，貌似没有取函数返回的结果的操作？</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 在Java代码中调用函数和返回函数结果是一条语句完成的，而在smali里则需要分开来完成，在使用上述指令后，如果调用的函数返回非void，那么还需要用到move-result（返回基本数据类型）和move-result-object（返回对象）指令：</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></p>
+<pre><code class="language-delphi">      <span class="hljs-keyword">const</span>/<span class="hljs-number">4</span> v2, <span class="hljs-number">0</span>x0
+      invoke-<span class="hljs-keyword">virtual</span> <span class="hljs-comment">{p0, v2}</span>, Lcom/disney/WMW/WMWActivity;-&gt;getPreferences(I)Landroid/content/SharedPreferences;
+      move-result-<span class="hljs-keyword">object</span> v1</code></pre>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></p>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; v1保存的就是调用getPreferences(int)方法返回的SharedPreferences实例。</span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;"><br></span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><pre><code class="language-delphi">      invoke-<span class="hljs-keyword">virtual</span> <span class="hljs-comment">{v2}</span>, Ljava/lang/<span class="hljs-keyword">String</span>;-&gt;length()I
+      move-result v2</code></pre></div>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; v2保存的则是调用String.length()返回的整型。</span></p>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></div>
+<a name="nbsp-nbsp-nbsp-nbsp4、smali中函数实体分析" style="color: rgb(42, 86, 133); font-family: Verdana, sans-serif;"></a><span style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></span>
+<h4 style='color: rgb(68, 68, 68); font-family: "Trebuchet MS", Verdana, sans-serif; font-size: 13px; border-bottom-color: rgb(187, 187, 187); border-bottom-width: 1px; border-bottom-style: dotted;'>
+&nbsp; &nbsp; &nbsp; &nbsp;4、smali中函数实体分析</h4>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 下面开始介绍函数实体，其实没有什么特别的地方，只是在植入代码时有一点需要特别注意，举例说明：</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></p>
+<pre><code class="language-java">.<span class="hljs-function">method <span class="hljs-keyword">protected</span> <span class="hljs-title">onDestroy</span><span class="hljs-params">()</span>V
+    .locals 0
+ 
+    .prologue
+    .line 277
+    invoke-<span class="hljs-keyword">super</span> </span>{p0}, Lcom/disney/common/BaseActivity;-&gt;onDestroy()V
+ 
+    .line <span class="hljs-number">279</span>
+    <span class="hljs-keyword">return</span>-<span class="hljs-keyword">void</span>
+.end method</code></pre>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></p>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 这是onDestroy()函数，它的作用大家都知道。首先看到函数内第一句：.local 0，这句话很重要，标明了你<strong>在这个函数中最少要用到的本地寄存器的个数</strong>。在这里，由于只需要调用一个父类的onDestroy()处理，所以只需要用到p0，所以使用到的本地寄存器数为0。如果不清楚这个规则，很容易在植入代码后忘记修改.local
+ 的值，那么回编译后运行时将会得到一个VerifyError错误，而且极难发现问题所在。我正是被这个问题困扰了很多次，最后研究发现.local的值有这个规律，于是在文档查证了一下果然是这个问题。例如我往onDestroy()增加一句：this.existed = true;那么应该改为（注意修改.local的值为1——使用到了v0这一个本地寄存器）：</span></div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><pre><code class="language-java">.<span class="hljs-function">method <span class="hljs-keyword">protected</span> <span class="hljs-title">onDestroy</span><span class="hljs-params">()</span>V
+    .locals 1
+ 
+    .prologue
+    .line 277
+    <span class="hljs-keyword">const</span>/4 v0, 0x1
+ 
+    iput-<span class="hljs-keyword">boolean</span> v0, p0, Lcom/disney/WMW/WMWActivity</span>;-&gt;exited:Z
+ 
+    invoke-<span class="hljs-keyword">super</span> {p0}, Lcom/disney/common/BaseActivity;-&gt;onDestroy()V
+ 
+    .line <span class="hljs-number">279</span>
+    <span class="hljs-keyword">return</span>-<span class="hljs-keyword">void</span>
+.end method</code></pre><br>
+&nbsp;</div>
+<div style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;">
+<div><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 另外注意到.line这个标识，它是标注了该代码在原Java文件中的行数，它也很有用，想想使用eclipse开发时，遇到错误崩溃时，在catLog不是有提示哪个文件哪一行崩溃的么？Dalvik VM运行到.line XX时就将这个值存起来，如果在这一行运行时出错了，就往catLog输出这个值，这样我们就能看到具体是哪一行的问题了。jd-gui这个工具也是通过分析这些信息将smali代码还原成我们喜闻乐见的Java代码的。当然，它不是必须的，去掉也没有关系，只不过为了方便调试还是保留一下吧。</span></div>
+<div><span style="font-size: 14px;"><br></span></div>
+<div><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 以上一些smali语法规则可以<a href="http://code.google.com/p/smali/wiki/TypesMethodsAndFields" rel="nofollow">参详这里</a>。</span></div>
+</div>
+</div>
+</div>
+                                    </div>
+                                                <div class="more-toolbox">
+                <div class="left-toolbox">
+                    <ul class="toolbox-list">
+                        
+                        <li class="tool-item tool-active is-like "><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#csdnc-thumbsup" />
+                        </svg><span class="name">点赞</span>
+                        <span class="count">26</span>
+                        </a></li>
+                        <li class="tool-item tool-active is-collection "><a href="javascript:;" data-report-click='{"mod":"popu_824"}'><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-Collection-G" />
+                        </svg><span class="name">收藏</span></a></li>
+                        <li class="tool-item tool-active is-share"><a href="javascript:;" data-report-click='{"mod":"1582594662_002"}'><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-fenxiang" />
+                        </svg>分享</a></li>
+                        <!--打赏开始-->
+                                                <!--打赏结束-->
+                                                <li class="tool-item tool-more">
+                            <a>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024" width="200" height="200" version="1.1" p-id="5717" t="1575545411852"><defs><style type="text/css" /></defs><path d="M 179.176 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5718" /><path d="M 509.684 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5719" /><path d="M 846.175 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5720" /></svg>
+                            </a>
+                            <ul class="more-box">
+                                <li class="item"><a class="article-report">文章举报</a></li>
+                            </ul>
+                        </li>
+                                            </ul>
+                </div>
+                            </div>
+            <div class="person-messagebox">
+                <div class="left-message"><a href="https://blog.csdn.net/lpohvbe">
+                    <img class="avatar_pic" src="images/android07101.jpg" username="lpohvbe">
+                                            <img class="user-years" src="images/android07102.png">
+                                    </a></div>
+                <div class="middle-message">
+                                        <div class="title"><span class="tit"><a href="https://blog.csdn.net/lpohvbe" target="_blank" data-report-click='{"mod":"popu_379"}'>lpohvbe</a></span>
+                                            </div>
+                    <div class="text"><span>发布了2 篇原创文章</span> · <span>获赞 17</span> · <span>访问量 4万+</span></div>
+                </div>
+                                <div class="right-message">
+                                            <a class="btn btn-sm btn-red-hollow bt-button personal-letter" href="https://im.csdn.net/im/main.html?userName=lpohvbe" target="_blank">私信
+                        </a>
+                                                            <a class="btn btn-sm  bt-button personal-watch" data-report-click='{"mod":"popu_379"}'>关注</a>
+                                    </div>
+                            </div>
+                    </div>
+
+</div>
+
+
+</body></html>

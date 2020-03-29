@@ -1,0 +1,164 @@
+﻿<html><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APK反编译之二：工具介绍_Java_mustime-CSDN博客</title>
+  <link href="images/style.css" rel="stylesheet">
+</head>
+
+<body class="stackedit"><div class="stackedit__html">
+
+<div class="article_content clearfix" id="article_content" style="overflow: hidden;">
+            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                            <link href="https://csdnimg.cn/release/phoenix/template/css/ck_htmledit_views-833878f763.css" rel="stylesheet">
+                <div class="htmledit_views" id="content_views">
+                                            
+<h1 style='color: rgb(68, 68, 68); font-family: "Trebuchet MS", Verdana, sans-serif; font-size: 20px; border-bottom-color: rgb(187, 187, 187); border-bottom-width: 1px; border-bottom-style: solid;'><a name="t0"></a><a name="t0"></a>
+APK反编译之二：工具介绍</h1>
+<div>
+<p style="text-align: center; color: rgb(51, 51, 51); line-height: 26px; font-family: Verdana, sans-serif; font-size: 14px;">
+<span style="font-family: verdana, geneva, sans-serif;"><strong><span style="color: rgb(255, 255, 255);">本人接触不久，有错误望请各位神牛不吝赐教，仅仅希望把自己这段时间研究的东西分享一下，如果可以帮助到有需要的童鞋万感荣幸。欢迎评论转载，但请加上转载来源谢谢！请尊重开发者劳动成果！请勿用于非法用途！</span></strong></span></p>
+<p style="text-align: center; line-height: 26px; font-family: Verdana, sans-serif; font-size: 14px;">
+<span style="font-family: verdana, geneva, sans-serif;"><strong><span><span style="color: rgb(255, 255, 255);">作者：lpohvbe |&nbsp;</span><a href="http://blog.csdn.net/lpohvbe/article/details/7983907"><span style="color: rgb(255, 255, 255);">http://blog.csdn.net/lpohvbe/article/details/7983907</span></a></span></strong></span></p>
+<br></div>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 前面一节我们说过，修改APK最终是通过修改smali来实现的，所以我们接下来介绍的工具就是如何把APK中的smali文件获取出来，当然同时也需要得到AndroidManifest.xml等文件。直接修改APK后缀为ZIP得到的xml文件是不能直接打开的，需要转换一下格式才能查看和修改。横观所有的工具中，最最最强大的当然还是ApkTool，所以下面后重点介绍！OK，开始正题。</span></p>
+<a name="一、查看xml文件" style="color: rgb(42, 86, 133); font-family: Verdana, sans-serif;"></a><span style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></span>
+<h2 style='color: rgb(68, 68, 68); font-family: "Trebuchet MS", Verdana, sans-serif; font-size: 16px; border-bottom-color: rgb(187, 187, 187); border-bottom-width: 1px; border-bottom-style: solid;'><a name="t1"></a><a name="t1"></a>
+一、查看xml文件</h2>
+<p style="text-align: left; font-family: Verdana, sans-serif;"><span style="font-size: 14px;"><span style="color: rgb(72, 72, 72);">&nbsp; &nbsp; &nbsp; 如果只是简单的需要查看xml中的内容（例如只是想看看AndroidManifest.xml中的配置信息、主启动Activity、permission权限或布局文件等等），那么可以使用</span><strong><a href="http://code.google.com/p/android4me/downloads/list" rel="nofollow">AXMLPrinter2.jar</a></strong><span style="color: rgb(72, 72, 72);">这个工具。使用方法很简单，例如想查看AndroidManifest.xml文件内容，为了方便，把AndroidManifest.xml和AXMLPrinter2.jar放到同一个目录下，在cmd中定向到该目录并输入：</span></span></p>
+<pre><code class="language-css"><span class="hljs-selector-tag">java</span> <span class="hljs-selector-tag">-jar</span> <span class="hljs-selector-tag">AXMLPrinter2</span><span class="hljs-selector-class">.jar</span> <span class="hljs-selector-tag">AndroidManifest</span><span class="hljs-selector-class">.xml</span> &gt; <span class="hljs-selector-tag">tmp</span><span class="hljs-selector-class">.txt</span></code></pre>
+<p></p>
+<p style="text-align: left; color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 则会在该目录下创建一个tmp.txt文档，内容就是解码后的AndroidManifest.xml的内容。</span></p>
+<p style="text-align: left; color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 这个方法有个缺点就是只能查看，不能修改后再转换回原格式的xml文件，需要修改xml文件内容的，下面会有介绍。</span></p>
+<a name="二、查看java源代码" style="color: rgb(42, 86, 133); font-family: Verdana, sans-serif;"></a><span style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></span>
+<h2 style='text-align: left; color: rgb(68, 68, 68); font-family: "Trebuchet MS", Verdana, sans-serif; font-size: 16px; border-bottom-color: rgb(187, 187, 187); border-bottom-width: 1px; border-bottom-style: solid;'><a name="t2"></a><a name="t2"></a>
+二、查看java源代码</h2>
+<p style="font-family: Verdana, sans-serif;"><span style="font-size: 14px;"><span style="color: rgb(72, 72, 72);">&nbsp; &nbsp; &nbsp; 直接解压apk只得到Dalvik VM执行的classes.dex文件，要通过这个dex文件查看java源代码的话，需要使用</span><strong><a href="http://code.google.com/p/dex2jar/downloads/list" rel="nofollow">dex2jar</a></strong><span style="color: rgb(72, 72, 72);">和</span><strong><a href="http://www.softpedia.com/progDownload/JD-GUI-Download-92540.html" rel="nofollow">jd-gui</a></strong><span style="color: rgb(72, 72, 72);">这两个工具。</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 我下载的是官方版本的dex2jar-0.0.9.9，解压后可以看到一大堆的bat和shell脚本。不过我们只需要用到其中的d2j-dex2jar或dex2jar.bat（Windows下）。具体操作步骤是：</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 1、把需要反编译的apk文件后缀改为zip，解压后取出其中的classes.dex文件，为了方便还是放到dex2jar-0.0.9.9目录下（和dex2jar.bat同一目录）；</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 2、打开cmd，定位到该目录后输入：</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></p>
+<pre><code class="language-css"><span class="hljs-selector-tag">d2j-dex2jar</span><span class="hljs-selector-class">.bat</span>  <span class="hljs-selector-tag">classes</span><span class="hljs-selector-class">.dex</span></code></pre>
+<p></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 几秒后程序就会在该目录下生成了一个classes-dex2jar.jar文件，这个jar文件就是原java代码编译后产生的文件；</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 3、打开jd-gui软件，点击左上角的“Open a file”按钮并找到2步骤生成的classes-dex2jar.jar文件，找到你想查看的java文件，还原度还是挺高的。如果有需要把java代码保存下来，点击File-Save Sources或者Save All Sources把当前java文件或全部java文件保存起来。</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 注意的是，<strong>这些java代码（基本上）不能直接重新编译</strong>，因为可能存在代码混淆，而且复杂一点的逻辑有时候还原不回来，显示出很奇怪的代码，所以这个软件还不是很完善，但是用来参考原java代码逻辑够用了。</span></p>
+<a name="三、获取和修改smali文件" style="color: rgb(42, 86, 133); font-family: Verdana, sans-serif;"></a><span style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></span>
+<h2 style='color: rgb(68, 68, 68); font-family: "Trebuchet MS", Verdana, sans-serif; font-size: 16px; border-bottom-color: rgb(187, 187, 187); border-bottom-width: 1px; border-bottom-style: solid;'><a name="t3"></a><a name="t3"></a>
+三、获取和修改smali文件</h2>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 获取smali文件是反编译的第一步，获取的方法有两种：</span></p>
+<a name="nbsp-nbsp-nbsp-1、baksmalijar和smalijar" style="color: rgb(42, 86, 133); font-family: Verdana, sans-serif;"></a><span style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></span>
+<h3 style='color: rgb(68, 68, 68); font-family: "Trebuchet MS", Verdana, sans-serif; font-size: 13px; border-bottom-color: rgb(187, 187, 187); border-bottom-width: 1px; border-bottom-style: dotted;'><a name="t4"></a><a name="t4"></a>
+&nbsp; &nbsp; &nbsp; 1、baksmali.jar和smali.jar</h3>
+<p style="font-family: Verdana, sans-serif;"><span style="font-size: 14px;"><span style="color: rgb(72, 72, 72);">&nbsp; &nbsp; &nbsp;&nbsp;</span><strong><a href="http://code.google.com/p/smali/downloads/list" rel="nofollow">baksmali.jar</a></strong><span style="color: rgb(72, 72, 72);">用来把dex或odex文件解析为一个一个的smali文件，使用命令：</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></p>
+<pre><code class="language-css"><span class="hljs-selector-tag">java</span> <span class="hljs-selector-tag">-jar</span> <span class="hljs-selector-tag">baksmali</span><span class="hljs-selector-class">.jar</span> <span class="hljs-selector-tag">-x</span> <span class="hljs-selector-tag">classes</span><span class="hljs-selector-class">.dex</span></code></pre>
+<p></p>
+<p style="font-family: Verdana, sans-serif;"><span style="font-size: 14px;"><span style="color: rgb(72, 72, 72);">&nbsp; &nbsp; &nbsp; 它会在目录下生成一个文件夹（默认是out），里面保存的就是这个dex中的smali文件，我们可以打开查看和修改，修改完毕后，使用</span><strong><a href="http://code.google.com/p/smali/downloads/list" rel="nofollow">smali.jar</a></strong><span style="color: rgb(72, 72, 72);">打包回dex文件：</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></p>
+<pre><code class="language-css"><span class="hljs-selector-tag">java</span> <span class="hljs-selector-tag">-jar</span> <span class="hljs-selector-tag">smali</span><span class="hljs-selector-class">.jar</span> <span class="hljs-selector-tag">out</span> <span class="hljs-selector-tag">-o</span> <span class="hljs-selector-tag">classes</span><span class="hljs-selector-class">.dex</span></code></pre>
+<p></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 其中out就是刚才使用baksmali.jar创建的文件夹名字。</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 这样修改后，直接放回zip中然后把后缀改为apk是不能直接安装到机子上测试的，因为你修改了里面的文件，还需要使用签名工具进行重新签名（稍后介绍）。</span></p>
+<a name="nbsp-nbsp-nbsp-2、ApkToolmdashmdash目前最强大的反编译工具" style="color: rgb(42, 86, 133); font-family: Verdana, sans-serif;"></a><span style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></span>
+<h3 style='color: rgb(68, 68, 68); font-family: "Trebuchet MS", Verdana, sans-serif; font-size: 13px; border-bottom-color: rgb(187, 187, 187); border-bottom-width: 1px; border-bottom-style: dotted;'><a name="t5"></a><a name="t5"></a>
+&nbsp; &nbsp; &nbsp; 2、ApkTool——目前最强大的反编译工具</h3>
+<p style="font-family: Verdana, sans-serif;"><span style="font-size: 14px;"><span style="color: rgb(72, 72, 72);">&nbsp; &nbsp; &nbsp; 以上所有工作，除了查看java源代码，其实有一个工具可以帮你轻松做到，那就是由一个外国开发者制作的</span><strong><a href="http://code.google.com/p/android-apktool/downloads/list" rel="nofollow">ApkTool.jar</a></strong><span style="color: rgb(72, 72, 72);">工具。它可以反编译apk中的资源文件、解码xml文件、生成smali文件，还能把修改后的工程逆向生成apk文件。换言之，有了它可以抛弃AXMLPrinter2.jar、smali.jar和baksmali.jar了，使用也相当的方便。</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; （1）、反编译apk得到smali和资源文件</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 例如要反编译的apk为zheshiyige.apk，那么把该apk与ApkTool放到同一目录，cmd执行：</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></p>
+<pre><code class="language-css"><span class="hljs-selector-tag">java</span> <span class="hljs-selector-tag">-jar</span> <span class="hljs-selector-tag">apktool</span><span class="hljs-selector-class">.jar</span> <span class="hljs-selector-tag">d</span> <span class="hljs-selector-tag">zheshiyige</span><span class="hljs-selector-class">.apk</span> <span class="hljs-selector-tag">APKFiles</span></code></pre>
+<p></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 等待一段时间后（视乎apk文件大小），可以看到该目录下生成了一个APKFiles文件夹，里面就是我们需要的解码后的资源文件、xml文件和smali文件等。xml文件不需要再使用AXMLPrinter2.jar来解码即可直接查看。</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; （2）、回编译成apk文件</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 对反编译得到的文件进行修改后把它回编译也是很简单的：</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></p>
+<pre><code class="language-css"><span class="hljs-selector-tag">java</span> <span class="hljs-selector-tag">-jar</span> <span class="hljs-selector-tag">apktool</span><span class="hljs-selector-class">.jar</span> <span class="hljs-selector-tag">b</span> <span class="hljs-selector-tag">APKFiles</span></code></pre>
+<p></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 同样等待一段时间后，如果修改正确没有错误的话，回编译产生的apk将会在APKFiles下的dist文件夹中，当然它也是没有重新签名的，不能直接安装使用。</span></p>
+<a name="四、对Apk进行签名" style="color: rgb(42, 86, 133); font-family: Verdana, sans-serif;"></a><span style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></span>
+<h2 style='color: rgb(68, 68, 68); font-family: "Trebuchet MS", Verdana, sans-serif; font-size: 16px; border-bottom-color: rgb(187, 187, 187); border-bottom-width: 1px; border-bottom-style: solid;'><a name="t6"></a><a name="t6"></a>
+四、对Apk进行签名</h2>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 关于签名，可以有些童鞋会感到疑惑，下面先简要提一提：</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 1、为什么需要签名？</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; &nbsp; （1）<span style="color: rgb(51, 51, 51); line-height: 25px; font-family: verdana, Arial, Helvetica, sans-serif;">发送者的身份认证，由于开发商可能通过使用相同的PackageName来混淆替换已经安装的程序，以此保证签名不同的包不被替换；</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; &nbsp; （2）<span style="color: rgb(51, 51, 51); line-height: 25px; font-family: verdana, Arial, Helvetica, sans-serif;">保证信息传输的完整性，签名对于包中的每个文件进行处理，以此确保包中内容不被替换，防止交易中的抵赖发生，Market对软件的要求。</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 2、签名的一些说明</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; &nbsp; （1）<span style="color: rgb(51, 51, 51); line-height: 25px; font-family: verdana, Arial, Helvetica, sans-serif;">所有的应用程序都必须有数字证书，Android系统不会安装一个没有数字证书的应用程序；</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; &nbsp; （2）<span style="color: rgb(51, 51, 51); line-height: 25px; font-family: verdana, Arial, Helvetica, sans-serif;">Android程序包使用的数字证书可以是自签名的，不需要一个权威的数字证书机构签名认证；</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; &nbsp; （3）<span style="color: rgb(51, 51, 51); line-height: 25px; font-family: verdana, Arial, Helvetica, sans-serif;">如果要正式发布一个Android应用，必须使用一个合适的私钥生成的数字证书来给程序签名，而不能使用adt插件或者ant工具生成的调试证书来发布；</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; &nbsp; （4）<span style="color: rgb(51, 51, 51); line-height: 25px; font-family: verdana, Arial, Helvetica, sans-serif;">数字证书都是有有效期的，Android只是在应用程序安装的时候才会检查证书的有效期。如果程序已经安装在系统中，即使证书过期也不会影响程序的正常功能；</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; &nbsp; （5）<span style="color: rgb(51, 51, 51); line-height: 25px; font-family: verdana, Arial, Helvetica, sans-serif;">Android将数字证书用来标识应用程序的作者和在应用程序之间建立信任关系，而不是用来决定最终用户可以安装哪些应用程序；</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; &nbsp; （6）<span style="color: rgb(51, 51, 51); line-height: 25px; font-family: verdana, Arial, Helvetica, sans-serif;">签名后需使用zipalign优化程序。</span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 3、如何签名</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 签名工具有不少，这里仅提及其中的一个：signapk.jar。signapk.jar本来就是包含在android源码包中的一个工具，用它可以把上面经过反编译-回编译后得到的apk进行签名，由于直接使用signapk.jar进行签名很麻烦，而且最终使用的是下面最后谈及的综合工具，所以这里仅提及签名流程：</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; （1）、使用OpenSSL生成公钥/私钥对；</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; （2）、使用signapk.jar和（1）的公私玥对对apk进行签名。</span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 这样经过签名后的apk才能安装到设备上进行测试。</span></p>
+<a name="五、推荐一个网友制作的综合工具：ApkTool-SignApk" style="color: rgb(42, 86, 133); font-family: Verdana, sans-serif;"></a><span style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"></span>
+<h2 style='color: rgb(68, 68, 68); font-family: "Trebuchet MS", Verdana, sans-serif; font-size: 16px; border-bottom-color: rgb(187, 187, 187); border-bottom-width: 1px; border-bottom-style: solid;'><a name="t7"></a><a name="t7"></a>
+五、推荐一个网友制作的综合工具：ApkTool + SignApk</h2>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 程序员是最怕麻烦的，所以早就有网友用脚本把所有操作都帮我们整理好了，它其实就是帮我们做好了自动反编译、自动回编译和签名的工作，不用再每一次都输入大串的命令。需要下载的请点击下面的链接，使用方式直接打开就知道，说明中已经说得很明白了。</span></p>
+<p style="text-align: center; color: rgb(72, 72, 72); font-family: Verdana, sans-serif;">
+<span style="font-size: 14px;"><img alt="" src="images/android07201.jpg"><br></span></p>
+<p style="text-align: center; font-family: Verdana, sans-serif;"><span style="font-size: 14px;"><span style="color: rgb(72, 72, 72);">&nbsp; &nbsp; &nbsp;</span><span><a href="http://download.csdn.net/detail/lpohvbe/4573234"><strong><span style="color: rgb(255, 255, 255);">==工具下载链接请戳我==</span></strong></a></span></span></p>
+<p style="text-align: center; font-family: Verdana, sans-serif;"><span style="font-size: 14px;"><span><br></span></span></p>
+<p style="text-align: left; font-family: Verdana, sans-serif;"><span style="font-size: 14px;"><span></span></span></p>
+<h2 style='color: rgb(68, 68, 68); font-family: "Trebuchet MS", Verdana, sans-serif; font-size: 16px; border-bottom-color: rgb(187, 187, 187); border-bottom-width: 1px; border-bottom-style: solid;'><a name="t8"></a><a name="t8"></a>
+六、其他辅助工具</h2>
+<p></p>
+<p style="font-family: Verdana, sans-serif;"><span style="font-size: 14px;"><span style="color: rgb(72, 72, 72);">&nbsp; &nbsp; &nbsp; 1、</span><span style="color: rgb(72, 72, 72);"><strong><a href="http://www.ultrafilesearch.com/download.html" rel="nofollow">UltraFileSearch</a></strong></span><span style="color: rgb(72, 72, 72);">：这是个很！有！用！的软件！UltraFileSearch&nbsp;</span><span style='line-height: 18px; font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;'><span style="color: rgb(72, 72, 72);">允许你指定多个文件掩码和多驱动器和/或文件夹在同一时间，它能够整理出的文件和文件夹根据自己的性质（如更新日期），找到其中包含某特定词或句子的所有文件。</span></span></span></p>
+<p style="color: rgb(72, 72, 72); font-family: Verdana, sans-serif;"><span style="font-size: 14px;">&nbsp; &nbsp; &nbsp; 2、如果使用NotePad++修改smali文件，推荐使用一个语法高亮文件<strong><a href="http://download.csdn.net/detail/lpohvbe/4573240">userDefineLang.xml</a></strong>，使用方法：放置到C:\Users\&lt;用户名&gt;\AppData\Roaming\Notepad++下即可。</span></p>
+<br><p style="text-align: left; font-family: Verdana, sans-serif;"><span style="font-size: 14px;"><span><br></span></span></p>
+<p style="text-align: left; font-family: Verdana, sans-serif;"><span style="font-size: 14px;"><strong>Reference:</strong></span></p>
+<p style="text-align: left; font-family: Verdana, sans-serif;"><span><span style="font-size: 14px;">&nbsp; &nbsp;</span><strong><span style="font-size: 10px;">Android apk 签名:&nbsp;<a href="http://www.cnblogs.com/not-code/archive/2011/05/15/2047057.html" rel="nofollow">http://www.cnblogs.com/not-code/archive/2011/05/15/2047057.html</a></span></strong></span></p>
+                                    </div>
+                                                <div class="more-toolbox">
+                <div class="left-toolbox">
+                    <ul class="toolbox-list">
+                        
+                        <li class="tool-item tool-active is-like "><a href="javascript:;"><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#csdnc-thumbsup" />
+                        </svg><span class="name">点赞</span>
+                        <span class="count">6</span>
+                        </a></li>
+                        <li class="tool-item tool-active is-collection "><a href="javascript:;" data-report-click='{"mod":"popu_824"}'><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-Collection-G" />
+                        </svg><span class="name">收藏</span></a></li>
+                        <li class="tool-item tool-active is-share"><a href="javascript:;" data-report-click='{"mod":"1582594662_002"}'><svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-csdnc-fenxiang" />
+                        </svg>分享</a></li>
+                        <!--打赏开始-->
+                                                <!--打赏结束-->
+                                                <li class="tool-item tool-more">
+                            <a>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024" width="200" height="200" version="1.1" p-id="5717" t="1575545411852"><defs><style type="text/css" /></defs><path d="M 179.176 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5718" /><path d="M 509.684 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5719" /><path d="M 846.175 499.222 m -113.245 0 a 113.245 113.245 0 1 0 226.49 0 a 113.245 113.245 0 1 0 -226.49 0 Z" p-id="5720" /></svg>
+                            </a>
+                            <ul class="more-box">
+                                <li class="item"><a class="article-report">文章举报</a></li>
+                            </ul>
+                        </li>
+                                            </ul>
+                </div>
+                            </div>
+            <div class="person-messagebox">
+                <div class="left-message"><a href="https://blog.csdn.net/lpohvbe">
+                    <img class="avatar_pic" src="images/android07202.jpg" username="lpohvbe">
+                                            <img class="user-years" src="images/android07203.png">
+                                    </a></div>
+                <div class="middle-message">
+                                        <div class="title"><span class="tit"><a href="https://blog.csdn.net/lpohvbe" target="_blank" data-report-click='{"mod":"popu_379"}'>lpohvbe</a></span>
+                                            </div>
+                    <div class="text"><span>发布了2 篇原创文章</span> · <span>获赞 17</span> · <span>访问量 4万+</span></div>
+                </div>
+                                <div class="right-message">
+                                            <a class="btn btn-sm btn-red-hollow bt-button personal-letter" href="https://im.csdn.net/im/main.html?userName=lpohvbe" target="_blank">私信
+                        </a>
+                                                            <a class="btn btn-sm  bt-button personal-watch" data-report-click='{"mod":"popu_379"}'>关注</a>
+                                    </div>
+                            </div>
+                    </div>
+
+</div>
+
+
+</body></html>
